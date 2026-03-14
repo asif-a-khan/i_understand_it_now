@@ -27,23 +27,35 @@ pub fn problems() -> Vec<Box<dyn Problem>> {
 
 /// Helper: generate a random set of intervals.
 fn gen_intervals(rng: &mut impl Rng, count: usize, max_val: i32) -> Vec<(i32, i32)> {
-    (0..count).map(|_| {
-        let a = rng.random_range(0..=max_val);
-        let b = rng.random_range(a..=max_val + 5);
-        (a, b)
-    }).collect()
+    (0..count)
+        .map(|_| {
+            let a = rng.random_range(0..=max_val);
+            let b = rng.random_range(a..=max_val + 5);
+            (a, b)
+        })
+        .collect()
 }
 
 // ── Easy 1: Merge Intervals ─────────────────────────────────────────
 
 struct MergeIntervals;
-struct MergeIntervalsTest { intervals: Vec<(i32, i32)> }
+struct MergeIntervalsTest {
+    intervals: Vec<(i32, i32)>,
+}
 
 impl Problem for MergeIntervals {
-    fn id(&self) -> &str { "intervals_merge" }
-    fn name(&self) -> &str { "Merge Intervals" }
-    fn topic(&self) -> &str { "intervals" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "intervals_merge"
+    }
+    fn name(&self) -> &str {
+        "Merge Intervals"
+    }
+    fn topic(&self) -> &str {
+        "intervals"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given an array of intervals where intervals[i] = (start, end), merge all \
          overlapping intervals and return the non-overlapping intervals that cover \
@@ -55,11 +67,15 @@ impl Problem for MergeIntervals {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=15);
-            let intervals = gen_intervals(&mut rng, n, 30);
-            TestCase { data: Box::new(MergeIntervalsTest { intervals }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=15);
+                let intervals = gen_intervals(&mut rng, n, 30);
+                TestCase {
+                    data: Box::new(MergeIntervalsTest { intervals }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -94,13 +110,23 @@ fn ref_merge_intervals(intervals: &[(i32, i32)]) -> Vec<(i32, i32)> {
 // ── Easy 2: Meeting Rooms ───────────────────────────────────────────
 
 struct MeetingRooms;
-struct MeetingRoomsTest { intervals: Vec<(i32, i32)> }
+struct MeetingRoomsTest {
+    intervals: Vec<(i32, i32)>,
+}
 
 impl Problem for MeetingRooms {
-    fn id(&self) -> &str { "intervals_meeting_rooms" }
-    fn name(&self) -> &str { "Meeting Rooms" }
-    fn topic(&self) -> &str { "intervals" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "intervals_meeting_rooms"
+    }
+    fn name(&self) -> &str {
+        "Meeting Rooms"
+    }
+    fn topic(&self) -> &str {
+        "intervals"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given an array of meeting time intervals (start, end), determine if a person \
          can attend all meetings (no two meetings overlap).\n\n\
@@ -111,11 +137,15 @@ impl Problem for MeetingRooms {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(0..=10);
-            let intervals = gen_intervals(&mut rng, n, 30);
-            TestCase { data: Box::new(MeetingRoomsTest { intervals }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(0..=10);
+                let intervals = gen_intervals(&mut rng, n, 30);
+                TestCase {
+                    data: Box::new(MeetingRoomsTest { intervals }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -145,13 +175,24 @@ fn ref_meeting_rooms(intervals: &[(i32, i32)]) -> bool {
 // ── Easy 3: Insert Interval ─────────────────────────────────────────
 
 struct InsertInterval;
-struct InsertIntervalTest { intervals: Vec<(i32, i32)>, new_interval: (i32, i32) }
+struct InsertIntervalTest {
+    intervals: Vec<(i32, i32)>,
+    new_interval: (i32, i32),
+}
 
 impl Problem for InsertInterval {
-    fn id(&self) -> &str { "intervals_insert" }
-    fn name(&self) -> &str { "Insert Interval" }
-    fn topic(&self) -> &str { "intervals" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "intervals_insert"
+    }
+    fn name(&self) -> &str {
+        "Insert Interval"
+    }
+    fn topic(&self) -> &str {
+        "intervals"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given a list of non-overlapping intervals sorted by start time, insert a new \
          interval into the list. Merge if necessary. Return the resulting list of \
@@ -163,22 +204,29 @@ impl Problem for InsertInterval {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(0..=8);
-            // Build non-overlapping sorted intervals
-            let mut intervals = Vec::new();
-            let mut cur = rng.random_range(0..=5);
-            for _ in 0..n {
-                let start = cur;
-                let end = start + rng.random_range(1..=5);
-                intervals.push((start, end));
-                cur = end + rng.random_range(1..=5);
-            }
-            let ns = rng.random_range(0..=cur + 5);
-            let ne = ns + rng.random_range(1..=8);
-            let new_interval = (ns, ne);
-            TestCase { data: Box::new(InsertIntervalTest { intervals, new_interval }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(0..=8);
+                // Build non-overlapping sorted intervals
+                let mut intervals = Vec::new();
+                let mut cur = rng.random_range(0..=5);
+                for _ in 0..n {
+                    let start = cur;
+                    let end = start + rng.random_range(1..=5);
+                    intervals.push((start, end));
+                    cur = end + rng.random_range(1..=5);
+                }
+                let ns = rng.random_range(0..=cur + 5);
+                let ne = ns + rng.random_range(1..=8);
+                let new_interval = (ns, ne);
+                TestCase {
+                    data: Box::new(InsertIntervalTest {
+                        intervals,
+                        new_interval,
+                    }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -221,13 +269,23 @@ fn ref_insert_interval(intervals: &[(i32, i32)], new: (i32, i32)) -> Vec<(i32, i
 // ── Easy 4: Summary Ranges ──────────────────────────────────────────
 
 struct SummaryRanges;
-struct SummaryRangesTest { nums: Vec<i32> }
+struct SummaryRangesTest {
+    nums: Vec<i32>,
+}
 
 impl Problem for SummaryRanges {
-    fn id(&self) -> &str { "intervals_summary_ranges" }
-    fn name(&self) -> &str { "Summary Ranges" }
-    fn topic(&self) -> &str { "intervals" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "intervals_summary_ranges"
+    }
+    fn name(&self) -> &str {
+        "Summary Ranges"
+    }
+    fn topic(&self) -> &str {
+        "intervals"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given a sorted unique integer array, return the smallest sorted list of ranges \
          that cover all numbers. Format: \"a->b\" if a != b, or \"a\" if a == b.\n\n\
@@ -238,15 +296,19 @@ impl Problem for SummaryRanges {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(0..=15);
-            let mut set = std::collections::BTreeSet::new();
-            while set.len() < n {
-                set.insert(rng.random_range(-20..=20));
-            }
-            let nums: Vec<i32> = set.into_iter().collect();
-            TestCase { data: Box::new(SummaryRangesTest { nums }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(0..=15);
+                let mut set = std::collections::BTreeSet::new();
+                while set.len() < n {
+                    set.insert(rng.random_range(-20..=20));
+                }
+                let nums: Vec<i32> = set.into_iter().collect();
+                TestCase {
+                    data: Box::new(SummaryRangesTest { nums }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -264,7 +326,9 @@ impl Problem for SummaryRanges {
 
 fn ref_summary_ranges(nums: &[i32]) -> Vec<String> {
     let mut result = Vec::new();
-    if nums.is_empty() { return result; }
+    if nums.is_empty() {
+        return result;
+    }
     let mut start = nums[0];
     for i in 1..=nums.len() {
         if i == nums.len() || nums[i] != nums[i - 1] + 1 {
@@ -274,7 +338,9 @@ fn ref_summary_ranges(nums: &[i32]) -> Vec<String> {
             } else {
                 result.push(format!("{start}->{end}"));
             }
-            if i < nums.len() { start = nums[i]; }
+            if i < nums.len() {
+                start = nums[i];
+            }
         }
     }
     result
@@ -283,13 +349,23 @@ fn ref_summary_ranges(nums: &[i32]) -> Vec<String> {
 // ── Easy 5: Covered Length ──────────────────────────────────────────
 
 struct CoveredLength;
-struct CoveredLengthTest { intervals: Vec<(i32, i32)> }
+struct CoveredLengthTest {
+    intervals: Vec<(i32, i32)>,
+}
 
 impl Problem for CoveredLength {
-    fn id(&self) -> &str { "intervals_covered_length" }
-    fn name(&self) -> &str { "Total Covered Length" }
-    fn topic(&self) -> &str { "intervals" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "intervals_covered_length"
+    }
+    fn name(&self) -> &str {
+        "Total Covered Length"
+    }
+    fn topic(&self) -> &str {
+        "intervals"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given a list of intervals, return the total length covered by the union \
          of all intervals. Overlapping regions are counted once.\n\n\
@@ -300,11 +376,15 @@ impl Problem for CoveredLength {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=15);
-            let intervals = gen_intervals(&mut rng, n, 30);
-            TestCase { data: Box::new(CoveredLengthTest { intervals }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=15);
+                let intervals = gen_intervals(&mut rng, n, 30);
+                TestCase {
+                    data: Box::new(CoveredLengthTest { intervals }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -328,13 +408,23 @@ fn ref_covered_length(intervals: &[(i32, i32)]) -> i32 {
 // ── Medium 1: Meeting Rooms II ──────────────────────────────────────
 
 struct MeetingRoomsII;
-struct MeetingRoomsIITest { intervals: Vec<(i32, i32)> }
+struct MeetingRoomsIITest {
+    intervals: Vec<(i32, i32)>,
+}
 
 impl Problem for MeetingRoomsII {
-    fn id(&self) -> &str { "intervals_meeting_rooms_ii" }
-    fn name(&self) -> &str { "Meeting Rooms II" }
-    fn topic(&self) -> &str { "intervals" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "intervals_meeting_rooms_ii"
+    }
+    fn name(&self) -> &str {
+        "Meeting Rooms II"
+    }
+    fn topic(&self) -> &str {
+        "intervals"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given an array of meeting time intervals, find the minimum number of \
          conference rooms required.\n\n\
@@ -345,11 +435,15 @@ impl Problem for MeetingRoomsII {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=15);
-            let intervals = gen_intervals(&mut rng, n, 30);
-            TestCase { data: Box::new(MeetingRoomsIITest { intervals }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=15);
+                let intervals = gen_intervals(&mut rng, n, 30);
+                TestCase {
+                    data: Box::new(MeetingRoomsIITest { intervals }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -384,13 +478,23 @@ fn ref_meeting_rooms_ii(intervals: &[(i32, i32)]) -> i32 {
 // ── Medium 2: Non-Overlapping Intervals ──────────────────────────────
 
 struct NonOverlapping;
-struct NonOverlappingTest { intervals: Vec<(i32, i32)> }
+struct NonOverlappingTest {
+    intervals: Vec<(i32, i32)>,
+}
 
 impl Problem for NonOverlapping {
-    fn id(&self) -> &str { "intervals_non_overlapping" }
-    fn name(&self) -> &str { "Non-Overlapping Intervals" }
-    fn topic(&self) -> &str { "intervals" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "intervals_non_overlapping"
+    }
+    fn name(&self) -> &str {
+        "Non-Overlapping Intervals"
+    }
+    fn topic(&self) -> &str {
+        "intervals"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given a collection of intervals, find the minimum number of intervals you need \
          to remove to make the rest non-overlapping.\n\n\
@@ -401,11 +505,15 @@ impl Problem for NonOverlapping {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=15);
-            let intervals = gen_intervals(&mut rng, n, 30);
-            TestCase { data: Box::new(NonOverlappingTest { intervals }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=15);
+                let intervals = gen_intervals(&mut rng, n, 30);
+                TestCase {
+                    data: Box::new(NonOverlappingTest { intervals }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -422,7 +530,9 @@ impl Problem for NonOverlapping {
 }
 
 fn ref_non_overlapping(intervals: &[(i32, i32)]) -> i32 {
-    if intervals.is_empty() { return 0; }
+    if intervals.is_empty() {
+        return 0;
+    }
     let mut sorted: Vec<(i32, i32)> = intervals.to_vec();
     sorted.sort_by_key(|iv| iv.1);
     let mut count = 0;
@@ -440,13 +550,23 @@ fn ref_non_overlapping(intervals: &[(i32, i32)]) -> i32 {
 // ── Medium 3: Minimum Number of Arrows ──────────────────────────────
 
 struct MinArrows;
-struct MinArrowsTest { balloons: Vec<(i32, i32)> }
+struct MinArrowsTest {
+    balloons: Vec<(i32, i32)>,
+}
 
 impl Problem for MinArrows {
-    fn id(&self) -> &str { "intervals_min_arrows" }
-    fn name(&self) -> &str { "Minimum Number of Arrows to Burst Balloons" }
-    fn topic(&self) -> &str { "intervals" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "intervals_min_arrows"
+    }
+    fn name(&self) -> &str {
+        "Minimum Number of Arrows to Burst Balloons"
+    }
+    fn topic(&self) -> &str {
+        "intervals"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given balloons as intervals (xstart, xend), an arrow shot at position x \
          bursts all balloons where xstart <= x <= xend. Return the minimum number \
@@ -457,11 +577,15 @@ impl Problem for MinArrows {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=15);
-            let balloons = gen_intervals(&mut rng, n, 30);
-            TestCase { data: Box::new(MinArrowsTest { balloons }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=15);
+                let balloons = gen_intervals(&mut rng, n, 30);
+                TestCase {
+                    data: Box::new(MinArrowsTest { balloons }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -478,7 +602,9 @@ impl Problem for MinArrows {
 }
 
 fn ref_min_arrows(balloons: &[(i32, i32)]) -> i32 {
-    if balloons.is_empty() { return 0; }
+    if balloons.is_empty() {
+        return 0;
+    }
     let mut sorted: Vec<(i32, i32)> = balloons.to_vec();
     sorted.sort_by_key(|b| b.1);
     let mut arrows = 1;
@@ -495,13 +621,24 @@ fn ref_min_arrows(balloons: &[(i32, i32)]) -> i32 {
 // ── Medium 4: Interval List Intersections ────────────────────────────
 
 struct IntervalIntersection;
-struct IntervalIntersectionTest { first: Vec<(i32, i32)>, second: Vec<(i32, i32)> }
+struct IntervalIntersectionTest {
+    first: Vec<(i32, i32)>,
+    second: Vec<(i32, i32)>,
+}
 
 impl Problem for IntervalIntersection {
-    fn id(&self) -> &str { "intervals_interval_intersection" }
-    fn name(&self) -> &str { "Interval List Intersections" }
-    fn topic(&self) -> &str { "intervals" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "intervals_interval_intersection"
+    }
+    fn name(&self) -> &str {
+        "Interval List Intersections"
+    }
+    fn topic(&self) -> &str {
+        "intervals"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given two lists of closed intervals (each sorted and non-overlapping), \
          return the intersection of these two interval lists.\n\n\
@@ -512,28 +649,36 @@ impl Problem for IntervalIntersection {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let make_sorted = |rng: &mut rand::rngs::ThreadRng, count: usize| -> Vec<(i32, i32)> {
-                let mut intervals = Vec::new();
-                let mut cur = rng.random_range(0..=5);
-                for _ in 0..count {
-                    let start = cur;
-                    let end = start + rng.random_range(1..=5);
-                    intervals.push((start, end));
-                    cur = end + rng.random_range(1..=5);
+        (0..10)
+            .map(|_| {
+                let make_sorted =
+                    |rng: &mut rand::rngs::ThreadRng, count: usize| -> Vec<(i32, i32)> {
+                        let mut intervals = Vec::new();
+                        let mut cur = rng.random_range(0..=5);
+                        for _ in 0..count {
+                            let start = cur;
+                            let end = start + rng.random_range(1..=5);
+                            intervals.push((start, end));
+                            cur = end + rng.random_range(1..=5);
+                        }
+                        intervals
+                    };
+                let n1 = rng.random_range(0..=6);
+                let n2 = rng.random_range(0..=6);
+                let first = make_sorted(&mut rng, n1);
+                let second = make_sorted(&mut rng, n2);
+                TestCase {
+                    data: Box::new(IntervalIntersectionTest { first, second }),
                 }
-                intervals
-            };
-            let n1 = rng.random_range(0..=6);
-            let n2 = rng.random_range(0..=6);
-            let first = make_sorted(&mut rng, n1);
-            let second = make_sorted(&mut rng, n2);
-            TestCase { data: Box::new(IntervalIntersectionTest { first, second }) }
-        }).collect()
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
-        let t = test.data.downcast_ref::<IntervalIntersectionTest>().unwrap();
+        let t = test
+            .data
+            .downcast_ref::<IntervalIntersectionTest>()
+            .unwrap();
         let expected = ref_interval_intersection(&t.first, &t.second);
         let actual = solutions::interval_intersection(&t.first, &t.second);
         SolutionResult {
@@ -554,7 +699,11 @@ fn ref_interval_intersection(first: &[(i32, i32)], second: &[(i32, i32)]) -> Vec
         if lo <= hi {
             result.push((lo, hi));
         }
-        if first[i].1 < second[j].1 { i += 1; } else { j += 1; }
+        if first[i].1 < second[j].1 {
+            i += 1;
+        } else {
+            j += 1;
+        }
     }
     result
 }
@@ -562,13 +711,23 @@ fn ref_interval_intersection(first: &[(i32, i32)], second: &[(i32, i32)]) -> Vec
 // ── Medium 5: My Calendar ───────────────────────────────────────────
 
 struct MyCalendar;
-struct MyCalendarTest { bookings: Vec<(i32, i32)> }
+struct MyCalendarTest {
+    bookings: Vec<(i32, i32)>,
+}
 
 impl Problem for MyCalendar {
-    fn id(&self) -> &str { "intervals_my_calendar" }
-    fn name(&self) -> &str { "My Calendar I" }
-    fn topic(&self) -> &str { "intervals" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "intervals_my_calendar"
+    }
+    fn name(&self) -> &str {
+        "My Calendar I"
+    }
+    fn topic(&self) -> &str {
+        "intervals"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Implement a calendar that can book events. For each booking attempt (start, end), \
          return true if the event can be added without causing a double-booking, false \
@@ -580,15 +739,21 @@ impl Problem for MyCalendar {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=12);
-            let bookings: Vec<(i32, i32)> = (0..n).map(|_| {
-                let s = rng.random_range(0..=20);
-                let e = rng.random_range(s + 1..=s + 8);
-                (s, e)
-            }).collect();
-            TestCase { data: Box::new(MyCalendarTest { bookings }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=12);
+                let bookings: Vec<(i32, i32)> = (0..n)
+                    .map(|_| {
+                        let s = rng.random_range(0..=20);
+                        let e = rng.random_range(s + 1..=s + 8);
+                        (s, e)
+                    })
+                    .collect();
+                TestCase {
+                    data: Box::new(MyCalendarTest { bookings }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -622,13 +787,23 @@ fn ref_my_calendar(bookings: &[(i32, i32)]) -> Vec<bool> {
 // ── Hard 1: Employee Free Time ──────────────────────────────────────
 
 struct EmployeeFreeTime;
-struct EmployeeFreeTimeTest { schedules: Vec<Vec<(i32, i32)>> }
+struct EmployeeFreeTimeTest {
+    schedules: Vec<Vec<(i32, i32)>>,
+}
 
 impl Problem for EmployeeFreeTime {
-    fn id(&self) -> &str { "intervals_employee_free_time" }
-    fn name(&self) -> &str { "Employee Free Time" }
-    fn topic(&self) -> &str { "intervals" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "intervals_employee_free_time"
+    }
+    fn name(&self) -> &str {
+        "Employee Free Time"
+    }
+    fn topic(&self) -> &str {
+        "intervals"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given the working time intervals for each employee (sorted for each employee), \
          find the common free time intervals for all employees, sorted in ascending order.\n\n\
@@ -640,22 +815,28 @@ impl Problem for EmployeeFreeTime {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let num_employees = rng.random_range(1..=4);
-            let schedules: Vec<Vec<(i32, i32)>> = (0..num_employees).map(|_| {
-                let num_intervals = rng.random_range(1..=4);
-                let mut intervals = Vec::new();
-                let mut cur = rng.random_range(0..=5);
-                for _ in 0..num_intervals {
-                    let start = cur;
-                    let end = start + rng.random_range(1..=5);
-                    intervals.push((start, end));
-                    cur = end + rng.random_range(1..=5);
+        (0..10)
+            .map(|_| {
+                let num_employees = rng.random_range(1..=4);
+                let schedules: Vec<Vec<(i32, i32)>> = (0..num_employees)
+                    .map(|_| {
+                        let num_intervals = rng.random_range(1..=4);
+                        let mut intervals = Vec::new();
+                        let mut cur = rng.random_range(0..=5);
+                        for _ in 0..num_intervals {
+                            let start = cur;
+                            let end = start + rng.random_range(1..=5);
+                            intervals.push((start, end));
+                            cur = end + rng.random_range(1..=5);
+                        }
+                        intervals
+                    })
+                    .collect();
+                TestCase {
+                    data: Box::new(EmployeeFreeTimeTest { schedules }),
                 }
-                intervals
-            }).collect();
-            TestCase { data: Box::new(EmployeeFreeTimeTest { schedules }) }
-        }).collect()
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -686,13 +867,23 @@ fn ref_employee_free_time(schedules: &[Vec<(i32, i32)>]) -> Vec<(i32, i32)> {
 // ── Hard 2: Skyline Problem ─────────────────────────────────────────
 
 struct Skyline;
-struct SkylineTest { buildings: Vec<(i32, i32, i32)> }
+struct SkylineTest {
+    buildings: Vec<(i32, i32, i32)>,
+}
 
 impl Problem for Skyline {
-    fn id(&self) -> &str { "intervals_skyline" }
-    fn name(&self) -> &str { "The Skyline Problem" }
-    fn topic(&self) -> &str { "intervals" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "intervals_skyline"
+    }
+    fn name(&self) -> &str {
+        "The Skyline Problem"
+    }
+    fn topic(&self) -> &str {
+        "intervals"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given buildings as (left, right, height) tuples, return the skyline as \
          key points (x, height).\n\n\
@@ -705,17 +896,23 @@ impl Problem for Skyline {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=8);
-            let mut buildings: Vec<(i32, i32, i32)> = (0..n).map(|_| {
-                let l = rng.random_range(0..=20);
-                let r = rng.random_range(l + 1..=l + 10);
-                let h = rng.random_range(1..=20);
-                (l, r, h)
-            }).collect();
-            buildings.sort_by_key(|b| b.0);
-            TestCase { data: Box::new(SkylineTest { buildings }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=8);
+                let mut buildings: Vec<(i32, i32, i32)> = (0..n)
+                    .map(|_| {
+                        let l = rng.random_range(0..=20);
+                        let r = rng.random_range(l + 1..=l + 10);
+                        let h = rng.random_range(1..=20);
+                        (l, r, h)
+                    })
+                    .collect();
+                buildings.sort_by_key(|b| b.0);
+                TestCase {
+                    data: Box::new(SkylineTest { buildings }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -736,7 +933,7 @@ fn ref_skyline_sweep(buildings: &[(i32, i32, i32)]) -> Vec<(i32, i32)> {
     let mut events: Vec<(i32, i32)> = Vec::new();
     for &(l, r, h) in buildings {
         events.push((l, -h)); // building start (negative for sorting)
-        events.push((r, h));  // building end
+        events.push((r, h)); // building end
     }
     events.sort_by(|a, b| a.0.cmp(&b.0).then(a.1.cmp(&b.1)));
 
@@ -751,7 +948,9 @@ fn ref_skyline_sweep(buildings: &[(i32, i32, i32)]) -> Vec<(i32, i32)> {
         } else {
             let count = heights.get_mut(&h).unwrap();
             *count -= 1;
-            if *count == 0 { heights.remove(&h); }
+            if *count == 0 {
+                heights.remove(&h);
+            }
         }
         let cur_max = *heights.keys().next_back().unwrap();
         if cur_max != prev_max {
@@ -765,13 +964,23 @@ fn ref_skyline_sweep(buildings: &[(i32, i32, i32)]) -> Vec<(i32, i32)> {
 // ── Hard 3: Data Stream as Disjoint Intervals ────────────────────────
 
 struct DataStreamDisjoint;
-struct DataStreamDisjointTest { nums: Vec<i32> }
+struct DataStreamDisjointTest {
+    nums: Vec<i32>,
+}
 
 impl Problem for DataStreamDisjoint {
-    fn id(&self) -> &str { "intervals_data_stream_disjoint" }
-    fn name(&self) -> &str { "Data Stream as Disjoint Intervals" }
-    fn topic(&self) -> &str { "intervals" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "intervals_data_stream_disjoint"
+    }
+    fn name(&self) -> &str {
+        "Data Stream as Disjoint Intervals"
+    }
+    fn topic(&self) -> &str {
+        "intervals"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given a stream of integers (in the order they arrive), after all numbers \
          have been added, return the disjoint intervals that cover all added numbers, \
@@ -783,11 +992,15 @@ impl Problem for DataStreamDisjoint {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=20);
-            let nums: Vec<i32> = (0..n).map(|_| rng.random_range(0..=30)).collect();
-            TestCase { data: Box::new(DataStreamDisjointTest { nums }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=20);
+                let nums: Vec<i32> = (0..n).map(|_| rng.random_range(0..=30)).collect();
+                TestCase {
+                    data: Box::new(DataStreamDisjointTest { nums }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -806,13 +1019,17 @@ impl Problem for DataStreamDisjoint {
 fn ref_data_stream_disjoint(nums: &[i32]) -> Vec<(i32, i32)> {
     let set: std::collections::BTreeSet<i32> = nums.iter().copied().collect();
     let sorted: Vec<i32> = set.into_iter().collect();
-    if sorted.is_empty() { return vec![]; }
+    if sorted.is_empty() {
+        return vec![];
+    }
     let mut result = Vec::new();
     let mut start = sorted[0];
     for i in 1..=sorted.len() {
         if i == sorted.len() || sorted[i] != sorted[i - 1] + 1 {
             result.push((start, sorted[i - 1]));
-            if i < sorted.len() { start = sorted[i]; }
+            if i < sorted.len() {
+                start = sorted[i];
+            }
         }
     }
     result
@@ -821,13 +1038,23 @@ fn ref_data_stream_disjoint(nums: &[i32]) -> Vec<(i32, i32)> {
 // ── Hard 4: Maximum Number of Events ─────────────────────────────────
 
 struct MaxEvents;
-struct MaxEventsTest { events: Vec<(i32, i32)> }
+struct MaxEventsTest {
+    events: Vec<(i32, i32)>,
+}
 
 impl Problem for MaxEvents {
-    fn id(&self) -> &str { "intervals_max_events" }
-    fn name(&self) -> &str { "Maximum Number of Events That Can Be Attended" }
-    fn topic(&self) -> &str { "intervals" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "intervals_max_events"
+    }
+    fn name(&self) -> &str {
+        "Maximum Number of Events That Can Be Attended"
+    }
+    fn topic(&self) -> &str {
+        "intervals"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given events as (startDay, endDay), you can attend an event on any single day \
          in [startDay, endDay]. Each day you can attend at most one event. Return the \
@@ -839,15 +1066,21 @@ impl Problem for MaxEvents {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=12);
-            let events: Vec<(i32, i32)> = (0..n).map(|_| {
-                let s = rng.random_range(1..=15);
-                let e = rng.random_range(s..=s + 5);
-                (s, e)
-            }).collect();
-            TestCase { data: Box::new(MaxEventsTest { events }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=12);
+                let events: Vec<(i32, i32)> = (0..n)
+                    .map(|_| {
+                        let s = rng.random_range(1..=15);
+                        let e = rng.random_range(s..=s + 5);
+                        (s, e)
+                    })
+                    .collect();
+                TestCase {
+                    data: Box::new(MaxEventsTest { events }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -864,8 +1097,8 @@ impl Problem for MaxEvents {
 }
 
 fn ref_max_events(events: &[(i32, i32)]) -> i32 {
-    use std::collections::BinaryHeap;
     use std::cmp::Reverse;
+    use std::collections::BinaryHeap;
 
     let mut sorted: Vec<(i32, i32)> = events.to_vec();
     sorted.sort();
@@ -881,7 +1114,11 @@ fn ref_max_events(events: &[(i32, i32)]) -> i32 {
         }
         // Remove expired events
         while let Some(&Reverse(end)) = heap.peek() {
-            if end < day { heap.pop(); } else { break; }
+            if end < day {
+                heap.pop();
+            } else {
+                break;
+            }
         }
         // Attend the event with the earliest end
         if heap.pop().is_some() {
@@ -894,13 +1131,24 @@ fn ref_max_events(events: &[(i32, i32)]) -> i32 {
 // ── Hard 5: Minimum Interval to Include Each Query ───────────────────
 
 struct MinIntervalQuery;
-struct MinIntervalQueryTest { intervals: Vec<(i32, i32)>, queries: Vec<i32> }
+struct MinIntervalQueryTest {
+    intervals: Vec<(i32, i32)>,
+    queries: Vec<i32>,
+}
 
 impl Problem for MinIntervalQuery {
-    fn id(&self) -> &str { "intervals_min_interval_query" }
-    fn name(&self) -> &str { "Minimum Interval to Include Each Query" }
-    fn topic(&self) -> &str { "intervals" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "intervals_min_interval_query"
+    }
+    fn name(&self) -> &str {
+        "Minimum Interval to Include Each Query"
+    }
+    fn topic(&self) -> &str {
+        "intervals"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given a 2D array of intervals and a query array, for each query point, \
          find the size of the smallest interval that contains that point. The size \
@@ -911,17 +1159,23 @@ impl Problem for MinIntervalQuery {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let ni = rng.random_range(1..=10);
-            let intervals: Vec<(i32, i32)> = (0..ni).map(|_| {
-                let a = rng.random_range(1..=20);
-                let b = rng.random_range(a..=a + 10);
-                (a, b)
-            }).collect();
-            let nq = rng.random_range(1..=10);
-            let queries: Vec<i32> = (0..nq).map(|_| rng.random_range(0..=30)).collect();
-            TestCase { data: Box::new(MinIntervalQueryTest { intervals, queries }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let ni = rng.random_range(1..=10);
+                let intervals: Vec<(i32, i32)> = (0..ni)
+                    .map(|_| {
+                        let a = rng.random_range(1..=20);
+                        let b = rng.random_range(a..=a + 10);
+                        (a, b)
+                    })
+                    .collect();
+                let nq = rng.random_range(1..=10);
+                let queries: Vec<i32> = (0..nq).map(|_| rng.random_range(0..=30)).collect();
+                TestCase {
+                    data: Box::new(MinIntervalQueryTest { intervals, queries }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -938,16 +1192,19 @@ impl Problem for MinIntervalQuery {
 }
 
 fn ref_min_interval_query(intervals: &[(i32, i32)], queries: &[i32]) -> Vec<i32> {
-    queries.iter().map(|&q| {
-        let mut best = -1;
-        for &(l, r) in intervals {
-            if l <= q && q <= r {
-                let size = r - l + 1;
-                if best == -1 || size < best {
-                    best = size;
+    queries
+        .iter()
+        .map(|&q| {
+            let mut best = -1;
+            for &(l, r) in intervals {
+                if l <= q && q <= r {
+                    let size = r - l + 1;
+                    if best == -1 || size < best {
+                        best = size;
+                    }
                 }
             }
-        }
-        best
-    }).collect()
+            best
+        })
+        .collect()
 }

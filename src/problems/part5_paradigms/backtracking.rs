@@ -33,10 +33,18 @@ struct SubsetsTest {
 }
 
 impl Problem for Subsets {
-    fn id(&self) -> &str { "backtracking_subsets" }
-    fn name(&self) -> &str { "Generate All Subsets" }
-    fn topic(&self) -> &str { "backtracking" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "backtracking_subsets"
+    }
+    fn name(&self) -> &str {
+        "Generate All Subsets"
+    }
+    fn topic(&self) -> &str {
+        "backtracking"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given a vector of distinct integers, return all possible subsets (the power set).\n\n\
          The solution must not contain duplicate subsets. Return them sorted \
@@ -49,11 +57,15 @@ impl Problem for Subsets {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(0..=6);
-            let nums = crate::problems::helpers::random_unique_vec(&mut rng, n, -10, 10);
-            TestCase { data: Box::new(SubsetsTest { nums }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(0..=6);
+                let nums = crate::problems::helpers::random_unique_vec(&mut rng, n, -10, 10);
+                TestCase {
+                    data: Box::new(SubsetsTest { nums }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -96,10 +108,18 @@ struct PermutationsTest {
 }
 
 impl Problem for Permutations {
-    fn id(&self) -> &str { "backtracking_permutations" }
-    fn name(&self) -> &str { "Generate All Permutations" }
-    fn topic(&self) -> &str { "backtracking" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "backtracking_permutations"
+    }
+    fn name(&self) -> &str {
+        "Generate All Permutations"
+    }
+    fn topic(&self) -> &str {
+        "backtracking"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given a vector of distinct integers, return all possible permutations.\n\n\
          Return them sorted lexicographically.\n\n\
@@ -111,11 +131,15 @@ impl Problem for Permutations {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=5);
-            let nums = crate::problems::helpers::random_unique_vec(&mut rng, n, -10, 10);
-            TestCase { data: Box::new(PermutationsTest { nums }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=5);
+                let nums = crate::problems::helpers::random_unique_vec(&mut rng, n, -10, 10);
+                TestCase {
+                    data: Box::new(PermutationsTest { nums }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -137,13 +161,20 @@ fn ref_permutations(nums: &[i32]) -> Vec<Vec<i32>> {
     sorted.sort();
     let mut used = vec![false; sorted.len()];
     let mut current = Vec::new();
-    fn backtrack(sorted: &[i32], used: &mut Vec<bool>, current: &mut Vec<i32>, result: &mut Vec<Vec<i32>>) {
+    fn backtrack(
+        sorted: &[i32],
+        used: &mut Vec<bool>,
+        current: &mut Vec<i32>,
+        result: &mut Vec<Vec<i32>>,
+    ) {
         if current.len() == sorted.len() {
             result.push(current.clone());
             return;
         }
         for i in 0..sorted.len() {
-            if used[i] { continue; }
+            if used[i] {
+                continue;
+            }
             used[i] = true;
             current.push(sorted[i]);
             backtrack(sorted, used, current, result);
@@ -166,10 +197,18 @@ struct CombinationsTest {
 }
 
 impl Problem for Combinations {
-    fn id(&self) -> &str { "backtracking_combinations" }
-    fn name(&self) -> &str { "Combinations C(n,k)" }
-    fn topic(&self) -> &str { "backtracking" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "backtracking_combinations"
+    }
+    fn name(&self) -> &str {
+        "Combinations C(n,k)"
+    }
+    fn topic(&self) -> &str {
+        "backtracking"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given two integers n and k, return all possible combinations of k numbers \
          chosen from the range [1, n]. Return them sorted.\n\n\
@@ -181,11 +220,15 @@ impl Problem for Combinations {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=10);
-            let k = rng.random_range(1..=n);
-            TestCase { data: Box::new(CombinationsTest { n, k }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=10);
+                let k = rng.random_range(1..=n);
+                TestCase {
+                    data: Box::new(CombinationsTest { n, k }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -229,10 +272,18 @@ struct LetterCombinationsTest {
 }
 
 impl Problem for LetterCombinations {
-    fn id(&self) -> &str { "backtracking_letter_combinations" }
-    fn name(&self) -> &str { "Letter Combinations of a Phone Number" }
-    fn topic(&self) -> &str { "backtracking" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "backtracking_letter_combinations"
+    }
+    fn name(&self) -> &str {
+        "Letter Combinations of a Phone Number"
+    }
+    fn topic(&self) -> &str {
+        "backtracking"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given a string containing digits from 2-9, return all possible letter combinations \
          that the number could represent (like on a phone keypad). Return them sorted.\n\n\
@@ -246,13 +297,17 @@ impl Problem for LetterCombinations {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(0..=4);
-            let digits: String = (0..n)
-                .map(|_| (b'2' + rng.random_range(0..=7u8)) as char)
-                .collect();
-            TestCase { data: Box::new(LetterCombinationsTest { digits }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(0..=4);
+                let digits: String = (0..n)
+                    .map(|_| (b'2' + rng.random_range(0..=7u8)) as char)
+                    .collect();
+                TestCase {
+                    data: Box::new(LetterCombinationsTest { digits }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -272,10 +327,18 @@ fn ref_letter_combinations(digits: &str) -> Vec<String> {
     if digits.is_empty() {
         return vec![];
     }
-    let mapping: [&str; 10] = ["", "", "abc", "def", "ghi", "jkl", "mno", "pqrs", "tuv", "wxyz"];
+    let mapping: [&str; 10] = [
+        "", "", "abc", "def", "ghi", "jkl", "mno", "pqrs", "tuv", "wxyz",
+    ];
     let mut result = Vec::new();
     let mut current = String::new();
-    fn backtrack(digits: &[u8], idx: usize, mapping: &[&str; 10], current: &mut String, result: &mut Vec<String>) {
+    fn backtrack(
+        digits: &[u8],
+        idx: usize,
+        mapping: &[&str; 10],
+        current: &mut String,
+        result: &mut Vec<String>,
+    ) {
         if idx == digits.len() {
             result.push(current.clone());
             return;
@@ -301,10 +364,18 @@ struct BinaryStringsTest {
 }
 
 impl Problem for BinaryStrings {
-    fn id(&self) -> &str { "backtracking_binary_strings" }
-    fn name(&self) -> &str { "Generate All Binary Strings" }
-    fn topic(&self) -> &str { "backtracking" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "backtracking_binary_strings"
+    }
+    fn name(&self) -> &str {
+        "Generate All Binary Strings"
+    }
+    fn topic(&self) -> &str {
+        "backtracking"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given an integer n, return all binary strings of length n, sorted.\n\n\
          Constraints:\n\
@@ -315,10 +386,14 @@ impl Problem for BinaryStrings {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(0..=8);
-            TestCase { data: Box::new(BinaryStringsTest { n }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(0..=8);
+                TestCase {
+                    data: Box::new(BinaryStringsTest { n }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -364,10 +439,18 @@ struct CombinationSumTest {
 }
 
 impl Problem for CombinationSum {
-    fn id(&self) -> &str { "backtracking_combination_sum" }
-    fn name(&self) -> &str { "Combination Sum" }
-    fn topic(&self) -> &str { "backtracking" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "backtracking_combination_sum"
+    }
+    fn name(&self) -> &str {
+        "Combination Sum"
+    }
+    fn topic(&self) -> &str {
+        "backtracking"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given an array of distinct integers `candidates` and a target integer, return all \
          unique combinations of candidates where the chosen numbers sum to target.\n\n\
@@ -382,12 +465,16 @@ impl Problem for CombinationSum {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(2..=8);
-            let candidates = crate::problems::helpers::random_unique_vec(&mut rng, n, 2, 20);
-            let target = rng.random_range(3..=25);
-            TestCase { data: Box::new(CombinationSumTest { candidates, target }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(2..=8);
+                let candidates = crate::problems::helpers::random_unique_vec(&mut rng, n, 2, 20);
+                let target = rng.random_range(3..=25);
+                TestCase {
+                    data: Box::new(CombinationSumTest { candidates, target }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -408,13 +495,21 @@ fn ref_combination_sum(candidates: &[i32], target: i32) -> Vec<Vec<i32>> {
     let mut sorted = candidates.to_vec();
     sorted.sort();
     let mut current = Vec::new();
-    fn backtrack(sorted: &[i32], start: usize, remaining: i32, current: &mut Vec<i32>, result: &mut Vec<Vec<i32>>) {
+    fn backtrack(
+        sorted: &[i32],
+        start: usize,
+        remaining: i32,
+        current: &mut Vec<i32>,
+        result: &mut Vec<Vec<i32>>,
+    ) {
         if remaining == 0 {
             result.push(current.clone());
             return;
         }
         for i in start..sorted.len() {
-            if sorted[i] > remaining { break; }
+            if sorted[i] > remaining {
+                break;
+            }
             current.push(sorted[i]);
             backtrack(sorted, i, remaining - sorted[i], current, result);
             current.pop();
@@ -435,10 +530,18 @@ struct CombinationSumIITest {
 }
 
 impl Problem for CombinationSumII {
-    fn id(&self) -> &str { "backtracking_combination_sum_ii" }
-    fn name(&self) -> &str { "Combination Sum II" }
-    fn topic(&self) -> &str { "backtracking" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "backtracking_combination_sum_ii"
+    }
+    fn name(&self) -> &str {
+        "Combination Sum II"
+    }
+    fn topic(&self) -> &str {
+        "backtracking"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given a collection of candidate numbers (may contain duplicates) and a target, \
          find all unique combinations where the candidates sum to target.\n\n\
@@ -453,12 +556,16 @@ impl Problem for CombinationSumII {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(2..=10);
-            let candidates: Vec<i32> = (0..n).map(|_| rng.random_range(1..=15)).collect();
-            let target = rng.random_range(3..=20);
-            TestCase { data: Box::new(CombinationSumIITest { candidates, target }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(2..=10);
+                let candidates: Vec<i32> = (0..n).map(|_| rng.random_range(1..=15)).collect();
+                let target = rng.random_range(3..=20);
+                TestCase {
+                    data: Box::new(CombinationSumIITest { candidates, target }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -479,14 +586,24 @@ fn ref_combination_sum_ii(candidates: &[i32], target: i32) -> Vec<Vec<i32>> {
     let mut sorted = candidates.to_vec();
     sorted.sort();
     let mut current = Vec::new();
-    fn backtrack(sorted: &[i32], start: usize, remaining: i32, current: &mut Vec<i32>, result: &mut Vec<Vec<i32>>) {
+    fn backtrack(
+        sorted: &[i32],
+        start: usize,
+        remaining: i32,
+        current: &mut Vec<i32>,
+        result: &mut Vec<Vec<i32>>,
+    ) {
         if remaining == 0 {
             result.push(current.clone());
             return;
         }
         for i in start..sorted.len() {
-            if sorted[i] > remaining { break; }
-            if i > start && sorted[i] == sorted[i - 1] { continue; }
+            if sorted[i] > remaining {
+                break;
+            }
+            if i > start && sorted[i] == sorted[i - 1] {
+                continue;
+            }
             current.push(sorted[i]);
             backtrack(sorted, i + 1, remaining - sorted[i], current, result);
             current.pop();
@@ -506,10 +623,18 @@ struct PalindromePartitionTest {
 }
 
 impl Problem for PalindromePartition {
-    fn id(&self) -> &str { "backtracking_palindrome_partition" }
-    fn name(&self) -> &str { "Palindrome Partitioning" }
-    fn topic(&self) -> &str { "backtracking" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "backtracking_palindrome_partition"
+    }
+    fn name(&self) -> &str {
+        "Palindrome Partitioning"
+    }
+    fn topic(&self) -> &str {
+        "backtracking"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given a string s, partition s such that every substring of the partition is a \
          palindrome. Return all possible palindrome partitions, sorted.\n\n\
@@ -521,12 +646,16 @@ impl Problem for PalindromePartition {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=8);
-            // Use a small alphabet to increase palindrome likelihood
-            let s = crate::problems::helpers::random_string_from(&mut rng, n, b"abc");
-            TestCase { data: Box::new(PalindromePartitionTest { s }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=8);
+                // Use a small alphabet to increase palindrome likelihood
+                let s = crate::problems::helpers::random_string_from(&mut rng, n, b"abc");
+                TestCase {
+                    data: Box::new(PalindromePartitionTest { s }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -549,13 +678,20 @@ fn ref_palindrome_partition(s: &str) -> Vec<Vec<String>> {
     fn is_palindrome(b: &[u8], lo: usize, hi: usize) -> bool {
         let (mut l, mut r) = (lo, hi);
         while l < r {
-            if b[l] != b[r] { return false; }
+            if b[l] != b[r] {
+                return false;
+            }
             l += 1;
             r -= 1;
         }
         true
     }
-    fn backtrack(bytes: &[u8], start: usize, current: &mut Vec<String>, result: &mut Vec<Vec<String>>) {
+    fn backtrack(
+        bytes: &[u8],
+        start: usize,
+        current: &mut Vec<String>,
+        result: &mut Vec<Vec<String>>,
+    ) {
         if start == bytes.len() {
             result.push(current.clone());
             return;
@@ -582,10 +718,18 @@ struct GenerateParenthesesTest {
 }
 
 impl Problem for GenerateParentheses {
-    fn id(&self) -> &str { "backtracking_generate_parentheses" }
-    fn name(&self) -> &str { "Generate Parentheses" }
-    fn topic(&self) -> &str { "backtracking" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "backtracking_generate_parentheses"
+    }
+    fn name(&self) -> &str {
+        "Generate Parentheses"
+    }
+    fn topic(&self) -> &str {
+        "backtracking"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given n pairs of parentheses, generate all combinations of well-formed \
          parentheses. Return them sorted.\n\n\
@@ -596,10 +740,14 @@ impl Problem for GenerateParentheses {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=6);
-            TestCase { data: Box::new(GenerateParenthesesTest { n }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=6);
+                TestCase {
+                    data: Box::new(GenerateParenthesesTest { n }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -618,7 +766,13 @@ impl Problem for GenerateParentheses {
 fn ref_generate_parentheses(n: usize) -> Vec<String> {
     let mut result = Vec::new();
     let mut current = String::new();
-    fn backtrack(n: usize, open: usize, close: usize, current: &mut String, result: &mut Vec<String>) {
+    fn backtrack(
+        n: usize,
+        open: usize,
+        close: usize,
+        current: &mut String,
+        result: &mut Vec<String>,
+    ) {
         if current.len() == 2 * n {
             result.push(current.clone());
             return;
@@ -649,10 +803,18 @@ struct WordSearchTest {
 }
 
 impl Problem for WordSearch {
-    fn id(&self) -> &str { "backtracking_word_search" }
-    fn name(&self) -> &str { "Word Search" }
-    fn topic(&self) -> &str { "backtracking" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "backtracking_word_search"
+    }
+    fn name(&self) -> &str {
+        "Word Search"
+    }
+    fn topic(&self) -> &str {
+        "backtracking"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given an m x n grid of characters and a string word, return true if the word \
          exists in the grid.\n\n\
@@ -667,25 +829,31 @@ impl Problem for WordSearch {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let rows = rng.random_range(2..=4);
-            let cols = rng.random_range(2..=4);
-            let board: Vec<Vec<char>> = (0..rows)
-                .map(|_| {
-                    (0..cols)
+        (0..10)
+            .map(|_| {
+                let rows = rng.random_range(2..=4);
+                let cols = rng.random_range(2..=4);
+                let board: Vec<Vec<char>> = (0..rows)
+                    .map(|_| {
+                        (0..cols)
+                            .map(|_| (b'A' + rng.random_range(0..6u8)) as char)
+                            .collect()
+                    })
+                    .collect();
+                // 50% chance to build word from the board for a positive case
+                let word = if rng.random_range(0..2) == 0 {
+                    ref_random_path_word(&board, &mut rng)
+                } else {
+                    let wlen = rng.random_range(2..=6);
+                    (0..wlen)
                         .map(|_| (b'A' + rng.random_range(0..6u8)) as char)
                         .collect()
-                })
-                .collect();
-            // 50% chance to build word from the board for a positive case
-            let word = if rng.random_range(0..2) == 0 {
-                ref_random_path_word(&board, &mut rng)
-            } else {
-                let wlen = rng.random_range(2..=6);
-                (0..wlen).map(|_| (b'A' + rng.random_range(0..6u8)) as char).collect()
-            };
-            TestCase { data: Box::new(WordSearchTest { board, word }) }
-        }).collect()
+                };
+                TestCase {
+                    data: Box::new(WordSearchTest { board, word }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -732,7 +900,9 @@ fn ref_random_path_word(board: &[Vec<char>], rng: &mut impl Rng) -> String {
                 }
             }
         }
-        if !moved { break; }
+        if !moved {
+            break;
+        }
     }
     word
 }
@@ -742,21 +912,34 @@ fn ref_word_search(board: &[Vec<char>], word: &str) -> bool {
     let cols = board[0].len();
     let word_bytes = word.as_bytes();
     let mut visited = vec![vec![false; cols]; rows];
-    fn dfs(board: &[Vec<char>], word: &[u8], idx: usize, r: usize, c: usize, visited: &mut Vec<Vec<bool>>) -> bool {
-        if idx == word.len() { return true; }
-        if r >= board.len() || c >= board[0].len() { return false; }
-        if visited[r][c] { return false; }
-        if board[r][c] as u8 != word[idx] { return false; }
+    fn dfs(
+        board: &[Vec<char>],
+        word: &[u8],
+        idx: usize,
+        r: usize,
+        c: usize,
+        visited: &mut Vec<Vec<bool>>,
+    ) -> bool {
+        if idx == word.len() {
+            return true;
+        }
+        if r >= board.len() || c >= board[0].len() {
+            return false;
+        }
+        if visited[r][c] {
+            return false;
+        }
+        if board[r][c] as u8 != word[idx] {
+            return false;
+        }
         visited[r][c] = true;
         let dirs: [(i32, i32); 4] = [(-1, 0), (1, 0), (0, -1), (0, 1)];
         for (dr, dc) in &dirs {
             let nr = r as i32 + dr;
             let nc = c as i32 + dc;
-            if nr >= 0 && nc >= 0 {
-                if dfs(board, word, idx + 1, nr as usize, nc as usize, visited) {
-                    visited[r][c] = false;
-                    return true;
-                }
+            if nr >= 0 && nc >= 0 && dfs(board, word, idx + 1, nr as usize, nc as usize, visited) {
+                visited[r][c] = false;
+                return true;
             }
         }
         // Also check if we're at the last character
@@ -786,10 +969,18 @@ struct NQueensTest {
 }
 
 impl Problem for NQueens {
-    fn id(&self) -> &str { "backtracking_n_queens" }
-    fn name(&self) -> &str { "N-Queens" }
-    fn topic(&self) -> &str { "backtracking" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "backtracking_n_queens"
+    }
+    fn name(&self) -> &str {
+        "N-Queens"
+    }
+    fn topic(&self) -> &str {
+        "backtracking"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Place n queens on an n x n chessboard such that no two queens attack each other. \
          Return all distinct solutions.\n\n\
@@ -805,10 +996,14 @@ impl Problem for NQueens {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=8);
-            TestCase { data: Box::new(NQueensTest { n }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=8);
+                TestCase {
+                    data: Box::new(NQueensTest { n }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -831,8 +1026,12 @@ fn ref_n_queens(n: usize) -> Vec<Vec<String>> {
     let mut diag1 = vec![false; 2 * n]; // row - col + n
     let mut diag2 = vec![false; 2 * n]; // row + col
     fn backtrack(
-        n: usize, row: usize, board: &mut Vec<Vec<char>>,
-        cols: &mut Vec<bool>, diag1: &mut Vec<bool>, diag2: &mut Vec<bool>,
+        n: usize,
+        row: usize,
+        board: &mut Vec<Vec<char>>,
+        cols: &mut Vec<bool>,
+        diag1: &mut Vec<bool>,
+        diag2: &mut Vec<bool>,
         result: &mut Vec<Vec<String>>,
     ) {
         if row == n {
@@ -843,7 +1042,9 @@ fn ref_n_queens(n: usize) -> Vec<Vec<String>> {
         for col in 0..n {
             let d1 = row + n - col;
             let d2 = row + col;
-            if cols[col] || diag1[d1] || diag2[d2] { continue; }
+            if cols[col] || diag1[d1] || diag2[d2] {
+                continue;
+            }
             board[row][col] = 'Q';
             cols[col] = true;
             diag1[d1] = true;
@@ -855,7 +1056,15 @@ fn ref_n_queens(n: usize) -> Vec<Vec<String>> {
             diag2[d2] = false;
         }
     }
-    backtrack(n, 0, &mut board, &mut cols, &mut diag1, &mut diag2, &mut result);
+    backtrack(
+        n,
+        0,
+        &mut board,
+        &mut cols,
+        &mut diag1,
+        &mut diag2,
+        &mut result,
+    );
     result.sort();
     result
 }
@@ -869,10 +1078,18 @@ struct SudokuSolverTest {
 }
 
 impl Problem for SudokuSolver {
-    fn id(&self) -> &str { "backtracking_sudoku_solver" }
-    fn name(&self) -> &str { "Sudoku Solver" }
-    fn topic(&self) -> &str { "backtracking" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "backtracking_sudoku_solver"
+    }
+    fn name(&self) -> &str {
+        "Sudoku Solver"
+    }
+    fn topic(&self) -> &str {
+        "backtracking"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Solve a Sudoku puzzle. The input is a 9x9 grid where 0 represents empty cells.\n\n\
          Fill in the grid so every row, column, and 3x3 box contains digits 1-9 exactly once.\n\n\
@@ -886,10 +1103,14 @@ impl Problem for SudokuSolver {
     fn generate_tests(&self) -> Vec<TestCase> {
         // Generate valid Sudoku puzzles by solving an empty board, then removing cells
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let board = ref_generate_sudoku(&mut rng);
-            TestCase { data: Box::new(SudokuSolverTest { board }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let board = ref_generate_sudoku(&mut rng);
+                TestCase {
+                    data: Box::new(SudokuSolverTest { board }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -917,9 +1138,9 @@ fn ref_generate_sudoku(rng: &mut impl Rng) -> Vec<Vec<u8>> {
             nums.swap(i, j);
         }
         let mut idx = 0;
-        for r in box_start..box_start + 3 {
-            for c in box_start..box_start + 3 {
-                board[r][c] = nums[idx];
+        for row in board.iter_mut().skip(box_start).take(3) {
+            for cell in row.iter_mut().skip(box_start).take(3) {
+                *cell = nums[idx];
                 idx += 1;
             }
         }
@@ -931,7 +1152,8 @@ fn ref_generate_sudoku(rng: &mut impl Rng) -> Vec<Vec<u8>> {
     // Remove cells to create the puzzle (keep ~25-35 clues)
     let clues = rng.random_range(25..=35);
     let remove = 81 - clues;
-    let mut positions: Vec<(usize, usize)> = (0..9).flat_map(|r| (0..9).map(move |c| (r, c))).collect();
+    let mut positions: Vec<(usize, usize)> =
+        (0..9).flat_map(|r| (0..9).map(move |c| (r, c))).collect();
     for i in (1..81).rev() {
         let j = rng.random_range(0..=i);
         positions.swap(i, j);
@@ -964,16 +1186,22 @@ fn ref_solve_sudoku_inplace(board: &mut Vec<Vec<u8>>) -> bool {
 
 fn ref_sudoku_valid(board: &[Vec<u8>], row: usize, col: usize, num: u8) -> bool {
     for c in 0..9 {
-        if board[row][c] == num { return false; }
+        if board[row][c] == num {
+            return false;
+        }
     }
-    for r in 0..9 {
-        if board[r][col] == num { return false; }
+    for row in board.iter().take(9) {
+        if row[col] == num {
+            return false;
+        }
     }
     let box_r = (row / 3) * 3;
     let box_c = (col / 3) * 3;
-    for r in box_r..box_r + 3 {
-        for c in box_c..box_c + 3 {
-            if board[r][c] == num { return false; }
+    for board_row in board.iter().skip(box_r).take(3) {
+        for &cell in board_row.iter().skip(box_c).take(3) {
+            if cell == num {
+                return false;
+            }
         }
     }
     true
@@ -995,10 +1223,18 @@ struct WordBreakIITest {
 }
 
 impl Problem for WordBreakII {
-    fn id(&self) -> &str { "backtracking_word_break_ii" }
-    fn name(&self) -> &str { "Word Break II" }
-    fn topic(&self) -> &str { "backtracking" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "backtracking_word_break_ii"
+    }
+    fn name(&self) -> &str {
+        "Word Break II"
+    }
+    fn topic(&self) -> &str {
+        "backtracking"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given a string s and a dictionary of strings wordDict, add spaces in s to \
          construct a sentence where each word is a valid dictionary word. Return all \
@@ -1013,25 +1249,29 @@ impl Problem for WordBreakII {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            // Build a string from dictionary words to guarantee at least one solution
-            let dict_size = rng.random_range(3..=8);
-            let word_dict: Vec<String> = (0..dict_size)
-                .map(|_| {
-                    let wlen = rng.random_range(1..=4);
-                    crate::problems::helpers::random_string_from(&mut rng, wlen, b"abcde")
-                })
-                .collect();
-            // Build s by concatenating 2-4 random words from dict
-            let word_count = rng.random_range(2..=4);
-            let s: String = (0..word_count)
-                .map(|_| {
-                    let idx = rng.random_range(0..word_dict.len());
-                    word_dict[idx].clone()
-                })
-                .collect();
-            TestCase { data: Box::new(WordBreakIITest { s, word_dict }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                // Build a string from dictionary words to guarantee at least one solution
+                let dict_size = rng.random_range(3..=8);
+                let word_dict: Vec<String> = (0..dict_size)
+                    .map(|_| {
+                        let wlen = rng.random_range(1..=4);
+                        crate::problems::helpers::random_string_from(&mut rng, wlen, b"abcde")
+                    })
+                    .collect();
+                // Build s by concatenating 2-4 random words from dict
+                let word_count = rng.random_range(2..=4);
+                let s: String = (0..word_count)
+                    .map(|_| {
+                        let idx = rng.random_range(0..word_dict.len());
+                        word_dict[idx].clone()
+                    })
+                    .collect();
+                TestCase {
+                    data: Box::new(WordBreakIITest { s, word_dict }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -1052,7 +1292,13 @@ fn ref_word_break_ii(s: &str, word_dict: &[String]) -> Vec<String> {
     let dict: HashSet<&str> = word_dict.iter().map(|w| w.as_str()).collect();
     let mut result = Vec::new();
     let mut current: Vec<String> = Vec::new();
-    fn backtrack(s: &str, start: usize, dict: &HashSet<&str>, current: &mut Vec<String>, result: &mut Vec<String>) {
+    fn backtrack(
+        s: &str,
+        start: usize,
+        dict: &HashSet<&str>,
+        current: &mut Vec<String>,
+        result: &mut Vec<String>,
+    ) {
         if start == s.len() {
             result.push(current.join(" "));
             return;
@@ -1080,10 +1326,18 @@ struct RestoreIpTest {
 }
 
 impl Problem for RestoreIp {
-    fn id(&self) -> &str { "backtracking_restore_ip" }
-    fn name(&self) -> &str { "Restore IP Addresses" }
-    fn topic(&self) -> &str { "backtracking" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "backtracking_restore_ip"
+    }
+    fn name(&self) -> &str {
+        "Restore IP Addresses"
+    }
+    fn topic(&self) -> &str {
+        "backtracking"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given a string s containing only digits, return all possible valid IP addresses \
          that can be formed by inserting dots into s. Return them sorted.\n\n\
@@ -1097,20 +1351,26 @@ impl Problem for RestoreIp {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            // 50% chance to generate from valid IP, 50% random digits
-            let s = if rng.random_range(0..2) == 0 {
-                let a = rng.random_range(0..=255);
-                let b = rng.random_range(0..=255);
-                let c = rng.random_range(0..=255);
-                let d = rng.random_range(0..=255);
-                format!("{a}{b}{c}{d}")
-            } else {
-                let len = rng.random_range(4..=12);
-                (0..len).map(|_| (b'0' + rng.random_range(0..=9u8)) as char).collect()
-            };
-            TestCase { data: Box::new(RestoreIpTest { s }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                // 50% chance to generate from valid IP, 50% random digits
+                let s = if rng.random_range(0..2) == 0 {
+                    let a = rng.random_range(0..=255);
+                    let b = rng.random_range(0..=255);
+                    let c = rng.random_range(0..=255);
+                    let d = rng.random_range(0..=255);
+                    format!("{a}{b}{c}{d}")
+                } else {
+                    let len = rng.random_range(4..=12);
+                    (0..len)
+                        .map(|_| (b'0' + rng.random_range(0..=9u8)) as char)
+                        .collect()
+                };
+                TestCase {
+                    data: Box::new(RestoreIpTest { s }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -1143,12 +1403,18 @@ fn ref_restore_ip(s: &str) -> Vec<String> {
             return;
         }
         for len in 1..=3 {
-            if start + len > s.len() { break; }
+            if start + len > s.len() {
+                break;
+            }
             let segment = &s[start..start + len];
             // No leading zeros (except "0" itself)
-            if segment.len() > 1 && segment.starts_with('0') { continue; }
+            if segment.len() > 1 && segment.starts_with('0') {
+                continue;
+            }
             let val: u32 = segment.parse().unwrap();
-            if val > 255 { continue; }
+            if val > 255 {
+                continue;
+            }
             parts.push(segment.to_string());
             backtrack(s, start + len, parts, result);
             parts.pop();
@@ -1169,10 +1435,18 @@ struct ExpressionAddOperatorsTest {
 }
 
 impl Problem for ExpressionAddOperators {
-    fn id(&self) -> &str { "backtracking_expression_add_operators" }
-    fn name(&self) -> &str { "Expression Add Operators" }
-    fn topic(&self) -> &str { "backtracking" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "backtracking_expression_add_operators"
+    }
+    fn name(&self) -> &str {
+        "Expression Add Operators"
+    }
+    fn topic(&self) -> &str {
+        "backtracking"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given a string num that contains only digits and an integer target, return all \
          possibilities to insert the binary operators +, -, and * between the digits \
@@ -1188,18 +1462,25 @@ impl Problem for ExpressionAddOperators {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let len = rng.random_range(1..=6);
-            let num: String = (0..len)
-                .map(|_| (b'0' + rng.random_range(0..=9u8)) as char)
-                .collect();
-            let target = rng.random_range(-50..=50) as i64;
-            TestCase { data: Box::new(ExpressionAddOperatorsTest { num, target }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let len = rng.random_range(1..=6);
+                let num: String = (0..len)
+                    .map(|_| (b'0' + rng.random_range(0..=9u8)) as char)
+                    .collect();
+                let target = rng.random_range(-50..=50) as i64;
+                TestCase {
+                    data: Box::new(ExpressionAddOperatorsTest { num, target }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
-        let t = test.data.downcast_ref::<ExpressionAddOperatorsTest>().unwrap();
+        let t = test
+            .data
+            .downcast_ref::<ExpressionAddOperatorsTest>()
+            .unwrap();
         let expected = ref_add_operators(&t.num, t.target);
         let actual = solutions::expression_add_operators(&t.num, t.target);
         SolutionResult {
@@ -1215,8 +1496,12 @@ fn ref_add_operators(num: &str, target: i64) -> Vec<String> {
     let mut result = Vec::new();
     let digits = num.as_bytes();
     fn backtrack(
-        digits: &[u8], idx: usize, target: i64,
-        expr: &mut String, eval: i64, prev_operand: i64,
+        digits: &[u8],
+        idx: usize,
+        target: i64,
+        expr: &mut String,
+        eval: i64,
+        prev_operand: i64,
         result: &mut Vec<String>,
     ) {
         if idx == digits.len() {
@@ -1229,7 +1514,9 @@ fn ref_add_operators(num: &str, target: i64) -> Vec<String> {
         let expr_len = expr.len();
         for i in idx..digits.len() {
             // Skip numbers with leading zeros
-            if i > idx && digits[idx] == b'0' { break; }
+            if i > idx && digits[idx] == b'0' {
+                break;
+            }
             operand = operand * 10 + (digits[i] - b'0') as i64;
             let operand_str = std::str::from_utf8(&digits[idx..=i]).unwrap();
             if idx == 0 {
@@ -1247,14 +1534,25 @@ fn ref_add_operators(num: &str, target: i64) -> Vec<String> {
                 // Try -
                 expr.push('-');
                 expr.push_str(operand_str);
-                backtrack(digits, i + 1, target, expr, eval - operand, -operand, result);
+                backtrack(
+                    digits,
+                    i + 1,
+                    target,
+                    expr,
+                    eval - operand,
+                    -operand,
+                    result,
+                );
                 expr.truncate(expr_len);
 
                 // Try *
                 expr.push('*');
                 expr.push_str(operand_str);
                 backtrack(
-                    digits, i + 1, target, expr,
+                    digits,
+                    i + 1,
+                    target,
+                    expr,
                     eval - prev_operand + prev_operand * operand,
                     prev_operand * operand,
                     result,

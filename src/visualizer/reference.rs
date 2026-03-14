@@ -5,13 +5,19 @@ use super::{HighlightKind, ReferenceViz, VizFrame};
 pub struct BubbleSortViz;
 
 impl ReferenceViz for BubbleSortViz {
-    fn id(&self) -> &str { "bubble_sort" }
-    fn name(&self) -> &str { "Bubble Sort" }
+    fn id(&self) -> &str {
+        "bubble_sort"
+    }
+    fn name(&self) -> &str {
+        "Bubble Sort"
+    }
     fn description(&self) -> &str {
         "Repeatedly steps through the list, compares adjacent elements, and swaps them \
          if they are in the wrong order. O(n^2) time, O(1) space."
     }
-    fn default_input(&self) -> Vec<i32> { vec![5, 3, 8, 1, 9, 2, 7] }
+    fn default_input(&self) -> Vec<i32> {
+        vec![5, 3, 8, 1, 9, 2, 7]
+    }
 
     fn generate_frames(&self, input: &[i32]) -> Vec<VizFrame> {
         let mut arr = input.to_vec();
@@ -26,15 +32,27 @@ impl ReferenceViz for BubbleSortViz {
             for j in 0..n - 1 - i {
                 frames.push(VizFrame {
                     array: arr.clone(),
-                    highlights: vec![(j, HighlightKind::Comparing), (j + 1, HighlightKind::Comparing)],
-                    annotation: format!("Compare arr[{}]={} and arr[{}]={}", j, arr[j], j + 1, arr[j + 1]),
+                    highlights: vec![
+                        (j, HighlightKind::Comparing),
+                        (j + 1, HighlightKind::Comparing),
+                    ],
+                    annotation: format!(
+                        "Compare arr[{}]={} and arr[{}]={}",
+                        j,
+                        arr[j],
+                        j + 1,
+                        arr[j + 1]
+                    ),
                 });
 
                 if arr[j] > arr[j + 1] {
                     arr.swap(j, j + 1);
                     frames.push(VizFrame {
                         array: arr.clone(),
-                        highlights: vec![(j, HighlightKind::Swapping), (j + 1, HighlightKind::Swapping)],
+                        highlights: vec![
+                            (j, HighlightKind::Swapping),
+                            (j + 1, HighlightKind::Swapping),
+                        ],
                         annotation: format!("Swap! arr[{}] and arr[{}]", j, j + 1),
                     });
                 }
@@ -60,13 +78,19 @@ impl ReferenceViz for BubbleSortViz {
 pub struct SelectionSortViz;
 
 impl ReferenceViz for SelectionSortViz {
-    fn id(&self) -> &str { "selection_sort" }
-    fn name(&self) -> &str { "Selection Sort" }
+    fn id(&self) -> &str {
+        "selection_sort"
+    }
+    fn name(&self) -> &str {
+        "Selection Sort"
+    }
     fn description(&self) -> &str {
         "Finds the minimum element from the unsorted part and puts it at the beginning. \
          O(n^2) time, O(1) space."
     }
-    fn default_input(&self) -> Vec<i32> { vec![64, 25, 12, 22, 11] }
+    fn default_input(&self) -> Vec<i32> {
+        vec![64, 25, 12, 22, 11]
+    }
 
     fn generate_frames(&self, input: &[i32]) -> Vec<VizFrame> {
         let mut arr = input.to_vec();
@@ -82,14 +106,23 @@ impl ReferenceViz for SelectionSortViz {
             frames.push(VizFrame {
                 array: arr.clone(),
                 highlights: vec![(i, HighlightKind::Active)],
-                annotation: format!("Finding minimum in unsorted portion starting at index {}", i),
+                annotation: format!(
+                    "Finding minimum in unsorted portion starting at index {}",
+                    i
+                ),
             });
 
             for j in i + 1..n {
                 frames.push(VizFrame {
                     array: arr.clone(),
-                    highlights: vec![(min_idx, HighlightKind::Active), (j, HighlightKind::Comparing)],
-                    annotation: format!("Compare current min arr[{}]={} with arr[{}]={}", min_idx, arr[min_idx], j, arr[j]),
+                    highlights: vec![
+                        (min_idx, HighlightKind::Active),
+                        (j, HighlightKind::Comparing),
+                    ],
+                    annotation: format!(
+                        "Compare current min arr[{}]={} with arr[{}]={}",
+                        min_idx, arr[min_idx], j, arr[j]
+                    ),
                 });
                 if arr[j] < arr[min_idx] {
                     min_idx = j;
@@ -100,7 +133,10 @@ impl ReferenceViz for SelectionSortViz {
                 arr.swap(i, min_idx);
                 frames.push(VizFrame {
                     array: arr.clone(),
-                    highlights: vec![(i, HighlightKind::Swapping), (min_idx, HighlightKind::Swapping)],
+                    highlights: vec![
+                        (i, HighlightKind::Swapping),
+                        (min_idx, HighlightKind::Swapping),
+                    ],
                     annotation: format!("Swap arr[{}] and arr[{}]", i, min_idx),
                 });
             }
@@ -126,13 +162,19 @@ impl ReferenceViz for SelectionSortViz {
 pub struct InsertionSortViz;
 
 impl ReferenceViz for InsertionSortViz {
-    fn id(&self) -> &str { "insertion_sort" }
-    fn name(&self) -> &str { "Insertion Sort" }
+    fn id(&self) -> &str {
+        "insertion_sort"
+    }
+    fn name(&self) -> &str {
+        "Insertion Sort"
+    }
     fn description(&self) -> &str {
         "Builds the sorted array one element at a time by inserting each element \
          into its correct position. O(n^2) worst case, O(n) best case."
     }
-    fn default_input(&self) -> Vec<i32> { vec![5, 2, 4, 6, 1, 3] }
+    fn default_input(&self) -> Vec<i32> {
+        vec![5, 2, 4, 6, 1, 3]
+    }
 
     fn generate_frames(&self, input: &[i32]) -> Vec<VizFrame> {
         let mut arr = input.to_vec();
@@ -155,7 +197,10 @@ impl ReferenceViz for InsertionSortViz {
             while j > 0 && arr[j - 1] > key {
                 frames.push(VizFrame {
                     array: arr.clone(),
-                    highlights: vec![(j, HighlightKind::Comparing), (j - 1, HighlightKind::Comparing)],
+                    highlights: vec![
+                        (j, HighlightKind::Comparing),
+                        (j - 1, HighlightKind::Comparing),
+                    ],
                     annotation: format!("arr[{}]={} > {} — shift right", j - 1, arr[j - 1], key),
                 });
                 arr[j] = arr[j - 1];
@@ -185,13 +230,19 @@ impl ReferenceViz for InsertionSortViz {
 pub struct MergeSortViz;
 
 impl ReferenceViz for MergeSortViz {
-    fn id(&self) -> &str { "merge_sort" }
-    fn name(&self) -> &str { "Merge Sort" }
+    fn id(&self) -> &str {
+        "merge_sort"
+    }
+    fn name(&self) -> &str {
+        "Merge Sort"
+    }
     fn description(&self) -> &str {
         "Divides the array in half, recursively sorts each half, then merges. \
          O(n log n) time, O(n) space."
     }
-    fn default_input(&self) -> Vec<i32> { vec![38, 27, 43, 3, 9, 82, 10] }
+    fn default_input(&self) -> Vec<i32> {
+        vec![38, 27, 43, 3, 9, 82, 10]
+    }
 
     fn generate_frames(&self, input: &[i32]) -> Vec<VizFrame> {
         let mut arr = input.to_vec();
@@ -218,13 +269,17 @@ fn merge_sort_frames(arr: &mut Vec<i32>, lo: usize, hi: usize, frames: &mut Vec<
         return;
     }
     let mid = lo + (hi - lo) / 2;
-    let highlights: Vec<_> = (lo..mid).map(|i| (i, HighlightKind::Active))
+    let highlights: Vec<_> = (lo..mid)
+        .map(|i| (i, HighlightKind::Active))
         .chain((mid..hi).map(|i| (i, HighlightKind::Comparing)))
         .collect();
     frames.push(VizFrame {
         array: arr.clone(),
         highlights,
-        annotation: format!("Split [{}, {}) into [{}, {}) and [{}, {})", lo, hi, lo, mid, mid, hi),
+        annotation: format!(
+            "Split [{}, {}) into [{}, {}) and [{}, {})",
+            lo, hi, lo, mid, mid, hi
+        ),
     });
 
     merge_sort_frames(arr, lo, mid, frames);
@@ -269,13 +324,19 @@ fn merge_sort_frames(arr: &mut Vec<i32>, lo: usize, hi: usize, frames: &mut Vec<
 pub struct QuickSortViz;
 
 impl ReferenceViz for QuickSortViz {
-    fn id(&self) -> &str { "quick_sort" }
-    fn name(&self) -> &str { "Quick Sort" }
+    fn id(&self) -> &str {
+        "quick_sort"
+    }
+    fn name(&self) -> &str {
+        "Quick Sort"
+    }
     fn description(&self) -> &str {
         "Picks a pivot, partitions around it, then recursively sorts partitions. \
          O(n log n) average, O(n^2) worst case."
     }
-    fn default_input(&self) -> Vec<i32> { vec![10, 7, 8, 9, 1, 5] }
+    fn default_input(&self) -> Vec<i32> {
+        vec![10, 7, 8, 9, 1, 5]
+    }
 
     fn generate_frames(&self, input: &[i32]) -> Vec<VizFrame> {
         let mut arr = input.to_vec();
@@ -313,7 +374,11 @@ fn quick_sort_frames(arr: &mut Vec<i32>, lo: usize, hi: usize, frames: &mut Vec<
     for j in lo..hi {
         frames.push(VizFrame {
             array: arr.clone(),
-            highlights: vec![(j, HighlightKind::Comparing), (hi, HighlightKind::Pivot), (i, HighlightKind::Active)],
+            highlights: vec![
+                (j, HighlightKind::Comparing),
+                (hi, HighlightKind::Pivot),
+                (i, HighlightKind::Active),
+            ],
             annotation: format!("Compare arr[{}]={} with pivot {}", j, arr[j], pivot_val),
         });
         if arr[j] < pivot_val {
@@ -321,7 +386,11 @@ fn quick_sort_frames(arr: &mut Vec<i32>, lo: usize, hi: usize, frames: &mut Vec<
                 arr.swap(i, j);
                 frames.push(VizFrame {
                     array: arr.clone(),
-                    highlights: vec![(i, HighlightKind::Swapping), (j, HighlightKind::Swapping), (hi, HighlightKind::Pivot)],
+                    highlights: vec![
+                        (i, HighlightKind::Swapping),
+                        (j, HighlightKind::Swapping),
+                        (hi, HighlightKind::Pivot),
+                    ],
                     annotation: format!("Swap arr[{}] and arr[{}]", i, j),
                 });
             }
@@ -348,13 +417,19 @@ fn quick_sort_frames(arr: &mut Vec<i32>, lo: usize, hi: usize, frames: &mut Vec<
 pub struct BinarySearchViz;
 
 impl ReferenceViz for BinarySearchViz {
-    fn id(&self) -> &str { "binary_search" }
-    fn name(&self) -> &str { "Binary Search" }
+    fn id(&self) -> &str {
+        "binary_search"
+    }
+    fn name(&self) -> &str {
+        "Binary Search"
+    }
     fn description(&self) -> &str {
         "Searches a sorted array by repeatedly dividing the search interval in half. \
          O(log n) time."
     }
-    fn default_input(&self) -> Vec<i32> { vec![2, 5, 8, 12, 16, 23, 38, 56, 72, 91] }
+    fn default_input(&self) -> Vec<i32> {
+        vec![2, 5, 8, 12, 16, 23, 38, 56, 72, 91]
+    }
 
     fn generate_frames(&self, input: &[i32]) -> Vec<VizFrame> {
         let arr = input.to_vec();
@@ -403,14 +478,20 @@ impl ReferenceViz for BinarySearchViz {
                 frames.push(VizFrame {
                     array: arr.clone(),
                     highlights: vec![(mid_u, HighlightKind::Comparing)],
-                    annotation: format!("arr[{}]={} < {} — search right half", mid, arr[mid_u], target),
+                    annotation: format!(
+                        "arr[{}]={} < {} — search right half",
+                        mid, arr[mid_u], target
+                    ),
                 });
                 lo = mid + 1;
             } else {
                 frames.push(VizFrame {
                     array: arr.clone(),
                     highlights: vec![(mid_u, HighlightKind::Comparing)],
-                    annotation: format!("arr[{}]={} > {} — search left half", mid, arr[mid_u], target),
+                    annotation: format!(
+                        "arr[{}]={} > {} — search left half",
+                        mid, arr[mid_u], target
+                    ),
                 });
                 hi = mid - 1;
             }
@@ -464,10 +545,7 @@ impl ReferenceViz for HeapSortViz {
             arr.swap(0, end);
             frames.push(VizFrame {
                 array: arr.clone(),
-                highlights: vec![
-                    (0, HighlightKind::Swapping),
-                    (end, HighlightKind::Swapping),
-                ],
+                highlights: vec![(0, HighlightKind::Swapping), (end, HighlightKind::Swapping)],
                 annotation: format!("Swap root ({}) with position {}", arr[end], end),
             });
 
@@ -520,10 +598,7 @@ fn heap_sift_down(arr: &mut [i32], start: usize, end: usize, frames: &mut Vec<Vi
                     (largest, HighlightKind::Active),
                     (right, HighlightKind::Comparing),
                 ],
-                annotation: format!(
-                    "Compare with right child [{}]={}",
-                    right, arr[right]
-                ),
+                annotation: format!("Compare with right child [{}]={}", right, arr[right]),
             });
             if arr[right] > arr[largest] {
                 largest = right;

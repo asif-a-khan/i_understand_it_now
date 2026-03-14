@@ -36,10 +36,18 @@ struct ContainsDuplicateTest {
 }
 
 impl Problem for ContainsDuplicate {
-    fn id(&self) -> &str { "hash_maps_contains_duplicate" }
-    fn name(&self) -> &str { "Contains Duplicate" }
-    fn topic(&self) -> &str { "hash_maps" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "hash_maps_contains_duplicate"
+    }
+    fn name(&self) -> &str {
+        "Contains Duplicate"
+    }
+    fn topic(&self) -> &str {
+        "hash_maps"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given an integer array `nums`, return `true` if any value appears at least twice, \
          and `false` if every element is distinct.\n\n\
@@ -51,11 +59,15 @@ impl Problem for ContainsDuplicate {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=30);
-            let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-50..=50)).collect();
-            TestCase { data: Box::new(ContainsDuplicateTest { nums }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=30);
+                let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-50..=50)).collect();
+                TestCase {
+                    data: Box::new(ContainsDuplicateTest { nums }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -84,10 +96,18 @@ struct SingleNumberTest {
 }
 
 impl Problem for SingleNumber {
-    fn id(&self) -> &str { "hash_maps_single_number" }
-    fn name(&self) -> &str { "Single Number" }
-    fn topic(&self) -> &str { "hash_maps" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "hash_maps_single_number"
+    }
+    fn name(&self) -> &str {
+        "Single Number"
+    }
+    fn topic(&self) -> &str {
+        "hash_maps"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given a non-empty array of integers `nums`, every element appears twice except \
          for one. Find that single one.\n\n\
@@ -99,24 +119,28 @@ impl Problem for SingleNumber {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let pair_count = rng.random_range(1..=15);
-            let mut nums: Vec<i32> = Vec::with_capacity(pair_count * 2 + 1);
-            for _ in 0..pair_count {
-                let v = rng.random_range(-500..=500);
-                nums.push(v);
-                nums.push(v);
-            }
-            // Add the unique element
-            let unique = rng.random_range(-500..=500);
-            nums.push(unique);
-            // Shuffle
-            for i in (1..nums.len()).rev() {
-                let j = rng.random_range(0..=i);
-                nums.swap(i, j);
-            }
-            TestCase { data: Box::new(SingleNumberTest { nums }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let pair_count = rng.random_range(1..=15);
+                let mut nums: Vec<i32> = Vec::with_capacity(pair_count * 2 + 1);
+                for _ in 0..pair_count {
+                    let v = rng.random_range(-500..=500);
+                    nums.push(v);
+                    nums.push(v);
+                }
+                // Add the unique element
+                let unique = rng.random_range(-500..=500);
+                nums.push(unique);
+                // Shuffle
+                for i in (1..nums.len()).rev() {
+                    let j = rng.random_range(0..=i);
+                    nums.swap(i, j);
+                }
+                TestCase {
+                    data: Box::new(SingleNumberTest { nums }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -145,10 +169,18 @@ struct IntersectionTest {
 }
 
 impl Problem for Intersection {
-    fn id(&self) -> &str { "hash_maps_intersection" }
-    fn name(&self) -> &str { "Intersection of Two Arrays" }
-    fn topic(&self) -> &str { "hash_maps" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "hash_maps_intersection"
+    }
+    fn name(&self) -> &str {
+        "Intersection of Two Arrays"
+    }
+    fn topic(&self) -> &str {
+        "hash_maps"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given two integer arrays `nums1` and `nums2`, return an array of their intersection. \
          Each element in the result must be unique. Return the result sorted in ascending order.\n\n\
@@ -159,13 +191,17 @@ impl Problem for Intersection {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n1 = rng.random_range(1..=20);
-            let n2 = rng.random_range(1..=20);
-            let nums1: Vec<i32> = (0..n1).map(|_| rng.random_range(0..=50)).collect();
-            let nums2: Vec<i32> = (0..n2).map(|_| rng.random_range(0..=50)).collect();
-            TestCase { data: Box::new(IntersectionTest { nums1, nums2 }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n1 = rng.random_range(1..=20);
+                let n2 = rng.random_range(1..=20);
+                let nums1: Vec<i32> = (0..n1).map(|_| rng.random_range(0..=50)).collect();
+                let nums2: Vec<i32> = (0..n2).map(|_| rng.random_range(0..=50)).collect();
+                TestCase {
+                    data: Box::new(IntersectionTest { nums1, nums2 }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -197,10 +233,18 @@ struct HappyNumberTest {
 }
 
 impl Problem for HappyNumber {
-    fn id(&self) -> &str { "hash_maps_happy_number" }
-    fn name(&self) -> &str { "Happy Number" }
-    fn topic(&self) -> &str { "hash_maps" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "hash_maps_happy_number"
+    }
+    fn name(&self) -> &str {
+        "Happy Number"
+    }
+    fn topic(&self) -> &str {
+        "hash_maps"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Determine if a number `n` is happy.\n\n\
          A happy number is defined by the following process:\n\
@@ -214,10 +258,14 @@ impl Problem for HappyNumber {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=10000);
-            TestCase { data: Box::new(HappyNumberTest { n }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=10000);
+                TestCase {
+                    data: Box::new(HappyNumberTest { n }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -237,8 +285,12 @@ fn ref_happy_number(n: i32) -> bool {
     let mut seen = HashSet::new();
     let mut current = n;
     loop {
-        if current == 1 { return true; }
-        if !seen.insert(current) { return false; }
+        if current == 1 {
+            return true;
+        }
+        if !seen.insert(current) {
+            return false;
+        }
         let mut sum = 0;
         let mut x = current;
         while x > 0 {
@@ -259,10 +311,18 @@ struct IsomorphicTest {
 }
 
 impl Problem for IsomorphicStrings {
-    fn id(&self) -> &str { "hash_maps_isomorphic_strings" }
-    fn name(&self) -> &str { "Isomorphic Strings" }
-    fn topic(&self) -> &str { "hash_maps" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "hash_maps_isomorphic_strings"
+    }
+    fn name(&self) -> &str {
+        "Isomorphic Strings"
+    }
+    fn topic(&self) -> &str {
+        "hash_maps"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given two strings `s` and `t`, determine if they are isomorphic.\n\n\
          Two strings are isomorphic if the characters in `s` can be replaced to get `t`, \
@@ -275,38 +335,42 @@ impl Problem for IsomorphicStrings {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let len = rng.random_range(1..=20);
-            let alphabet_size = rng.random_range(2..=8usize);
-            let s: String = (0..len)
-                .map(|_| (b'a' + rng.random_range(0..alphabet_size as u8)) as char)
-                .collect();
-            // Sometimes generate isomorphic, sometimes not
-            let t = if rng.random_range(0..2) == 0 {
-                // Create isomorphic mapping
-                let mut mapping: HashMap<u8, u8> = HashMap::new();
-                let mut used: HashSet<u8> = HashSet::new();
-                let mut result = Vec::with_capacity(len);
-                for &b in s.as_bytes() {
-                    let mapped = *mapping.entry(b).or_insert_with(|| {
-                        let mut c = b'a' + rng.random_range(0..26u8);
-                        while used.contains(&c) {
-                            c = b'a' + rng.random_range(0..26u8);
-                        }
-                        used.insert(c);
-                        c
-                    });
-                    result.push(mapped);
-                }
-                String::from_utf8(result).unwrap()
-            } else {
-                // Random string (may or may not be isomorphic)
-                (0..len)
+        (0..10)
+            .map(|_| {
+                let len = rng.random_range(1..=20);
+                let alphabet_size = rng.random_range(2..=8usize);
+                let s: String = (0..len)
                     .map(|_| (b'a' + rng.random_range(0..alphabet_size as u8)) as char)
-                    .collect()
-            };
-            TestCase { data: Box::new(IsomorphicTest { s, t }) }
-        }).collect()
+                    .collect();
+                // Sometimes generate isomorphic, sometimes not
+                let t = if rng.random_range(0..2) == 0 {
+                    // Create isomorphic mapping
+                    let mut mapping: HashMap<u8, u8> = HashMap::new();
+                    let mut used: HashSet<u8> = HashSet::new();
+                    let mut result = Vec::with_capacity(len);
+                    for &b in s.as_bytes() {
+                        let mapped = *mapping.entry(b).or_insert_with(|| {
+                            let mut c = b'a' + rng.random_range(0..26u8);
+                            while used.contains(&c) {
+                                c = b'a' + rng.random_range(0..26u8);
+                            }
+                            used.insert(c);
+                            c
+                        });
+                        result.push(mapped);
+                    }
+                    String::from_utf8(result).unwrap()
+                } else {
+                    // Random string (may or may not be isomorphic)
+                    (0..len)
+                        .map(|_| (b'a' + rng.random_range(0..alphabet_size as u8)) as char)
+                        .collect()
+                };
+                TestCase {
+                    data: Box::new(IsomorphicTest { s, t }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -323,7 +387,9 @@ impl Problem for IsomorphicStrings {
 }
 
 fn ref_isomorphic(s: &str, t: &str) -> bool {
-    if s.len() != t.len() { return false; }
+    if s.len() != t.len() {
+        return false;
+    }
     let mut s_to_t: HashMap<u8, u8> = HashMap::new();
     let mut t_to_s: HashMap<u8, u8> = HashMap::new();
     for (&sb, &tb) in s.as_bytes().iter().zip(t.as_bytes()) {
@@ -331,7 +397,9 @@ fn ref_isomorphic(s: &str, t: &str) -> bool {
             Some(&mapped) if mapped != tb => return false,
             None => {
                 if let Some(&mapped_back) = t_to_s.get(&tb) {
-                    if mapped_back != sb { return false; }
+                    if mapped_back != sb {
+                        return false;
+                    }
                 }
                 s_to_t.insert(sb, tb);
                 t_to_s.insert(tb, sb);
@@ -350,10 +418,18 @@ struct GroupAnagramsTest {
 }
 
 impl Problem for GroupAnagrams {
-    fn id(&self) -> &str { "hash_maps_group_anagrams" }
-    fn name(&self) -> &str { "Group Anagrams" }
-    fn topic(&self) -> &str { "hash_maps" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "hash_maps_group_anagrams"
+    }
+    fn name(&self) -> &str {
+        "Group Anagrams"
+    }
+    fn topic(&self) -> &str {
+        "hash_maps"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given an array of strings `strs`, group the anagrams together. \
          Return a list of groups where each group is sorted alphabetically, \
@@ -367,17 +443,23 @@ impl Problem for GroupAnagrams {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=15);
-            let strs: Vec<String> = (0..n).map(|_| {
-                let len = rng.random_range(1..=6);
-                let alphabet_size = rng.random_range(2..=6u8);
-                (0..len)
-                    .map(|_| (b'a' + rng.random_range(0..alphabet_size)) as char)
-                    .collect()
-            }).collect();
-            TestCase { data: Box::new(GroupAnagramsTest { strs }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=15);
+                let strs: Vec<String> = (0..n)
+                    .map(|_| {
+                        let len = rng.random_range(1..=6);
+                        let alphabet_size = rng.random_range(2..=6u8);
+                        (0..len)
+                            .map(|_| (b'a' + rng.random_range(0..alphabet_size)) as char)
+                            .collect()
+                    })
+                    .collect();
+                TestCase {
+                    data: Box::new(GroupAnagramsTest { strs }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -417,10 +499,18 @@ struct TopKFrequentTest {
 }
 
 impl Problem for TopKFrequent {
-    fn id(&self) -> &str { "hash_maps_top_k_frequent" }
-    fn name(&self) -> &str { "Top K Frequent Elements" }
-    fn topic(&self) -> &str { "hash_maps" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "hash_maps_top_k_frequent"
+    }
+    fn name(&self) -> &str {
+        "Top K Frequent Elements"
+    }
+    fn topic(&self) -> &str {
+        "hash_maps"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given an integer array `nums` and an integer `k`, return the `k` most frequent elements. \
          Return them sorted by frequency in descending order. If two elements have the same \
@@ -433,13 +523,17 @@ impl Problem for TopKFrequent {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=30);
-            let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-20..=20)).collect();
-            let distinct: HashSet<i32> = nums.iter().copied().collect();
-            let k = rng.random_range(1..=distinct.len());
-            TestCase { data: Box::new(TopKFrequentTest { nums, k }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=30);
+                let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-20..=20)).collect();
+                let distinct: HashSet<i32> = nums.iter().copied().collect();
+                let k = rng.random_range(1..=distinct.len());
+                TestCase {
+                    data: Box::new(TopKFrequentTest { nums, k }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -474,10 +568,18 @@ struct LongestConsecutiveTest {
 }
 
 impl Problem for LongestConsecutive {
-    fn id(&self) -> &str { "hash_maps_longest_consecutive" }
-    fn name(&self) -> &str { "Longest Consecutive Sequence" }
-    fn topic(&self) -> &str { "hash_maps" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "hash_maps_longest_consecutive"
+    }
+    fn name(&self) -> &str {
+        "Longest Consecutive Sequence"
+    }
+    fn topic(&self) -> &str {
+        "hash_maps"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given an unsorted array of integers `nums`, return the length of the longest \
          consecutive elements sequence.\n\n\
@@ -491,11 +593,15 @@ impl Problem for LongestConsecutive {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(0..=30);
-            let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-50..=50)).collect();
-            TestCase { data: Box::new(LongestConsecutiveTest { nums }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(0..=30);
+                let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-50..=50)).collect();
+                TestCase {
+                    data: Box::new(LongestConsecutiveTest { nums }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -537,10 +643,18 @@ struct SubarraySumKTest {
 }
 
 impl Problem for SubarraySumK {
-    fn id(&self) -> &str { "hash_maps_subarray_sum_k" }
-    fn name(&self) -> &str { "Subarray Sum Equals K" }
-    fn topic(&self) -> &str { "hash_maps" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "hash_maps_subarray_sum_k"
+    }
+    fn name(&self) -> &str {
+        "Subarray Sum Equals K"
+    }
+    fn topic(&self) -> &str {
+        "hash_maps"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given an array of integers `nums` and an integer `k`, return the total number of \
          subarrays whose sum equals `k`.\n\n\
@@ -555,12 +669,16 @@ impl Problem for SubarraySumK {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=20);
-            let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-10..=10)).collect();
-            let k = rng.random_range(-20..=20);
-            TestCase { data: Box::new(SubarraySumKTest { nums, k }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=20);
+                let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-10..=10)).collect();
+                let k = rng.random_range(-20..=20);
+                TestCase {
+                    data: Box::new(SubarraySumKTest { nums, k }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -599,10 +717,18 @@ struct EncodeDecodeTest {
 }
 
 impl Problem for EncodeDecode {
-    fn id(&self) -> &str { "hash_maps_encode_decode" }
-    fn name(&self) -> &str { "Encode and Decode Strings" }
-    fn topic(&self) -> &str { "hash_maps" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "hash_maps_encode_decode"
+    }
+    fn name(&self) -> &str {
+        "Encode and Decode Strings"
+    }
+    fn topic(&self) -> &str {
+        "hash_maps"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Design an algorithm to encode a list of strings to a single string, and decode \
          it back to the original list.\n\n\
@@ -618,18 +744,24 @@ impl Problem for EncodeDecode {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(0..=10);
-            let strs: Vec<String> = (0..n).map(|_| {
-                let len = rng.random_range(0..=10);
-                // Include some tricky characters: #, digits, spaces
-                let alphabet = b"abcdefghij0123456789# ";
-                (0..len)
-                    .map(|_| alphabet[rng.random_range(0..alphabet.len())] as char)
-                    .collect()
-            }).collect();
-            TestCase { data: Box::new(EncodeDecodeTest { strs }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(0..=10);
+                let strs: Vec<String> = (0..n)
+                    .map(|_| {
+                        let len = rng.random_range(0..=10);
+                        // Include some tricky characters: #, digits, spaces
+                        let alphabet = b"abcdefghij0123456789# ";
+                        (0..len)
+                            .map(|_| alphabet[rng.random_range(0..alphabet.len())] as char)
+                            .collect()
+                    })
+                    .collect();
+                TestCase {
+                    data: Box::new(EncodeDecodeTest { strs }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -654,10 +786,18 @@ struct MinWindowTest {
 }
 
 impl Problem for MinWindowSubstring {
-    fn id(&self) -> &str { "hash_maps_min_window_substring" }
-    fn name(&self) -> &str { "Minimum Window Substring" }
-    fn topic(&self) -> &str { "hash_maps" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "hash_maps_min_window_substring"
+    }
+    fn name(&self) -> &str {
+        "Minimum Window Substring"
+    }
+    fn topic(&self) -> &str {
+        "hash_maps"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given two strings `s` and `t`, return the minimum window substring of `s` such \
          that every character in `t` (including duplicates) is included in the window. \
@@ -670,20 +810,24 @@ impl Problem for MinWindowSubstring {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let s_len = rng.random_range(5..=30);
-            let t_len = rng.random_range(1..=s_len.min(10));
-            let alphabet_size = rng.random_range(3..=8u8);
-            let s: String = (0..s_len)
-                .map(|_| (b'a' + rng.random_range(0..alphabet_size)) as char)
-                .collect();
-            // Build t from characters that appear in s (so a solution is more likely)
-            let s_bytes: Vec<u8> = s.bytes().collect();
-            let t: String = (0..t_len)
-                .map(|_| s_bytes[rng.random_range(0..s_bytes.len())] as char)
-                .collect();
-            TestCase { data: Box::new(MinWindowTest { s, t }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let s_len = rng.random_range(5..=30);
+                let t_len = rng.random_range(1..=s_len.min(10));
+                let alphabet_size = rng.random_range(3..=8u8);
+                let s: String = (0..s_len)
+                    .map(|_| (b'a' + rng.random_range(0..alphabet_size)) as char)
+                    .collect();
+                // Build t from characters that appear in s (so a solution is more likely)
+                let s_bytes: Vec<u8> = s.bytes().collect();
+                let t: String = (0..t_len)
+                    .map(|_| s_bytes[rng.random_range(0..s_bytes.len())] as char)
+                    .collect();
+                TestCase {
+                    data: Box::new(MinWindowTest { s, t }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -700,7 +844,9 @@ impl Problem for MinWindowSubstring {
 }
 
 fn ref_min_window(s: &str, t: &str) -> String {
-    if t.is_empty() || s.len() < t.len() { return String::new(); }
+    if t.is_empty() || s.len() < t.len() {
+        return String::new();
+    }
     let s_bytes = s.as_bytes();
     let mut need: HashMap<u8, i32> = HashMap::new();
     for &b in t.as_bytes() {
@@ -750,10 +896,18 @@ struct LongestKDistinctTest {
 }
 
 impl Problem for LongestKDistinct {
-    fn id(&self) -> &str { "hash_maps_longest_k_distinct" }
-    fn name(&self) -> &str { "Longest Substring with At Most K Distinct Characters" }
-    fn topic(&self) -> &str { "hash_maps" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "hash_maps_longest_k_distinct"
+    }
+    fn name(&self) -> &str {
+        "Longest Substring with At Most K Distinct Characters"
+    }
+    fn topic(&self) -> &str {
+        "hash_maps"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given a string `s` and an integer `k`, return the length of the longest substring \
          that contains at most `k` distinct characters.\n\n\
@@ -766,15 +920,19 @@ impl Problem for LongestKDistinct {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let len = rng.random_range(1..=30);
-            let alphabet_size = rng.random_range(2..=8u8);
-            let s: String = (0..len)
-                .map(|_| (b'a' + rng.random_range(0..alphabet_size)) as char)
-                .collect();
-            let k = rng.random_range(1..=alphabet_size as usize);
-            TestCase { data: Box::new(LongestKDistinctTest { s, k }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let len = rng.random_range(1..=30);
+                let alphabet_size = rng.random_range(2..=8u8);
+                let s: String = (0..len)
+                    .map(|_| (b'a' + rng.random_range(0..alphabet_size)) as char)
+                    .collect();
+                let k = rng.random_range(1..=alphabet_size as usize);
+                TestCase {
+                    data: Box::new(LongestKDistinctTest { s, k }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -819,10 +977,18 @@ struct AlienDictionaryTest {
 }
 
 impl Problem for AlienDictionary {
-    fn id(&self) -> &str { "hash_maps_alien_dictionary" }
-    fn name(&self) -> &str { "Alien Dictionary" }
-    fn topic(&self) -> &str { "hash_maps" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "hash_maps_alien_dictionary"
+    }
+    fn name(&self) -> &str {
+        "Alien Dictionary"
+    }
+    fn topic(&self) -> &str {
+        "hash_maps"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "There is a new alien language that uses the English lowercase alphabet. The order \
          among the letters is unknown to you.\n\n\
@@ -840,38 +1006,28 @@ impl Problem for AlienDictionary {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let letter_count = rng.random_range(2..=6usize);
-            // Create a random permutation of letters as the alien order
-            let mut alphabet: Vec<u8> = (0..letter_count as u8).map(|i| b'a' + i).collect();
-            for i in (1..alphabet.len()).rev() {
-                let j = rng.random_range(0..=i);
-                alphabet.swap(i, j);
-            }
-            // Generate words that respect this ordering
-            let word_count = rng.random_range(2..=8);
-            let mut words: Vec<String> = (0..word_count).map(|_| {
-                let len = rng.random_range(1..=4);
-                (0..len)
-                    .map(|_| alphabet[rng.random_range(0..alphabet.len())] as char)
-                    .collect()
-            }).collect();
-            // Sort by alien order
-            let order_map: HashMap<u8, usize> = alphabet.iter().enumerate()
-                .map(|(i, &c)| (c, i)).collect();
-            words.sort_by(|a, b| {
-                for (ac, bc) in a.bytes().zip(b.bytes()) {
-                    let ord = order_map[&ac].cmp(&order_map[&bc]);
-                    if ord != std::cmp::Ordering::Equal {
-                        return ord;
-                    }
+        (0..10)
+            .map(|_| {
+                let letter_count = rng.random_range(2..=6usize);
+                // Create a random permutation of letters as the alien order
+                let mut alphabet: Vec<u8> = (0..letter_count as u8).map(|i| b'a' + i).collect();
+                for i in (1..alphabet.len()).rev() {
+                    let j = rng.random_range(0..=i);
+                    alphabet.swap(i, j);
                 }
-                a.len().cmp(&b.len())
-            });
-            words.dedup();
-            if words.len() < 2 {
-                // Ensure at least 2 words
-                words.push(String::from(alphabet[0] as char));
+                // Generate words that respect this ordering
+                let word_count = rng.random_range(2..=8);
+                let mut words: Vec<String> = (0..word_count)
+                    .map(|_| {
+                        let len = rng.random_range(1..=4);
+                        (0..len)
+                            .map(|_| alphabet[rng.random_range(0..alphabet.len())] as char)
+                            .collect()
+                    })
+                    .collect();
+                // Sort by alien order
+                let order_map: HashMap<u8, usize> =
+                    alphabet.iter().enumerate().map(|(i, &c)| (c, i)).collect();
                 words.sort_by(|a, b| {
                     for (ac, bc) in a.bytes().zip(b.bytes()) {
                         let ord = order_map[&ac].cmp(&order_map[&bc]);
@@ -882,9 +1038,25 @@ impl Problem for AlienDictionary {
                     a.len().cmp(&b.len())
                 });
                 words.dedup();
-            }
-            TestCase { data: Box::new(AlienDictionaryTest { words }) }
-        }).collect()
+                if words.len() < 2 {
+                    // Ensure at least 2 words
+                    words.push(String::from(alphabet[0] as char));
+                    words.sort_by(|a, b| {
+                        for (ac, bc) in a.bytes().zip(b.bytes()) {
+                            let ord = order_map[&ac].cmp(&order_map[&bc]);
+                            if ord != std::cmp::Ordering::Equal {
+                                return ord;
+                            }
+                        }
+                        a.len().cmp(&b.len())
+                    });
+                    words.dedup();
+                }
+                TestCase {
+                    data: Box::new(AlienDictionaryTest { words }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -929,7 +1101,7 @@ fn ref_alien_dictionary(words: &[String]) -> String {
 
         for j in 0..min_len {
             if w1[j] != w2[j] {
-                if adj.get(&w1[j]).map_or(true, |s| !s.contains(&w2[j])) {
+                if adj.get(&w1[j]).is_none_or(|s| !s.contains(&w2[j])) {
                     adj.entry(w1[j]).or_default().insert(w2[j]);
                     *in_degree.entry(w2[j]).or_default() += 1;
                 }
@@ -987,10 +1159,18 @@ struct AllO1Test {
 }
 
 impl Problem for AllO1 {
-    fn id(&self) -> &str { "hash_maps_all_o1" }
-    fn name(&self) -> &str { "All O(1) Data Structure" }
-    fn topic(&self) -> &str { "hash_maps" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "hash_maps_all_o1"
+    }
+    fn name(&self) -> &str {
+        "All O(1) Data Structure"
+    }
+    fn topic(&self) -> &str {
+        "hash_maps"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Design a data structure that supports the following operations, all in O(1) time:\n\n\
          - `inc(key)` — Increments the count of `key` by 1. If `key` doesn't exist, insert \
@@ -1010,81 +1190,97 @@ impl Problem for AllO1 {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let keys: Vec<String> = (0..rng.random_range(2..=5))
-                .map(|_| {
-                    let len = rng.random_range(1..=4);
-                    (0..len).map(|_| (b'a' + rng.random_range(0..6u8)) as char).collect()
-                })
-                .collect();
+        (0..10)
+            .map(|_| {
+                let keys: Vec<String> = (0..rng.random_range(2..=5))
+                    .map(|_| {
+                        let len = rng.random_range(1..=4);
+                        (0..len)
+                            .map(|_| (b'a' + rng.random_range(0..6u8)) as char)
+                            .collect()
+                    })
+                    .collect();
 
-            let op_count = rng.random_range(5..=20);
-            let mut ops = Vec::new();
-            let mut counts: HashMap<String, i32> = HashMap::new();
-            let mut expected_results = Vec::new();
+                let op_count = rng.random_range(5..=20);
+                let mut ops = Vec::new();
+                let mut counts: HashMap<String, i32> = HashMap::new();
+                let mut expected_results = Vec::new();
 
-            for _ in 0..op_count {
-                let op_type = rng.random_range(0..4);
-                match op_type {
-                    0 => {
-                        let key = keys[rng.random_range(0..keys.len())].clone();
-                        *counts.entry(key.clone()).or_default() += 1;
-                        ops.push(AllO1Op::Inc(key));
-                        expected_results.push(None);
-                    }
-                    1 => {
-                        // Only dec if there are keys with positive counts
-                        let positive: Vec<String> = counts.iter()
-                            .filter(|(_, &v)| v > 0)
-                            .map(|(k, _)| k.clone())
-                            .collect();
-                        if positive.is_empty() {
-                            // Do an inc instead
+                for _ in 0..op_count {
+                    let op_type = rng.random_range(0..4);
+                    match op_type {
+                        0 => {
                             let key = keys[rng.random_range(0..keys.len())].clone();
                             *counts.entry(key.clone()).or_default() += 1;
                             ops.push(AllO1Op::Inc(key));
                             expected_results.push(None);
-                        } else {
-                            let key = positive[rng.random_range(0..positive.len())].clone();
-                            *counts.get_mut(&key).unwrap() -= 1;
-                            if counts[&key] == 0 {
-                                counts.remove(&key);
+                        }
+                        1 => {
+                            // Only dec if there are keys with positive counts
+                            let positive: Vec<String> = counts
+                                .iter()
+                                .filter(|(_, &v)| v > 0)
+                                .map(|(k, _)| k.clone())
+                                .collect();
+                            if positive.is_empty() {
+                                // Do an inc instead
+                                let key = keys[rng.random_range(0..keys.len())].clone();
+                                *counts.entry(key.clone()).or_default() += 1;
+                                ops.push(AllO1Op::Inc(key));
+                                expected_results.push(None);
+                            } else {
+                                let key = positive[rng.random_range(0..positive.len())].clone();
+                                *counts.get_mut(&key).unwrap() -= 1;
+                                if counts[&key] == 0 {
+                                    counts.remove(&key);
+                                }
+                                ops.push(AllO1Op::Dec(key));
+                                expected_results.push(None);
                             }
-                            ops.push(AllO1Op::Dec(key));
-                            expected_results.push(None);
+                        }
+                        2 => {
+                            ops.push(AllO1Op::GetMaxKey);
+                            let max_key = ref_get_max_key(&counts);
+                            expected_results.push(Some(max_key));
+                        }
+                        _ => {
+                            ops.push(AllO1Op::GetMinKey);
+                            let min_key = ref_get_min_key(&counts);
+                            expected_results.push(Some(min_key));
                         }
                     }
-                    2 => {
-                        ops.push(AllO1Op::GetMaxKey);
-                        let max_key = ref_get_max_key(&counts);
-                        expected_results.push(Some(max_key));
-                    }
-                    _ => {
-                        ops.push(AllO1Op::GetMinKey);
-                        let min_key = ref_get_min_key(&counts);
-                        expected_results.push(Some(min_key));
-                    }
                 }
-            }
 
-            TestCase { data: Box::new(AllO1Test { ops, expected_results }) }
-        }).collect()
+                TestCase {
+                    data: Box::new(AllO1Test {
+                        ops,
+                        expected_results,
+                    }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<AllO1Test>().unwrap();
 
         // Convert ops to the format the user solution expects: Vec<(String, String)>
-        let user_ops: Vec<(String, String)> = t.ops.iter().map(|op| match op {
-            AllO1Op::Inc(k) => ("inc".to_string(), k.clone()),
-            AllO1Op::Dec(k) => ("dec".to_string(), k.clone()),
-            AllO1Op::GetMaxKey => ("max".to_string(), String::new()),
-            AllO1Op::GetMinKey => ("min".to_string(), String::new()),
-        }).collect();
+        let user_ops: Vec<(String, String)> = t
+            .ops
+            .iter()
+            .map(|op| match op {
+                AllO1Op::Inc(k) => ("inc".to_string(), k.clone()),
+                AllO1Op::Dec(k) => ("dec".to_string(), k.clone()),
+                AllO1Op::GetMaxKey => ("max".to_string(), String::new()),
+                AllO1Op::GetMinKey => ("min".to_string(), String::new()),
+            })
+            .collect();
 
         let actual = solutions::all_o1(&user_ops);
 
-        let expected: Vec<String> = t.expected_results.iter()
+        let expected: Vec<String> = t
+            .expected_results
+            .iter()
             .filter_map(|r| r.clone())
             .collect();
 
@@ -1098,9 +1294,12 @@ impl Problem for AllO1 {
 }
 
 fn ref_get_max_key(counts: &HashMap<String, i32>) -> String {
-    if counts.is_empty() { return String::new(); }
+    if counts.is_empty() {
+        return String::new();
+    }
     let max_val = *counts.values().max().unwrap();
-    let mut candidates: Vec<&String> = counts.iter()
+    let mut candidates: Vec<&String> = counts
+        .iter()
         .filter(|(_, &v)| v == max_val)
         .map(|(k, _)| k)
         .collect();
@@ -1109,9 +1308,12 @@ fn ref_get_max_key(counts: &HashMap<String, i32>) -> String {
 }
 
 fn ref_get_min_key(counts: &HashMap<String, i32>) -> String {
-    if counts.is_empty() { return String::new(); }
+    if counts.is_empty() {
+        return String::new();
+    }
     let min_val = *counts.values().min().unwrap();
-    let mut candidates: Vec<&String> = counts.iter()
+    let mut candidates: Vec<&String> = counts
+        .iter()
         .filter(|(_, &v)| v == min_val)
         .map(|(k, _)| k)
         .collect();
@@ -1127,10 +1329,18 @@ struct MaxPointsTest {
 }
 
 impl Problem for MaxPointsLine {
-    fn id(&self) -> &str { "hash_maps_max_points_line" }
-    fn name(&self) -> &str { "Max Points on a Line" }
-    fn topic(&self) -> &str { "hash_maps" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "hash_maps_max_points_line"
+    }
+    fn name(&self) -> &str {
+        "Max Points on a Line"
+    }
+    fn topic(&self) -> &str {
+        "hash_maps"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given an array of points on the X-Y plane `points[i] = (xi, yi)`, return the \
          maximum number of points that lie on the same straight line.\n\n\
@@ -1144,19 +1354,23 @@ impl Problem for MaxPointsLine {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=15);
-            let mut used: HashSet<(i32, i32)> = HashSet::new();
-            let mut points = Vec::with_capacity(n);
-            while points.len() < n {
-                let x = rng.random_range(-100..=100);
-                let y = rng.random_range(-100..=100);
-                if used.insert((x, y)) {
-                    points.push((x, y));
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=15);
+                let mut used: HashSet<(i32, i32)> = HashSet::new();
+                let mut points = Vec::with_capacity(n);
+                while points.len() < n {
+                    let x = rng.random_range(-100..=100);
+                    let y = rng.random_range(-100..=100);
+                    if used.insert((x, y)) {
+                        points.push((x, y));
+                    }
                 }
-            }
-            TestCase { data: Box::new(MaxPointsTest { points }) }
-        }).collect()
+                TestCase {
+                    data: Box::new(MaxPointsTest { points }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -1174,7 +1388,9 @@ impl Problem for MaxPointsLine {
 
 fn ref_max_points(points: &[(i32, i32)]) -> i32 {
     let n = points.len();
-    if n <= 2 { return n as i32; }
+    if n <= 2 {
+        return n as i32;
+    }
     let mut best = 2i32;
 
     for i in 0..n {
@@ -1205,5 +1421,9 @@ fn ref_max_points(points: &[(i32, i32)]) -> i32 {
 }
 
 fn gcd(a: i32, b: i32) -> i32 {
-    if b == 0 { a } else { gcd(b, a % b) }
+    if b == 0 {
+        a
+    } else {
+        gcd(b, a % b)
+    }
 }

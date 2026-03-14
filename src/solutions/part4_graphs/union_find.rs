@@ -44,11 +44,7 @@ pub fn accounts_merge(_accounts: &[Vec<String>]) -> Vec<Vec<String>> {
 /// Number of Islands II: add land cells one at a time.
 /// Return Vec<i32> with island count after each addition.
 /// If a cell is added twice, count stays the same.
-pub fn num_islands_ii(
-    _rows: usize,
-    _cols: usize,
-    _positions: &[(usize, usize)],
-) -> Vec<i32> {
+pub fn num_islands_ii(_rows: usize, _cols: usize, _positions: &[(usize, usize)]) -> Vec<i32> {
     todo!()
 }
 

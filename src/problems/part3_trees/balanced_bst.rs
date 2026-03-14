@@ -1,6 +1,8 @@
 use rand::Rng;
 
-use crate::problems::helpers::{self, TreeNode, build_tree, tree_to_level_order, inorder, random_bst, random_tree};
+use crate::problems::helpers::{
+    self, build_tree, inorder, random_bst, random_tree, tree_to_level_order, TreeNode,
+};
 use crate::problems::{Difficulty, Problem, SolutionResult, TestCase};
 use crate::solutions::part3_trees::balanced_bst as solutions;
 use crate::tracker::OperationLog;
@@ -61,9 +63,10 @@ fn is_bst(arena: &[TreeNode], root: Option<usize>) -> bool {
             None => true,
             Some(idx) => {
                 let val = arena[idx].val as i64;
-                if val <= min || val >= max { return false; }
-                check(arena, arena[idx].left, min, val)
-                    && check(arena, arena[idx].right, val, max)
+                if val <= min || val >= max {
+                    return false;
+                }
+                check(arena, arena[idx].left, min, val) && check(arena, arena[idx].right, val, max)
             }
         }
     }
@@ -93,7 +96,11 @@ fn bst_insert(arena: &mut Vec<TreeNode>, root: Option<usize>, val: i32) -> usize
     match root {
         None => {
             let idx = arena.len();
-            arena.push(TreeNode { val, left: None, right: None });
+            arena.push(TreeNode {
+                val,
+                left: None,
+                right: None,
+            });
             idx
         }
         Some(idx) => {
@@ -112,13 +119,23 @@ fn bst_insert(arena: &mut Vec<TreeNode>, root: Option<usize>, val: i32) -> usize
 // ── Easy 1: Is Balanced ─────────────────────────────────────────────────
 
 struct IsBalanced;
-struct IsBalancedTest { tree: Vec<Option<i32>> }
+struct IsBalancedTest {
+    tree: Vec<Option<i32>>,
+}
 
 impl Problem for IsBalanced {
-    fn id(&self) -> &str { "balanced_bst_is_balanced" }
-    fn name(&self) -> &str { "Is Balanced" }
-    fn topic(&self) -> &str { "balanced_bst" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "balanced_bst_is_balanced"
+    }
+    fn name(&self) -> &str {
+        "Is Balanced"
+    }
+    fn topic(&self) -> &str {
+        "balanced_bst"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given a binary tree (level-order representation), determine if it is \
          height-balanced. A tree is height-balanced if for every node, the depth \
@@ -129,15 +146,19 @@ impl Problem for IsBalanced {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(0..=15);
-            let tree = if rng.random_range(0..2) == 0 {
-                random_bst(&mut rng, n, -100, 100)
-            } else {
-                random_tree(&mut rng, n, -100, 100)
-            };
-            TestCase { data: Box::new(IsBalancedTest { tree }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(0..=15);
+                let tree = if rng.random_range(0..2) == 0 {
+                    random_bst(&mut rng, n, -100, 100)
+                } else {
+                    random_tree(&mut rng, n, -100, 100)
+                };
+                TestCase {
+                    data: Box::new(IsBalancedTest { tree }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -157,13 +178,23 @@ impl Problem for IsBalanced {
 // ── Easy 2: Sorted Array to BST ─────────────────────────────────────────
 
 struct SortedArrayToBST;
-struct SortedArrayToBSTTest { nums: Vec<i32> }
+struct SortedArrayToBSTTest {
+    nums: Vec<i32>,
+}
 
 impl Problem for SortedArrayToBST {
-    fn id(&self) -> &str { "balanced_bst_sorted_array_to_bst" }
-    fn name(&self) -> &str { "Sorted Array to BST" }
-    fn topic(&self) -> &str { "balanced_bst" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "balanced_bst_sorted_array_to_bst"
+    }
+    fn name(&self) -> &str {
+        "Sorted Array to BST"
+    }
+    fn topic(&self) -> &str {
+        "balanced_bst"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given a sorted (ascending) integer array with unique values, convert it to a \
          height-balanced BST. Return the level-order representation.\n\n\
@@ -174,13 +205,17 @@ impl Problem for SortedArrayToBST {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(0..=20);
-            let nums = helpers::random_unique_vec(&mut rng, n, -100, 100);
-            let mut nums = nums;
-            nums.sort();
-            TestCase { data: Box::new(SortedArrayToBSTTest { nums }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(0..=20);
+                let nums = helpers::random_unique_vec(&mut rng, n, -100, 100);
+                let mut nums = nums;
+                nums.sort();
+                TestCase {
+                    data: Box::new(SortedArrayToBSTTest { nums }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -195,7 +230,10 @@ impl Problem for SortedArrayToBST {
             is_correct,
             input_description: format!("nums={:?}", t.nums),
             expected: "valid balanced BST with same elements".to_string(),
-            actual: format!("tree={:?}, balanced={}, bst={}, inorder={:?}", actual, balanced, valid_bst, in_order),
+            actual: format!(
+                "tree={:?}, balanced={}, bst={}, inorder={:?}",
+                actual, balanced, valid_bst, in_order
+            ),
         }
     }
 }
@@ -203,13 +241,23 @@ impl Problem for SortedArrayToBST {
 // ── Easy 3: Min Depth ───────────────────────────────────────────────────
 
 struct MinDepth;
-struct MinDepthTest { tree: Vec<Option<i32>> }
+struct MinDepthTest {
+    tree: Vec<Option<i32>>,
+}
 
 impl Problem for MinDepth {
-    fn id(&self) -> &str { "balanced_bst_min_depth" }
-    fn name(&self) -> &str { "Minimum Depth of Binary Tree" }
-    fn topic(&self) -> &str { "balanced_bst" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "balanced_bst_min_depth"
+    }
+    fn name(&self) -> &str {
+        "Minimum Depth of Binary Tree"
+    }
+    fn topic(&self) -> &str {
+        "balanced_bst"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given a binary tree, find its minimum depth. The minimum depth is the number of \
          nodes along the shortest path from the root node down to the nearest leaf node.\n\n\
@@ -220,11 +268,15 @@ impl Problem for MinDepth {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(0..=15);
-            let tree = random_tree(&mut rng, n, -100, 100);
-            TestCase { data: Box::new(MinDepthTest { tree }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(0..=15);
+                let tree = random_tree(&mut rng, n, -100, 100);
+                TestCase {
+                    data: Box::new(MinDepthTest { tree }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -247,9 +299,15 @@ fn ref_min_depth(arena: &[TreeNode], root: Option<usize>) -> i32 {
         Some(idx) => {
             let left = arena[idx].left;
             let right = arena[idx].right;
-            if left.is_none() && right.is_none() { return 1; }
-            if left.is_none() { return 1 + ref_min_depth(arena, right); }
-            if right.is_none() { return 1 + ref_min_depth(arena, left); }
+            if left.is_none() && right.is_none() {
+                return 1;
+            }
+            if left.is_none() {
+                return 1 + ref_min_depth(arena, right);
+            }
+            if right.is_none() {
+                return 1 + ref_min_depth(arena, left);
+            }
             1 + ref_min_depth(arena, left).min(ref_min_depth(arena, right))
         }
     }
@@ -258,13 +316,23 @@ fn ref_min_depth(arena: &[TreeNode], root: Option<usize>) -> i32 {
 // ── Easy 4: Tree Height ─────────────────────────────────────────────────
 
 struct TreeHeight;
-struct TreeHeightTest { tree: Vec<Option<i32>> }
+struct TreeHeightTest {
+    tree: Vec<Option<i32>>,
+}
 
 impl Problem for TreeHeight {
-    fn id(&self) -> &str { "balanced_bst_height" }
-    fn name(&self) -> &str { "Height of Binary Tree" }
-    fn topic(&self) -> &str { "balanced_bst" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "balanced_bst_height"
+    }
+    fn name(&self) -> &str {
+        "Height of Binary Tree"
+    }
+    fn topic(&self) -> &str {
+        "balanced_bst"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Calculate the height of a binary tree. The height is the number of nodes along \
          the longest path from the root to any leaf.\n\n\
@@ -275,11 +343,15 @@ impl Problem for TreeHeight {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(0..=15);
-            let tree = random_tree(&mut rng, n, -100, 100);
-            TestCase { data: Box::new(TreeHeightTest { tree }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(0..=15);
+                let tree = random_tree(&mut rng, n, -100, 100);
+                TestCase {
+                    data: Box::new(TreeHeightTest { tree }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -299,13 +371,23 @@ impl Problem for TreeHeight {
 // ── Easy 5: Count Nodes in Complete Binary Tree ─────────────────────────
 
 struct CountNodes;
-struct CountNodesTest { tree: Vec<Option<i32>> }
+struct CountNodesTest {
+    tree: Vec<Option<i32>>,
+}
 
 impl Problem for CountNodes {
-    fn id(&self) -> &str { "balanced_bst_count_nodes" }
-    fn name(&self) -> &str { "Count Complete Tree Nodes" }
-    fn topic(&self) -> &str { "balanced_bst" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "balanced_bst_count_nodes"
+    }
+    fn name(&self) -> &str {
+        "Count Complete Tree Nodes"
+    }
+    fn topic(&self) -> &str {
+        "balanced_bst"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given a complete binary tree, return the number of nodes.\n\n\
          A complete binary tree is one where every level, except possibly the last, is \
@@ -317,12 +399,17 @@ impl Problem for CountNodes {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(0..=20);
-            // Build a complete binary tree
-            let tree: Vec<Option<i32>> = (0..n).map(|_| Some(rng.random_range(-100..=100))).collect();
-            TestCase { data: Box::new(CountNodesTest { tree }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(0..=20);
+                // Build a complete binary tree
+                let tree: Vec<Option<i32>> =
+                    (0..n).map(|_| Some(rng.random_range(-100..=100))).collect();
+                TestCase {
+                    data: Box::new(CountNodesTest { tree }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -342,13 +429,23 @@ impl Problem for CountNodes {
 // ── Medium 1: Balance a BST ─────────────────────────────────────────────
 
 struct BalanceBST;
-struct BalanceBSTTest { tree: Vec<Option<i32>> }
+struct BalanceBSTTest {
+    tree: Vec<Option<i32>>,
+}
 
 impl Problem for BalanceBST {
-    fn id(&self) -> &str { "balanced_bst_balance" }
-    fn name(&self) -> &str { "Balance a BST" }
-    fn topic(&self) -> &str { "balanced_bst" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "balanced_bst_balance"
+    }
+    fn name(&self) -> &str {
+        "Balance a BST"
+    }
+    fn topic(&self) -> &str {
+        "balanced_bst"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given the root of a BST, return a balanced BST with the same node values.\n\n\
          The result must be a valid BST and height-balanced.\n\n\
@@ -358,11 +455,15 @@ impl Problem for BalanceBST {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=15);
-            let tree = random_unbalanced_bst(&mut rng, n, -200, 200);
-            TestCase { data: Box::new(BalanceBSTTest { tree }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=15);
+                let tree = random_unbalanced_bst(&mut rng, n, -200, 200);
+                TestCase {
+                    data: Box::new(BalanceBSTTest { tree }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -381,7 +482,10 @@ impl Problem for BalanceBST {
             is_correct,
             input_description: format!("tree={:?}", t.tree),
             expected: "balanced BST with same elements".to_string(),
-            actual: format!("tree={:?}, balanced={}, bst={}", actual, balanced, valid_bst),
+            actual: format!(
+                "tree={:?}, balanced={}, bst={}",
+                actual, balanced, valid_bst
+            ),
         }
     }
 }
@@ -389,13 +493,23 @@ impl Problem for BalanceBST {
 // ── Medium 2: Convert Sorted List to BST ────────────────────────────────
 
 struct ConvertSortedList;
-struct ConvertSortedListTest { nums: Vec<i32> }
+struct ConvertSortedListTest {
+    nums: Vec<i32>,
+}
 
 impl Problem for ConvertSortedList {
-    fn id(&self) -> &str { "balanced_bst_convert_sorted_list" }
-    fn name(&self) -> &str { "Convert Sorted List to BST" }
-    fn topic(&self) -> &str { "balanced_bst" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "balanced_bst_convert_sorted_list"
+    }
+    fn name(&self) -> &str {
+        "Convert Sorted List to BST"
+    }
+    fn topic(&self) -> &str {
+        "balanced_bst"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given a sorted (ascending) list of integers, convert it to a height-balanced BST. \
          Return the level-order representation.\n\n\
@@ -406,14 +520,18 @@ impl Problem for ConvertSortedList {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(0..=20);
-            let nums = helpers::random_sorted_vec(&mut rng, n, -100, 100);
-            // Deduplicate for BST property
-            let mut nums = nums;
-            nums.dedup();
-            TestCase { data: Box::new(ConvertSortedListTest { nums }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(0..=20);
+                let nums = helpers::random_sorted_vec(&mut rng, n, -100, 100);
+                // Deduplicate for BST property
+                let mut nums = nums;
+                nums.dedup();
+                TestCase {
+                    data: Box::new(ConvertSortedListTest { nums }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -428,7 +546,10 @@ impl Problem for ConvertSortedList {
             is_correct,
             input_description: format!("nums={:?}", t.nums),
             expected: "valid balanced BST with same elements".to_string(),
-            actual: format!("tree={:?}, balanced={}, bst={}, inorder={:?}", actual, balanced, valid_bst, in_order),
+            actual: format!(
+                "tree={:?}, balanced={}, bst={}, inorder={:?}",
+                actual, balanced, valid_bst, in_order
+            ),
         }
     }
 }
@@ -436,13 +557,24 @@ impl Problem for ConvertSortedList {
 // ── Medium 3: Closest Value in BST ──────────────────────────────────────
 
 struct ClosestValue;
-struct ClosestValueTest { tree: Vec<Option<i32>>, target: f64 }
+struct ClosestValueTest {
+    tree: Vec<Option<i32>>,
+    target: f64,
+}
 
 impl Problem for ClosestValue {
-    fn id(&self) -> &str { "balanced_bst_closest_value" }
-    fn name(&self) -> &str { "Closest Value in BST" }
-    fn topic(&self) -> &str { "balanced_bst" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "balanced_bst_closest_value"
+    }
+    fn name(&self) -> &str {
+        "Closest Value in BST"
+    }
+    fn topic(&self) -> &str {
+        "balanced_bst"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given a BST and a target floating-point value, find the value in the BST that is \
          closest to the target.\n\n\
@@ -454,14 +586,18 @@ impl Problem for ClosestValue {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=15);
-            let tree = random_bst(&mut rng, n, -100, 100);
-            let target = rng.random_range(-120.0..=120.0_f64);
-            // Round to 1 decimal for cleaner display
-            let target = (target * 10.0).round() / 10.0;
-            TestCase { data: Box::new(ClosestValueTest { tree, target }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=15);
+                let tree = random_bst(&mut rng, n, -100, 100);
+                let target = rng.random_range(-120.0..=120.0_f64);
+                // Round to 1 decimal for cleaner display
+                let target = (target * 10.0).round() / 10.0;
+                TestCase {
+                    data: Box::new(ClosestValueTest { tree, target }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -488,7 +624,11 @@ fn ref_closest_value(arena: &[TreeNode], root: Option<usize>, target: f64) -> i3
         if diff < best_diff || (diff == best_diff && val < closest) {
             closest = val;
         }
-        node = if target < val as f64 { arena[idx].left } else { arena[idx].right };
+        node = if target < val as f64 {
+            arena[idx].left
+        } else {
+            arena[idx].right
+        };
     }
     closest
 }
@@ -496,13 +636,24 @@ fn ref_closest_value(arena: &[TreeNode], root: Option<usize>, target: f64) -> i3
 // ── Medium 4: Kth Smallest in BST ───────────────────────────────────────
 
 struct KthSmallest;
-struct KthSmallestTest { tree: Vec<Option<i32>>, k: usize }
+struct KthSmallestTest {
+    tree: Vec<Option<i32>>,
+    k: usize,
+}
 
 impl Problem for KthSmallest {
-    fn id(&self) -> &str { "balanced_bst_kth_smallest" }
-    fn name(&self) -> &str { "Kth Smallest Element in BST" }
-    fn topic(&self) -> &str { "balanced_bst" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "balanced_bst_kth_smallest"
+    }
+    fn name(&self) -> &str {
+        "Kth Smallest Element in BST"
+    }
+    fn topic(&self) -> &str {
+        "balanced_bst"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given the root of a BST and an integer `k`, return the kth smallest value \
          (1-indexed) in the tree.\n\n\
@@ -513,12 +664,16 @@ impl Problem for KthSmallest {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=20);
-            let tree = random_bst(&mut rng, n, -200, 200);
-            let k = rng.random_range(1..=n);
-            TestCase { data: Box::new(KthSmallestTest { tree, k }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=20);
+                let tree = random_bst(&mut rng, n, -200, 200);
+                let k = rng.random_range(1..=n);
+                TestCase {
+                    data: Box::new(KthSmallestTest { tree, k }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -539,13 +694,24 @@ impl Problem for KthSmallest {
 // ── Medium 5: All Elements in Two BSTs ──────────────────────────────────
 
 struct AllElementsTwoBST;
-struct AllElementsTest { tree1: Vec<Option<i32>>, tree2: Vec<Option<i32>> }
+struct AllElementsTest {
+    tree1: Vec<Option<i32>>,
+    tree2: Vec<Option<i32>>,
+}
 
 impl Problem for AllElementsTwoBST {
-    fn id(&self) -> &str { "balanced_bst_all_elements_two_bst" }
-    fn name(&self) -> &str { "All Elements in Two BSTs" }
-    fn topic(&self) -> &str { "balanced_bst" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "balanced_bst_all_elements_two_bst"
+    }
+    fn name(&self) -> &str {
+        "All Elements in Two BSTs"
+    }
+    fn topic(&self) -> &str {
+        "balanced_bst"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given two BSTs, return a sorted list of all elements from both trees.\n\n\
          Constraints:\n\
@@ -554,13 +720,17 @@ impl Problem for AllElementsTwoBST {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n1 = rng.random_range(0..=10);
-            let n2 = rng.random_range(0..=10);
-            let tree1 = random_bst(&mut rng, n1, -100, 100);
-            let tree2 = random_bst(&mut rng, n2, -100, 100);
-            TestCase { data: Box::new(AllElementsTest { tree1, tree2 }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n1 = rng.random_range(0..=10);
+                let n2 = rng.random_range(0..=10);
+                let tree1 = random_bst(&mut rng, n1, -100, 100);
+                let tree2 = random_bst(&mut rng, n2, -100, 100);
+                TestCase {
+                    data: Box::new(AllElementsTest { tree1, tree2 }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -583,13 +753,23 @@ impl Problem for AllElementsTwoBST {
 // ── Hard 1: Largest BST Subtree ─────────────────────────────────────────
 
 struct LargestBSTSubtree;
-struct LargestBSTTest { tree: Vec<Option<i32>> }
+struct LargestBSTTest {
+    tree: Vec<Option<i32>>,
+}
 
 impl Problem for LargestBSTSubtree {
-    fn id(&self) -> &str { "balanced_bst_largest_bst_subtree" }
-    fn name(&self) -> &str { "Largest BST Subtree" }
-    fn topic(&self) -> &str { "balanced_bst" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "balanced_bst_largest_bst_subtree"
+    }
+    fn name(&self) -> &str {
+        "Largest BST Subtree"
+    }
+    fn topic(&self) -> &str {
+        "balanced_bst"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given a binary tree, find the largest subtree that is also a valid BST. \
          Return the number of nodes in that subtree.\n\n\
@@ -600,11 +780,15 @@ impl Problem for LargestBSTSubtree {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(0..=15);
-            let tree = random_tree(&mut rng, n, -50, 50);
-            TestCase { data: Box::new(LargestBSTTest { tree }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(0..=15);
+                let tree = random_tree(&mut rng, n, -50, 50);
+                TestCase {
+                    data: Box::new(LargestBSTTest { tree }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -646,13 +830,23 @@ fn ref_largest_bst_subtree(arena: &[TreeNode], root: Option<usize>) -> i32 {
 // ── Hard 2: Verify Preorder of BST ──────────────────────────────────────
 
 struct VerifyPreorder;
-struct VerifyPreorderTest { preorder: Vec<i32> }
+struct VerifyPreorderTest {
+    preorder: Vec<i32>,
+}
 
 impl Problem for VerifyPreorder {
-    fn id(&self) -> &str { "balanced_bst_verify_preorder" }
-    fn name(&self) -> &str { "Verify Preorder Sequence of BST" }
-    fn topic(&self) -> &str { "balanced_bst" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "balanced_bst_verify_preorder"
+    }
+    fn name(&self) -> &str {
+        "Verify Preorder Sequence of BST"
+    }
+    fn topic(&self) -> &str {
+        "balanced_bst"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given an array of unique integers, determine if it is a valid preorder traversal \
          sequence of a BST.\n\n\
@@ -663,19 +857,23 @@ impl Problem for VerifyPreorder {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=15);
-            let preorder = if rng.random_range(0..2) == 0 {
-                // Generate valid preorder from a BST
-                let tree = random_bst(&mut rng, n, -200, 200);
-                let (arena, root) = build_tree(&tree);
-                ref_preorder(&arena, root)
-            } else {
-                // Random permutation (may or may not be valid)
-                helpers::random_unique_vec(&mut rng, n, -200, 200)
-            };
-            TestCase { data: Box::new(VerifyPreorderTest { preorder }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=15);
+                let preorder = if rng.random_range(0..2) == 0 {
+                    // Generate valid preorder from a BST
+                    let tree = random_bst(&mut rng, n, -200, 200);
+                    let (arena, root) = build_tree(&tree);
+                    ref_preorder(&arena, root)
+                } else {
+                    // Random permutation (may or may not be valid)
+                    helpers::random_unique_vec(&mut rng, n, -200, 200)
+                };
+                TestCase {
+                    data: Box::new(VerifyPreorderTest { preorder }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -708,7 +906,9 @@ fn ref_verify_preorder(preorder: &[i32]) -> bool {
     let mut stack: Vec<i32> = Vec::new();
     let mut low = i64::MIN;
     for &val in preorder {
-        if (val as i64) < low { return false; }
+        if (val as i64) < low {
+            return false;
+        }
         while let Some(&top) = stack.last() {
             if top < val {
                 low = stack.pop().unwrap() as i64;
@@ -724,13 +924,25 @@ fn ref_verify_preorder(preorder: &[i32]) -> bool {
 // ── Hard 3: Count Nodes in Range ────────────────────────────────────────
 
 struct CountRange;
-struct CountRangeTest { tree: Vec<Option<i32>>, lo: i32, hi: i32 }
+struct CountRangeTest {
+    tree: Vec<Option<i32>>,
+    lo: i32,
+    hi: i32,
+}
 
 impl Problem for CountRange {
-    fn id(&self) -> &str { "balanced_bst_count_range" }
-    fn name(&self) -> &str { "Count Nodes in Range" }
-    fn topic(&self) -> &str { "balanced_bst" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "balanced_bst_count_range"
+    }
+    fn name(&self) -> &str {
+        "Count Nodes in Range"
+    }
+    fn topic(&self) -> &str {
+        "balanced_bst"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given a BST and a range [lo, hi], count the number of nodes with values \
          in the inclusive range [lo, hi].\n\n\
@@ -741,14 +953,18 @@ impl Problem for CountRange {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(0..=20);
-            let tree = random_bst(&mut rng, n, -100, 100);
-            let a = rng.random_range(-120..=120);
-            let b = rng.random_range(-120..=120);
-            let (lo, hi) = if a <= b { (a, b) } else { (b, a) };
-            TestCase { data: Box::new(CountRangeTest { tree, lo, hi }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(0..=20);
+                let tree = random_bst(&mut rng, n, -100, 100);
+                let a = rng.random_range(-120..=120);
+                let b = rng.random_range(-120..=120);
+                let (lo, hi) = if a <= b { (a, b) } else { (b, a) };
+                TestCase {
+                    data: Box::new(CountRangeTest { tree, lo, hi }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -769,13 +985,23 @@ impl Problem for CountRange {
 // ── Hard 4: Median of BST ──────────────────────────────────────────────
 
 struct MedianBST;
-struct MedianBSTTest { tree: Vec<Option<i32>> }
+struct MedianBSTTest {
+    tree: Vec<Option<i32>>,
+}
 
 impl Problem for MedianBST {
-    fn id(&self) -> &str { "balanced_bst_median_bst" }
-    fn name(&self) -> &str { "Median of BST" }
-    fn topic(&self) -> &str { "balanced_bst" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "balanced_bst_median_bst"
+    }
+    fn name(&self) -> &str {
+        "Median of BST"
+    }
+    fn topic(&self) -> &str {
+        "balanced_bst"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given a BST, find the median value. If the tree has an even number of nodes, \
          return the average of the two middle values.\n\n\
@@ -786,11 +1012,15 @@ impl Problem for MedianBST {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=20);
-            let tree = random_bst(&mut rng, n, -200, 200);
-            TestCase { data: Box::new(MedianBSTTest { tree }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=20);
+                let tree = random_bst(&mut rng, n, -200, 200);
+                TestCase {
+                    data: Box::new(MedianBSTTest { tree }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -817,13 +1047,24 @@ impl Problem for MedianBST {
 // ── Hard 5: Rank from Stream ────────────────────────────────────────────
 
 struct RankFromStream;
-struct RankStreamTest { stream: Vec<i32>, queries: Vec<i32> }
+struct RankStreamTest {
+    stream: Vec<i32>,
+    queries: Vec<i32>,
+}
 
 impl Problem for RankFromStream {
-    fn id(&self) -> &str { "balanced_bst_rank_from_stream" }
-    fn name(&self) -> &str { "Rank from Stream" }
-    fn topic(&self) -> &str { "balanced_bst" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "balanced_bst_rank_from_stream"
+    }
+    fn name(&self) -> &str {
+        "Rank from Stream"
+    }
+    fn topic(&self) -> &str {
+        "balanced_bst"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "You are reading integers from a data stream. After reading all integers, \
          answer queries: for each query value x, return the rank of x, which is the \
@@ -835,20 +1076,26 @@ impl Problem for RankFromStream {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=30);
-            let stream: Vec<i32> = (0..n).map(|_| rng.random_range(-100..=100)).collect();
-            let q = rng.random_range(1..=10);
-            let queries: Vec<i32> = (0..q).map(|_| rng.random_range(-120..=120)).collect();
-            TestCase { data: Box::new(RankStreamTest { stream, queries }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=30);
+                let stream: Vec<i32> = (0..n).map(|_| rng.random_range(-100..=100)).collect();
+                let q = rng.random_range(1..=10);
+                let queries: Vec<i32> = (0..q).map(|_| rng.random_range(-120..=120)).collect();
+                TestCase {
+                    data: Box::new(RankStreamTest { stream, queries }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<RankStreamTest>().unwrap();
-        let expected: Vec<i32> = t.queries.iter().map(|&q| {
-            t.stream.iter().filter(|&&v| v <= q).count() as i32
-        }).collect();
+        let expected: Vec<i32> = t
+            .queries
+            .iter()
+            .map(|&q| t.stream.iter().filter(|&&v| v <= q).count() as i32)
+            .collect();
         let actual = solutions::rank_from_stream(&t.stream, &t.queries);
         SolutionResult {
             is_correct: expected == actual,

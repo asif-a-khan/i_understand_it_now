@@ -74,11 +74,8 @@ fn estimate_big_o(measurements: &[(usize, usize)]) -> String {
     // For O(log n): ops_ratio ≈ log(n2)/log(n1)
     // For O(1): ops_ratio ≈ 1
 
-    let avg_exponent: f64 = ratios
-        .iter()
-        .map(|(sr, or)| or.ln() / sr.ln())
-        .sum::<f64>()
-        / ratios.len() as f64;
+    let avg_exponent: f64 =
+        ratios.iter().map(|(sr, or)| or.ln() / sr.ln()).sum::<f64>() / ratios.len() as f64;
 
     if avg_exponent < 0.1 {
         "O(1)".to_string()
@@ -111,7 +108,7 @@ fn draw_plot(measurements: &[(usize, usize)], estimated: &str) -> String {
     let mut lines = Vec::new();
     lines.push(format!("  Empirical Complexity: {}", estimated));
     lines.push(String::new());
-    lines.push(format!("  ops"));
+    lines.push("  ops".to_string());
 
     // Build the plot grid
     let mut grid = vec![vec![' '; width]; height];
@@ -125,8 +122,12 @@ fn draw_plot(measurements: &[(usize, usize)], estimated: &str) -> String {
         grid[y][x] = '*';
 
         // Draw a dot with surrounding area for visibility
-        if x > 0 { grid[y][x - 1] = '-'; }
-        if x + 1 < width { grid[y][x + 1] = '-'; }
+        if x > 0 {
+            grid[y][x - 1] = '-';
+        }
+        if x + 1 < width {
+            grid[y][x + 1] = '-';
+        }
     }
 
     // Render rows (top to bottom = high to low)
@@ -144,7 +145,12 @@ fn draw_plot(measurements: &[(usize, usize)], estimated: &str) -> String {
 
     // X-axis
     lines.push(format!("  {:>8} +{}", "", "-".repeat(width)));
-    lines.push(format!("  {:>8}  0{:>width$}", "", max_n, width = width - 1));
+    lines.push(format!(
+        "  {:>8}  0{:>width$}",
+        "",
+        max_n,
+        width = width - 1
+    ));
     lines.push(format!("  {:>8}  n (input size)", ""));
     lines.push(String::new());
 

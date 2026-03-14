@@ -770,10 +770,7 @@ impl Problem for RotateList {
             .collect();
         // Edge case: empty list
         tests.push(TestCase {
-            data: Box::new(RotateListTest {
-                vals: vec![],
-                k: 5,
-            }),
+            data: Box::new(RotateListTest { vals: vec![], k: 5 }),
         });
         // Edge case: k=0
         tests.push(TestCase {

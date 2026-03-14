@@ -53,9 +53,7 @@ pub fn render_help(f: &mut Frame, screen: &Screen) {
             ("Esc", "Back to problem list"),
             ("?", "Toggle this help"),
         ],
-        Screen::ProblemRunning { .. } => vec![
-            ("", "Tests running..."),
-        ],
+        Screen::ProblemRunning { .. } => vec![("", "Tests running...")],
         Screen::ProblemResult { .. } => vec![
             ("r", "Run tests again"),
             ("e", "Edit solution in $EDITOR"),

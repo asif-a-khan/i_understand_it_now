@@ -1,9 +1,7 @@
 use rand::Rng;
 use std::collections::VecDeque;
 
-use crate::problems::helpers::{
-    build_tree, inorder, random_tree, tree_to_level_order, TreeNode,
-};
+use crate::problems::helpers::{build_tree, inorder, random_tree, tree_to_level_order, TreeNode};
 use crate::problems::{Difficulty, Problem, SolutionResult, TestCase};
 use crate::solutions::part3_trees::binary_trees as solutions;
 use crate::tracker::OperationLog;
@@ -39,10 +37,18 @@ struct MaxDepthTest {
 }
 
 impl Problem for MaxDepth {
-    fn id(&self) -> &str { "binary_trees_max_depth" }
-    fn name(&self) -> &str { "Maximum Depth of Binary Tree" }
-    fn topic(&self) -> &str { "binary_trees" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "binary_trees_max_depth"
+    }
+    fn name(&self) -> &str {
+        "Maximum Depth of Binary Tree"
+    }
+    fn topic(&self) -> &str {
+        "binary_trees"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given a binary tree (level-order representation), return its maximum depth.\n\n\
          The maximum depth is the number of nodes along the longest path from the \
@@ -55,15 +61,25 @@ impl Problem for MaxDepth {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        let mut tests: Vec<TestCase> = (0..8).map(|_| {
-            let size = rng.random_range(1..=20);
-            let tree = random_tree(&mut rng, size, -100, 100);
-            TestCase { data: Box::new(MaxDepthTest { tree }) }
-        }).collect();
+        let mut tests: Vec<TestCase> = (0..8)
+            .map(|_| {
+                let size = rng.random_range(1..=20);
+                let tree = random_tree(&mut rng, size, -100, 100);
+                TestCase {
+                    data: Box::new(MaxDepthTest { tree }),
+                }
+            })
+            .collect();
         // Edge case: empty tree
-        tests.push(TestCase { data: Box::new(MaxDepthTest { tree: vec![] }) });
+        tests.push(TestCase {
+            data: Box::new(MaxDepthTest { tree: vec![] }),
+        });
         // Edge case: single node
-        tests.push(TestCase { data: Box::new(MaxDepthTest { tree: vec![Some(1)] }) });
+        tests.push(TestCase {
+            data: Box::new(MaxDepthTest {
+                tree: vec![Some(1)],
+            }),
+        });
         tests
     }
 
@@ -103,10 +119,18 @@ struct InorderTraversalTest {
 }
 
 impl Problem for InorderTraversal {
-    fn id(&self) -> &str { "binary_trees_inorder_traversal" }
-    fn name(&self) -> &str { "Binary Tree Inorder Traversal" }
-    fn topic(&self) -> &str { "binary_trees" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "binary_trees_inorder_traversal"
+    }
+    fn name(&self) -> &str {
+        "Binary Tree Inorder Traversal"
+    }
+    fn topic(&self) -> &str {
+        "binary_trees"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given a binary tree (level-order representation), return its inorder traversal \
          as a Vec<i32>.\n\n\
@@ -119,13 +143,23 @@ impl Problem for InorderTraversal {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        let mut tests: Vec<TestCase> = (0..8).map(|_| {
-            let size = rng.random_range(1..=20);
-            let tree = random_tree(&mut rng, size, -100, 100);
-            TestCase { data: Box::new(InorderTraversalTest { tree }) }
-        }).collect();
-        tests.push(TestCase { data: Box::new(InorderTraversalTest { tree: vec![] }) });
-        tests.push(TestCase { data: Box::new(InorderTraversalTest { tree: vec![Some(42)] }) });
+        let mut tests: Vec<TestCase> = (0..8)
+            .map(|_| {
+                let size = rng.random_range(1..=20);
+                let tree = random_tree(&mut rng, size, -100, 100);
+                TestCase {
+                    data: Box::new(InorderTraversalTest { tree }),
+                }
+            })
+            .collect();
+        tests.push(TestCase {
+            data: Box::new(InorderTraversalTest { tree: vec![] }),
+        });
+        tests.push(TestCase {
+            data: Box::new(InorderTraversalTest {
+                tree: vec![Some(42)],
+            }),
+        });
         tests
     }
 
@@ -151,10 +185,18 @@ struct IsSymmetricTest {
 }
 
 impl Problem for IsSymmetric {
-    fn id(&self) -> &str { "binary_trees_is_symmetric" }
-    fn name(&self) -> &str { "Symmetric Tree" }
-    fn topic(&self) -> &str { "binary_trees" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "binary_trees_is_symmetric"
+    }
+    fn name(&self) -> &str {
+        "Symmetric Tree"
+    }
+    fn topic(&self) -> &str {
+        "binary_trees"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given a binary tree, check whether it is a mirror of itself (symmetric around \
          its center).\n\n\
@@ -171,17 +213,27 @@ impl Problem for IsSymmetric {
         // Generate symmetric trees
         for _ in 0..4 {
             let tree = ref_random_symmetric_tree(&mut rng);
-            tests.push(TestCase { data: Box::new(IsSymmetricTest { tree }) });
+            tests.push(TestCase {
+                data: Box::new(IsSymmetricTest { tree }),
+            });
         }
         // Generate random (likely non-symmetric) trees
         for _ in 0..4 {
             let size = rng.random_range(2..=15);
             let tree = random_tree(&mut rng, size, -10, 10);
-            tests.push(TestCase { data: Box::new(IsSymmetricTest { tree }) });
+            tests.push(TestCase {
+                data: Box::new(IsSymmetricTest { tree }),
+            });
         }
         // Edge cases
-        tests.push(TestCase { data: Box::new(IsSymmetricTest { tree: vec![] }) });
-        tests.push(TestCase { data: Box::new(IsSymmetricTest { tree: vec![Some(1)] }) });
+        tests.push(TestCase {
+            data: Box::new(IsSymmetricTest { tree: vec![] }),
+        });
+        tests.push(TestCase {
+            data: Box::new(IsSymmetricTest {
+                tree: vec![Some(1)],
+            }),
+        });
         tests
     }
 
@@ -222,13 +274,12 @@ fn ref_random_symmetric_tree(rng: &mut impl Rng) -> Vec<Option<i32>> {
             }
         }
         // Mirror: left half children, then right half children (reversed vals)
-        let half = left_half.len();
         let mut level = Vec::new();
-        for i in 0..half {
-            level.push(left_half[i]);
+        for &item in left_half.iter() {
+            level.push(item);
         }
-        for i in (0..half).rev() {
-            level.push(left_half[i]);
+        for &item in left_half.iter().rev() {
+            level.push(item);
         }
         level_size = level.len();
         result.extend(level);
@@ -268,10 +319,18 @@ struct IsSameTreeTest {
 }
 
 impl Problem for IsSameTree {
-    fn id(&self) -> &str { "binary_trees_is_same_tree" }
-    fn name(&self) -> &str { "Same Tree" }
-    fn topic(&self) -> &str { "binary_trees" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "binary_trees_is_same_tree"
+    }
+    fn name(&self) -> &str {
+        "Same Tree"
+    }
+    fn topic(&self) -> &str {
+        "binary_trees"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given two binary trees (level-order), check if they are structurally identical \
          and have the same node values.\n\n\
@@ -290,7 +349,10 @@ impl Problem for IsSameTree {
             let size = rng.random_range(1..=15);
             let tree = random_tree(&mut rng, size, -50, 50);
             tests.push(TestCase {
-                data: Box::new(IsSameTreeTest { tree1: tree.clone(), tree2: tree }),
+                data: Box::new(IsSameTreeTest {
+                    tree1: tree.clone(),
+                    tree2: tree,
+                }),
             });
         }
         // Different trees
@@ -305,10 +367,16 @@ impl Problem for IsSameTree {
         }
         // Edge cases
         tests.push(TestCase {
-            data: Box::new(IsSameTreeTest { tree1: vec![], tree2: vec![] }),
+            data: Box::new(IsSameTreeTest {
+                tree1: vec![],
+                tree2: vec![],
+            }),
         });
         tests.push(TestCase {
-            data: Box::new(IsSameTreeTest { tree1: vec![Some(1)], tree2: vec![] }),
+            data: Box::new(IsSameTreeTest {
+                tree1: vec![Some(1)],
+                tree2: vec![],
+            }),
         });
         tests
     }
@@ -351,10 +419,18 @@ struct InvertTreeTest {
 }
 
 impl Problem for InvertTree {
-    fn id(&self) -> &str { "binary_trees_invert" }
-    fn name(&self) -> &str { "Invert Binary Tree" }
-    fn topic(&self) -> &str { "binary_trees" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "binary_trees_invert"
+    }
+    fn name(&self) -> &str {
+        "Invert Binary Tree"
+    }
+    fn topic(&self) -> &str {
+        "binary_trees"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given a binary tree (level-order), invert it (swap left and right subtrees \
          at every node) and return the result as a level-order representation.\n\n\
@@ -366,13 +442,23 @@ impl Problem for InvertTree {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        let mut tests: Vec<TestCase> = (0..8).map(|_| {
-            let size = rng.random_range(1..=20);
-            let tree = random_tree(&mut rng, size, -100, 100);
-            TestCase { data: Box::new(InvertTreeTest { tree }) }
-        }).collect();
-        tests.push(TestCase { data: Box::new(InvertTreeTest { tree: vec![] }) });
-        tests.push(TestCase { data: Box::new(InvertTreeTest { tree: vec![Some(1)] }) });
+        let mut tests: Vec<TestCase> = (0..8)
+            .map(|_| {
+                let size = rng.random_range(1..=20);
+                let tree = random_tree(&mut rng, size, -100, 100);
+                TestCase {
+                    data: Box::new(InvertTreeTest { tree }),
+                }
+            })
+            .collect();
+        tests.push(TestCase {
+            data: Box::new(InvertTreeTest { tree: vec![] }),
+        });
+        tests.push(TestCase {
+            data: Box::new(InvertTreeTest {
+                tree: vec![Some(1)],
+            }),
+        });
         tests
     }
 
@@ -413,10 +499,18 @@ struct LevelOrderTest {
 }
 
 impl Problem for LevelOrder {
-    fn id(&self) -> &str { "binary_trees_level_order" }
-    fn name(&self) -> &str { "Binary Tree Level Order Traversal" }
-    fn topic(&self) -> &str { "binary_trees" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "binary_trees_level_order"
+    }
+    fn name(&self) -> &str {
+        "Binary Tree Level Order Traversal"
+    }
+    fn topic(&self) -> &str {
+        "binary_trees"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given a binary tree, return its level order traversal as Vec<Vec<i32>> \
          (i.e., from left to right, level by level).\n\n\
@@ -428,13 +522,23 @@ impl Problem for LevelOrder {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        let mut tests: Vec<TestCase> = (0..8).map(|_| {
-            let size = rng.random_range(1..=25);
-            let tree = random_tree(&mut rng, size, -100, 100);
-            TestCase { data: Box::new(LevelOrderTest { tree }) }
-        }).collect();
-        tests.push(TestCase { data: Box::new(LevelOrderTest { tree: vec![] }) });
-        tests.push(TestCase { data: Box::new(LevelOrderTest { tree: vec![Some(1)] }) });
+        let mut tests: Vec<TestCase> = (0..8)
+            .map(|_| {
+                let size = rng.random_range(1..=25);
+                let tree = random_tree(&mut rng, size, -100, 100);
+                TestCase {
+                    data: Box::new(LevelOrderTest { tree }),
+                }
+            })
+            .collect();
+        tests.push(TestCase {
+            data: Box::new(LevelOrderTest { tree: vec![] }),
+        });
+        tests.push(TestCase {
+            data: Box::new(LevelOrderTest {
+                tree: vec![Some(1)],
+            }),
+        });
         tests
     }
 
@@ -463,8 +567,12 @@ fn ref_level_order(tree: &[Option<i32>]) -> Vec<Vec<i32>> {
         for _ in 0..level_size {
             let idx = queue.pop_front().unwrap();
             level.push(arena[idx].val);
-            if let Some(l) = arena[idx].left { queue.push_back(l); }
-            if let Some(r) = arena[idx].right { queue.push_back(r); }
+            if let Some(l) = arena[idx].left {
+                queue.push_back(l);
+            }
+            if let Some(r) = arena[idx].right {
+                queue.push_back(r);
+            }
         }
         result.push(level);
     }
@@ -479,10 +587,18 @@ struct ZigzagLevelOrderTest {
 }
 
 impl Problem for ZigzagLevelOrder {
-    fn id(&self) -> &str { "binary_trees_zigzag_level_order" }
-    fn name(&self) -> &str { "Binary Tree Zigzag Level Order Traversal" }
-    fn topic(&self) -> &str { "binary_trees" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "binary_trees_zigzag_level_order"
+    }
+    fn name(&self) -> &str {
+        "Binary Tree Zigzag Level Order Traversal"
+    }
+    fn topic(&self) -> &str {
+        "binary_trees"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given a binary tree, return its zigzag level order traversal.\n\n\
          The first level is left-to-right, the second right-to-left, the third \
@@ -495,13 +611,23 @@ impl Problem for ZigzagLevelOrder {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        let mut tests: Vec<TestCase> = (0..8).map(|_| {
-            let size = rng.random_range(1..=25);
-            let tree = random_tree(&mut rng, size, -100, 100);
-            TestCase { data: Box::new(ZigzagLevelOrderTest { tree }) }
-        }).collect();
-        tests.push(TestCase { data: Box::new(ZigzagLevelOrderTest { tree: vec![] }) });
-        tests.push(TestCase { data: Box::new(ZigzagLevelOrderTest { tree: vec![Some(1)] }) });
+        let mut tests: Vec<TestCase> = (0..8)
+            .map(|_| {
+                let size = rng.random_range(1..=25);
+                let tree = random_tree(&mut rng, size, -100, 100);
+                TestCase {
+                    data: Box::new(ZigzagLevelOrderTest { tree }),
+                }
+            })
+            .collect();
+        tests.push(TestCase {
+            data: Box::new(ZigzagLevelOrderTest { tree: vec![] }),
+        });
+        tests.push(TestCase {
+            data: Box::new(ZigzagLevelOrderTest {
+                tree: vec![Some(1)],
+            }),
+        });
         tests
     }
 
@@ -536,10 +662,18 @@ struct RightSideViewTest {
 }
 
 impl Problem for RightSideView {
-    fn id(&self) -> &str { "binary_trees_right_side_view" }
-    fn name(&self) -> &str { "Binary Tree Right Side View" }
-    fn topic(&self) -> &str { "binary_trees" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "binary_trees_right_side_view"
+    }
+    fn name(&self) -> &str {
+        "Binary Tree Right Side View"
+    }
+    fn topic(&self) -> &str {
+        "binary_trees"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given a binary tree, imagine yourself standing on the right side of it. \
          Return the values of the nodes you can see ordered from top to bottom.\n\n\
@@ -551,13 +685,23 @@ impl Problem for RightSideView {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        let mut tests: Vec<TestCase> = (0..8).map(|_| {
-            let size = rng.random_range(1..=25);
-            let tree = random_tree(&mut rng, size, -100, 100);
-            TestCase { data: Box::new(RightSideViewTest { tree }) }
-        }).collect();
-        tests.push(TestCase { data: Box::new(RightSideViewTest { tree: vec![] }) });
-        tests.push(TestCase { data: Box::new(RightSideViewTest { tree: vec![Some(1)] }) });
+        let mut tests: Vec<TestCase> = (0..8)
+            .map(|_| {
+                let size = rng.random_range(1..=25);
+                let tree = random_tree(&mut rng, size, -100, 100);
+                TestCase {
+                    data: Box::new(RightSideViewTest { tree }),
+                }
+            })
+            .collect();
+        tests.push(TestCase {
+            data: Box::new(RightSideViewTest { tree: vec![] }),
+        });
+        tests.push(TestCase {
+            data: Box::new(RightSideViewTest {
+                tree: vec![Some(1)],
+            }),
+        });
         tests
     }
 
@@ -576,7 +720,10 @@ impl Problem for RightSideView {
 
 fn ref_right_side_view(tree: &[Option<i32>]) -> Vec<i32> {
     let levels = ref_level_order(tree);
-    levels.iter().filter_map(|level| level.last().copied()).collect()
+    levels
+        .iter()
+        .filter_map(|level| level.last().copied())
+        .collect()
 }
 
 // ── Medium 4: Flatten Binary Tree to Linked List ──────────────────────
@@ -587,10 +734,18 @@ struct FlattenToLinkedListTest {
 }
 
 impl Problem for FlattenToLinkedList {
-    fn id(&self) -> &str { "binary_trees_flatten_to_linked_list" }
-    fn name(&self) -> &str { "Flatten Binary Tree to Linked List" }
-    fn topic(&self) -> &str { "binary_trees" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "binary_trees_flatten_to_linked_list"
+    }
+    fn name(&self) -> &str {
+        "Flatten Binary Tree to Linked List"
+    }
+    fn topic(&self) -> &str {
+        "binary_trees"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given a binary tree, flatten it to a linked list in-place following preorder \
          traversal. Return the values in preorder as a Vec<i32>.\n\n\
@@ -602,13 +757,23 @@ impl Problem for FlattenToLinkedList {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        let mut tests: Vec<TestCase> = (0..8).map(|_| {
-            let size = rng.random_range(1..=20);
-            let tree = random_tree(&mut rng, size, -100, 100);
-            TestCase { data: Box::new(FlattenToLinkedListTest { tree }) }
-        }).collect();
-        tests.push(TestCase { data: Box::new(FlattenToLinkedListTest { tree: vec![] }) });
-        tests.push(TestCase { data: Box::new(FlattenToLinkedListTest { tree: vec![Some(1)] }) });
+        let mut tests: Vec<TestCase> = (0..8)
+            .map(|_| {
+                let size = rng.random_range(1..=20);
+                let tree = random_tree(&mut rng, size, -100, 100);
+                TestCase {
+                    data: Box::new(FlattenToLinkedListTest { tree }),
+                }
+            })
+            .collect();
+        tests.push(TestCase {
+            data: Box::new(FlattenToLinkedListTest { tree: vec![] }),
+        });
+        tests.push(TestCase {
+            data: Box::new(FlattenToLinkedListTest {
+                tree: vec![Some(1)],
+            }),
+        });
         tests
     }
 
@@ -648,10 +813,18 @@ struct ConstructFromPreorderInorderTest {
 }
 
 impl Problem for ConstructFromPreorderInorder {
-    fn id(&self) -> &str { "binary_trees_construct_from_preorder_inorder" }
-    fn name(&self) -> &str { "Construct Binary Tree from Preorder and Inorder Traversal" }
-    fn topic(&self) -> &str { "binary_trees" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "binary_trees_construct_from_preorder_inorder"
+    }
+    fn name(&self) -> &str {
+        "Construct Binary Tree from Preorder and Inorder Traversal"
+    }
+    fn topic(&self) -> &str {
+        "binary_trees"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given two integer arrays `preorder` and `inorder` where `preorder` is the \
          preorder traversal and `inorder` is the inorder traversal of the same tree, \
@@ -666,48 +839,54 @@ impl Problem for ConstructFromPreorderInorder {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        let mut tests: Vec<TestCase> = (0..9).map(|_| {
-            let size = rng.random_range(1..=15);
-            let tree = random_tree(&mut rng, size, -200, 200);
-            // Rebuild to get consistent unique values
-            let (arena, root) = build_tree(&tree);
-            // Ensure unique values: assign indices as values
-            let mut unique_arena = arena.clone();
-            let vals_in = inorder(&arena, root);
-            // If there are duplicates, regenerate with unique values
-            let unique_set: std::collections::HashSet<i32> = vals_in.iter().copied().collect();
-            if unique_set.len() == vals_in.len() {
-                let preorder_vals = ref_preorder(&tree);
-                let inorder_vals = inorder(&unique_arena, root);
-                TestCase {
-                    data: Box::new(ConstructFromPreorderInorderTest {
-                        preorder: preorder_vals,
-                        inorder_vals,
-                    }),
-                }
-            } else {
-                // Reassign unique values
-                let mut counter = 0i32;
-                fn assign_unique(arena: &mut Vec<TreeNode>, node: Option<usize>, counter: &mut i32) {
-                    if let Some(idx) = node {
-                        assign_unique(arena, arena[idx].left, counter);
-                        arena[idx].val = *counter;
-                        *counter += 1;
-                        assign_unique(arena, arena[idx].right, counter);
+        let mut tests: Vec<TestCase> = (0..9)
+            .map(|_| {
+                let size = rng.random_range(1..=15);
+                let tree = random_tree(&mut rng, size, -200, 200);
+                // Rebuild to get consistent unique values
+                let (arena, root) = build_tree(&tree);
+                // Ensure unique values: assign indices as values
+                let mut unique_arena = arena.clone();
+                let vals_in = inorder(&arena, root);
+                // If there are duplicates, regenerate with unique values
+                let unique_set: std::collections::HashSet<i32> = vals_in.iter().copied().collect();
+                if unique_set.len() == vals_in.len() {
+                    let preorder_vals = ref_preorder(&tree);
+                    let inorder_vals = inorder(&unique_arena, root);
+                    TestCase {
+                        data: Box::new(ConstructFromPreorderInorderTest {
+                            preorder: preorder_vals,
+                            inorder_vals,
+                        }),
+                    }
+                } else {
+                    // Reassign unique values
+                    let mut counter = 0i32;
+                    fn assign_unique(
+                        arena: &mut Vec<TreeNode>,
+                        node: Option<usize>,
+                        counter: &mut i32,
+                    ) {
+                        if let Some(idx) = node {
+                            assign_unique(arena, arena[idx].left, counter);
+                            arena[idx].val = *counter;
+                            *counter += 1;
+                            assign_unique(arena, arena[idx].right, counter);
+                        }
+                    }
+                    assign_unique(&mut unique_arena, root, &mut counter);
+                    let level_order = tree_to_level_order(&unique_arena, root);
+                    let preorder_vals = ref_preorder(&level_order);
+                    let inorder_vals = inorder(&unique_arena, root);
+                    TestCase {
+                        data: Box::new(ConstructFromPreorderInorderTest {
+                            preorder: preorder_vals,
+                            inorder_vals,
+                        }),
                     }
                 }
-                assign_unique(&mut unique_arena, root, &mut counter);
-                let level_order = tree_to_level_order(&unique_arena, root);
-                let preorder_vals = ref_preorder(&level_order);
-                let inorder_vals = inorder(&unique_arena, root);
-                TestCase {
-                    data: Box::new(ConstructFromPreorderInorderTest {
-                        preorder: preorder_vals,
-                        inorder_vals,
-                    }),
-                }
-            }
-        }).collect();
+            })
+            .collect();
         // Edge case: single node
         tests.push(TestCase {
             data: Box::new(ConstructFromPreorderInorderTest {
@@ -719,7 +898,10 @@ impl Problem for ConstructFromPreorderInorder {
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
-        let t = test.data.downcast_ref::<ConstructFromPreorderInorderTest>().unwrap();
+        let t = test
+            .data
+            .downcast_ref::<ConstructFromPreorderInorderTest>()
+            .unwrap();
         let expected = ref_build_from_preorder_inorder(&t.preorder, &t.inorder_vals);
         let actual = solutions::construct_from_preorder_inorder(&t.preorder, &t.inorder_vals);
         // Compare by rebuilding and checking inorder traversal (structure match)
@@ -740,7 +922,11 @@ impl Problem for ConstructFromPreorderInorder {
 
 fn ref_build_from_preorder_inorder(preorder: &[i32], inorder_vals: &[i32]) -> Vec<Option<i32>> {
     use std::collections::HashMap;
-    let in_map: HashMap<i32, usize> = inorder_vals.iter().enumerate().map(|(i, &v)| (v, i)).collect();
+    let in_map: HashMap<i32, usize> = inorder_vals
+        .iter()
+        .enumerate()
+        .map(|(i, &v)| (v, i))
+        .collect();
     let mut pre_idx = 0;
     let mut arena = Vec::new();
 
@@ -758,7 +944,11 @@ fn ref_build_from_preorder_inorder(preorder: &[i32], inorder_vals: &[i32]) -> Ve
         let root_val = preorder[*pre_idx];
         *pre_idx += 1;
         let idx = arena.len();
-        arena.push(TreeNode { val: root_val, left: None, right: None });
+        arena.push(TreeNode {
+            val: root_val,
+            left: None,
+            right: None,
+        });
         let in_pos = in_map[&root_val];
         let left = if in_pos > in_lo {
             build(preorder, pre_idx, in_lo, in_pos - 1, in_map, arena)
@@ -778,7 +968,14 @@ fn ref_build_from_preorder_inorder(preorder: &[i32], inorder_vals: &[i32]) -> Ve
     if preorder.is_empty() {
         return vec![];
     }
-    let root = build(preorder, &mut pre_idx, 0, inorder_vals.len() - 1, &in_map, &mut arena);
+    let root = build(
+        preorder,
+        &mut pre_idx,
+        0,
+        inorder_vals.len() - 1,
+        &in_map,
+        &mut arena,
+    );
     tree_to_level_order(&arena, root)
 }
 
@@ -790,10 +987,18 @@ struct MaxPathSumTest {
 }
 
 impl Problem for MaxPathSum {
-    fn id(&self) -> &str { "binary_trees_max_path_sum" }
-    fn name(&self) -> &str { "Binary Tree Maximum Path Sum" }
-    fn topic(&self) -> &str { "binary_trees" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "binary_trees_max_path_sum"
+    }
+    fn name(&self) -> &str {
+        "Binary Tree Maximum Path Sum"
+    }
+    fn topic(&self) -> &str {
+        "binary_trees"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given a binary tree, find the maximum path sum. A path is a sequence of nodes \
          where each pair of adjacent nodes has an edge. The path does not need to pass \
@@ -807,17 +1012,27 @@ impl Problem for MaxPathSum {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        let mut tests: Vec<TestCase> = (0..8).map(|_| {
-            let size = rng.random_range(1..=20);
-            let tree = random_tree(&mut rng, size, -100, 100);
-            TestCase { data: Box::new(MaxPathSumTest { tree }) }
-        }).collect();
+        let mut tests: Vec<TestCase> = (0..8)
+            .map(|_| {
+                let size = rng.random_range(1..=20);
+                let tree = random_tree(&mut rng, size, -100, 100);
+                TestCase {
+                    data: Box::new(MaxPathSumTest { tree }),
+                }
+            })
+            .collect();
         // Edge case: single node
-        tests.push(TestCase { data: Box::new(MaxPathSumTest { tree: vec![Some(-5)] }) });
+        tests.push(TestCase {
+            data: Box::new(MaxPathSumTest {
+                tree: vec![Some(-5)],
+            }),
+        });
         // All negative
-        tests.push(TestCase { data: Box::new(MaxPathSumTest {
-            tree: vec![Some(-3), Some(-2), Some(-1)],
-        }) });
+        tests.push(TestCase {
+            data: Box::new(MaxPathSumTest {
+                tree: vec![Some(-3), Some(-2), Some(-1)],
+            }),
+        });
         tests
     }
 
@@ -857,10 +1072,18 @@ struct SerializeDeserializeTest {
 }
 
 impl Problem for SerializeDeserialize {
-    fn id(&self) -> &str { "binary_trees_serialize_deserialize" }
-    fn name(&self) -> &str { "Serialize and Deserialize Binary Tree" }
-    fn topic(&self) -> &str { "binary_trees" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "binary_trees_serialize_deserialize"
+    }
+    fn name(&self) -> &str {
+        "Serialize and Deserialize Binary Tree"
+    }
+    fn topic(&self) -> &str {
+        "binary_trees"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Design an algorithm to serialize a binary tree into a string and deserialize \
          the string back to the original tree.\n\n\
@@ -875,18 +1098,31 @@ impl Problem for SerializeDeserialize {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        let mut tests: Vec<TestCase> = (0..8).map(|_| {
-            let size = rng.random_range(1..=20);
-            let tree = random_tree(&mut rng, size, -1000, 1000);
-            TestCase { data: Box::new(SerializeDeserializeTest { tree }) }
-        }).collect();
-        tests.push(TestCase { data: Box::new(SerializeDeserializeTest { tree: vec![] }) });
-        tests.push(TestCase { data: Box::new(SerializeDeserializeTest { tree: vec![Some(42)] }) });
+        let mut tests: Vec<TestCase> = (0..8)
+            .map(|_| {
+                let size = rng.random_range(1..=20);
+                let tree = random_tree(&mut rng, size, -1000, 1000);
+                TestCase {
+                    data: Box::new(SerializeDeserializeTest { tree }),
+                }
+            })
+            .collect();
+        tests.push(TestCase {
+            data: Box::new(SerializeDeserializeTest { tree: vec![] }),
+        });
+        tests.push(TestCase {
+            data: Box::new(SerializeDeserializeTest {
+                tree: vec![Some(42)],
+            }),
+        });
         tests
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
-        let t = test.data.downcast_ref::<SerializeDeserializeTest>().unwrap();
+        let t = test
+            .data
+            .downcast_ref::<SerializeDeserializeTest>()
+            .unwrap();
         // The expected output is the canonical level-order form of the input tree.
         let (arena, root) = build_tree(&t.tree);
         let expected = tree_to_level_order(&arena, root);
@@ -894,10 +1130,8 @@ impl Problem for SerializeDeserialize {
         // Compare by rebuilding both and checking structural equality
         let (ea, er) = build_tree(&expected);
         let (aa, ar) = build_tree(&actual);
-        let correct = ref_is_same_tree(
-            &tree_to_level_order(&ea, er),
-            &tree_to_level_order(&aa, ar),
-        );
+        let correct =
+            ref_is_same_tree(&tree_to_level_order(&ea, er), &tree_to_level_order(&aa, ar));
         SolutionResult {
             is_correct: correct,
             input_description: format!("tree={:?}", t.tree),
@@ -917,10 +1151,18 @@ struct LowestCommonAncestorTest {
 }
 
 impl Problem for LowestCommonAncestor {
-    fn id(&self) -> &str { "binary_trees_lowest_common_ancestor" }
-    fn name(&self) -> &str { "Lowest Common Ancestor of a Binary Tree" }
-    fn topic(&self) -> &str { "binary_trees" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "binary_trees_lowest_common_ancestor"
+    }
+    fn name(&self) -> &str {
+        "Lowest Common Ancestor of a Binary Tree"
+    }
+    fn topic(&self) -> &str {
+        "binary_trees"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given a binary tree and two node values `p` and `q`, find the lowest common \
          ancestor (LCA). The LCA is the deepest node that is an ancestor of both p \
@@ -940,13 +1182,19 @@ impl Problem for LowestCommonAncestor {
         for _ in 0..10 {
             let size = rng.random_range(2..=20);
             // Build tree with unique values
-            let vals: Vec<i32> = crate::problems::helpers::random_unique_vec(&mut rng, size, -200, 200);
+            let vals: Vec<i32> =
+                crate::problems::helpers::random_unique_vec(&mut rng, size, -200, 200);
             // Build a tree from unique values
             let tree = random_tree(&mut rng, size, -200, 200);
             let (mut arena, root) = build_tree(&tree);
             // Reassign unique values via inorder
             let mut idx = 0;
-            fn assign_vals(arena: &mut Vec<TreeNode>, node: Option<usize>, vals: &[i32], idx: &mut usize) {
+            fn assign_vals(
+                arena: &mut Vec<TreeNode>,
+                node: Option<usize>,
+                vals: &[i32],
+                idx: &mut usize,
+            ) {
                 if let Some(n) = node {
                     assign_vals(arena, arena[n].left, vals, idx);
                     arena[n].val = vals[*idx];
@@ -960,18 +1208,27 @@ impl Problem for LowestCommonAncestor {
             let all_vals = inorder(&arena, root);
             let pi = rng.random_range(0..all_vals.len());
             let mut qi = rng.random_range(0..all_vals.len());
-            while qi == pi { qi = rng.random_range(0..all_vals.len()); }
+            while qi == pi {
+                qi = rng.random_range(0..all_vals.len());
+            }
             let p = all_vals[pi];
             let q = all_vals[qi];
             tests.push(TestCase {
-                data: Box::new(LowestCommonAncestorTest { tree: tree_lo, p, q }),
+                data: Box::new(LowestCommonAncestorTest {
+                    tree: tree_lo,
+                    p,
+                    q,
+                }),
             });
         }
         tests
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
-        let t = test.data.downcast_ref::<LowestCommonAncestorTest>().unwrap();
+        let t = test
+            .data
+            .downcast_ref::<LowestCommonAncestorTest>()
+            .unwrap();
         let expected = ref_lca(&t.tree, t.p, t.q);
         let actual = solutions::lowest_common_ancestor(&t.tree, t.p, t.q);
         SolutionResult {
@@ -1011,10 +1268,18 @@ struct DiameterTest {
 }
 
 impl Problem for Diameter {
-    fn id(&self) -> &str { "binary_trees_diameter" }
-    fn name(&self) -> &str { "Diameter of Binary Tree" }
-    fn topic(&self) -> &str { "binary_trees" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "binary_trees_diameter"
+    }
+    fn name(&self) -> &str {
+        "Diameter of Binary Tree"
+    }
+    fn topic(&self) -> &str {
+        "binary_trees"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given a binary tree, return its diameter. The diameter is the length of the \
          longest path between any two nodes (measured in number of edges).\n\n\
@@ -1027,15 +1292,25 @@ impl Problem for Diameter {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        let mut tests: Vec<TestCase> = (0..8).map(|_| {
-            let size = rng.random_range(1..=25);
-            let tree = random_tree(&mut rng, size, -100, 100);
-            TestCase { data: Box::new(DiameterTest { tree }) }
-        }).collect();
-        tests.push(TestCase { data: Box::new(DiameterTest { tree: vec![Some(1)] }) });
-        tests.push(TestCase { data: Box::new(DiameterTest {
-            tree: vec![Some(1), Some(2)],
-        }) });
+        let mut tests: Vec<TestCase> = (0..8)
+            .map(|_| {
+                let size = rng.random_range(1..=25);
+                let tree = random_tree(&mut rng, size, -100, 100);
+                TestCase {
+                    data: Box::new(DiameterTest { tree }),
+                }
+            })
+            .collect();
+        tests.push(TestCase {
+            data: Box::new(DiameterTest {
+                tree: vec![Some(1)],
+            }),
+        });
+        tests.push(TestCase {
+            data: Box::new(DiameterTest {
+                tree: vec![Some(1), Some(2)],
+            }),
+        });
         tests
     }
 
@@ -1074,10 +1349,18 @@ struct CountCompleteTreeNodesTest {
 }
 
 impl Problem for CountCompleteTreeNodes {
-    fn id(&self) -> &str { "binary_trees_count_complete_tree_nodes" }
-    fn name(&self) -> &str { "Count Complete Tree Nodes" }
-    fn topic(&self) -> &str { "binary_trees" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "binary_trees_count_complete_tree_nodes"
+    }
+    fn name(&self) -> &str {
+        "Count Complete Tree Nodes"
+    }
+    fn topic(&self) -> &str {
+        "binary_trees"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given a complete binary tree, return the number of nodes.\n\n\
          A complete binary tree is one where every level, except possibly the last, \
@@ -1091,19 +1374,32 @@ impl Problem for CountCompleteTreeNodes {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        let mut tests: Vec<TestCase> = (0..8).map(|_| {
-            let size = rng.random_range(1..=50);
-            // Build a complete binary tree
-            let tree: Vec<Option<i32>> = (0..size).map(|i| Some(i as i32 + 1)).collect();
-            TestCase { data: Box::new(CountCompleteTreeNodesTest { tree }) }
-        }).collect();
-        tests.push(TestCase { data: Box::new(CountCompleteTreeNodesTest { tree: vec![] }) });
-        tests.push(TestCase { data: Box::new(CountCompleteTreeNodesTest { tree: vec![Some(1)] }) });
+        let mut tests: Vec<TestCase> = (0..8)
+            .map(|_| {
+                let size = rng.random_range(1..=50);
+                // Build a complete binary tree
+                let tree: Vec<Option<i32>> = (0..size).map(|i| Some(i + 1)).collect();
+                TestCase {
+                    data: Box::new(CountCompleteTreeNodesTest { tree }),
+                }
+            })
+            .collect();
+        tests.push(TestCase {
+            data: Box::new(CountCompleteTreeNodesTest { tree: vec![] }),
+        });
+        tests.push(TestCase {
+            data: Box::new(CountCompleteTreeNodesTest {
+                tree: vec![Some(1)],
+            }),
+        });
         tests
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
-        let t = test.data.downcast_ref::<CountCompleteTreeNodesTest>().unwrap();
+        let t = test
+            .data
+            .downcast_ref::<CountCompleteTreeNodesTest>()
+            .unwrap();
         let (arena, root) = build_tree(&t.tree);
         let expected = ref_count_nodes(&arena, root);
         let actual = solutions::count_complete_tree_nodes(&t.tree);
@@ -1119,6 +1415,8 @@ impl Problem for CountCompleteTreeNodes {
 fn ref_count_nodes(arena: &[TreeNode], root: Option<usize>) -> i32 {
     match root {
         None => 0,
-        Some(idx) => 1 + ref_count_nodes(arena, arena[idx].left) + ref_count_nodes(arena, arena[idx].right),
+        Some(idx) => {
+            1 + ref_count_nodes(arena, arena[idx].left) + ref_count_nodes(arena, arena[idx].right)
+        }
     }
 }

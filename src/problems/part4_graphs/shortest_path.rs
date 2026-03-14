@@ -30,7 +30,11 @@ const NO_PATH: i32 = i32::MAX;
 
 /// Generate a random connected weighted directed graph as edge list.
 fn gen_connected_weighted_directed(
-    rng: &mut impl Rng, n: usize, extra: usize, w_lo: i32, w_hi: i32,
+    rng: &mut impl Rng,
+    n: usize,
+    extra: usize,
+    w_lo: i32,
+    w_hi: i32,
 ) -> Vec<(usize, usize, i32)> {
     let mut edges = Vec::new();
     // Spanning tree (directed forward)
@@ -53,7 +57,11 @@ fn gen_connected_weighted_directed(
 
 /// Generate a random connected undirected weighted graph as edge list.
 fn gen_connected_weighted_undirected(
-    rng: &mut impl Rng, n: usize, extra: usize, w_lo: i32, w_hi: i32,
+    rng: &mut impl Rng,
+    n: usize,
+    extra: usize,
+    w_lo: i32,
+    w_hi: i32,
 ) -> Vec<(usize, usize, i32)> {
     let mut edges = Vec::new();
     for i in 1..n {
@@ -101,10 +109,18 @@ struct UnweightedTest {
 }
 
 impl Problem for ShortestPathUnweighted {
-    fn id(&self) -> &str { "shortest_path_unweighted" }
-    fn name(&self) -> &str { "BFS Shortest Path (Unweighted)" }
-    fn topic(&self) -> &str { "shortest_path" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "shortest_path_unweighted"
+    }
+    fn name(&self) -> &str {
+        "BFS Shortest Path (Unweighted)"
+    }
+    fn topic(&self) -> &str {
+        "shortest_path"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given an undirected unweighted graph with `n` nodes and edges, find the shortest \
          path (number of edges) from `src` to `dst`. Return -1 if no path exists.\n\n\
@@ -115,14 +131,18 @@ impl Problem for ShortestPathUnweighted {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(2..=15);
-            let extra = rng.random_range(0..=n);
-            let edges = gen_connected_unweighted(&mut rng, n, extra);
-            let src = rng.random_range(0..n);
-            let dst = rng.random_range(0..n);
-            TestCase { data: Box::new(UnweightedTest { n, edges, src, dst }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(2..=15);
+                let extra = rng.random_range(0..=n);
+                let edges = gen_connected_unweighted(&mut rng, n, extra);
+                let src = rng.random_range(0..n);
+                let dst = rng.random_range(0..n);
+                TestCase {
+                    data: Box::new(UnweightedTest { n, edges, src, dst }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -131,7 +151,10 @@ impl Problem for ShortestPathUnweighted {
         let actual = solutions::shortest_path_unweighted(t.n, &t.edges, t.src, t.dst);
         SolutionResult {
             is_correct: expected == actual,
-            input_description: format!("n={}, edges={:?}, src={}, dst={}", t.n, t.edges, t.src, t.dst),
+            input_description: format!(
+                "n={}, edges={:?}, src={}, dst={}",
+                t.n, t.edges, t.src, t.dst
+            ),
             expected: format!("{expected}"),
             actual: format!("{actual}"),
         }
@@ -175,10 +198,18 @@ struct BinaryGridTest {
 }
 
 impl Problem for ShortestPathBinaryGrid {
-    fn id(&self) -> &str { "shortest_path_binary_grid" }
-    fn name(&self) -> &str { "Shortest Path in Binary Grid" }
-    fn topic(&self) -> &str { "shortest_path" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "shortest_path_binary_grid"
+    }
+    fn name(&self) -> &str {
+        "Shortest Path in Binary Grid"
+    }
+    fn topic(&self) -> &str {
+        "shortest_path"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given an n x n binary grid where 0 is passable and 1 is blocked, return the \
          length of the shortest path from (0,0) to (n-1,n-1). The path can move in 8 \
@@ -191,15 +222,23 @@ impl Problem for ShortestPathBinaryGrid {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(2..=8);
-            let mut grid: Vec<Vec<i32>> = (0..n)
-                .map(|_| (0..n).map(|_| if rng.random_range(0..=3) == 0 { 1 } else { 0 }).collect())
-                .collect();
-            grid[0][0] = 0;
-            grid[n - 1][n - 1] = 0;
-            TestCase { data: Box::new(BinaryGridTest { grid }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(2..=8);
+                let mut grid: Vec<Vec<i32>> = (0..n)
+                    .map(|_| {
+                        (0..n)
+                            .map(|_| if rng.random_range(0..=3) == 0 { 1 } else { 0 })
+                            .collect()
+                    })
+                    .collect();
+                grid[0][0] = 0;
+                grid[n - 1][n - 1] = 0;
+                TestCase {
+                    data: Box::new(BinaryGridTest { grid }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -229,7 +268,16 @@ fn ref_shortest_binary_grid(grid: &[Vec<i32>]) -> i32 {
     let mut queue = VecDeque::new();
     queue.push_back((0usize, 0usize, 1i32));
 
-    let dirs: [(i32, i32); 8] = [(-1,-1),(-1,0),(-1,1),(0,-1),(0,1),(1,-1),(1,0),(1,1)];
+    let dirs: [(i32, i32); 8] = [
+        (-1, -1),
+        (-1, 0),
+        (-1, 1),
+        (0, -1),
+        (0, 1),
+        (1, -1),
+        (1, 0),
+        (1, 1),
+    ];
     while let Some((r, c, dist)) = queue.pop_front() {
         for (dr, dc) in &dirs {
             let nr = r as i32 + dr;
@@ -260,10 +308,18 @@ struct MinStepsTest {
 }
 
 impl Problem for ShortestPathMinSteps {
-    fn id(&self) -> &str { "shortest_path_min_steps" }
-    fn name(&self) -> &str { "Minimum Steps to Reach Target" }
-    fn topic(&self) -> &str { "shortest_path" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "shortest_path_min_steps"
+    }
+    fn name(&self) -> &str {
+        "Minimum Steps to Reach Target"
+    }
+    fn topic(&self) -> &str {
+        "shortest_path"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "On an infinite number line, you start at position `start`. Each step, you can move \
          left or right by exactly 1. Return the minimum number of steps to reach `target`.\n\n\
@@ -273,11 +329,15 @@ impl Problem for ShortestPathMinSteps {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let start = rng.random_range(-100..=100);
-            let target = rng.random_range(-100..=100);
-            TestCase { data: Box::new(MinStepsTest { start, target }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let start = rng.random_range(-100..=100);
+                let target = rng.random_range(-100..=100);
+                TestCase {
+                    data: Box::new(MinStepsTest { start, target }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -304,10 +364,18 @@ struct NetworkDelayTest {
 }
 
 impl Problem for ShortestPathNetworkDelay {
-    fn id(&self) -> &str { "shortest_path_network_delay" }
-    fn name(&self) -> &str { "Network Delay Time" }
-    fn topic(&self) -> &str { "shortest_path" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "shortest_path_network_delay"
+    }
+    fn name(&self) -> &str {
+        "Network Delay Time"
+    }
+    fn topic(&self) -> &str {
+        "shortest_path"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "There are `n` network nodes labeled 0..n-1. Given directed weighted edges \
          (u, v, time), a signal is sent from node `src`. Return the minimum time it takes \
@@ -319,13 +387,17 @@ impl Problem for ShortestPathNetworkDelay {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(2..=10);
-            let extra = rng.random_range(0..=n);
-            let edges = gen_connected_weighted_directed(&mut rng, n, extra, 1, 50);
-            let src = rng.random_range(0..n);
-            TestCase { data: Box::new(NetworkDelayTest { n, edges, src }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(2..=10);
+                let extra = rng.random_range(0..=n);
+                let edges = gen_connected_weighted_directed(&mut rng, n, extra, 1, 50);
+                let src = rng.random_range(0..n);
+                TestCase {
+                    data: Box::new(NetworkDelayTest { n, edges, src }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -344,7 +416,11 @@ impl Problem for ShortestPathNetworkDelay {
 fn ref_network_delay(n: usize, edges: &[(usize, usize, i32)], src: usize) -> i32 {
     let dist = ref_dijkstra(n, edges, src);
     let max_dist = *dist.iter().max().unwrap();
-    if max_dist == NO_PATH { -1 } else { max_dist }
+    if max_dist == NO_PATH {
+        -1
+    } else {
+        max_dist
+    }
 }
 
 fn ref_dijkstra(n: usize, edges: &[(usize, usize, i32)], src: usize) -> Vec<i32> {
@@ -384,10 +460,18 @@ struct CityFewestNeighborsTest {
 }
 
 impl Problem for ShortestPathCityFewestNeighbors {
-    fn id(&self) -> &str { "shortest_path_city_fewest_neighbors" }
-    fn name(&self) -> &str { "City with Fewest Reachable Neighbors" }
-    fn topic(&self) -> &str { "shortest_path" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "shortest_path_city_fewest_neighbors"
+    }
+    fn name(&self) -> &str {
+        "City with Fewest Reachable Neighbors"
+    }
+    fn topic(&self) -> &str {
+        "shortest_path"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given `n` cities connected by undirected weighted roads (edges), find the city with \
          the smallest number of other cities reachable within `threshold` distance. If there \
@@ -400,13 +484,21 @@ impl Problem for ShortestPathCityFewestNeighbors {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(2..=8);
-            let extra = rng.random_range(0..=n);
-            let edges = gen_connected_weighted_undirected(&mut rng, n, extra, 1, 50);
-            let threshold = rng.random_range(10..=200);
-            TestCase { data: Box::new(CityFewestNeighborsTest { n, edges, threshold }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(2..=8);
+                let extra = rng.random_range(0..=n);
+                let edges = gen_connected_weighted_undirected(&mut rng, n, extra, 1, 50);
+                let threshold = rng.random_range(10..=200);
+                TestCase {
+                    data: Box::new(CityFewestNeighborsTest {
+                        n,
+                        edges,
+                        threshold,
+                    }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -435,7 +527,10 @@ fn ref_city_fewest_neighbors(n: usize, edges: &[(usize, usize, i32)], threshold:
 
     for city in 0..n {
         let dist = ref_dijkstra(n, &all_edges, city);
-        let count = dist.iter().filter(|&&d| d != NO_PATH && d <= threshold && d > 0).count();
+        let count = dist
+            .iter()
+            .filter(|&&d| d != NO_PATH && d <= threshold && d > 0)
+            .count();
         if count <= best_count {
             best_count = count;
             best_city = city;
@@ -455,10 +550,18 @@ struct DijkstraTest {
 }
 
 impl Problem for ShortestPathDijkstra {
-    fn id(&self) -> &str { "shortest_path_dijkstra" }
-    fn name(&self) -> &str { "Dijkstra's Single-Source Shortest Paths" }
-    fn topic(&self) -> &str { "shortest_path" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "shortest_path_dijkstra"
+    }
+    fn name(&self) -> &str {
+        "Dijkstra's Single-Source Shortest Paths"
+    }
+    fn topic(&self) -> &str {
+        "shortest_path"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Implement Dijkstra's algorithm. Given a directed weighted graph with `n` nodes, \
          edges (u, v, weight), and a source node `src`, return an array where result[i] is \
@@ -471,13 +574,17 @@ impl Problem for ShortestPathDijkstra {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(2..=15);
-            let extra = rng.random_range(0..=n * 2);
-            let edges = gen_connected_weighted_directed(&mut rng, n, extra, 1, 100);
-            let src = rng.random_range(0..n);
-            TestCase { data: Box::new(DijkstraTest { n, edges, src }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(2..=15);
+                let extra = rng.random_range(0..=n * 2);
+                let edges = gen_connected_weighted_directed(&mut rng, n, extra, 1, 100);
+                let src = rng.random_range(0..n);
+                TestCase {
+                    data: Box::new(DijkstraTest { n, edges, src }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -504,10 +611,18 @@ struct BellmanFordTest {
 }
 
 impl Problem for ShortestPathBellmanFord {
-    fn id(&self) -> &str { "shortest_path_bellman_ford" }
-    fn name(&self) -> &str { "Bellman-Ford Algorithm" }
-    fn topic(&self) -> &str { "shortest_path" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "shortest_path_bellman_ford"
+    }
+    fn name(&self) -> &str {
+        "Bellman-Ford Algorithm"
+    }
+    fn topic(&self) -> &str {
+        "shortest_path"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Implement the Bellman-Ford algorithm. Given a directed weighted graph that may \
          contain negative weight edges (but no negative cycles), return the shortest \
@@ -520,27 +635,31 @@ impl Problem for ShortestPathBellmanFord {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(2..=10);
-            let extra = rng.random_range(0..=n);
-            // Use DAG-like structure to avoid negative cycles
-            let mut edges = Vec::new();
-            for i in 1..n {
-                let j = rng.random_range(0..i);
-                let w = rng.random_range(-20..=50);
-                edges.push((j, i, w));
-            }
-            for _ in 0..extra {
-                let u = rng.random_range(0..n);
-                let v = rng.random_range(0..n);
-                if u < v {
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(2..=10);
+                let extra = rng.random_range(0..=n);
+                // Use DAG-like structure to avoid negative cycles
+                let mut edges = Vec::new();
+                for i in 1..n {
+                    let j = rng.random_range(0..i);
                     let w = rng.random_range(-20..=50);
-                    edges.push((u, v, w));
+                    edges.push((j, i, w));
                 }
-            }
-            let src = rng.random_range(0..n);
-            TestCase { data: Box::new(BellmanFordTest { n, edges, src }) }
-        }).collect()
+                for _ in 0..extra {
+                    let u = rng.random_range(0..n);
+                    let v = rng.random_range(0..n);
+                    if u < v {
+                        let w = rng.random_range(-20..=50);
+                        edges.push((u, v, w));
+                    }
+                }
+                let src = rng.random_range(0..n);
+                TestCase {
+                    data: Box::new(BellmanFordTest { n, edges, src }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -587,10 +706,18 @@ struct CheapestFlightsTest {
 }
 
 impl Problem for ShortestPathCheapestFlights {
-    fn id(&self) -> &str { "shortest_path_cheapest_flights" }
-    fn name(&self) -> &str { "Cheapest Flights Within K Stops" }
-    fn topic(&self) -> &str { "shortest_path" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "shortest_path_cheapest_flights"
+    }
+    fn name(&self) -> &str {
+        "Cheapest Flights Within K Stops"
+    }
+    fn topic(&self) -> &str {
+        "shortest_path"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given `n` cities and directed flights (u, v, price), find the cheapest price from \
          `src` to `dst` with at most `k` stops (intermediate cities). Return -1 if no such \
@@ -603,18 +730,28 @@ impl Problem for ShortestPathCheapestFlights {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(3..=10);
-            let extra = rng.random_range(0..=n * 2);
-            let edges = gen_connected_weighted_directed(&mut rng, n, extra, 1, 100);
-            let src = rng.random_range(0..n);
-            let mut dst = rng.random_range(0..n);
-            while dst == src {
-                dst = rng.random_range(0..n);
-            }
-            let k = rng.random_range(0..n.min(5));
-            TestCase { data: Box::new(CheapestFlightsTest { n, edges, src, dst, k }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(3..=10);
+                let extra = rng.random_range(0..=n * 2);
+                let edges = gen_connected_weighted_directed(&mut rng, n, extra, 1, 100);
+                let src = rng.random_range(0..n);
+                let mut dst = rng.random_range(0..n);
+                while dst == src {
+                    dst = rng.random_range(0..n);
+                }
+                let k = rng.random_range(0..n.min(5));
+                TestCase {
+                    data: Box::new(CheapestFlightsTest {
+                        n,
+                        edges,
+                        src,
+                        dst,
+                        k,
+                    }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -624,7 +761,8 @@ impl Problem for ShortestPathCheapestFlights {
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!(
-                "n={}, flights={:?}, src={}, dst={}, k={}", t.n, t.edges, t.src, t.dst, t.k
+                "n={}, flights={:?}, src={}, dst={}, k={}",
+                t.n, t.edges, t.src, t.dst, t.k
             ),
             expected: format!("{expected}"),
             actual: format!("{actual}"),
@@ -633,7 +771,11 @@ impl Problem for ShortestPathCheapestFlights {
 }
 
 fn ref_cheapest_flights(
-    n: usize, edges: &[(usize, usize, i32)], src: usize, dst: usize, k: usize,
+    n: usize,
+    edges: &[(usize, usize, i32)],
+    src: usize,
+    dst: usize,
+    k: usize,
 ) -> i32 {
     // Modified Bellman-Ford: relax at most k+1 times
     let mut dist = vec![NO_PATH; n];
@@ -646,7 +788,11 @@ fn ref_cheapest_flights(
             }
         }
     }
-    if dist[dst] == NO_PATH { -1 } else { dist[dst] }
+    if dist[dst] == NO_PATH {
+        -1
+    } else {
+        dist[dst]
+    }
 }
 
 // ── Medium 9: Path with Minimum Effort ─────────────────────────────────
@@ -658,10 +804,18 @@ struct MinEffortTest {
 }
 
 impl Problem for ShortestPathMinEffort {
-    fn id(&self) -> &str { "shortest_path_path_with_min_effort" }
-    fn name(&self) -> &str { "Path with Minimum Effort" }
-    fn topic(&self) -> &str { "shortest_path" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "shortest_path_path_with_min_effort"
+    }
+    fn name(&self) -> &str {
+        "Path with Minimum Effort"
+    }
+    fn topic(&self) -> &str {
+        "shortest_path"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given an m x n grid of `heights`, return the minimum effort to travel from the \
          top-left to the bottom-right. The effort of a path is the maximum absolute \
@@ -673,14 +827,18 @@ impl Problem for ShortestPathMinEffort {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let rows = rng.random_range(2..=8);
-            let cols = rng.random_range(2..=8);
-            let heights: Vec<Vec<i32>> = (0..rows)
-                .map(|_| (0..cols).map(|_| rng.random_range(1..=100)).collect())
-                .collect();
-            TestCase { data: Box::new(MinEffortTest { heights }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let rows = rng.random_range(2..=8);
+                let cols = rng.random_range(2..=8);
+                let heights: Vec<Vec<i32>> = (0..rows)
+                    .map(|_| (0..cols).map(|_| rng.random_range(1..=100)).collect())
+                    .collect();
+                TestCase {
+                    data: Box::new(MinEffortTest { heights }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -706,7 +864,7 @@ fn ref_min_effort(heights: &[Vec<i32>]) -> i32 {
     let mut heap = BinaryHeap::new();
     heap.push(Reverse((0i32, 0usize, 0usize)));
 
-    let dirs: [(i32, i32); 4] = [(-1,0),(1,0),(0,-1),(0,1)];
+    let dirs: [(i32, i32); 4] = [(-1, 0), (1, 0), (0, -1), (0, 1)];
     while let Some(Reverse((effort, r, c))) = heap.pop() {
         if r == rows - 1 && c == cols - 1 {
             return effort;
@@ -742,10 +900,18 @@ struct MazeTest {
 }
 
 impl Problem for ShortestPathMaze {
-    fn id(&self) -> &str { "shortest_path_maze" }
-    fn name(&self) -> &str { "The Maze II (Shortest Distance)" }
-    fn topic(&self) -> &str { "shortest_path" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "shortest_path_maze"
+    }
+    fn name(&self) -> &str {
+        "The Maze II (Shortest Distance)"
+    }
+    fn topic(&self) -> &str {
+        "shortest_path"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "A ball is in a maze represented as a grid. 0 = empty, 1 = wall. The ball rolls \
          in a chosen direction until hitting a wall, then stops. Find the shortest distance \
@@ -757,24 +923,32 @@ impl Problem for ShortestPathMaze {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let rows = rng.random_range(3..=8);
-            let cols = rng.random_range(3..=8);
-            let maze: Vec<Vec<i32>> = (0..rows)
-                .map(|_| (0..cols).map(|_| if rng.random_range(0..=3) == 0 { 1 } else { 0 }).collect())
-                .collect();
-            let start = (rng.random_range(0..rows), rng.random_range(0..cols));
-            let mut dest = (rng.random_range(0..rows), rng.random_range(0..cols));
-            // Ensure start and dest are empty and different
-            let mut maze = maze;
-            maze[start.0][start.1] = 0;
-            maze[dest.0][dest.1] = 0;
-            while start == dest {
-                dest = (rng.random_range(0..rows), rng.random_range(0..cols));
+        (0..10)
+            .map(|_| {
+                let rows = rng.random_range(3..=8);
+                let cols = rng.random_range(3..=8);
+                let maze: Vec<Vec<i32>> = (0..rows)
+                    .map(|_| {
+                        (0..cols)
+                            .map(|_| if rng.random_range(0..=3) == 0 { 1 } else { 0 })
+                            .collect()
+                    })
+                    .collect();
+                let start = (rng.random_range(0..rows), rng.random_range(0..cols));
+                let mut dest = (rng.random_range(0..rows), rng.random_range(0..cols));
+                // Ensure start and dest are empty and different
+                let mut maze = maze;
+                maze[start.0][start.1] = 0;
                 maze[dest.0][dest.1] = 0;
-            }
-            TestCase { data: Box::new(MazeTest { maze, start, dest }) }
-        }).collect()
+                while start == dest {
+                    dest = (rng.random_range(0..rows), rng.random_range(0..cols));
+                    maze[dest.0][dest.1] = 0;
+                }
+                TestCase {
+                    data: Box::new(MazeTest { maze, start, dest }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -800,7 +974,7 @@ fn ref_maze_shortest(maze: &[Vec<i32>], start: (usize, usize), dest: (usize, usi
     let mut heap = BinaryHeap::new();
     heap.push(Reverse((0i32, start.0, start.1)));
 
-    let dirs: [(i32, i32); 4] = [(-1,0),(1,0),(0,-1),(0,1)];
+    let dirs: [(i32, i32); 4] = [(-1, 0), (1, 0), (0, -1), (0, 1)];
     while let Some(Reverse((d, r, c))) = heap.pop() {
         if d > dist[r][c] {
             continue;
@@ -816,7 +990,10 @@ fn ref_maze_shortest(maze: &[Vec<i32>], start: (usize, usize), dest: (usize, usi
             loop {
                 let nnr = nr + dr;
                 let nnc = nc + dc;
-                if nnr < 0 || nnr >= rows as i32 || nnc < 0 || nnc >= cols as i32
+                if nnr < 0
+                    || nnr >= rows as i32
+                    || nnc < 0
+                    || nnc >= cols as i32
                     || maze[nnr as usize][nnc as usize] == 1
                 {
                     break;
@@ -833,7 +1010,11 @@ fn ref_maze_shortest(maze: &[Vec<i32>], start: (usize, usize), dest: (usize, usi
             }
         }
     }
-    if dist[dest.0][dest.1] == i32::MAX { -1 } else { dist[dest.0][dest.1] }
+    if dist[dest.0][dest.1] == i32::MAX {
+        -1
+    } else {
+        dist[dest.0][dest.1]
+    }
 }
 
 // ── Hard 11: Floyd-Warshall ────────────────────────────────────────────
@@ -846,10 +1027,18 @@ struct FloydWarshallTest {
 }
 
 impl Problem for ShortestPathFloydWarshall {
-    fn id(&self) -> &str { "shortest_path_floyd_warshall" }
-    fn name(&self) -> &str { "Floyd-Warshall (All-Pairs Shortest Paths)" }
-    fn topic(&self) -> &str { "shortest_path" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "shortest_path_floyd_warshall"
+    }
+    fn name(&self) -> &str {
+        "Floyd-Warshall (All-Pairs Shortest Paths)"
+    }
+    fn topic(&self) -> &str {
+        "shortest_path"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Implement the Floyd-Warshall algorithm. Given a directed weighted graph with `n` \
          nodes and edges (u, v, weight), return an n x n matrix where result[i][j] is the \
@@ -862,26 +1051,30 @@ impl Problem for ShortestPathFloydWarshall {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(2..=8);
-            let extra = rng.random_range(0..=n);
-            // DAG structure to avoid negative cycles
-            let mut edges = Vec::new();
-            for i in 1..n {
-                let j = rng.random_range(0..i);
-                let w = rng.random_range(-10..=50);
-                edges.push((j, i, w));
-            }
-            for _ in 0..extra {
-                let u = rng.random_range(0..n);
-                let v = rng.random_range(0..n);
-                if u < v {
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(2..=8);
+                let extra = rng.random_range(0..=n);
+                // DAG structure to avoid negative cycles
+                let mut edges = Vec::new();
+                for i in 1..n {
+                    let j = rng.random_range(0..i);
                     let w = rng.random_range(-10..=50);
-                    edges.push((u, v, w));
+                    edges.push((j, i, w));
                 }
-            }
-            TestCase { data: Box::new(FloydWarshallTest { n, edges }) }
-        }).collect()
+                for _ in 0..extra {
+                    let u = rng.random_range(0..n);
+                    let v = rng.random_range(0..n);
+                    if u < v {
+                        let w = rng.random_range(-10..=50);
+                        edges.push((u, v, w));
+                    }
+                }
+                TestCase {
+                    data: Box::new(FloydWarshallTest { n, edges }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -899,8 +1092,8 @@ impl Problem for ShortestPathFloydWarshall {
 
 fn ref_floyd_warshall(n: usize, edges: &[(usize, usize, i32)]) -> Vec<Vec<i32>> {
     let mut dist = vec![vec![NO_PATH; n]; n];
-    for i in 0..n {
-        dist[i][i] = 0;
+    for (i, row) in dist.iter_mut().enumerate().take(n) {
+        row[i] = 0;
     }
     for &(u, v, w) in edges {
         dist[u][v] = dist[u][v].min(w);
@@ -933,10 +1126,18 @@ struct KShortestTest {
 }
 
 impl Problem for ShortestPathKShortest {
-    fn id(&self) -> &str { "shortest_path_k_shortest" }
-    fn name(&self) -> &str { "K Shortest Paths" }
-    fn topic(&self) -> &str { "shortest_path" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "shortest_path_k_shortest"
+    }
+    fn name(&self) -> &str {
+        "K Shortest Paths"
+    }
+    fn topic(&self) -> &str {
+        "shortest_path"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given a directed weighted graph, find the K shortest path lengths from `src` to \
          `dst`. The same edge can be used multiple times. Return a sorted vector of the K \
@@ -949,18 +1150,28 @@ impl Problem for ShortestPathKShortest {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(2..=8);
-            let extra = rng.random_range(1..=n * 2);
-            let edges = gen_connected_weighted_directed(&mut rng, n, extra, 1, 30);
-            let src = rng.random_range(0..n);
-            let mut dst = rng.random_range(0..n);
-            while dst == src {
-                dst = rng.random_range(0..n);
-            }
-            let k = rng.random_range(1..=5);
-            TestCase { data: Box::new(KShortestTest { n, edges, src, dst, k }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(2..=8);
+                let extra = rng.random_range(1..=n * 2);
+                let edges = gen_connected_weighted_directed(&mut rng, n, extra, 1, 30);
+                let src = rng.random_range(0..n);
+                let mut dst = rng.random_range(0..n);
+                while dst == src {
+                    dst = rng.random_range(0..n);
+                }
+                let k = rng.random_range(1..=5);
+                TestCase {
+                    data: Box::new(KShortestTest {
+                        n,
+                        edges,
+                        src,
+                        dst,
+                        k,
+                    }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -970,7 +1181,8 @@ impl Problem for ShortestPathKShortest {
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!(
-                "n={}, edges={:?}, src={}, dst={}, k={}", t.n, t.edges, t.src, t.dst, t.k
+                "n={}, edges={:?}, src={}, dst={}, k={}",
+                t.n, t.edges, t.src, t.dst, t.k
             ),
             expected: format!("{expected:?}"),
             actual: format!("{actual:?}"),
@@ -979,7 +1191,11 @@ impl Problem for ShortestPathKShortest {
 }
 
 fn ref_k_shortest(
-    n: usize, edges: &[(usize, usize, i32)], src: usize, dst: usize, k: usize,
+    n: usize,
+    edges: &[(usize, usize, i32)],
+    src: usize,
+    dst: usize,
+    k: usize,
 ) -> Vec<i32> {
     use std::cmp::Reverse;
     use std::collections::BinaryHeap;
@@ -1019,10 +1235,18 @@ struct MinCostConnectTest {
 }
 
 impl Problem for ShortestPathMinCostConnectAll {
-    fn id(&self) -> &str { "shortest_path_minimum_cost_connect_all" }
-    fn name(&self) -> &str { "Min Cost to Connect All Points" }
-    fn topic(&self) -> &str { "shortest_path" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "shortest_path_minimum_cost_connect_all"
+    }
+    fn name(&self) -> &str {
+        "Min Cost to Connect All Points"
+    }
+    fn topic(&self) -> &str {
+        "shortest_path"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given an array of `points` where points[i] = (x_i, y_i), return the minimum cost \
          to connect all points. The cost to connect two points is the Manhattan distance: \
@@ -1035,13 +1259,17 @@ impl Problem for ShortestPathMinCostConnectAll {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(2..=10);
-            let points: Vec<(i32, i32)> = (0..n)
-                .map(|_| (rng.random_range(-100..=100), rng.random_range(-100..=100)))
-                .collect();
-            TestCase { data: Box::new(MinCostConnectTest { points }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(2..=10);
+                let points: Vec<(i32, i32)> = (0..n)
+                    .map(|_| (rng.random_range(-100..=100), rng.random_range(-100..=100)))
+                    .collect();
+                TestCase {
+                    data: Box::new(MinCostConnectTest { points }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -1101,10 +1329,18 @@ struct ReconstructTest {
 }
 
 impl Problem for ShortestPathReconstruct {
-    fn id(&self) -> &str { "shortest_path_reconstruct" }
-    fn name(&self) -> &str { "Reconstruct Shortest Path (Dijkstra)" }
-    fn topic(&self) -> &str { "shortest_path" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "shortest_path_reconstruct"
+    }
+    fn name(&self) -> &str {
+        "Reconstruct Shortest Path (Dijkstra)"
+    }
+    fn topic(&self) -> &str {
+        "shortest_path"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given a directed weighted graph, find the shortest path from `src` to `dst` and \
          return the actual path as a sequence of node indices. If no path exists, return an \
@@ -1117,17 +1353,21 @@ impl Problem for ShortestPathReconstruct {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(2..=10);
-            let extra = rng.random_range(0..=n * 2);
-            let edges = gen_connected_weighted_directed(&mut rng, n, extra, 1, 50);
-            let src = rng.random_range(0..n);
-            let mut dst = rng.random_range(0..n);
-            while dst == src {
-                dst = rng.random_range(0..n);
-            }
-            TestCase { data: Box::new(ReconstructTest { n, edges, src, dst }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(2..=10);
+                let extra = rng.random_range(0..=n * 2);
+                let edges = gen_connected_weighted_directed(&mut rng, n, extra, 1, 50);
+                let src = rng.random_range(0..n);
+                let mut dst = rng.random_range(0..n);
+                while dst == src {
+                    dst = rng.random_range(0..n);
+                }
+                TestCase {
+                    data: Box::new(ReconstructTest { n, edges, src, dst }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -1138,7 +1378,8 @@ impl Problem for ShortestPathReconstruct {
         SolutionResult {
             is_correct: valid,
             input_description: format!(
-                "n={}, edges={:?}, src={}, dst={}", t.n, t.edges, t.src, t.dst
+                "n={}, edges={:?}, src={}, dst={}",
+                t.n, t.edges, t.src, t.dst
             ),
             expected: if ref_dist[t.dst] == NO_PATH {
                 "[] (no path)".to_string()
@@ -1151,8 +1392,12 @@ impl Problem for ShortestPathReconstruct {
 }
 
 fn ref_validate_path(
-    _n: usize, edges: &[(usize, usize, i32)], src: usize, dst: usize,
-    expected_dist: i32, path: &[usize],
+    _n: usize,
+    edges: &[(usize, usize, i32)],
+    src: usize,
+    dst: usize,
+    expected_dist: i32,
+    path: &[usize],
 ) -> bool {
     if expected_dist == NO_PATH {
         return path.is_empty();
@@ -1190,10 +1435,18 @@ struct AlternatingColorsTest {
 }
 
 impl Problem for ShortestPathAlternatingColors {
-    fn id(&self) -> &str { "shortest_path_with_alternating_colors" }
-    fn name(&self) -> &str { "Shortest Path with Alternating Colors" }
-    fn topic(&self) -> &str { "shortest_path" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "shortest_path_with_alternating_colors"
+    }
+    fn name(&self) -> &str {
+        "Shortest Path with Alternating Colors"
+    }
+    fn topic(&self) -> &str {
+        "shortest_path"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given a directed graph with `n` nodes, some edges colored red and some blue, find \
          the shortest path from node 0 to each node that alternates between red and blue \
@@ -1207,18 +1460,26 @@ impl Problem for ShortestPathAlternatingColors {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(2..=10);
-            let red_count = rng.random_range(0..=n * 2);
-            let blue_count = rng.random_range(0..=n * 2);
-            let red_edges: Vec<(usize, usize)> = (0..red_count)
-                .map(|_| (rng.random_range(0..n), rng.random_range(0..n)))
-                .collect();
-            let blue_edges: Vec<(usize, usize)> = (0..blue_count)
-                .map(|_| (rng.random_range(0..n), rng.random_range(0..n)))
-                .collect();
-            TestCase { data: Box::new(AlternatingColorsTest { n, red_edges, blue_edges }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(2..=10);
+                let red_count = rng.random_range(0..=n * 2);
+                let blue_count = rng.random_range(0..=n * 2);
+                let red_edges: Vec<(usize, usize)> = (0..red_count)
+                    .map(|_| (rng.random_range(0..n), rng.random_range(0..n)))
+                    .collect();
+                let blue_edges: Vec<(usize, usize)> = (0..blue_count)
+                    .map(|_| (rng.random_range(0..n), rng.random_range(0..n)))
+                    .collect();
+                TestCase {
+                    data: Box::new(AlternatingColorsTest {
+                        n,
+                        red_edges,
+                        blue_edges,
+                    }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -1228,7 +1489,8 @@ impl Problem for ShortestPathAlternatingColors {
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!(
-                "n={}, red_edges={:?}, blue_edges={:?}", t.n, t.red_edges, t.blue_edges
+                "n={}, red_edges={:?}, blue_edges={:?}",
+                t.n, t.red_edges, t.blue_edges
             ),
             expected: format!("{expected:?}"),
             actual: format!("{actual:?}"),
@@ -1237,7 +1499,9 @@ impl Problem for ShortestPathAlternatingColors {
 }
 
 fn ref_alternating_colors(
-    n: usize, red_edges: &[(usize, usize)], blue_edges: &[(usize, usize)],
+    n: usize,
+    red_edges: &[(usize, usize)],
+    blue_edges: &[(usize, usize)],
 ) -> Vec<i32> {
     use std::collections::VecDeque;
     // Build adjacency lists: 0 = red, 1 = blue

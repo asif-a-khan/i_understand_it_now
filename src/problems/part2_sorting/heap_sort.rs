@@ -23,7 +23,7 @@ pub fn problems() -> Vec<Box<dyn Problem>> {
         Box::new(SlidingWindowMedian),
         Box::new(TrappingRainWaterII),
         Box::new(SmallestRange),
-        Box::new(IPO),
+        Box::new(Ipo),
     ]
 }
 
@@ -37,10 +37,18 @@ struct HeapSortBasicTest {
 }
 
 impl Problem for HeapSortBasic {
-    fn id(&self) -> &str { "heap_sort_basic" }
-    fn name(&self) -> &str { "Heap Sort" }
-    fn topic(&self) -> &str { "heap_sort" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "heap_sort_basic"
+    }
+    fn name(&self) -> &str {
+        "Heap Sort"
+    }
+    fn topic(&self) -> &str {
+        "heap_sort"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Implement heap sort to sort an array of integers in ascending order \
          using Tracked<i32>.\n\n\
@@ -71,7 +79,7 @@ impl Problem for HeapSortBasic {
         let shared_log = Rc::new(RefCell::new(OperationLog::new()));
         let mut tracked = track_slice(&t.nums, shared_log.clone());
         solutions::heap_sort(&mut tracked);
-        let actual: Vec<i32> = tracked.iter().map(|t| t.value.clone()).collect();
+        let actual: Vec<i32> = tracked.iter().map(|t| t.value).collect();
         let inner = shared_log.borrow();
         for op in inner.operations() {
             log.record(op.clone());
@@ -97,10 +105,18 @@ struct KthLargestTest {
 }
 
 impl Problem for KthLargest {
-    fn id(&self) -> &str { "heap_sort_kth_largest" }
-    fn name(&self) -> &str { "Kth Largest Element" }
-    fn topic(&self) -> &str { "heap_sort" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "heap_sort_kth_largest"
+    }
+    fn name(&self) -> &str {
+        "Kth Largest Element"
+    }
+    fn topic(&self) -> &str {
+        "heap_sort"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given an integer array `nums` and an integer `k`, return the kth largest \
          element in the array (1-indexed: k=1 means the largest).\n\n\
@@ -153,10 +169,18 @@ struct LastStoneWeightTest {
 }
 
 impl Problem for LastStoneWeight {
-    fn id(&self) -> &str { "heap_sort_last_stone_weight" }
-    fn name(&self) -> &str { "Last Stone Weight" }
-    fn topic(&self) -> &str { "heap_sort" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "heap_sort_last_stone_weight"
+    }
+    fn name(&self) -> &str {
+        "Last Stone Weight"
+    }
+    fn topic(&self) -> &str {
+        "heap_sort"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "You have a collection of stones, each with a positive integer weight.\n\n\
          Each turn, pick the two heaviest stones and smash them. If they have equal weight, \
@@ -217,10 +241,18 @@ struct KWeakestRowsTest {
 }
 
 impl Problem for KWeakestRows {
-    fn id(&self) -> &str { "heap_sort_k_weakest_rows" }
-    fn name(&self) -> &str { "K Weakest Rows in a Binary Matrix" }
-    fn topic(&self) -> &str { "heap_sort" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "heap_sort_k_weakest_rows"
+    }
+    fn name(&self) -> &str {
+        "K Weakest Rows in a Binary Matrix"
+    }
+    fn topic(&self) -> &str {
+        "heap_sort"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given an m x n binary matrix `mat` where each row has 1s followed by 0s, \
          and an integer `k`, return the indices of the k weakest rows.\n\n\
@@ -286,10 +318,18 @@ struct RelativeRanksTest {
 }
 
 impl Problem for RelativeRanks {
-    fn id(&self) -> &str { "heap_sort_relative_ranks" }
-    fn name(&self) -> &str { "Relative Ranks" }
-    fn topic(&self) -> &str { "heap_sort" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "heap_sort_relative_ranks"
+    }
+    fn name(&self) -> &str {
+        "Relative Ranks"
+    }
+    fn topic(&self) -> &str {
+        "heap_sort"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given an array of unique scores, return an array of ranks:\n\
          - 1st place: \"Gold Medal\"\n\
@@ -329,7 +369,12 @@ impl Problem for RelativeRanks {
 }
 
 fn ref_relative_ranks(scores: &[i32]) -> Vec<String> {
-    let mut indexed: Vec<(i32, usize)> = scores.iter().copied().enumerate().map(|(i, s)| (s, i)).collect();
+    let mut indexed: Vec<(i32, usize)> = scores
+        .iter()
+        .copied()
+        .enumerate()
+        .map(|(i, s)| (s, i))
+        .collect();
     indexed.sort_unstable_by(|a, b| b.0.cmp(&a.0));
     let mut result = vec![String::new(); scores.len()];
     for (rank, &(_, idx)) in indexed.iter().enumerate() {
@@ -354,10 +399,18 @@ struct KClosestPointsTest {
 }
 
 impl Problem for KClosestPoints {
-    fn id(&self) -> &str { "heap_sort_k_closest_points" }
-    fn name(&self) -> &str { "K Closest Points to Origin" }
-    fn topic(&self) -> &str { "heap_sort" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "heap_sort_k_closest_points"
+    }
+    fn name(&self) -> &str {
+        "K Closest Points to Origin"
+    }
+    fn topic(&self) -> &str {
+        "heap_sort"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given an array of points (x, y) and an integer k, return the k closest \
          points to the origin (0, 0).\n\n\
@@ -415,10 +468,18 @@ struct TopKFrequentTest {
 }
 
 impl Problem for TopKFrequent {
-    fn id(&self) -> &str { "heap_sort_top_k_frequent" }
-    fn name(&self) -> &str { "Top K Frequent Elements" }
-    fn topic(&self) -> &str { "heap_sort" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "heap_sort_top_k_frequent"
+    }
+    fn name(&self) -> &str {
+        "Top K Frequent Elements"
+    }
+    fn topic(&self) -> &str {
+        "heap_sort"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given an integer array `nums` and an integer `k`, return the k most frequent \
          elements. Return them sorted by frequency (descending). Ties broken by value \
@@ -477,10 +538,18 @@ struct SortNearlySortedTest {
 }
 
 impl Problem for SortNearlySorted {
-    fn id(&self) -> &str { "heap_sort_sort_nearly_sorted" }
-    fn name(&self) -> &str { "Sort a Nearly Sorted Array" }
-    fn topic(&self) -> &str { "heap_sort" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "heap_sort_sort_nearly_sorted"
+    }
+    fn name(&self) -> &str {
+        "Sort a Nearly Sorted Array"
+    }
+    fn topic(&self) -> &str {
+        "heap_sort"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given an array where each element is at most `k` positions away from its \
          sorted position, sort the array efficiently using a min-heap of size k+1.\n\n\
@@ -536,10 +605,18 @@ struct MergeKSortedTest {
 }
 
 impl Problem for MergeKSorted {
-    fn id(&self) -> &str { "heap_sort_merge_k_sorted" }
-    fn name(&self) -> &str { "Merge K Sorted Lists" }
-    fn topic(&self) -> &str { "heap_sort" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "heap_sort_merge_k_sorted"
+    }
+    fn name(&self) -> &str {
+        "Merge K Sorted Lists"
+    }
+    fn topic(&self) -> &str {
+        "heap_sort"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given k sorted integer lists, merge them into one sorted list.\n\n\
          Use a min-heap to efficiently merge.\n\n\
@@ -595,10 +672,18 @@ struct TaskSchedulerTest {
 }
 
 impl Problem for TaskScheduler {
-    fn id(&self) -> &str { "heap_sort_task_scheduler" }
-    fn name(&self) -> &str { "Task Scheduler" }
-    fn topic(&self) -> &str { "heap_sort" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "heap_sort_task_scheduler"
+    }
+    fn name(&self) -> &str {
+        "Task Scheduler"
+    }
+    fn topic(&self) -> &str {
+        "heap_sort"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given a list of tasks represented by characters and a cooldown period `n`, \
          find the minimum number of intervals the CPU needs to execute all tasks.\n\n\
@@ -661,10 +746,18 @@ struct FindMedianStreamTest {
 }
 
 impl Problem for FindMedianStream {
-    fn id(&self) -> &str { "heap_sort_find_median_stream" }
-    fn name(&self) -> &str { "Find Median from Data Stream" }
-    fn topic(&self) -> &str { "heap_sort" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "heap_sort_find_median_stream"
+    }
+    fn name(&self) -> &str {
+        "Find Median from Data Stream"
+    }
+    fn topic(&self) -> &str {
+        "heap_sort"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given a stream of integers, compute the running median after each insertion.\n\n\
          Return a Vec<f64> where result[i] is the median after inserting nums[0..=i].\n\n\
@@ -733,10 +826,18 @@ struct SlidingWindowMedianTest {
 }
 
 impl Problem for SlidingWindowMedian {
-    fn id(&self) -> &str { "heap_sort_sliding_window_median" }
-    fn name(&self) -> &str { "Sliding Window Median" }
-    fn topic(&self) -> &str { "heap_sort" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "heap_sort_sliding_window_median"
+    }
+    fn name(&self) -> &str {
+        "Sliding Window Median"
+    }
+    fn topic(&self) -> &str {
+        "heap_sort"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given an array `nums` and window size `k`, return the median of each sliding \
          window of size k as the window moves from left to right.\n\n\
@@ -803,10 +904,18 @@ struct TrappingRainWaterIITest {
 }
 
 impl Problem for TrappingRainWaterII {
-    fn id(&self) -> &str { "heap_sort_trapping_rain_water_ii" }
-    fn name(&self) -> &str { "Trapping Rain Water II" }
-    fn topic(&self) -> &str { "heap_sort" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "heap_sort_trapping_rain_water_ii"
+    }
+    fn name(&self) -> &str {
+        "Trapping Rain Water II"
+    }
+    fn topic(&self) -> &str {
+        "heap_sort"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given an m x n matrix of positive integers representing the height of each \
          cell in a 2D elevation map, compute the volume of water it can trap after raining.\n\n\
@@ -902,10 +1011,18 @@ struct SmallestRangeTest {
 }
 
 impl Problem for SmallestRange {
-    fn id(&self) -> &str { "heap_sort_smallest_range" }
-    fn name(&self) -> &str { "Smallest Range Covering Elements from K Lists" }
-    fn topic(&self) -> &str { "heap_sort" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "heap_sort_smallest_range"
+    }
+    fn name(&self) -> &str {
+        "Smallest Range Covering Elements from K Lists"
+    }
+    fn topic(&self) -> &str {
+        "heap_sort"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given k sorted lists of integers, find the smallest range [a, b] such that \
          at least one number from each list is included in the range.\n\n\
@@ -992,7 +1109,7 @@ fn ref_smallest_range(lists: &[Vec<i32>]) -> (i32, i32) {
 // Hard 5: IPO
 // ═══════════════════════════════════════════════════════════════════════
 
-struct IPO;
+struct Ipo;
 struct IPOTest {
     k: usize,
     w: i32,
@@ -1000,11 +1117,19 @@ struct IPOTest {
     capital: Vec<i32>,
 }
 
-impl Problem for IPO {
-    fn id(&self) -> &str { "heap_sort_ipo" }
-    fn name(&self) -> &str { "IPO" }
-    fn topic(&self) -> &str { "heap_sort" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+impl Problem for Ipo {
+    fn id(&self) -> &str {
+        "heap_sort_ipo"
+    }
+    fn name(&self) -> &str {
+        "IPO"
+    }
+    fn topic(&self) -> &str {
+        "heap_sort"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "You are given `k` projects you can finish at most, initial capital `w`, \
          arrays `profits` and `capital` where profits[i] is the profit and capital[i] \

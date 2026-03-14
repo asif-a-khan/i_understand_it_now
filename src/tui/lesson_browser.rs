@@ -26,7 +26,7 @@ impl LessonInfo {
         if let Ok(entries) = std::fs::read_dir(dir) {
             for entry in entries.flatten() {
                 let path = entry.path();
-                if path.extension().map_or(false, |e| e == "md") {
+                if path.extension().is_some_and(|e| e == "md") {
                     let filename = path
                         .file_name()
                         .unwrap_or_default()
@@ -41,9 +41,10 @@ impl LessonInfo {
                     let title = std::fs::read_to_string(&path)
                         .ok()
                         .and_then(|content| {
-                            content.lines().next().map(|line| {
-                                line.trim_start_matches('#').trim().to_string()
-                            })
+                            content
+                                .lines()
+                                .next()
+                                .map(|line| line.trim_start_matches('#').trim().to_string())
                         })
                         .unwrap_or_else(|| lesson_id.clone());
 
@@ -73,11 +74,7 @@ impl LessonListState {
         Self { list_state }
     }
 
-    pub fn handle_key(
-        &mut self,
-        key: KeyEvent,
-        lessons: &[LessonInfo],
-    ) -> Action {
+    pub fn handle_key(&mut self, key: KeyEvent, lessons: &[LessonInfo]) -> Action {
         let len = lessons.len();
         if len == 0 {
             if key.code == KeyCode::Esc {
@@ -180,8 +177,10 @@ impl LessonReaderState {
             if let Ok(content) = std::fs::read_to_string(&path) {
                 self.parsed_lines = markdown::render_markdown(&content);
             } else {
-                self.parsed_lines =
-                    vec![Line::from(Span::styled("Failed to read lesson file", theme::error_style()))];
+                self.parsed_lines = vec![Line::from(Span::styled(
+                    "Failed to read lesson file",
+                    theme::error_style(),
+                ))];
             }
         }
     }
@@ -193,7 +192,10 @@ impl LessonReaderState {
         progress: &mut Progress,
         visible_height: u16,
     ) -> Action {
-        let max_scroll = self.parsed_lines.len().saturating_sub(visible_height as usize) as u16;
+        let max_scroll = self
+            .parsed_lines
+            .len()
+            .saturating_sub(visible_height as usize) as u16;
 
         match key.code {
             KeyCode::Char('j') | KeyCode::Down => {
@@ -245,25 +247,15 @@ impl LessonReaderState {
         }
     }
 
-    pub fn render(
-        &self,
-        f: &mut Frame,
-        area: Rect,
-        lessons: &[LessonInfo],
-        progress: &Progress,
-    ) {
-        let chunks = Layout::vertical([
-            Constraint::Min(1),
-            Constraint::Length(1),
-        ])
-        .split(area);
+    pub fn render(&self, f: &mut Frame, area: Rect, lessons: &[LessonInfo], progress: &Progress) {
+        let chunks = Layout::vertical([Constraint::Min(1), Constraint::Length(1)]).split(area);
 
         let title = lessons
             .get(self.lesson_idx)
             .map(|l| l.title.clone())
             .unwrap_or_default();
 
-        let is_read = lessons.get(self.lesson_idx).map_or(false, |l| {
+        let is_read = lessons.get(self.lesson_idx).is_some_and(|l| {
             progress
                 .lessons_read
                 .get(&l.lesson_id)

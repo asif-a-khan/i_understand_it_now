@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::path::PathBuf;
 
-const PROGRESS_DIR: &str = ".dsa-forge";
+const PROGRESS_DIR: &str = ".iuin";
 const PROGRESS_FILE: &str = "progress.toml";
 
 #[derive(Debug, Default, Serialize, Deserialize)]
@@ -44,8 +44,7 @@ impl Progress {
         if let Some(parent) = path.parent() {
             std::fs::create_dir_all(parent)?;
         }
-        let contents = toml::to_string_pretty(self)
-            .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e))?;
+        let contents = toml::to_string_pretty(self).map_err(std::io::Error::other)?;
         std::fs::write(path, contents)
     }
 }

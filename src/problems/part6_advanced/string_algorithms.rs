@@ -246,9 +246,7 @@ fn ref_lcp_array(s: &str) -> Vec<usize> {
                 h += 1;
             }
             lcp[rank[i] - 1] = h;
-            if h > 0 {
-                h -= 1;
-            }
+            h = h.saturating_sub(1);
         } else {
             h = 0;
         }
@@ -272,8 +270,8 @@ fn ref_palindrome_partitioning_min(s: &str) -> i32 {
     }
     // is_pal[i][j] = true if s[i..=j] is palindrome
     let mut is_pal = vec![vec![false; n]; n];
-    for i in 0..n {
-        is_pal[i][i] = true;
+    for (i, row) in is_pal.iter_mut().enumerate().take(n) {
+        row[i] = true;
     }
     for len in 2..=n {
         for i in 0..=n - len {
@@ -340,10 +338,18 @@ struct PatternMatchTest {
 }
 
 impl Problem for StringAlgoPatternMatch {
-    fn id(&self) -> &str { "string_algo_pattern_match" }
-    fn name(&self) -> &str { "First Pattern Occurrence" }
-    fn topic(&self) -> &str { "string_algorithms" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "string_algo_pattern_match"
+    }
+    fn name(&self) -> &str {
+        "First Pattern Occurrence"
+    }
+    fn topic(&self) -> &str {
+        "string_algorithms"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Find the first occurrence of pattern in text. Return -1 if not found.\n\n\
          Input: (text: String, pattern: String)\n\
@@ -355,9 +361,8 @@ impl Problem for StringAlgoPatternMatch {
         (0..10)
             .map(|_| {
                 let text_len = rng.random_range(5..=30);
-                let text = crate::problems::helpers::random_string_from(
-                    &mut rng, text_len, b"abcd",
-                );
+                let text =
+                    crate::problems::helpers::random_string_from(&mut rng, text_len, b"abcd");
                 let pat_len = rng.random_range(1..=5);
                 let pattern = if rng.random_range(0..3) == 0 {
                     // Sometimes use a substring of text
@@ -397,10 +402,18 @@ struct CountOccTest {
 }
 
 impl Problem for StringAlgoCountOccurrences {
-    fn id(&self) -> &str { "string_algo_count_occurrences" }
-    fn name(&self) -> &str { "Count Pattern Occurrences" }
-    fn topic(&self) -> &str { "string_algorithms" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "string_algo_count_occurrences"
+    }
+    fn name(&self) -> &str {
+        "Count Pattern Occurrences"
+    }
+    fn topic(&self) -> &str {
+        "string_algorithms"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Count the number of (possibly overlapping) occurrences of pattern in text.\n\n\
          Input: (text: String, pattern: String)\n\
@@ -412,13 +425,10 @@ impl Problem for StringAlgoCountOccurrences {
         (0..10)
             .map(|_| {
                 let text_len = rng.random_range(5..=30);
-                let text = crate::problems::helpers::random_string_from(
-                    &mut rng, text_len, b"abc",
-                );
+                let text = crate::problems::helpers::random_string_from(&mut rng, text_len, b"abc");
                 let pat_len = rng.random_range(1..=3);
-                let pattern = crate::problems::helpers::random_string_from(
-                    &mut rng, pat_len, b"abc",
-                );
+                let pattern =
+                    crate::problems::helpers::random_string_from(&mut rng, pat_len, b"abc");
                 TestCase {
                     data: Box::new(CountOccTest { text, pattern }),
                 }
@@ -449,10 +459,18 @@ struct RotationTest {
 }
 
 impl Problem for StringAlgoIsRotation {
-    fn id(&self) -> &str { "string_algo_is_rotation" }
-    fn name(&self) -> &str { "String Rotation Check" }
-    fn topic(&self) -> &str { "string_algorithms" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "string_algo_is_rotation"
+    }
+    fn name(&self) -> &str {
+        "String Rotation Check"
+    }
+    fn topic(&self) -> &str {
+        "string_algorithms"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Check if s2 is a rotation of s1.\n\
          Example: \"abcde\" rotated -> \"cdeab\"\n\n\
@@ -502,10 +520,18 @@ struct LpsTest {
 }
 
 impl Problem for StringAlgoLongestPrefixSuffix {
-    fn id(&self) -> &str { "string_algo_longest_prefix_suffix" }
-    fn name(&self) -> &str { "Longest Proper Prefix = Suffix" }
-    fn topic(&self) -> &str { "string_algorithms" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "string_algo_longest_prefix_suffix"
+    }
+    fn name(&self) -> &str {
+        "Longest Proper Prefix = Suffix"
+    }
+    fn topic(&self) -> &str {
+        "string_algorithms"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Find the length of the longest proper prefix of the string which is also a suffix.\n\
          A proper prefix is not the entire string.\n\n\
@@ -519,7 +545,9 @@ impl Problem for StringAlgoLongestPrefixSuffix {
             .map(|_| {
                 let len = rng.random_range(2..=20);
                 let s = crate::problems::helpers::random_string_from(&mut rng, len, b"abc");
-                TestCase { data: Box::new(LpsTest { s }) }
+                TestCase {
+                    data: Box::new(LpsTest { s }),
+                }
             })
             .collect()
     }
@@ -547,10 +575,18 @@ struct RepeatedMatchTest {
 }
 
 impl Problem for StringAlgoRepeatedStringMatch {
-    fn id(&self) -> &str { "string_algo_repeated_string_match" }
-    fn name(&self) -> &str { "Repeated String Match" }
-    fn topic(&self) -> &str { "string_algorithms" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "string_algo_repeated_string_match"
+    }
+    fn name(&self) -> &str {
+        "Repeated String Match"
+    }
+    fn topic(&self) -> &str {
+        "string_algorithms"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Find the minimum number of times you need to repeat string a so that b is a \
          substring of the repeated string. Return -1 if impossible.\n\n\
@@ -604,10 +640,18 @@ struct KmpTest {
 }
 
 impl Problem for StringAlgoKmp {
-    fn id(&self) -> &str { "string_algo_kmp" }
-    fn name(&self) -> &str { "KMP Pattern Matching" }
-    fn topic(&self) -> &str { "string_algorithms" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "string_algo_kmp"
+    }
+    fn name(&self) -> &str {
+        "KMP Pattern Matching"
+    }
+    fn topic(&self) -> &str {
+        "string_algorithms"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Find all occurrences of pattern in text using KMP algorithm.\n\
          Return starting indices of all matches.\n\n\
@@ -620,13 +664,10 @@ impl Problem for StringAlgoKmp {
         (0..10)
             .map(|_| {
                 let text_len = rng.random_range(10..=40);
-                let text = crate::problems::helpers::random_string_from(
-                    &mut rng, text_len, b"abc",
-                );
+                let text = crate::problems::helpers::random_string_from(&mut rng, text_len, b"abc");
                 let pat_len = rng.random_range(1..=5);
-                let pattern = crate::problems::helpers::random_string_from(
-                    &mut rng, pat_len, b"abc",
-                );
+                let pattern =
+                    crate::problems::helpers::random_string_from(&mut rng, pat_len, b"abc");
                 TestCase {
                     data: Box::new(KmpTest { text, pattern }),
                 }
@@ -657,10 +698,18 @@ struct RabinKarpTest {
 }
 
 impl Problem for StringAlgoRabinKarp {
-    fn id(&self) -> &str { "string_algo_rabin_karp" }
-    fn name(&self) -> &str { "Rabin-Karp Pattern Matching" }
-    fn topic(&self) -> &str { "string_algorithms" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "string_algo_rabin_karp"
+    }
+    fn name(&self) -> &str {
+        "Rabin-Karp Pattern Matching"
+    }
+    fn topic(&self) -> &str {
+        "string_algorithms"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Find all occurrences of pattern in text using Rabin-Karp (rolling hash).\n\
          Return starting indices of all matches.\n\n\
@@ -673,13 +722,11 @@ impl Problem for StringAlgoRabinKarp {
         (0..10)
             .map(|_| {
                 let text_len = rng.random_range(10..=40);
-                let text = crate::problems::helpers::random_string_from(
-                    &mut rng, text_len, b"abcd",
-                );
+                let text =
+                    crate::problems::helpers::random_string_from(&mut rng, text_len, b"abcd");
                 let pat_len = rng.random_range(1..=5);
-                let pattern = crate::problems::helpers::random_string_from(
-                    &mut rng, pat_len, b"abcd",
-                );
+                let pattern =
+                    crate::problems::helpers::random_string_from(&mut rng, pat_len, b"abcd");
                 TestCase {
                     data: Box::new(RabinKarpTest { text, pattern }),
                 }
@@ -709,10 +756,18 @@ struct ZFuncTest {
 }
 
 impl Problem for StringAlgoZFunction {
-    fn id(&self) -> &str { "string_algo_z_function" }
-    fn name(&self) -> &str { "Z-Function Array" }
-    fn topic(&self) -> &str { "string_algorithms" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "string_algo_z_function"
+    }
+    fn name(&self) -> &str {
+        "Z-Function Array"
+    }
+    fn topic(&self) -> &str {
+        "string_algorithms"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Compute the Z-function array. z[i] = length of the longest substring starting \
          at position i which is also a prefix of the string. z[0] = len(s) by convention.\n\n\
@@ -726,7 +781,9 @@ impl Problem for StringAlgoZFunction {
             .map(|_| {
                 let len = rng.random_range(3..=20);
                 let s = crate::problems::helpers::random_string_from(&mut rng, len, b"abc");
-                TestCase { data: Box::new(ZFuncTest { s }) }
+                TestCase {
+                    data: Box::new(ZFuncTest { s }),
+                }
             })
             .collect()
     }
@@ -753,10 +810,18 @@ struct LongestDupTest {
 }
 
 impl Problem for StringAlgoLongestDuplicateSubstring {
-    fn id(&self) -> &str { "string_algo_longest_duplicate_substring" }
-    fn name(&self) -> &str { "Longest Duplicate Substring" }
-    fn topic(&self) -> &str { "string_algorithms" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "string_algo_longest_duplicate_substring"
+    }
+    fn name(&self) -> &str {
+        "Longest Duplicate Substring"
+    }
+    fn topic(&self) -> &str {
+        "string_algorithms"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Find the longest substring that appears at least twice.\n\
          Return empty string if none.\n\n\
@@ -770,7 +835,9 @@ impl Problem for StringAlgoLongestDuplicateSubstring {
             .map(|_| {
                 let len = rng.random_range(4..=15);
                 let s = crate::problems::helpers::random_string_from(&mut rng, len, b"abc");
-                TestCase { data: Box::new(LongestDupTest { s }) }
+                TestCase {
+                    data: Box::new(LongestDupTest { s }),
+                }
             })
             .collect()
     }
@@ -781,8 +848,7 @@ impl Problem for StringAlgoLongestDuplicateSubstring {
         let actual = solutions::longest_duplicate_substring(&t.s);
         // Accept any answer of the same length that occurs at least twice
         let valid = actual.len() == expected.len()
-            && (actual.is_empty()
-                || t.s.match_indices(&actual).count() >= 2);
+            && (actual.is_empty() || t.s.match_indices(&actual).count() >= 2);
         SolutionResult {
             is_correct: valid,
             input_description: format!("s=\"{}\"", t.s),
@@ -801,10 +867,18 @@ struct ShortPalTest {
 }
 
 impl Problem for StringAlgoShortestPalindrome {
-    fn id(&self) -> &str { "string_algo_shortest_palindrome" }
-    fn name(&self) -> &str { "Shortest Palindrome" }
-    fn topic(&self) -> &str { "string_algorithms" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "string_algo_shortest_palindrome"
+    }
+    fn name(&self) -> &str {
+        "Shortest Palindrome"
+    }
+    fn topic(&self) -> &str {
+        "string_algorithms"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Find the shortest palindrome by adding characters to the front of s.\n\n\
          Input: String\n\
@@ -817,7 +891,9 @@ impl Problem for StringAlgoShortestPalindrome {
             .map(|_| {
                 let len = rng.random_range(2..=15);
                 let s = crate::problems::helpers::random_string_from(&mut rng, len, b"abc");
-                TestCase { data: Box::new(ShortPalTest { s }) }
+                TestCase {
+                    data: Box::new(ShortPalTest { s }),
+                }
             })
             .collect()
     }
@@ -844,10 +920,18 @@ struct SuffixArrayTest {
 }
 
 impl Problem for StringAlgoSuffixArray {
-    fn id(&self) -> &str { "string_algo_suffix_array" }
-    fn name(&self) -> &str { "Build Suffix Array" }
-    fn topic(&self) -> &str { "string_algorithms" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "string_algo_suffix_array"
+    }
+    fn name(&self) -> &str {
+        "Build Suffix Array"
+    }
+    fn topic(&self) -> &str {
+        "string_algorithms"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Build the suffix array for a string. The suffix array is the array of starting \
          indices of all suffixes, sorted lexicographically.\n\n\
@@ -861,7 +945,9 @@ impl Problem for StringAlgoSuffixArray {
             .map(|_| {
                 let len = rng.random_range(3..=15);
                 let s = crate::problems::helpers::random_string_from(&mut rng, len, b"abcd");
-                TestCase { data: Box::new(SuffixArrayTest { s }) }
+                TestCase {
+                    data: Box::new(SuffixArrayTest { s }),
+                }
             })
             .collect()
     }
@@ -888,10 +974,18 @@ struct LcpArrayTest {
 }
 
 impl Problem for StringAlgoLcpArray {
-    fn id(&self) -> &str { "string_algo_lcp_array" }
-    fn name(&self) -> &str { "LCP Array from Suffix Array" }
-    fn topic(&self) -> &str { "string_algorithms" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "string_algo_lcp_array"
+    }
+    fn name(&self) -> &str {
+        "LCP Array from Suffix Array"
+    }
+    fn topic(&self) -> &str {
+        "string_algorithms"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Build the LCP (Longest Common Prefix) array from the suffix array.\n\
          lcp[i] = length of longest common prefix between suffix sa[i] and sa[i+1].\n\n\
@@ -905,7 +999,9 @@ impl Problem for StringAlgoLcpArray {
             .map(|_| {
                 let len = rng.random_range(3..=15);
                 let s = crate::problems::helpers::random_string_from(&mut rng, len, b"abcd");
-                TestCase { data: Box::new(LcpArrayTest { s }) }
+                TestCase {
+                    data: Box::new(LcpArrayTest { s }),
+                }
             })
             .collect()
     }
@@ -932,10 +1028,18 @@ struct DistinctSubTest {
 }
 
 impl Problem for StringAlgoDistinctSubstrings {
-    fn id(&self) -> &str { "string_algo_distinct_substrings" }
-    fn name(&self) -> &str { "Count Distinct Substrings" }
-    fn topic(&self) -> &str { "string_algorithms" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "string_algo_distinct_substrings"
+    }
+    fn name(&self) -> &str {
+        "Count Distinct Substrings"
+    }
+    fn topic(&self) -> &str {
+        "string_algorithms"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Count the number of distinct non-empty substrings of a string.\n\
          Use suffix array + LCP array for efficient computation.\n\n\
@@ -949,7 +1053,9 @@ impl Problem for StringAlgoDistinctSubstrings {
             .map(|_| {
                 let len = rng.random_range(3..=12);
                 let s = crate::problems::helpers::random_string_from(&mut rng, len, b"abc");
-                TestCase { data: Box::new(DistinctSubTest { s }) }
+                TestCase {
+                    data: Box::new(DistinctSubTest { s }),
+                }
             })
             .collect()
     }
@@ -976,10 +1082,18 @@ struct PalPartTest {
 }
 
 impl Problem for StringAlgoPalindromePartitioningMin {
-    fn id(&self) -> &str { "string_algo_palindrome_partitioning_min" }
-    fn name(&self) -> &str { "Min Cuts for Palindrome Partitioning" }
-    fn topic(&self) -> &str { "string_algorithms" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "string_algo_palindrome_partitioning_min"
+    }
+    fn name(&self) -> &str {
+        "Min Cuts for Palindrome Partitioning"
+    }
+    fn topic(&self) -> &str {
+        "string_algorithms"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Find the minimum number of cuts to partition the string so every part is a palindrome.\n\n\
          Input: String\n\
@@ -992,7 +1106,9 @@ impl Problem for StringAlgoPalindromePartitioningMin {
             .map(|_| {
                 let len = rng.random_range(2..=12);
                 let s = crate::problems::helpers::random_string_from(&mut rng, len, b"abcde");
-                TestCase { data: Box::new(PalPartTest { s }) }
+                TestCase {
+                    data: Box::new(PalPartTest { s }),
+                }
             })
             .collect()
     }
@@ -1020,10 +1136,18 @@ struct LcsTest {
 }
 
 impl Problem for StringAlgoLongestCommonSubstring {
-    fn id(&self) -> &str { "string_algo_longest_common_substring" }
-    fn name(&self) -> &str { "Longest Common Substring" }
-    fn topic(&self) -> &str { "string_algorithms" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "string_algo_longest_common_substring"
+    }
+    fn name(&self) -> &str {
+        "Longest Common Substring"
+    }
+    fn topic(&self) -> &str {
+        "string_algorithms"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Find the longest substring that appears in both s1 and s2.\n\
          Return empty string if none.\n\n\
@@ -1039,7 +1163,9 @@ impl Problem for StringAlgoLongestCommonSubstring {
                 let len2 = rng.random_range(3..=15);
                 let s1 = crate::problems::helpers::random_string_from(&mut rng, len1, b"abcd");
                 let s2 = crate::problems::helpers::random_string_from(&mut rng, len2, b"abcd");
-                TestCase { data: Box::new(LcsTest { s1, s2 }) }
+                TestCase {
+                    data: Box::new(LcsTest { s1, s2 }),
+                }
             })
             .collect()
     }
@@ -1050,8 +1176,7 @@ impl Problem for StringAlgoLongestCommonSubstring {
         let actual = solutions::longest_common_substring(&t.s1, &t.s2);
         // Accept any answer of the same length that is a substring of both
         let valid = actual.len() == expected.len()
-            && (actual.is_empty()
-                || (t.s1.contains(&actual) && t.s2.contains(&actual)));
+            && (actual.is_empty() || (t.s1.contains(&actual) && t.s2.contains(&actual)));
         SolutionResult {
             is_correct: valid,
             input_description: format!("s1=\"{}\", s2=\"{}\"", t.s1, t.s2),

@@ -46,7 +46,11 @@ struct RefTrie {
 
 impl RefTrie {
     fn new() -> Self {
-        Self { children: HashMap::new(), is_end: false, count: 0 }
+        Self {
+            children: HashMap::new(),
+            is_end: false,
+            count: 0,
+        }
     }
 
     fn insert(&mut self, word: &str) {
@@ -145,10 +149,18 @@ struct ImplementTrieTest {
 }
 
 impl Problem for ImplementTrie {
-    fn id(&self) -> &str { "tries_implement_trie" }
-    fn name(&self) -> &str { "Implement Trie" }
-    fn topic(&self) -> &str { "tries" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "tries_implement_trie"
+    }
+    fn name(&self) -> &str {
+        "Implement Trie"
+    }
+    fn topic(&self) -> &str {
+        "tries"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Implement a trie that supports insert, search, and starts_with operations.\n\n\
          Input is a Vec of (operation, argument) pairs where operation is one of:\n\
@@ -163,25 +175,33 @@ impl Problem for ImplementTrie {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n_inserts = rng.random_range(1..=10);
-            let n_queries = rng.random_range(1..=10);
-            let mut ops = Vec::new();
-            let words = random_word_list(&mut rng, n_inserts, 8);
-            for w in &words {
-                ops.push(("insert".to_string(), w.clone()));
-            }
-            for _ in 0..n_queries {
-                let op = if rng.random_range(0..2) == 0 { "search" } else { "starts_with" };
-                let word = if rng.random_range(0..2) == 0 {
-                    words[rng.random_range(0..words.len())].clone()
-                } else {
-                    random_word(&mut rng, 8)
-                };
-                ops.push((op.to_string(), word));
-            }
-            TestCase { data: Box::new(ImplementTrieTest { ops }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n_inserts = rng.random_range(1..=10);
+                let n_queries = rng.random_range(1..=10);
+                let mut ops = Vec::new();
+                let words = random_word_list(&mut rng, n_inserts, 8);
+                for w in &words {
+                    ops.push(("insert".to_string(), w.clone()));
+                }
+                for _ in 0..n_queries {
+                    let op = if rng.random_range(0..2) == 0 {
+                        "search"
+                    } else {
+                        "starts_with"
+                    };
+                    let word = if rng.random_range(0..2) == 0 {
+                        words[rng.random_range(0..words.len())].clone()
+                    } else {
+                        random_word(&mut rng, 8)
+                    };
+                    ops.push((op.to_string(), word));
+                }
+                TestCase {
+                    data: Box::new(ImplementTrieTest { ops }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -202,9 +222,15 @@ fn ref_implement_trie(ops: &[(String, String)]) -> Vec<bool> {
     let mut result = Vec::new();
     for (op, arg) in ops {
         match op.as_str() {
-            "insert" => { trie.insert(arg); }
-            "search" => { result.push(trie.search(arg)); }
-            "starts_with" => { result.push(trie.starts_with(arg)); }
+            "insert" => {
+                trie.insert(arg);
+            }
+            "search" => {
+                result.push(trie.search(arg));
+            }
+            "starts_with" => {
+                result.push(trie.starts_with(arg));
+            }
             _ => {}
         }
     }
@@ -214,13 +240,24 @@ fn ref_implement_trie(ops: &[(String, String)]) -> Vec<bool> {
 // ── Easy 2: Search Word in Dictionary ───────────────────────────────────
 
 struct SearchWord;
-struct SearchWordTest { dict: Vec<String>, queries: Vec<String> }
+struct SearchWordTest {
+    dict: Vec<String>,
+    queries: Vec<String>,
+}
 
 impl Problem for SearchWord {
-    fn id(&self) -> &str { "tries_search_word" }
-    fn name(&self) -> &str { "Search Word in Dictionary" }
-    fn topic(&self) -> &str { "tries" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "tries_search_word"
+    }
+    fn name(&self) -> &str {
+        "Search Word in Dictionary"
+    }
+    fn topic(&self) -> &str {
+        "tries"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given a dictionary of words and a list of queries, for each query return whether \
          the word exists in the dictionary.\n\n\
@@ -232,19 +269,25 @@ impl Problem for SearchWord {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=15);
-            let dict = random_word_list(&mut rng, n, 8);
-            let q = rng.random_range(1..=10);
-            let queries: Vec<String> = (0..q).map(|_| {
-                if rng.random_range(0..2) == 0 {
-                    dict[rng.random_range(0..dict.len())].clone()
-                } else {
-                    random_word(&mut rng, 8)
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=15);
+                let dict = random_word_list(&mut rng, n, 8);
+                let q = rng.random_range(1..=10);
+                let queries: Vec<String> = (0..q)
+                    .map(|_| {
+                        if rng.random_range(0..2) == 0 {
+                            dict[rng.random_range(0..dict.len())].clone()
+                        } else {
+                            random_word(&mut rng, 8)
+                        }
+                    })
+                    .collect();
+                TestCase {
+                    data: Box::new(SearchWordTest { dict, queries }),
                 }
-            }).collect();
-            TestCase { data: Box::new(SearchWordTest { dict, queries }) }
-        }).collect()
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -264,13 +307,23 @@ impl Problem for SearchWord {
 // ── Easy 3: Longest Common Prefix ───────────────────────────────────────
 
 struct LongestCommonPrefix;
-struct LCPTest { words: Vec<String> }
+struct LCPTest {
+    words: Vec<String>,
+}
 
 impl Problem for LongestCommonPrefix {
-    fn id(&self) -> &str { "tries_longest_common_prefix" }
-    fn name(&self) -> &str { "Longest Common Prefix" }
-    fn topic(&self) -> &str { "tries" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "tries_longest_common_prefix"
+    }
+    fn name(&self) -> &str {
+        "Longest Common Prefix"
+    }
+    fn topic(&self) -> &str {
+        "tries"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Find the longest common prefix string amongst an array of strings using a trie.\n\n\
          If there is no common prefix, return an empty string.\n\n\
@@ -282,17 +335,23 @@ impl Problem for LongestCommonPrefix {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=10);
-            let prefix_len = rng.random_range(0..=4);
-            let prefix = helpers::random_string(&mut rng, prefix_len);
-            let words: Vec<String> = (0..n).map(|_| {
-                let suffix_len = rng.random_range(0..=5);
-                let suffix = helpers::random_string(&mut rng, suffix_len);
-                format!("{prefix}{suffix}")
-            }).collect();
-            TestCase { data: Box::new(LCPTest { words }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=10);
+                let prefix_len = rng.random_range(0..=4);
+                let prefix = helpers::random_string(&mut rng, prefix_len);
+                let words: Vec<String> = (0..n)
+                    .map(|_| {
+                        let suffix_len = rng.random_range(0..=5);
+                        let suffix = helpers::random_string(&mut rng, suffix_len);
+                        format!("{prefix}{suffix}")
+                    })
+                    .collect();
+                TestCase {
+                    data: Box::new(LCPTest { words }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -309,7 +368,9 @@ impl Problem for LongestCommonPrefix {
 }
 
 fn ref_longest_common_prefix(words: &[String]) -> String {
-    if words.is_empty() { return String::new(); }
+    if words.is_empty() {
+        return String::new();
+    }
     let first = &words[0];
     let mut prefix_len = first.len();
     for word in &words[1..] {
@@ -327,13 +388,24 @@ fn ref_longest_common_prefix(words: &[String]) -> String {
 // ── Easy 4: Count Words with Prefix ─────────────────────────────────────
 
 struct CountPrefix;
-struct CountPrefixTest { words: Vec<String>, prefix: String }
+struct CountPrefixTest {
+    words: Vec<String>,
+    prefix: String,
+}
 
 impl Problem for CountPrefix {
-    fn id(&self) -> &str { "tries_count_prefix" }
-    fn name(&self) -> &str { "Count Words with Prefix" }
-    fn topic(&self) -> &str { "tries" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "tries_count_prefix"
+    }
+    fn name(&self) -> &str {
+        "Count Words with Prefix"
+    }
+    fn topic(&self) -> &str {
+        "tries"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given a list of words and a prefix, count how many words start with the given prefix.\n\n\
          Constraints:\n\
@@ -343,20 +415,24 @@ impl Problem for CountPrefix {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=20);
-            let words = random_word_list(&mut rng, n, 8);
-            let prefix = if rng.random_range(0..3) == 0 {
-                // Use prefix from existing word
-                let w = &words[rng.random_range(0..words.len())];
-                let plen = rng.random_range(1..=w.len());
-                w[..plen].to_string()
-            } else {
-                let plen = rng.random_range(1..=3);
-                helpers::random_string(&mut rng, plen)
-            };
-            TestCase { data: Box::new(CountPrefixTest { words, prefix }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=20);
+                let words = random_word_list(&mut rng, n, 8);
+                let prefix = if rng.random_range(0..3) == 0 {
+                    // Use prefix from existing word
+                    let w = &words[rng.random_range(0..words.len())];
+                    let plen = rng.random_range(1..=w.len());
+                    w[..plen].to_string()
+                } else {
+                    let plen = rng.random_range(1..=3);
+                    helpers::random_string(&mut rng, plen)
+                };
+                TestCase {
+                    data: Box::new(CountPrefixTest { words, prefix }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -375,13 +451,24 @@ impl Problem for CountPrefix {
 // ── Easy 5: Auto Complete ───────────────────────────────────────────────
 
 struct AutoComplete;
-struct AutoCompleteTest { words: Vec<String>, prefix: String }
+struct AutoCompleteTest {
+    words: Vec<String>,
+    prefix: String,
+}
 
 impl Problem for AutoComplete {
-    fn id(&self) -> &str { "tries_auto_complete" }
-    fn name(&self) -> &str { "Auto Complete" }
-    fn topic(&self) -> &str { "tries" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "tries_auto_complete"
+    }
+    fn name(&self) -> &str {
+        "Auto Complete"
+    }
+    fn topic(&self) -> &str {
+        "tries"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given a list of words and a prefix, return all words that start with the prefix, \
          sorted lexicographically.\n\n\
@@ -392,24 +479,30 @@ impl Problem for AutoComplete {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=15);
-            let words = random_word_list(&mut rng, n, 6);
-            let prefix = if rng.random_range(0..3) == 0 {
-                let w = &words[rng.random_range(0..words.len())];
-                let plen = rng.random_range(1..=w.len());
-                w[..plen].to_string()
-            } else {
-                let plen = rng.random_range(1..=2);
-                helpers::random_string(&mut rng, plen)
-            };
-            TestCase { data: Box::new(AutoCompleteTest { words, prefix }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=15);
+                let words = random_word_list(&mut rng, n, 6);
+                let prefix = if rng.random_range(0..3) == 0 {
+                    let w = &words[rng.random_range(0..words.len())];
+                    let plen = rng.random_range(1..=w.len());
+                    w[..plen].to_string()
+                } else {
+                    let plen = rng.random_range(1..=2);
+                    helpers::random_string(&mut rng, plen)
+                };
+                TestCase {
+                    data: Box::new(AutoCompleteTest { words, prefix }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<AutoCompleteTest>().unwrap();
-        let mut expected: Vec<String> = t.words.iter()
+        let mut expected: Vec<String> = t
+            .words
+            .iter()
             .filter(|w| w.starts_with(&t.prefix))
             .cloned()
             .collect();
@@ -428,13 +521,24 @@ impl Problem for AutoComplete {
 // ── Medium 1: Word Search II ────────────────────────────────────────────
 
 struct WordSearchII;
-struct WordSearchIITest { board: Vec<Vec<char>>, words: Vec<String> }
+struct WordSearchIITest {
+    board: Vec<Vec<char>>,
+    words: Vec<String>,
+}
 
 impl Problem for WordSearchII {
-    fn id(&self) -> &str { "tries_word_search_ii" }
-    fn name(&self) -> &str { "Word Search II" }
-    fn topic(&self) -> &str { "tries" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "tries_word_search_ii"
+    }
+    fn name(&self) -> &str {
+        "Word Search II"
+    }
+    fn topic(&self) -> &str {
+        "tries"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given an m x n board of characters and a list of words, return all words that can \
          be constructed from letters of sequentially adjacent cells (horizontally or vertically). \
@@ -448,20 +552,29 @@ impl Problem for WordSearchII {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let rows = rng.random_range(2..=4);
-            let cols = rng.random_range(2..=4);
-            let board: Vec<Vec<char>> = (0..rows)
-                .map(|_| (0..cols).map(|_| (b'a' + rng.random_range(0..6u8)) as char).collect())
-                .collect();
-            let n_words = rng.random_range(1..=8);
-            let words: Vec<String> = (0..n_words).map(|_| {
-                let len = rng.random_range(1..=4);
-                let w = helpers::random_string_from(&mut rng, len, b"abcdef");
-                w
-            }).collect();
-            TestCase { data: Box::new(WordSearchIITest { board, words }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let rows = rng.random_range(2..=4);
+                let cols = rng.random_range(2..=4);
+                let board: Vec<Vec<char>> = (0..rows)
+                    .map(|_| {
+                        (0..cols)
+                            .map(|_| (b'a' + rng.random_range(0..6u8)) as char)
+                            .collect()
+                    })
+                    .collect();
+                let n_words = rng.random_range(1..=8);
+                let words: Vec<String> = (0..n_words)
+                    .map(|_| {
+                        let len = rng.random_range(1..=4);
+                        helpers::random_string_from(&mut rng, len, b"abcdef")
+                    })
+                    .collect();
+                TestCase {
+                    data: Box::new(WordSearchIITest { board, words }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -483,7 +596,9 @@ fn ref_word_search_ii(board: &[Vec<char>], words: &[String]) -> Vec<String> {
     let mut found = HashSet::new();
 
     for word in words {
-        if found.contains(word) { continue; }
+        if found.contains(word) {
+            continue;
+        }
         let chars: Vec<char> = word.chars().collect();
         'outer: for r in 0..rows {
             for c in 0..cols {
@@ -500,8 +615,17 @@ fn ref_word_search_ii(board: &[Vec<char>], words: &[String]) -> Vec<String> {
     result
 }
 
-fn dfs_word(board: &[Vec<char>], chars: &[char], idx: usize, r: usize, c: usize, visited: &mut [Vec<bool>]) -> bool {
-    if idx == chars.len() { return true; }
+fn dfs_word(
+    board: &[Vec<char>],
+    chars: &[char],
+    idx: usize,
+    r: usize,
+    c: usize,
+    visited: &mut [Vec<bool>],
+) -> bool {
+    if idx == chars.len() {
+        return true;
+    }
     if r >= board.len() || c >= board[0].len() || visited[r][c] || board[r][c] != chars[idx] {
         return false;
     }
@@ -510,11 +634,10 @@ fn dfs_word(board: &[Vec<char>], chars: &[char], idx: usize, r: usize, c: usize,
     for (dr, dc) in dirs {
         let nr = r as i32 + dr;
         let nc = c as i32 + dc;
-        if nr >= 0 && nc >= 0 {
-            if dfs_word(board, chars, idx + 1, nr as usize, nc as usize, visited) {
-                visited[r][c] = false;
-                return true;
-            }
+        if nr >= 0 && nc >= 0 && dfs_word(board, chars, idx + 1, nr as usize, nc as usize, visited)
+        {
+            visited[r][c] = false;
+            return true;
         }
     }
     visited[r][c] = false;
@@ -524,13 +647,24 @@ fn dfs_word(board: &[Vec<char>], chars: &[char], idx: usize, r: usize, c: usize,
 // ── Medium 2: Replace Words ─────────────────────────────────────────────
 
 struct ReplaceWords;
-struct ReplaceWordsTest { dict: Vec<String>, sentence: String }
+struct ReplaceWordsTest {
+    dict: Vec<String>,
+    sentence: String,
+}
 
 impl Problem for ReplaceWords {
-    fn id(&self) -> &str { "tries_replace_words" }
-    fn name(&self) -> &str { "Replace Words" }
-    fn topic(&self) -> &str { "tries" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "tries_replace_words"
+    }
+    fn name(&self) -> &str {
+        "Replace Words"
+    }
+    fn topic(&self) -> &str {
+        "tries"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given a dictionary of root words and a sentence, replace each word in the sentence \
          with the shortest root that is a prefix of that word. If no root matches, keep the \
@@ -542,30 +676,36 @@ impl Problem for ReplaceWords {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n_roots = rng.random_range(1..=5);
-            let dict: Vec<String> = (0..n_roots)
-                .map(|_| {
-                    let len = rng.random_range(1..=3);
-                    helpers::random_string(&mut rng, len)
-                })
-                .collect();
-            let n_words = rng.random_range(1..=8);
-            let sentence_words: Vec<String> = (0..n_words).map(|_| {
-                if rng.random_range(0..3) == 0 {
-                    // Build word from root
-                    let root = &dict[rng.random_range(0..dict.len())];
-                    let slen = rng.random_range(0..=4);
-                    let suffix = helpers::random_string(&mut rng, slen);
-                    format!("{root}{suffix}")
-                } else {
-                    let wlen = rng.random_range(1..=6);
-                    helpers::random_string(&mut rng, wlen)
+        (0..10)
+            .map(|_| {
+                let n_roots = rng.random_range(1..=5);
+                let dict: Vec<String> = (0..n_roots)
+                    .map(|_| {
+                        let len = rng.random_range(1..=3);
+                        helpers::random_string(&mut rng, len)
+                    })
+                    .collect();
+                let n_words = rng.random_range(1..=8);
+                let sentence_words: Vec<String> = (0..n_words)
+                    .map(|_| {
+                        if rng.random_range(0..3) == 0 {
+                            // Build word from root
+                            let root = &dict[rng.random_range(0..dict.len())];
+                            let slen = rng.random_range(0..=4);
+                            let suffix = helpers::random_string(&mut rng, slen);
+                            format!("{root}{suffix}")
+                        } else {
+                            let wlen = rng.random_range(1..=6);
+                            helpers::random_string(&mut rng, wlen)
+                        }
+                    })
+                    .collect();
+                let sentence = sentence_words.join(" ");
+                TestCase {
+                    data: Box::new(ReplaceWordsTest { dict, sentence }),
                 }
-            }).collect();
-            let sentence = sentence_words.join(" ");
-            TestCase { data: Box::new(ReplaceWordsTest { dict, sentence }) }
-        }).collect()
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -583,23 +723,29 @@ impl Problem for ReplaceWords {
 
 fn ref_replace_words(dict: &[String], sentence: &str) -> String {
     let mut trie = RefTrie::new();
-    for root in dict { trie.insert(root); }
+    for root in dict {
+        trie.insert(root);
+    }
 
-    sentence.split_whitespace().map(|word| {
-        let mut node = &trie;
-        for (i, c) in word.chars().enumerate() {
-            match node.children.get(&c) {
-                Some(child) => {
-                    if child.is_end {
-                        return word[..=i].to_string();
+    sentence
+        .split_whitespace()
+        .map(|word| {
+            let mut node = &trie;
+            for (i, c) in word.char_indices() {
+                match node.children.get(&c) {
+                    Some(child) => {
+                        if child.is_end {
+                            return word[..=i].to_string();
+                        }
+                        node = child;
                     }
-                    node = child;
+                    None => break,
                 }
-                None => break,
             }
-        }
-        word.to_string()
-    }).collect::<Vec<_>>().join(" ")
+            word.to_string()
+        })
+        .collect::<Vec<_>>()
+        .join(" ")
 }
 
 // ── Medium 3: Map Sum Pairs ─────────────────────────────────────────────
@@ -610,10 +756,18 @@ struct MapSumTest {
 }
 
 impl Problem for MapSum {
-    fn id(&self) -> &str { "tries_map_sum" }
-    fn name(&self) -> &str { "Map Sum Pairs" }
-    fn topic(&self) -> &str { "tries" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "tries_map_sum"
+    }
+    fn name(&self) -> &str {
+        "Map Sum Pairs"
+    }
+    fn topic(&self) -> &str {
+        "tries"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Implement a MapSum class:\n\
          - \"insert\" key value: insert or overwrite the key with value\n\
@@ -627,27 +781,31 @@ impl Problem for MapSum {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n_inserts = rng.random_range(1..=8);
-            let n_queries = rng.random_range(1..=5);
-            let mut ops = Vec::new();
-            let keys = random_word_list(&mut rng, n_inserts, 5);
-            for k in &keys {
-                ops.push(("insert".to_string(), k.clone(), rng.random_range(1..=100)));
-            }
-            for _ in 0..n_queries {
-                let prefix = if rng.random_range(0..2) == 0 {
-                    let k = &keys[rng.random_range(0..keys.len())];
-                    let plen = rng.random_range(1..=k.len());
-                    k[..plen].to_string()
-                } else {
-                    let plen = rng.random_range(1..=2);
-                    helpers::random_string(&mut rng, plen)
-                };
-                ops.push(("sum".to_string(), prefix, 0));
-            }
-            TestCase { data: Box::new(MapSumTest { ops }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n_inserts = rng.random_range(1..=8);
+                let n_queries = rng.random_range(1..=5);
+                let mut ops = Vec::new();
+                let keys = random_word_list(&mut rng, n_inserts, 5);
+                for k in &keys {
+                    ops.push(("insert".to_string(), k.clone(), rng.random_range(1..=100)));
+                }
+                for _ in 0..n_queries {
+                    let prefix = if rng.random_range(0..2) == 0 {
+                        let k = &keys[rng.random_range(0..keys.len())];
+                        let plen = rng.random_range(1..=k.len());
+                        k[..plen].to_string()
+                    } else {
+                        let plen = rng.random_range(1..=2);
+                        helpers::random_string(&mut rng, plen)
+                    };
+                    ops.push(("sum".to_string(), prefix, 0));
+                }
+                TestCase {
+                    data: Box::new(MapSumTest { ops }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -668,9 +826,12 @@ fn ref_map_sum(ops: &[(String, String, i32)]) -> Vec<i32> {
     let mut result = Vec::new();
     for (op, key, value) in ops {
         match op.as_str() {
-            "insert" => { map.insert(key.clone(), *value); }
+            "insert" => {
+                map.insert(key.clone(), *value);
+            }
             "sum" => {
-                let s: i32 = map.iter()
+                let s: i32 = map
+                    .iter()
                     .filter(|(k, _)| k.starts_with(key))
                     .map(|(_, v)| v)
                     .sum();
@@ -685,13 +846,24 @@ fn ref_map_sum(ops: &[(String, String, i32)]) -> Vec<i32> {
 // ── Medium 4: Search Suggestions System ─────────────────────────────────
 
 struct SearchSuggestions;
-struct SearchSuggestionsTest { products: Vec<String>, search: String }
+struct SearchSuggestionsTest {
+    products: Vec<String>,
+    search: String,
+}
 
 impl Problem for SearchSuggestions {
-    fn id(&self) -> &str { "tries_search_suggestions" }
-    fn name(&self) -> &str { "Search Suggestions System" }
-    fn topic(&self) -> &str { "tries" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "tries_search_suggestions"
+    }
+    fn name(&self) -> &str {
+        "Search Suggestions System"
+    }
+    fn topic(&self) -> &str {
+        "tries"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given an array of product names and a search word, for each character typed in the \
          search word, return the top 3 product suggestions (lexicographically smallest) that \
@@ -705,12 +877,16 @@ impl Problem for SearchSuggestions {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=15);
-            let products = random_word_list(&mut rng, n, 8);
-            let search = random_word(&mut rng, 5);
-            TestCase { data: Box::new(SearchSuggestionsTest { products, search }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=15);
+                let products = random_word_list(&mut rng, n, 8);
+                let search = random_word(&mut rng, 5);
+                TestCase {
+                    data: Box::new(SearchSuggestionsTest { products, search }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -733,7 +909,8 @@ fn ref_search_suggestions(products: &[String], search: &str) -> Vec<Vec<String>>
     let mut result = Vec::new();
     for i in 1..=search.len() {
         let prefix = &search[..i];
-        let suggestions: Vec<String> = sorted.iter()
+        let suggestions: Vec<String> = sorted
+            .iter()
             .filter(|p| p.starts_with(prefix))
             .take(3)
             .cloned()
@@ -751,10 +928,18 @@ struct AddSearchWordTest {
 }
 
 impl Problem for AddSearchWord {
-    fn id(&self) -> &str { "tries_add_search_word" }
-    fn name(&self) -> &str { "Add and Search Word" }
-    fn topic(&self) -> &str { "tries" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "tries_add_search_word"
+    }
+    fn name(&self) -> &str {
+        "Add and Search Word"
+    }
+    fn topic(&self) -> &str {
+        "tries"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Design a data structure that supports:\n\
          - \"add\" word: adds a word to the data structure\n\
@@ -768,35 +953,41 @@ impl Problem for AddSearchWord {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n_adds = rng.random_range(1..=8);
-            let n_searches = rng.random_range(1..=8);
-            let mut ops = Vec::new();
-            let words = random_word_list(&mut rng, n_adds, 5);
-            for w in &words {
-                ops.push(("add".to_string(), w.clone()));
-            }
-            for _ in 0..n_searches {
-                let pattern = if rng.random_range(0..3) == 0 {
-                    // Add wildcards to existing word
-                    let w = &words[rng.random_range(0..words.len())];
-                    w.chars().map(|c| {
-                        if rng.random_range(0..3) == 0 { '.' } else { c }
-                    }).collect()
-                } else {
-                    let len = rng.random_range(1..=5);
-                    (0..len).map(|_| {
-                        if rng.random_range(0..4) == 0 {
-                            '.'
-                        } else {
-                            (b'a' + rng.random_range(0..26u8)) as char
-                        }
-                    }).collect()
-                };
-                ops.push(("search".to_string(), pattern));
-            }
-            TestCase { data: Box::new(AddSearchWordTest { ops }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n_adds = rng.random_range(1..=8);
+                let n_searches = rng.random_range(1..=8);
+                let mut ops = Vec::new();
+                let words = random_word_list(&mut rng, n_adds, 5);
+                for w in &words {
+                    ops.push(("add".to_string(), w.clone()));
+                }
+                for _ in 0..n_searches {
+                    let pattern = if rng.random_range(0..3) == 0 {
+                        // Add wildcards to existing word
+                        let w = &words[rng.random_range(0..words.len())];
+                        w.chars()
+                            .map(|c| if rng.random_range(0..3) == 0 { '.' } else { c })
+                            .collect()
+                    } else {
+                        let len = rng.random_range(1..=5);
+                        (0..len)
+                            .map(|_| {
+                                if rng.random_range(0..4) == 0 {
+                                    '.'
+                                } else {
+                                    (b'a' + rng.random_range(0..26u8)) as char
+                                }
+                            })
+                            .collect()
+                    };
+                    ops.push(("search".to_string(), pattern));
+                }
+                TestCase {
+                    data: Box::new(AddSearchWordTest { ops }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -833,13 +1024,23 @@ fn ref_add_search_word(ops: &[(String, String)]) -> Vec<Option<bool>> {
 // ── Hard 1: Palindrome Pairs ────────────────────────────────────────────
 
 struct PalindromePairs;
-struct PalindromePairsTest { words: Vec<String> }
+struct PalindromePairsTest {
+    words: Vec<String>,
+}
 
 impl Problem for PalindromePairs {
-    fn id(&self) -> &str { "tries_palindrome_pairs" }
-    fn name(&self) -> &str { "Palindrome Pairs" }
-    fn topic(&self) -> &str { "tries" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "tries_palindrome_pairs"
+    }
+    fn name(&self) -> &str {
+        "Palindrome Pairs"
+    }
+    fn topic(&self) -> &str {
+        "tries"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given a list of unique words, find all pairs (i, j) where i != j and \
          words[i] + words[j] forms a palindrome.\n\n\
@@ -851,30 +1052,34 @@ impl Problem for PalindromePairs {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(2..=8);
-            let mut words: Vec<String> = Vec::new();
-            let mut used = HashSet::new();
-            while words.len() < n {
-                let wlen = rng.random_range(0..=3);
-                let w = helpers::random_string_from(&mut rng, wlen, b"abc");
-                if !used.contains(&w) {
-                    used.insert(w.clone());
-                    words.push(w);
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(2..=8);
+                let mut words: Vec<String> = Vec::new();
+                let mut used = HashSet::new();
+                while words.len() < n {
+                    let wlen = rng.random_range(0..=3);
+                    let w = helpers::random_string_from(&mut rng, wlen, b"abc");
+                    if !used.contains(&w) {
+                        used.insert(w.clone());
+                        words.push(w);
+                    }
                 }
-            }
-            // Add some reversed words to increase palindrome pair probability
-            if rng.random_range(0..2) == 0 && words.len() >= 2 {
-                let rev: String = words[0].chars().rev().collect();
-                if !used.contains(&rev) {
-                    let idx = rng.random_range(1..words.len());
-                    used.remove(&words[idx]);
-                    words[idx] = rev.clone();
-                    used.insert(rev);
+                // Add some reversed words to increase palindrome pair probability
+                if rng.random_range(0..2) == 0 && words.len() >= 2 {
+                    let rev: String = words[0].chars().rev().collect();
+                    if !used.contains(&rev) {
+                        let idx = rng.random_range(1..words.len());
+                        used.remove(&words[idx]);
+                        words[idx] = rev.clone();
+                        used.insert(rev);
+                    }
                 }
-            }
-            TestCase { data: Box::new(PalindromePairsTest { words }) }
-        }).collect()
+                TestCase {
+                    data: Box::new(PalindromePairsTest { words }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -894,7 +1099,9 @@ fn is_palindrome(s: &str) -> bool {
     let bytes = s.as_bytes();
     let n = bytes.len();
     for i in 0..n / 2 {
-        if bytes[i] != bytes[n - 1 - i] { return false; }
+        if bytes[i] != bytes[n - 1 - i] {
+            return false;
+        }
     }
     true
 }
@@ -918,13 +1125,24 @@ fn ref_palindrome_pairs(words: &[String]) -> Vec<(usize, usize)> {
 // ── Hard 2: Word Break II ──────────────────────────────────────────────
 
 struct WordBreakII;
-struct WordBreakIITest { s: String, word_dict: Vec<String> }
+struct WordBreakIITest {
+    s: String,
+    word_dict: Vec<String>,
+}
 
 impl Problem for WordBreakII {
-    fn id(&self) -> &str { "tries_word_break_ii" }
-    fn name(&self) -> &str { "Word Break II" }
-    fn topic(&self) -> &str { "tries" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "tries_word_break_ii"
+    }
+    fn name(&self) -> &str {
+        "Word Break II"
+    }
+    fn topic(&self) -> &str {
+        "tries"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given a string `s` and a dictionary of words, add spaces to `s` to construct every \
          possible sentence where each word is a valid dictionary word.\n\n\
@@ -936,22 +1154,26 @@ impl Problem for WordBreakII {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n_words = rng.random_range(2..=6);
-            let word_dict: Vec<String> = (0..n_words)
-                .map(|_| {
-                    let wlen = rng.random_range(1..=4);
-                    helpers::random_string_from(&mut rng, wlen, b"abcd")
-                })
-                .collect();
-            // Build s from concatenation of dictionary words
-            let n_concat = rng.random_range(1..=3);
-            let s: String = (0..n_concat)
-                .map(|_| word_dict[rng.random_range(0..word_dict.len())].as_str())
-                .collect::<Vec<_>>()
-                .join("");
-            TestCase { data: Box::new(WordBreakIITest { s, word_dict }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n_words = rng.random_range(2..=6);
+                let word_dict: Vec<String> = (0..n_words)
+                    .map(|_| {
+                        let wlen = rng.random_range(1..=4);
+                        helpers::random_string_from(&mut rng, wlen, b"abcd")
+                    })
+                    .collect();
+                // Build s from concatenation of dictionary words
+                let n_concat = rng.random_range(1..=3);
+                let s: String = (0..n_concat)
+                    .map(|_| word_dict[rng.random_range(0..word_dict.len())].as_str())
+                    .collect::<Vec<_>>()
+                    .join("");
+                TestCase {
+                    data: Box::new(WordBreakIITest { s, word_dict }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -977,7 +1199,13 @@ fn ref_word_break_ii(s: &str, word_dict: &[String]) -> Vec<String> {
     result
 }
 
-fn wb_backtrack(s: &str, start: usize, dict: &HashSet<&str>, path: &mut Vec<String>, result: &mut Vec<String>) {
+fn wb_backtrack(
+    s: &str,
+    start: usize,
+    dict: &HashSet<&str>,
+    path: &mut Vec<String>,
+    result: &mut Vec<String>,
+) {
     if start == s.len() {
         result.push(path.join(" "));
         return;
@@ -995,13 +1223,23 @@ fn wb_backtrack(s: &str, start: usize, dict: &HashSet<&str>, path: &mut Vec<Stri
 // ── Hard 3: Concatenated Words ──────────────────────────────────────────
 
 struct ConcatenatedWords;
-struct ConcatenatedWordsTest { words: Vec<String> }
+struct ConcatenatedWordsTest {
+    words: Vec<String>,
+}
 
 impl Problem for ConcatenatedWords {
-    fn id(&self) -> &str { "tries_concatenated_words" }
-    fn name(&self) -> &str { "Concatenated Words" }
-    fn topic(&self) -> &str { "tries" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "tries_concatenated_words"
+    }
+    fn name(&self) -> &str {
+        "Concatenated Words"
+    }
+    fn topic(&self) -> &str {
+        "tries"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given a list of words, find all words that can be formed by concatenating at least \
          two other words from the list.\n\n\
@@ -1013,26 +1251,30 @@ impl Problem for ConcatenatedWords {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n_base = rng.random_range(2..=5);
-            let mut words: Vec<String> = (0..n_base)
-                .map(|_| {
-                    let wlen = rng.random_range(1..=3);
-                    helpers::random_string_from(&mut rng, wlen, b"abc")
-                })
-                .collect();
-            // Add some concatenated words
-            let n_concat = rng.random_range(0..=3);
-            for _ in 0..n_concat {
-                let ai = rng.random_range(0..n_base);
-                let bi = rng.random_range(0..n_base);
-                let concat = format!("{}{}", words[ai], words[bi]);
-                words.push(concat);
-            }
-            words.sort();
-            words.dedup();
-            TestCase { data: Box::new(ConcatenatedWordsTest { words }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n_base = rng.random_range(2..=5);
+                let mut words: Vec<String> = (0..n_base)
+                    .map(|_| {
+                        let wlen = rng.random_range(1..=3);
+                        helpers::random_string_from(&mut rng, wlen, b"abc")
+                    })
+                    .collect();
+                // Add some concatenated words
+                let n_concat = rng.random_range(0..=3);
+                for _ in 0..n_concat {
+                    let ai = rng.random_range(0..n_base);
+                    let bi = rng.random_range(0..n_base);
+                    let concat = format!("{}{}", words[ai], words[bi]);
+                    words.push(concat);
+                }
+                words.sort();
+                words.dedup();
+                TestCase {
+                    data: Box::new(ConcatenatedWordsTest { words }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -1052,7 +1294,9 @@ fn ref_concatenated_words(words: &[String]) -> Vec<String> {
     let word_set: HashSet<&str> = words.iter().map(|w| w.as_str()).collect();
     let mut result = Vec::new();
     for word in words {
-        if word.is_empty() { continue; }
+        if word.is_empty() {
+            continue;
+        }
         if can_form(word, &word_set) {
             result.push(word.clone());
         }
@@ -1067,7 +1311,9 @@ fn can_form(word: &str, word_set: &HashSet<&str>) -> bool {
     dp[0] = true;
     for i in 1..=n {
         for j in 0..i {
-            if j == 0 && i == n { continue; } // Skip the word itself
+            if j == 0 && i == n {
+                continue;
+            } // Skip the word itself
             if dp[j] && word_set.contains(&word[j..i]) {
                 dp[i] = true;
                 break;
@@ -1080,13 +1326,23 @@ fn can_form(word: &str, word_set: &HashSet<&str>) -> bool {
 // ── Hard 4: Maximum XOR of Two Numbers ──────────────────────────────────
 
 struct MaximumXor;
-struct MaximumXorTest { nums: Vec<i32> }
+struct MaximumXorTest {
+    nums: Vec<i32>,
+}
 
 impl Problem for MaximumXor {
-    fn id(&self) -> &str { "tries_maximum_xor" }
-    fn name(&self) -> &str { "Maximum XOR of Two Numbers" }
-    fn topic(&self) -> &str { "tries" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "tries_maximum_xor"
+    }
+    fn name(&self) -> &str {
+        "Maximum XOR of Two Numbers"
+    }
+    fn topic(&self) -> &str {
+        "tries"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given an integer array `nums`, return the maximum XOR of any two elements.\n\n\
          Use a bitwise trie for O(n * 32) solution.\n\n\
@@ -1097,11 +1353,15 @@ impl Problem for MaximumXor {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(2..=20);
-            let nums: Vec<i32> = (0..n).map(|_| rng.random_range(0..=1000)).collect();
-            TestCase { data: Box::new(MaximumXorTest { nums }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(2..=20);
+                let nums: Vec<i32> = (0..n).map(|_| rng.random_range(0..=1000)).collect();
+                TestCase {
+                    data: Box::new(MaximumXorTest { nums }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -1130,13 +1390,24 @@ fn ref_maximum_xor(nums: &[i32]) -> i32 {
 // ── Hard 5: Stream of Characters ────────────────────────────────────────
 
 struct StreamOfCharacters;
-struct StreamTest { words: Vec<String>, stream: Vec<char> }
+struct StreamTest {
+    words: Vec<String>,
+    stream: Vec<char>,
+}
 
 impl Problem for StreamOfCharacters {
-    fn id(&self) -> &str { "tries_stream_of_characters" }
-    fn name(&self) -> &str { "Stream of Characters" }
-    fn topic(&self) -> &str { "tries" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "tries_stream_of_characters"
+    }
+    fn name(&self) -> &str {
+        "Stream of Characters"
+    }
+    fn topic(&self) -> &str {
+        "tries"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "You are given a list of words and a stream of characters. For each character in \
          the stream, determine if the suffix of all characters received so far matches \
@@ -1150,31 +1421,35 @@ impl Problem for StreamOfCharacters {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n_words = rng.random_range(1..=5);
-            let words: Vec<String> = (0..n_words)
-                .map(|_| {
-                    let wlen = rng.random_range(1..=4);
-                    helpers::random_string_from(&mut rng, wlen, b"abcd")
-                })
-                .collect();
-            let stream_len = rng.random_range(1..=15);
-            let mut stream: Vec<char> = Vec::new();
-            for _ in 0..stream_len {
-                if rng.random_range(0..3) == 0 && !words.is_empty() {
-                    // Feed characters from a word to increase matches
-                    let w = &words[rng.random_range(0..words.len())];
-                    let chars: Vec<char> = w.chars().collect();
-                    if !chars.is_empty() {
-                        let idx = rng.random_range(0..chars.len());
-                        stream.push(chars[idx]);
-                        continue;
+        (0..10)
+            .map(|_| {
+                let n_words = rng.random_range(1..=5);
+                let words: Vec<String> = (0..n_words)
+                    .map(|_| {
+                        let wlen = rng.random_range(1..=4);
+                        helpers::random_string_from(&mut rng, wlen, b"abcd")
+                    })
+                    .collect();
+                let stream_len = rng.random_range(1..=15);
+                let mut stream: Vec<char> = Vec::new();
+                for _ in 0..stream_len {
+                    if rng.random_range(0..3) == 0 && !words.is_empty() {
+                        // Feed characters from a word to increase matches
+                        let w = &words[rng.random_range(0..words.len())];
+                        let chars: Vec<char> = w.chars().collect();
+                        if !chars.is_empty() {
+                            let idx = rng.random_range(0..chars.len());
+                            stream.push(chars[idx]);
+                            continue;
+                        }
                     }
+                    stream.push((b'a' + rng.random_range(0..4u8)) as char);
                 }
-                stream.push((b'a' + rng.random_range(0..4u8)) as char);
-            }
-            TestCase { data: Box::new(StreamTest { words, stream }) }
-        }).collect()
+                TestCase {
+                    data: Box::new(StreamTest { words, stream }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {

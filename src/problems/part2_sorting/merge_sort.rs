@@ -36,10 +36,18 @@ struct MergeSortBasicTest {
 }
 
 impl Problem for MergeSortBasic {
-    fn id(&self) -> &str { "merge_sort_basic" }
-    fn name(&self) -> &str { "Merge Sort (Tracked)" }
-    fn topic(&self) -> &str { "merge_sort" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "merge_sort_basic"
+    }
+    fn name(&self) -> &str {
+        "Merge Sort (Tracked)"
+    }
+    fn topic(&self) -> &str {
+        "merge_sort"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Implement merge sort on a slice of Tracked<i32>.\n\n\
          The function signature is:\n\
@@ -53,11 +61,15 @@ impl Problem for MergeSortBasic {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(0..=50);
-            let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-1000..=1000)).collect();
-            TestCase { data: Box::new(MergeSortBasicTest { nums }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(0..=50);
+                let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-1000..=1000)).collect();
+                TestCase {
+                    data: Box::new(MergeSortBasicTest { nums }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
@@ -68,9 +80,11 @@ impl Problem for MergeSortBasic {
         let shared_log = Rc::new(RefCell::new(OperationLog::new()));
         let mut tracked = track_slice(&t.nums, shared_log.clone());
         solutions::merge_sort_basic(&mut tracked);
-        let actual: Vec<i32> = tracked.iter().map(|t| t.value.clone()).collect();
+        let actual: Vec<i32> = tracked.iter().map(|t| t.value).collect();
         let inner = shared_log.borrow();
-        for op in inner.operations() { log.record(op.clone()); }
+        for op in inner.operations() {
+            log.record(op.clone());
+        }
 
         SolutionResult {
             is_correct: actual == expected,
@@ -91,10 +105,18 @@ struct MergeTwoSortedTest {
 }
 
 impl Problem for MergeTwoSorted {
-    fn id(&self) -> &str { "merge_sort_merge_two_sorted" }
-    fn name(&self) -> &str { "Merge Two Sorted Arrays" }
-    fn topic(&self) -> &str { "merge_sort" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "merge_sort_merge_two_sorted"
+    }
+    fn name(&self) -> &str {
+        "Merge Two Sorted Arrays"
+    }
+    fn topic(&self) -> &str {
+        "merge_sort"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given two sorted arrays `a` and `b`, merge them into a single sorted array.\n\n\
          Return the merged array.\n\n\
@@ -105,15 +127,19 @@ impl Problem for MergeTwoSorted {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let na = rng.random_range(0..=20);
-            let nb = rng.random_range(0..=20);
-            let mut a: Vec<i32> = (0..na).map(|_| rng.random_range(-100..=100)).collect();
-            let mut b: Vec<i32> = (0..nb).map(|_| rng.random_range(-100..=100)).collect();
-            a.sort();
-            b.sort();
-            TestCase { data: Box::new(MergeTwoSortedTest { a, b }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let na = rng.random_range(0..=20);
+                let nb = rng.random_range(0..=20);
+                let mut a: Vec<i32> = (0..na).map(|_| rng.random_range(-100..=100)).collect();
+                let mut b: Vec<i32> = (0..nb).map(|_| rng.random_range(-100..=100)).collect();
+                a.sort();
+                b.sort();
+                TestCase {
+                    data: Box::new(MergeTwoSortedTest { a, b }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -155,10 +181,18 @@ struct CountInversionsTest {
 }
 
 impl Problem for CountInversions {
-    fn id(&self) -> &str { "merge_sort_count_inversions" }
-    fn name(&self) -> &str { "Count Inversions" }
-    fn topic(&self) -> &str { "merge_sort" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "merge_sort_count_inversions"
+    }
+    fn name(&self) -> &str {
+        "Count Inversions"
+    }
+    fn topic(&self) -> &str {
+        "merge_sort"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given an array of integers, count the number of inversions.\n\n\
          An inversion is a pair (i, j) where i < j but nums[i] > nums[j].\n\n\
@@ -170,11 +204,15 @@ impl Problem for CountInversions {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(0..=40);
-            let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-100..=100)).collect();
-            TestCase { data: Box::new(CountInversionsTest { nums }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(0..=40);
+                let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-100..=100)).collect();
+                TestCase {
+                    data: Box::new(CountInversionsTest { nums }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -191,19 +229,23 @@ impl Problem for CountInversions {
 }
 
 fn ref_count_inversions(nums: &[i32]) -> i64 {
-    if nums.len() <= 1 { return 0; }
+    if nums.len() <= 1 {
+        return 0;
+    }
     let mut arr = nums.to_vec();
     ref_count_inversions_helper(&mut arr)
 }
 
 fn ref_count_inversions_helper(arr: &mut [i32]) -> i64 {
     let n = arr.len();
-    if n <= 1 { return 0; }
+    if n <= 1 {
+        return 0;
+    }
     let mid = n / 2;
     let mut left = arr[..mid].to_vec();
     let mut right = arr[mid..].to_vec();
-    let mut count = ref_count_inversions_helper(&mut left)
-        + ref_count_inversions_helper(&mut right);
+    let mut count =
+        ref_count_inversions_helper(&mut left) + ref_count_inversions_helper(&mut right);
     let (mut i, mut j, mut k) = (0, 0, 0);
     while i < left.len() && j < right.len() {
         if left[i] <= right[j] {
@@ -216,8 +258,16 @@ fn ref_count_inversions_helper(arr: &mut [i32]) -> i64 {
         }
         k += 1;
     }
-    while i < left.len() { arr[k] = left[i]; i += 1; k += 1; }
-    while j < right.len() { arr[k] = right[j]; j += 1; k += 1; }
+    while i < left.len() {
+        arr[k] = left[i];
+        i += 1;
+        k += 1;
+    }
+    while j < right.len() {
+        arr[k] = right[j];
+        j += 1;
+        k += 1;
+    }
     count
 }
 
@@ -230,10 +280,18 @@ struct SortLinkedListTest {
 }
 
 impl Problem for SortLinkedList {
-    fn id(&self) -> &str { "merge_sort_sort_linked_list" }
-    fn name(&self) -> &str { "Sort a Linked List (as Vec)" }
-    fn topic(&self) -> &str { "merge_sort" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "merge_sort_sort_linked_list"
+    }
+    fn name(&self) -> &str {
+        "Sort a Linked List (as Vec)"
+    }
+    fn topic(&self) -> &str {
+        "merge_sort"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Sort a linked list using merge sort.\n\n\
          The linked list is represented as a Vec<i32>. Return a new sorted Vec<i32>.\n\n\
@@ -245,11 +303,15 @@ impl Problem for SortLinkedList {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(0..=40);
-            let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-500..=500)).collect();
-            TestCase { data: Box::new(SortLinkedListTest { nums }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(0..=40);
+                let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-500..=500)).collect();
+                TestCase {
+                    data: Box::new(SortLinkedListTest { nums }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -275,10 +337,18 @@ struct MergeKSortedTest {
 }
 
 impl Problem for MergeKSortedArrays {
-    fn id(&self) -> &str { "merge_sort_merge_sorted_arrays" }
-    fn name(&self) -> &str { "Merge K Sorted Arrays" }
-    fn topic(&self) -> &str { "merge_sort" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "merge_sort_merge_sorted_arrays"
+    }
+    fn name(&self) -> &str {
+        "Merge K Sorted Arrays"
+    }
+    fn topic(&self) -> &str {
+        "merge_sort"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given k sorted arrays, merge them into a single sorted array.\n\n\
          Return the merged result.\n\n\
@@ -290,16 +360,23 @@ impl Problem for MergeKSortedArrays {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let k = rng.random_range(1..=8);
-            let arrays: Vec<Vec<i32>> = (0..k).map(|_| {
-                let n = rng.random_range(0..=15);
-                let mut v: Vec<i32> = (0..n).map(|_| rng.random_range(-100..=100)).collect();
-                v.sort();
-                v
-            }).collect();
-            TestCase { data: Box::new(MergeKSortedTest { arrays }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let k = rng.random_range(1..=8);
+                let arrays: Vec<Vec<i32>> = (0..k)
+                    .map(|_| {
+                        let n = rng.random_range(0..=15);
+                        let mut v: Vec<i32> =
+                            (0..n).map(|_| rng.random_range(-100..=100)).collect();
+                        v.sort();
+                        v
+                    })
+                    .collect();
+                TestCase {
+                    data: Box::new(MergeKSortedTest { arrays }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -325,10 +402,18 @@ struct SortArrayTest {
 }
 
 impl Problem for SortArray {
-    fn id(&self) -> &str { "merge_sort_sort_array" }
-    fn name(&self) -> &str { "Sort Array (Merge Sort)" }
-    fn topic(&self) -> &str { "merge_sort" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "merge_sort_sort_array"
+    }
+    fn name(&self) -> &str {
+        "Sort Array (Merge Sort)"
+    }
+    fn topic(&self) -> &str {
+        "merge_sort"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Sort an array using merge sort (non-tracked). Return a new sorted Vec<i32>.\n\n\
          Do not use the built-in sort. Implement merge sort from scratch.\n\n\
@@ -339,11 +424,15 @@ impl Problem for SortArray {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(0..=100);
-            let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-10000..=10000)).collect();
-            TestCase { data: Box::new(SortArrayTest { nums }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(0..=100);
+                let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-10000..=10000)).collect();
+                TestCase {
+                    data: Box::new(SortArrayTest { nums }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -369,10 +458,18 @@ struct SmallestRangeTest {
 }
 
 impl Problem for SmallestRange {
-    fn id(&self) -> &str { "merge_sort_smallest_range" }
-    fn name(&self) -> &str { "Smallest Range Covering K Lists" }
-    fn topic(&self) -> &str { "merge_sort" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "merge_sort_smallest_range"
+    }
+    fn name(&self) -> &str {
+        "Smallest Range Covering K Lists"
+    }
+    fn topic(&self) -> &str {
+        "merge_sort"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given k sorted lists of integers, find the smallest range [a, b] that includes \
          at least one number from each of the k lists.\n\n\
@@ -386,18 +483,26 @@ impl Problem for SmallestRange {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let k = rng.random_range(2..=5);
-            let lists: Vec<Vec<i32>> = (0..k).map(|_| {
-                let n = rng.random_range(1..=10);
-                let mut v: Vec<i32> = (0..n).map(|_| rng.random_range(-50..=50)).collect();
-                v.sort();
-                v.dedup();
-                if v.is_empty() { v.push(rng.random_range(-50..=50)); }
-                v
-            }).collect();
-            TestCase { data: Box::new(SmallestRangeTest { lists }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let k = rng.random_range(2..=5);
+                let lists: Vec<Vec<i32>> = (0..k)
+                    .map(|_| {
+                        let n = rng.random_range(1..=10);
+                        let mut v: Vec<i32> = (0..n).map(|_| rng.random_range(-50..=50)).collect();
+                        v.sort();
+                        v.dedup();
+                        if v.is_empty() {
+                            v.push(rng.random_range(-50..=50));
+                        }
+                        v
+                    })
+                    .collect();
+                TestCase {
+                    data: Box::new(SmallestRangeTest { lists }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -427,9 +532,7 @@ fn ref_smallest_range(lists: &[Vec<i32>]) -> (i32, i32) {
     let mut best = (i32::MIN / 2, i32::MAX / 2);
     while heap.len() == lists.len() {
         let Reverse((val, li, ei)) = heap.pop().unwrap();
-        if cur_max - val < best.1 - best.0
-            || (cur_max - val == best.1 - best.0 && val < best.0)
-        {
+        if cur_max - val < best.1 - best.0 || (cur_max - val == best.1 - best.0 && val < best.0) {
             best = (val, cur_max);
         }
         if ei + 1 < lists[li].len() {
@@ -454,10 +557,18 @@ struct CountRangeSumTest {
 }
 
 impl Problem for CountRangeSum {
-    fn id(&self) -> &str { "merge_sort_count_range_sum" }
-    fn name(&self) -> &str { "Count Range Sum" }
-    fn topic(&self) -> &str { "merge_sort" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "merge_sort_count_range_sum"
+    }
+    fn name(&self) -> &str {
+        "Count Range Sum"
+    }
+    fn topic(&self) -> &str {
+        "merge_sort"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given an integer array `nums` and two integers `lower` and `upper`, return the \
          number of range sums that lie in [lower, upper].\n\n\
@@ -471,14 +582,18 @@ impl Problem for CountRangeSum {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(0..=30);
-            let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-50..=50)).collect();
-            let a = rng.random_range(-200..=200);
-            let b = rng.random_range(-200..=200);
-            let (lower, upper) = if a <= b { (a, b) } else { (b, a) };
-            TestCase { data: Box::new(CountRangeSumTest { nums, lower, upper }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(0..=30);
+                let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-50..=50)).collect();
+                let a = rng.random_range(-200..=200);
+                let b = rng.random_range(-200..=200);
+                let (lower, upper) = if a <= b { (a, b) } else { (b, a) };
+                TestCase {
+                    data: Box::new(CountRangeSumTest { nums, lower, upper }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -500,8 +615,8 @@ fn ref_count_range_sum(nums: &[i32], lower: i32, upper: i32) -> i32 {
     let mut count = 0i32;
     for i in 0..n {
         let mut sum: i64 = 0;
-        for j in i..n {
-            sum += nums[j] as i64;
+        for &num in nums.iter().take(n).skip(i) {
+            sum += num as i64;
             if sum >= lower as i64 && sum <= upper as i64 {
                 count += 1;
             }
@@ -519,10 +634,18 @@ struct ReversePairsTest {
 }
 
 impl Problem for ReversePairs {
-    fn id(&self) -> &str { "merge_sort_reverse_pairs" }
-    fn name(&self) -> &str { "Reverse Pairs" }
-    fn topic(&self) -> &str { "merge_sort" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "merge_sort_reverse_pairs"
+    }
+    fn name(&self) -> &str {
+        "Reverse Pairs"
+    }
+    fn topic(&self) -> &str {
+        "merge_sort"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given an array `nums`, return the number of reverse pairs.\n\n\
          A reverse pair is a pair (i, j) where i < j and nums[i] > 2 * nums[j].\n\n\
@@ -534,11 +657,15 @@ impl Problem for ReversePairs {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(0..=50);
-            let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-500..=500)).collect();
-            TestCase { data: Box::new(ReversePairsTest { nums }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(0..=50);
+                let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-500..=500)).collect();
+                TestCase {
+                    data: Box::new(ReversePairsTest { nums }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -576,10 +703,18 @@ struct SortByFrequencyTest {
 }
 
 impl Problem for SortByFrequency {
-    fn id(&self) -> &str { "merge_sort_sort_by_frequency" }
-    fn name(&self) -> &str { "Sort by Frequency" }
-    fn topic(&self) -> &str { "merge_sort" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "merge_sort_sort_by_frequency"
+    }
+    fn name(&self) -> &str {
+        "Sort by Frequency"
+    }
+    fn topic(&self) -> &str {
+        "merge_sort"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Sort array elements by frequency in descending order (most frequent first).\n\n\
          If two elements have the same frequency, the smaller value comes first.\n\n\
@@ -591,11 +726,15 @@ impl Problem for SortByFrequency {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(0..=40);
-            let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-20..=20)).collect();
-            TestCase { data: Box::new(SortByFrequencyTest { nums }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(0..=40);
+                let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-20..=20)).collect();
+                TestCase {
+                    data: Box::new(SortByFrequencyTest { nums }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -613,7 +752,9 @@ impl Problem for SortByFrequency {
 
 fn ref_sort_by_frequency(nums: &[i32]) -> Vec<i32> {
     let mut freq: HashMap<i32, usize> = HashMap::new();
-    for &n in nums { *freq.entry(n).or_insert(0) += 1; }
+    for &n in nums {
+        *freq.entry(n).or_insert(0) += 1;
+    }
     let mut result = nums.to_vec();
     result.sort_by(|a, b| {
         let fa = freq[a];
@@ -633,10 +774,18 @@ struct ExternalSortTest {
 }
 
 impl Problem for ExternalSort {
-    fn id(&self) -> &str { "merge_sort_external_sort" }
-    fn name(&self) -> &str { "External Sort Simulation" }
-    fn topic(&self) -> &str { "merge_sort" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "merge_sort_external_sort"
+    }
+    fn name(&self) -> &str {
+        "External Sort Simulation"
+    }
+    fn topic(&self) -> &str {
+        "merge_sort"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Simulate external sort: split the input into chunks of size k, sort each chunk \
          individually, then merge all sorted chunks into one sorted array.\n\n\
@@ -649,12 +798,16 @@ impl Problem for ExternalSort {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(0..=60);
-            let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-500..=500)).collect();
-            let chunk_size = rng.random_range(1..=15);
-            TestCase { data: Box::new(ExternalSortTest { nums, chunk_size }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(0..=60);
+                let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-500..=500)).collect();
+                let chunk_size = rng.random_range(1..=15);
+                TestCase {
+                    data: Box::new(ExternalSortTest { nums, chunk_size }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -680,10 +833,18 @@ struct CountSmallerAfterTest {
 }
 
 impl Problem for CountSmallerAfter {
-    fn id(&self) -> &str { "merge_sort_count_smaller_after" }
-    fn name(&self) -> &str { "Count Smaller After Self" }
-    fn topic(&self) -> &str { "merge_sort" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "merge_sort_count_smaller_after"
+    }
+    fn name(&self) -> &str {
+        "Count Smaller After Self"
+    }
+    fn topic(&self) -> &str {
+        "merge_sort"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given an integer array `nums`, return a new array `counts` where `counts[i]` is \
          the number of elements to the right of `nums[i]` that are strictly smaller.\n\n\
@@ -695,11 +856,15 @@ impl Problem for CountSmallerAfter {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(0..=50);
-            let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-500..=500)).collect();
-            TestCase { data: Box::new(CountSmallerAfterTest { nums }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(0..=50);
+                let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-500..=500)).collect();
+                TestCase {
+                    data: Box::new(CountSmallerAfterTest { nums }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -738,10 +903,18 @@ struct MaxSumAfterKOpsTest {
 }
 
 impl Problem for MaxSumAfterKOps {
-    fn id(&self) -> &str { "merge_sort_max_sum_after_k_ops" }
-    fn name(&self) -> &str { "Maximize Sum After K Negations" }
-    fn topic(&self) -> &str { "merge_sort" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "merge_sort_max_sum_after_k_ops"
+    }
+    fn name(&self) -> &str {
+        "Maximize Sum After K Negations"
+    }
+    fn topic(&self) -> &str {
+        "merge_sort"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given an array `nums` and integer `k`, you may negate any element up to `k` times \
          (the same element can be negated multiple times). Maximize the sum of the array.\n\n\
@@ -754,12 +927,16 @@ impl Problem for MaxSumAfterKOps {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=30);
-            let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-100..=100)).collect();
-            let k = rng.random_range(1..=50);
-            TestCase { data: Box::new(MaxSumAfterKOpsTest { nums, k }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=30);
+                let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-100..=100)).collect();
+                let k = rng.random_range(1..=50);
+                TestCase {
+                    data: Box::new(MaxSumAfterKOpsTest { nums, k }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -801,10 +978,18 @@ struct MedianStreamTest {
 }
 
 impl Problem for MedianStream {
-    fn id(&self) -> &str { "merge_sort_median_stream" }
-    fn name(&self) -> &str { "Find Median from Data Stream" }
-    fn topic(&self) -> &str { "merge_sort" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "merge_sort_median_stream"
+    }
+    fn name(&self) -> &str {
+        "Find Median from Data Stream"
+    }
+    fn topic(&self) -> &str {
+        "merge_sort"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given a stream of integers, find the running median after each element is added.\n\n\
          Return a Vec<f64> where result[i] is the median of nums[0..=i].\n\n\
@@ -816,11 +1001,15 @@ impl Problem for MedianStream {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=30);
-            let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-100..=100)).collect();
-            TestCase { data: Box::new(MedianStreamTest { nums }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=30);
+                let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-100..=100)).collect();
+                TestCase {
+                    data: Box::new(MedianStreamTest { nums }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -828,7 +1017,10 @@ impl Problem for MedianStream {
         let expected = ref_median_stream(&t.nums);
         let actual = solutions::median_stream(&t.nums);
         let is_correct = expected.len() == actual.len()
-            && expected.iter().zip(actual.iter()).all(|(e, a)| (e - a).abs() < 1e-5);
+            && expected
+                .iter()
+                .zip(actual.iter())
+                .all(|(e, a)| (e - a).abs() < 1e-5);
         SolutionResult {
             is_correct,
             input_description: format!("nums={:?}", t.nums),
@@ -864,10 +1056,18 @@ struct NthElementTest {
 }
 
 impl Problem for NthElement {
-    fn id(&self) -> &str { "merge_sort_nth_element" }
-    fn name(&self) -> &str { "Find Nth Smallest Element" }
-    fn topic(&self) -> &str { "merge_sort" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "merge_sort_nth_element"
+    }
+    fn name(&self) -> &str {
+        "Find Nth Smallest Element"
+    }
+    fn topic(&self) -> &str {
+        "merge_sort"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Find the nth smallest element in an unsorted array using a merge-sort-like approach.\n\n\
          `n` is 1-indexed: n=1 means the smallest element.\n\n\
@@ -879,12 +1079,16 @@ impl Problem for NthElement {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let len = rng.random_range(1..=50);
-            let nums: Vec<i32> = (0..len).map(|_| rng.random_range(-500..=500)).collect();
-            let n = rng.random_range(1..=len);
-            TestCase { data: Box::new(NthElementTest { nums, n }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let len = rng.random_range(1..=50);
+                let nums: Vec<i32> = (0..len).map(|_| rng.random_range(-500..=500)).collect();
+                let n = rng.random_range(1..=len);
+                TestCase {
+                    data: Box::new(NthElementTest { nums, n }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {

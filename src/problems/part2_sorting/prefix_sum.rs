@@ -28,13 +28,24 @@ pub fn problems() -> Vec<Box<dyn Problem>> {
 // ── Easy 1: Range Sum Query ─────────────────────────────────────────────
 
 struct RangeSum;
-struct RangeSumTest { nums: Vec<i32>, queries: Vec<(usize, usize)> }
+struct RangeSumTest {
+    nums: Vec<i32>,
+    queries: Vec<(usize, usize)>,
+}
 
 impl Problem for RangeSum {
-    fn id(&self) -> &str { "prefix_sum_range_sum" }
-    fn name(&self) -> &str { "Range Sum Query - Immutable" }
-    fn topic(&self) -> &str { "prefix_sum" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "prefix_sum_range_sum"
+    }
+    fn name(&self) -> &str {
+        "Range Sum Query - Immutable"
+    }
+    fn topic(&self) -> &str {
+        "prefix_sum"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given an integer array `nums` and a list of queries `(left, right)`, return an \
          array of sums where each sum is the total of `nums[left..=right]`.\n\n\
@@ -43,24 +54,32 @@ impl Problem for RangeSum {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=30);
-            let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-100..=100)).collect();
-            let q = rng.random_range(1..=10);
-            let queries: Vec<(usize, usize)> = (0..q).map(|_| {
-                let a = rng.random_range(0..n);
-                let b = rng.random_range(a..n);
-                (a, b)
-            }).collect();
-            TestCase { data: Box::new(RangeSumTest { nums, queries }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=30);
+                let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-100..=100)).collect();
+                let q = rng.random_range(1..=10);
+                let queries: Vec<(usize, usize)> = (0..q)
+                    .map(|_| {
+                        let a = rng.random_range(0..n);
+                        let b = rng.random_range(a..n);
+                        (a, b)
+                    })
+                    .collect();
+                TestCase {
+                    data: Box::new(RangeSumTest { nums, queries }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<RangeSumTest>().unwrap();
-        let expected: Vec<i32> = t.queries.iter().map(|&(l, r)| {
-            t.nums[l..=r].iter().sum()
-        }).collect();
+        let expected: Vec<i32> = t
+            .queries
+            .iter()
+            .map(|&(l, r)| t.nums[l..=r].iter().sum())
+            .collect();
         let actual = solutions::range_sum(&t.nums, &t.queries);
         SolutionResult {
             is_correct: expected == actual,
@@ -74,31 +93,48 @@ impl Problem for RangeSum {
 // ── Easy 2: Running Sum ────────────────────────────────────────────────
 
 struct RunningSum;
-struct RunningSumTest { nums: Vec<i32> }
+struct RunningSumTest {
+    nums: Vec<i32>,
+}
 
 impl Problem for RunningSum {
-    fn id(&self) -> &str { "prefix_sum_running_sum" }
-    fn name(&self) -> &str { "Running Sum of 1D Array" }
-    fn topic(&self) -> &str { "prefix_sum" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "prefix_sum_running_sum"
+    }
+    fn name(&self) -> &str {
+        "Running Sum of 1D Array"
+    }
+    fn topic(&self) -> &str {
+        "prefix_sum"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given an array `nums`, return the running sum where `running_sum[i] = sum(nums[0..=i])`."
     }
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=30);
-            let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-100..=100)).collect();
-            TestCase { data: Box::new(RunningSumTest { nums }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=30);
+                let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-100..=100)).collect();
+                TestCase {
+                    data: Box::new(RunningSumTest { nums }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<RunningSumTest>().unwrap();
         let mut expected = Vec::with_capacity(t.nums.len());
         let mut acc = 0;
-        for &v in &t.nums { acc += v; expected.push(acc); }
+        for &v in &t.nums {
+            acc += v;
+            expected.push(acc);
+        }
         let actual = solutions::running_sum(&t.nums);
         SolutionResult {
             is_correct: expected == actual,
@@ -112,13 +148,23 @@ impl Problem for RunningSum {
 // ── Easy 3: Pivot Index ────────────────────────────────────────────────
 
 struct PivotIndex;
-struct PivotIndexTest { nums: Vec<i32> }
+struct PivotIndexTest {
+    nums: Vec<i32>,
+}
 
 impl Problem for PivotIndex {
-    fn id(&self) -> &str { "prefix_sum_pivot_index" }
-    fn name(&self) -> &str { "Find Pivot Index" }
-    fn topic(&self) -> &str { "prefix_sum" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "prefix_sum_pivot_index"
+    }
+    fn name(&self) -> &str {
+        "Find Pivot Index"
+    }
+    fn topic(&self) -> &str {
+        "prefix_sum"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given an array `nums`, return the leftmost pivot index where the sum of elements \
          strictly to the left equals the sum of elements strictly to the right.\n\n\
@@ -128,11 +174,15 @@ impl Problem for PivotIndex {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=30);
-            let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-50..=50)).collect();
-            TestCase { data: Box::new(PivotIndexTest { nums }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=30);
+                let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-50..=50)).collect();
+                TestCase {
+                    data: Box::new(PivotIndexTest { nums }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -163,13 +213,23 @@ fn ref_pivot_index(nums: &[i32]) -> i32 {
 // ── Easy 4: Sum of Absolute Differences ────────────────────────────────
 
 struct SumOfAbsoluteDifferences;
-struct SADTest { nums: Vec<i32> }
+struct SADTest {
+    nums: Vec<i32>,
+}
 
 impl Problem for SumOfAbsoluteDifferences {
-    fn id(&self) -> &str { "prefix_sum_sum_of_absolute_differences" }
-    fn name(&self) -> &str { "Sum of Absolute Differences in Sorted Array" }
-    fn topic(&self) -> &str { "prefix_sum" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "prefix_sum_sum_of_absolute_differences"
+    }
+    fn name(&self) -> &str {
+        "Sum of Absolute Differences in Sorted Array"
+    }
+    fn topic(&self) -> &str {
+        "prefix_sum"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given a sorted integer array `nums`, return an array `result` where \
          `result[i] = sum of |nums[i] - nums[j]|` for all j != i.\n\n\
@@ -178,12 +238,16 @@ impl Problem for SumOfAbsoluteDifferences {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(2..=20);
-            let mut nums: Vec<i32> = (0..n).map(|_| rng.random_range(1..=100)).collect();
-            nums.sort();
-            TestCase { data: Box::new(SADTest { nums }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(2..=20);
+                let mut nums: Vec<i32> = (0..n).map(|_| rng.random_range(1..=100)).collect();
+                nums.sort();
+                TestCase {
+                    data: Box::new(SADTest { nums }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -222,13 +286,23 @@ fn ref_sum_abs_diff(nums: &[i32]) -> Vec<i32> {
 // ── Easy 5: Count Negatives in Sorted Matrix ───────────────────────────
 
 struct CountNegatives;
-struct CountNegTest { matrix: Vec<Vec<i32>> }
+struct CountNegTest {
+    matrix: Vec<Vec<i32>>,
+}
 
 impl Problem for CountNegatives {
-    fn id(&self) -> &str { "prefix_sum_count_negatives" }
-    fn name(&self) -> &str { "Count Negatives in a Sorted Matrix" }
-    fn topic(&self) -> &str { "prefix_sum" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "prefix_sum_count_negatives"
+    }
+    fn name(&self) -> &str {
+        "Count Negatives in a Sorted Matrix"
+    }
+    fn topic(&self) -> &str {
+        "prefix_sum"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given an m x n matrix `grid` where each row and column is sorted in non-increasing \
          order, return the number of negative numbers in `grid`."
@@ -236,21 +310,30 @@ impl Problem for CountNegatives {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let rows = rng.random_range(1..=8);
-            let cols = rng.random_range(1..=8);
-            let matrix: Vec<Vec<i32>> = (0..rows).map(|_| {
-                let mut row: Vec<i32> = (0..cols).map(|_| rng.random_range(-50..=50)).collect();
-                row.sort_by(|a, b| b.cmp(a)); // non-increasing
-                row
-            }).collect();
-            TestCase { data: Box::new(CountNegTest { matrix }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let rows = rng.random_range(1..=8);
+                let cols = rng.random_range(1..=8);
+                let matrix: Vec<Vec<i32>> = (0..rows)
+                    .map(|_| {
+                        let mut row: Vec<i32> =
+                            (0..cols).map(|_| rng.random_range(-50..=50)).collect();
+                        row.sort_by(|a, b| b.cmp(a)); // non-increasing
+                        row
+                    })
+                    .collect();
+                TestCase {
+                    data: Box::new(CountNegTest { matrix }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<CountNegTest>().unwrap();
-        let expected: i32 = t.matrix.iter()
+        let expected: i32 = t
+            .matrix
+            .iter()
             .flat_map(|row| row.iter())
             .filter(|&&v| v < 0)
             .count() as i32;
@@ -267,13 +350,24 @@ impl Problem for CountNegatives {
 // ── Medium 1: Subarray Sum Equals K ────────────────────────────────────
 
 struct SubarraySumK;
-struct SubSumKTest { nums: Vec<i32>, k: i32 }
+struct SubSumKTest {
+    nums: Vec<i32>,
+    k: i32,
+}
 
 impl Problem for SubarraySumK {
-    fn id(&self) -> &str { "prefix_sum_subarray_sum_k" }
-    fn name(&self) -> &str { "Subarray Sum Equals K" }
-    fn topic(&self) -> &str { "prefix_sum" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "prefix_sum_subarray_sum_k"
+    }
+    fn name(&self) -> &str {
+        "Subarray Sum Equals K"
+    }
+    fn topic(&self) -> &str {
+        "prefix_sum"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given an array `nums` and an integer `k`, return the total number of contiguous \
          subarrays whose sum equals `k`.\n\n\
@@ -282,12 +376,16 @@ impl Problem for SubarraySumK {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=30);
-            let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-20..=20)).collect();
-            let k = rng.random_range(-30..=30);
-            TestCase { data: Box::new(SubSumKTest { nums, k }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=30);
+                let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-20..=20)).collect();
+                let k = rng.random_range(-30..=30);
+                TestCase {
+                    data: Box::new(SubSumKTest { nums, k }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -321,13 +419,23 @@ fn ref_subarray_sum_k(nums: &[i32], k: i32) -> i32 {
 // ── Medium 2: Product of Array Except Self ─────────────────────────────
 
 struct ProductExceptSelf;
-struct ProductTest { nums: Vec<i32> }
+struct ProductTest {
+    nums: Vec<i32>,
+}
 
 impl Problem for ProductExceptSelf {
-    fn id(&self) -> &str { "prefix_sum_product_except_self" }
-    fn name(&self) -> &str { "Product of Array Except Self" }
-    fn topic(&self) -> &str { "prefix_sum" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "prefix_sum_product_except_self"
+    }
+    fn name(&self) -> &str {
+        "Product of Array Except Self"
+    }
+    fn topic(&self) -> &str {
+        "prefix_sum"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given an integer array `nums`, return an array `answer` such that `answer[i]` \
          is equal to the product of all elements of `nums` except `nums[i]`.\n\n\
@@ -336,20 +444,26 @@ impl Problem for ProductExceptSelf {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(2..=15);
-            let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-10..=10)).collect();
-            TestCase { data: Box::new(ProductTest { nums }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(2..=15);
+                let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-10..=10)).collect();
+                TestCase {
+                    data: Box::new(ProductTest { nums }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<ProductTest>().unwrap();
         let n = t.nums.len();
         let mut expected = vec![1i32; n];
-        for i in 0..n {
+        for (i, expected_val) in expected.iter_mut().enumerate().take(n) {
             for (j, &v) in t.nums.iter().enumerate() {
-                if i != j { expected[i] *= v; }
+                if i != j {
+                    *expected_val *= v;
+                }
             }
         }
         let actual = solutions::product_except_self(&t.nums);
@@ -365,13 +479,23 @@ impl Problem for ProductExceptSelf {
 // ── Medium 3: Contiguous Array ─────────────────────────────────────────
 
 struct ContiguousArray;
-struct ContiguousArrayTest { nums: Vec<i32> }
+struct ContiguousArrayTest {
+    nums: Vec<i32>,
+}
 
 impl Problem for ContiguousArray {
-    fn id(&self) -> &str { "prefix_sum_contiguous_array" }
-    fn name(&self) -> &str { "Contiguous Array" }
-    fn topic(&self) -> &str { "prefix_sum" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "prefix_sum_contiguous_array"
+    }
+    fn name(&self) -> &str {
+        "Contiguous Array"
+    }
+    fn topic(&self) -> &str {
+        "prefix_sum"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given a binary array `nums` (containing only 0s and 1s), find the maximum length \
          of a contiguous subarray with an equal number of 0 and 1.\n\n\
@@ -380,11 +504,15 @@ impl Problem for ContiguousArray {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(2..=30);
-            let nums: Vec<i32> = (0..n).map(|_| rng.random_range(0..=1)).collect();
-            TestCase { data: Box::new(ContiguousArrayTest { nums }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(2..=30);
+                let nums: Vec<i32> = (0..n).map(|_| rng.random_range(0..=1)).collect();
+                TestCase {
+                    data: Box::new(ContiguousArrayTest { nums }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -425,10 +553,18 @@ struct RangeSum2DTest {
 }
 
 impl Problem for RangeSum2D {
-    fn id(&self) -> &str { "prefix_sum_2d_range_sum" }
-    fn name(&self) -> &str { "Range Sum Query 2D - Immutable" }
-    fn topic(&self) -> &str { "prefix_sum" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "prefix_sum_2d_range_sum"
+    }
+    fn name(&self) -> &str {
+        "Range Sum Query 2D - Immutable"
+    }
+    fn topic(&self) -> &str {
+        "prefix_sum"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given a 2D matrix and a list of queries (row1, col1, row2, col2), return the sum \
          of elements in the rectangle defined by (row1, col1) as the upper-left corner and \
@@ -438,35 +574,45 @@ impl Problem for RangeSum2D {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let rows = rng.random_range(1..=8);
-            let cols = rng.random_range(1..=8);
-            let matrix: Vec<Vec<i32>> = (0..rows)
-                .map(|_| (0..cols).map(|_| rng.random_range(-50..=50)).collect())
-                .collect();
-            let q = rng.random_range(1..=8);
-            let queries: Vec<(usize, usize, usize, usize)> = (0..q).map(|_| {
-                let r1 = rng.random_range(0..rows);
-                let r2 = rng.random_range(r1..rows);
-                let c1 = rng.random_range(0..cols);
-                let c2 = rng.random_range(c1..cols);
-                (r1, c1, r2, c2)
-            }).collect();
-            TestCase { data: Box::new(RangeSum2DTest { matrix, queries }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let rows = rng.random_range(1..=8);
+                let cols = rng.random_range(1..=8);
+                let matrix: Vec<Vec<i32>> = (0..rows)
+                    .map(|_| (0..cols).map(|_| rng.random_range(-50..=50)).collect())
+                    .collect();
+                let q = rng.random_range(1..=8);
+                let queries: Vec<(usize, usize, usize, usize)> = (0..q)
+                    .map(|_| {
+                        let r1 = rng.random_range(0..rows);
+                        let r2 = rng.random_range(r1..rows);
+                        let c1 = rng.random_range(0..cols);
+                        let c2 = rng.random_range(c1..cols);
+                        (r1, c1, r2, c2)
+                    })
+                    .collect();
+                TestCase {
+                    data: Box::new(RangeSum2DTest { matrix, queries }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<RangeSum2DTest>().unwrap();
-        let expected: Vec<i32> = t.queries.iter().map(|&(r1, c1, r2, c2)| {
-            let mut sum = 0;
-            for r in r1..=r2 {
-                for c in c1..=c2 {
-                    sum += t.matrix[r][c];
+        let expected: Vec<i32> = t
+            .queries
+            .iter()
+            .map(|&(r1, c1, r2, c2)| {
+                let mut sum = 0;
+                for r in r1..=r2 {
+                    for c in c1..=c2 {
+                        sum += t.matrix[r][c];
+                    }
                 }
-            }
-            sum
-        }).collect();
+                sum
+            })
+            .collect();
         let actual = solutions::range_sum_2d(&t.matrix, &t.queries);
         SolutionResult {
             is_correct: expected == actual,
@@ -480,13 +626,24 @@ impl Problem for RangeSum2D {
 // ── Medium 5: Maximum Length Subarray with Sum <= k ─────────────────────
 
 struct MaxSubarrayLength;
-struct MaxSubLenTest { nums: Vec<i32>, k: i32 }
+struct MaxSubLenTest {
+    nums: Vec<i32>,
+    k: i32,
+}
 
 impl Problem for MaxSubarrayLength {
-    fn id(&self) -> &str { "prefix_sum_max_subarray_length" }
-    fn name(&self) -> &str { "Maximum Length Subarray with Sum at Most K" }
-    fn topic(&self) -> &str { "prefix_sum" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "prefix_sum_max_subarray_length"
+    }
+    fn name(&self) -> &str {
+        "Maximum Length Subarray with Sum at Most K"
+    }
+    fn topic(&self) -> &str {
+        "prefix_sum"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given an array of positive integers `nums` and a positive integer `k`, return the \
          maximum length of a subarray whose sum is less than or equal to `k`.\n\n\
@@ -495,12 +652,16 @@ impl Problem for MaxSubarrayLength {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=30);
-            let nums: Vec<i32> = (0..n).map(|_| rng.random_range(1..=20)).collect();
-            let k = rng.random_range(1..=100);
-            TestCase { data: Box::new(MaxSubLenTest { nums, k }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=30);
+                let nums: Vec<i32> = (0..n).map(|_| rng.random_range(1..=20)).collect();
+                let k = rng.random_range(1..=100);
+                TestCase {
+                    data: Box::new(MaxSubLenTest { nums, k }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -536,13 +697,25 @@ fn ref_max_subarray_length(nums: &[i32], k: i32) -> i32 {
 // ── Hard 1: Count of Range Sum ─────────────────────────────────────────
 
 struct CountRangeSum;
-struct CountRangeSumTest { nums: Vec<i32>, lower: i32, upper: i32 }
+struct CountRangeSumTest {
+    nums: Vec<i32>,
+    lower: i32,
+    upper: i32,
+}
 
 impl Problem for CountRangeSum {
-    fn id(&self) -> &str { "prefix_sum_count_range_sum" }
-    fn name(&self) -> &str { "Count of Range Sum" }
-    fn topic(&self) -> &str { "prefix_sum" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "prefix_sum_count_range_sum"
+    }
+    fn name(&self) -> &str {
+        "Count of Range Sum"
+    }
+    fn topic(&self) -> &str {
+        "prefix_sum"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given an integer array `nums` and two integers `lower` and `upper`, return the \
          number of range sums that lie in [lower, upper] inclusive.\n\n\
@@ -551,13 +724,21 @@ impl Problem for CountRangeSum {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=20);
-            let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-20..=20)).collect();
-            let a = rng.random_range(-50..=50);
-            let b = rng.random_range(a..=a + 50);
-            TestCase { data: Box::new(CountRangeSumTest { nums, lower: a, upper: b }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=20);
+                let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-20..=20)).collect();
+                let a = rng.random_range(-50..=50);
+                let b = rng.random_range(a..=a + 50);
+                TestCase {
+                    data: Box::new(CountRangeSumTest {
+                        nums,
+                        lower: a,
+                        upper: b,
+                    }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -580,8 +761,8 @@ fn ref_count_range_sum(nums: &[i32], lower: i32, upper: i32) -> i32 {
     let upper = upper as i64;
     for i in 0..n {
         let mut sum: i64 = 0;
-        for j in i..n {
-            sum += nums[j] as i64;
+        for &num in nums.iter().take(n).skip(i) {
+            sum += num as i64;
             if sum >= lower && sum <= upper {
                 count += 1;
             }
@@ -593,13 +774,23 @@ fn ref_count_range_sum(nums: &[i32], lower: i32, upper: i32) -> i32 {
 // ── Hard 2: Maximum Sum Rectangle ──────────────────────────────────────
 
 struct MaxSumRectangle;
-struct MaxSumRectTest { matrix: Vec<Vec<i32>> }
+struct MaxSumRectTest {
+    matrix: Vec<Vec<i32>>,
+}
 
 impl Problem for MaxSumRectangle {
-    fn id(&self) -> &str { "prefix_sum_max_sum_rectangle" }
-    fn name(&self) -> &str { "Maximum Sum Rectangle in 2D Matrix" }
-    fn topic(&self) -> &str { "prefix_sum" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "prefix_sum_max_sum_rectangle"
+    }
+    fn name(&self) -> &str {
+        "Maximum Sum Rectangle in 2D Matrix"
+    }
+    fn topic(&self) -> &str {
+        "prefix_sum"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given a 2D matrix of integers, find the rectangle (submatrix) with the \
          maximum sum. Return that sum.\n\n\
@@ -608,14 +799,18 @@ impl Problem for MaxSumRectangle {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let rows = rng.random_range(1..=8);
-            let cols = rng.random_range(1..=8);
-            let matrix: Vec<Vec<i32>> = (0..rows)
-                .map(|_| (0..cols).map(|_| rng.random_range(-20..=20)).collect())
-                .collect();
-            TestCase { data: Box::new(MaxSumRectTest { matrix }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let rows = rng.random_range(1..=8);
+                let cols = rng.random_range(1..=8);
+                let matrix: Vec<Vec<i32>> = (0..rows)
+                    .map(|_| (0..cols).map(|_| rng.random_range(-20..=20)).collect())
+                    .collect();
+                TestCase {
+                    data: Box::new(MaxSumRectTest { matrix }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -632,7 +827,9 @@ impl Problem for MaxSumRectangle {
 }
 
 fn ref_max_sum_rectangle(matrix: &[Vec<i32>]) -> i32 {
-    if matrix.is_empty() || matrix[0].is_empty() { return 0; }
+    if matrix.is_empty() || matrix[0].is_empty() {
+        return 0;
+    }
     let rows = matrix.len();
     let cols = matrix[0].len();
     let mut max_sum = i32::MIN;
@@ -658,13 +855,24 @@ fn ref_max_sum_rectangle(matrix: &[Vec<i32>]) -> i32 {
 // ── Hard 3: Shortest Subarray with Sum >= K ────────────────────────────
 
 struct ShortestSubarraySumK;
-struct ShortestSubKTest { nums: Vec<i32>, k: i32 }
+struct ShortestSubKTest {
+    nums: Vec<i32>,
+    k: i32,
+}
 
 impl Problem for ShortestSubarraySumK {
-    fn id(&self) -> &str { "prefix_sum_shortest_subarray_sum_k" }
-    fn name(&self) -> &str { "Shortest Subarray with Sum at Least K" }
-    fn topic(&self) -> &str { "prefix_sum" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "prefix_sum_shortest_subarray_sum_k"
+    }
+    fn name(&self) -> &str {
+        "Shortest Subarray with Sum at Least K"
+    }
+    fn topic(&self) -> &str {
+        "prefix_sum"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given an integer array `nums` (may contain negative values) and an integer `k`, \
          return the length of the shortest non-empty subarray whose sum is at least `k`.\n\n\
@@ -674,12 +882,16 @@ impl Problem for ShortestSubarraySumK {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=20);
-            let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-20..=30)).collect();
-            let k = rng.random_range(1..=50);
-            TestCase { data: Box::new(ShortestSubKTest { nums, k }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=20);
+                let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-20..=30)).collect();
+                let k = rng.random_range(1..=50);
+                TestCase {
+                    data: Box::new(ShortestSubKTest { nums, k }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -700,27 +912,41 @@ fn ref_shortest_subarray_sum_k(nums: &[i32], k: i32) -> i32 {
     let mut min_len = i32::MAX;
     for i in 0..n {
         let mut sum: i64 = 0;
-        for j in i..n {
-            sum += nums[j] as i64;
+        for (j, &num) in nums.iter().enumerate().take(n).skip(i) {
+            sum += num as i64;
             if sum >= k as i64 {
                 min_len = min_len.min((j - i + 1) as i32);
                 break; // No need to extend further from this start for brute force min
             }
         }
     }
-    if min_len == i32::MAX { -1 } else { min_len }
+    if min_len == i32::MAX {
+        -1
+    } else {
+        min_len
+    }
 }
 
 // ── Hard 4: Number of Subarrays with Odd Sum ───────────────────────────
 
 struct NumberOfSubarraysOddSum;
-struct OddSumTest { nums: Vec<i32> }
+struct OddSumTest {
+    nums: Vec<i32>,
+}
 
 impl Problem for NumberOfSubarraysOddSum {
-    fn id(&self) -> &str { "prefix_sum_number_of_subarrays_odd_sum" }
-    fn name(&self) -> &str { "Number of Sub-arrays With Odd Sum" }
-    fn topic(&self) -> &str { "prefix_sum" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "prefix_sum_number_of_subarrays_odd_sum"
+    }
+    fn name(&self) -> &str {
+        "Number of Sub-arrays With Odd Sum"
+    }
+    fn topic(&self) -> &str {
+        "prefix_sum"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given an array of integers `nums`, return the number of subarrays that have an \
          odd sum. Return the answer modulo 10^9 + 7.\n\n\
@@ -729,11 +955,15 @@ impl Problem for NumberOfSubarraysOddSum {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=30);
-            let nums: Vec<i32> = (0..n).map(|_| rng.random_range(1..=100)).collect();
-            TestCase { data: Box::new(OddSumTest { nums }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=30);
+                let nums: Vec<i32> = (0..n).map(|_| rng.random_range(1..=100)).collect();
+                TestCase {
+                    data: Box::new(OddSumTest { nums }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -775,13 +1005,24 @@ fn ref_subarrays_odd_sum(nums: &[i32]) -> i32 {
 // ── Hard 5: XOR Queries of a Subarray ──────────────────────────────────
 
 struct XorQueries;
-struct XorQueriesTest { nums: Vec<i32>, queries: Vec<(usize, usize)> }
+struct XorQueriesTest {
+    nums: Vec<i32>,
+    queries: Vec<(usize, usize)>,
+}
 
 impl Problem for XorQueries {
-    fn id(&self) -> &str { "prefix_sum_xor_queries" }
-    fn name(&self) -> &str { "XOR Queries of a Subarray" }
-    fn topic(&self) -> &str { "prefix_sum" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "prefix_sum_xor_queries"
+    }
+    fn name(&self) -> &str {
+        "XOR Queries of a Subarray"
+    }
+    fn topic(&self) -> &str {
+        "prefix_sum"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given an array `nums` and a list of queries `(left, right)`, return an array of \
          answers where each answer is the XOR of elements from `nums[left]` to `nums[right]`.\n\n\
@@ -790,24 +1031,32 @@ impl Problem for XorQueries {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=30);
-            let nums: Vec<i32> = (0..n).map(|_| rng.random_range(0..=1000)).collect();
-            let q = rng.random_range(1..=10);
-            let queries: Vec<(usize, usize)> = (0..q).map(|_| {
-                let a = rng.random_range(0..n);
-                let b = rng.random_range(a..n);
-                (a, b)
-            }).collect();
-            TestCase { data: Box::new(XorQueriesTest { nums, queries }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=30);
+                let nums: Vec<i32> = (0..n).map(|_| rng.random_range(0..=1000)).collect();
+                let q = rng.random_range(1..=10);
+                let queries: Vec<(usize, usize)> = (0..q)
+                    .map(|_| {
+                        let a = rng.random_range(0..n);
+                        let b = rng.random_range(a..n);
+                        (a, b)
+                    })
+                    .collect();
+                TestCase {
+                    data: Box::new(XorQueriesTest { nums, queries }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<XorQueriesTest>().unwrap();
-        let expected: Vec<i32> = t.queries.iter().map(|&(l, r)| {
-            t.nums[l..=r].iter().fold(0, |acc, &x| acc ^ x)
-        }).collect();
+        let expected: Vec<i32> = t
+            .queries
+            .iter()
+            .map(|&(l, r)| t.nums[l..=r].iter().fold(0, |acc, &x| acc ^ x))
+            .collect();
         let actual = solutions::xor_queries(&t.nums, &t.queries);
         SolutionResult {
             is_correct: expected == actual,

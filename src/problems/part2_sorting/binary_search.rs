@@ -34,10 +34,18 @@ struct BinarySearchBasicTest {
 }
 
 impl Problem for BinarySearchBasic {
-    fn id(&self) -> &str { "binary_search_basic" }
-    fn name(&self) -> &str { "Binary Search" }
-    fn topic(&self) -> &str { "binary_search" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "binary_search_basic"
+    }
+    fn name(&self) -> &str {
+        "Binary Search"
+    }
+    fn topic(&self) -> &str {
+        "binary_search"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given a sorted array of integers `nums` and an integer `target`, return the index \
          of `target` if it exists, or `None` if it does not.\n\n\
@@ -50,18 +58,22 @@ impl Problem for BinarySearchBasic {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=50);
-            let mut nums = crate::problems::helpers::random_unique_vec(&mut rng, n, -500, 500);
-            nums.sort();
-            // 50% chance the target is in the array
-            let target = if rng.random_range(0..2) == 0 {
-                nums[rng.random_range(0..n)]
-            } else {
-                rng.random_range(-600..=600)
-            };
-            TestCase { data: Box::new(BinarySearchBasicTest { nums, target }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=50);
+                let mut nums = crate::problems::helpers::random_unique_vec(&mut rng, n, -500, 500);
+                nums.sort();
+                // 50% chance the target is in the array
+                let target = if rng.random_range(0..2) == 0 {
+                    nums[rng.random_range(0..n)]
+                } else {
+                    rng.random_range(-600..=600)
+                };
+                TestCase {
+                    data: Box::new(BinarySearchBasicTest { nums, target }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -103,10 +115,18 @@ struct InsertPositionTest {
 }
 
 impl Problem for BinarySearchInsertPosition {
-    fn id(&self) -> &str { "binary_search_insert_position" }
-    fn name(&self) -> &str { "Search Insert Position" }
-    fn topic(&self) -> &str { "binary_search" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "binary_search_insert_position"
+    }
+    fn name(&self) -> &str {
+        "Search Insert Position"
+    }
+    fn topic(&self) -> &str {
+        "binary_search"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given a sorted array of distinct integers and a `target`, return the index where \
          the target is found. If not found, return the index where it would be inserted \
@@ -119,17 +139,21 @@ impl Problem for BinarySearchInsertPosition {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=50);
-            let mut nums = crate::problems::helpers::random_unique_vec(&mut rng, n, -500, 500);
-            nums.sort();
-            let target = if rng.random_range(0..2) == 0 {
-                nums[rng.random_range(0..n)]
-            } else {
-                rng.random_range(-600..=600)
-            };
-            TestCase { data: Box::new(InsertPositionTest { nums, target }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=50);
+                let mut nums = crate::problems::helpers::random_unique_vec(&mut rng, n, -500, 500);
+                nums.sort();
+                let target = if rng.random_range(0..2) == 0 {
+                    nums[rng.random_range(0..n)]
+                } else {
+                    rng.random_range(-600..=600)
+                };
+                TestCase {
+                    data: Box::new(InsertPositionTest { nums, target }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -168,10 +192,18 @@ struct FirstLastTest {
 }
 
 impl Problem for BinarySearchFirstLast {
-    fn id(&self) -> &str { "binary_search_first_last" }
-    fn name(&self) -> &str { "Find First and Last Position of Element" }
-    fn topic(&self) -> &str { "binary_search" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "binary_search_first_last"
+    }
+    fn name(&self) -> &str {
+        "Find First and Last Position of Element"
+    }
+    fn topic(&self) -> &str {
+        "binary_search"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given a sorted array of integers (may contain duplicates) and a `target`, return \
          the starting and ending position of `target`. Return (-1, -1) if the target is \
@@ -184,17 +216,21 @@ impl Problem for BinarySearchFirstLast {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(0..=40);
-            let mut nums: Vec<i32> = (0..n).map(|_| rng.random_range(-20..=20)).collect();
-            nums.sort();
-            let target = if n > 0 && rng.random_range(0..2) == 0 {
-                nums[rng.random_range(0..n)]
-            } else {
-                rng.random_range(-25..=25)
-            };
-            TestCase { data: Box::new(FirstLastTest { nums, target }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(0..=40);
+                let mut nums: Vec<i32> = (0..n).map(|_| rng.random_range(-20..=20)).collect();
+                nums.sort();
+                let target = if n > 0 && rng.random_range(0..2) == 0 {
+                    nums[rng.random_range(0..n)]
+                } else {
+                    rng.random_range(-25..=25)
+                };
+                TestCase {
+                    data: Box::new(FirstLastTest { nums, target }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -250,10 +286,18 @@ struct SqrtTest {
 }
 
 impl Problem for BinarySearchSqrt {
-    fn id(&self) -> &str { "binary_search_sqrt" }
-    fn name(&self) -> &str { "Integer Square Root" }
-    fn topic(&self) -> &str { "binary_search" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "binary_search_sqrt"
+    }
+    fn name(&self) -> &str {
+        "Integer Square Root"
+    }
+    fn topic(&self) -> &str {
+        "binary_search"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given a non-negative integer `x`, return the integer square root of `x`. \
          That is, return the largest integer `r` such that `r * r <= x`.\n\n\
@@ -266,12 +310,18 @@ impl Problem for BinarySearchSqrt {
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
         let mut tests: Vec<TestCase> = vec![
-            TestCase { data: Box::new(SqrtTest { x: 0 }) },
-            TestCase { data: Box::new(SqrtTest { x: 1 }) },
+            TestCase {
+                data: Box::new(SqrtTest { x: 0 }),
+            },
+            TestCase {
+                data: Box::new(SqrtTest { x: 1 }),
+            },
         ];
         for _ in 0..8 {
             let x: u64 = rng.random_range(0..=1_000_000_000_000u64);
-            tests.push(TestCase { data: Box::new(SqrtTest { x }) });
+            tests.push(TestCase {
+                data: Box::new(SqrtTest { x }),
+            });
         }
         tests
     }
@@ -316,10 +366,18 @@ struct GuessNumberTest {
 }
 
 impl Problem for BinarySearchGuessNumber {
-    fn id(&self) -> &str { "binary_search_guess_number" }
-    fn name(&self) -> &str { "Guess Number Higher or Lower" }
-    fn topic(&self) -> &str { "binary_search" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "binary_search_guess_number"
+    }
+    fn name(&self) -> &str {
+        "Guess Number Higher or Lower"
+    }
+    fn topic(&self) -> &str {
+        "binary_search"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "I pick a number from 1 to n. You guess which number I picked.\n\n\
          You are given a function `guess(num, pick) -> i32` that returns:\n\
@@ -336,11 +394,15 @@ impl Problem for BinarySearchGuessNumber {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=1_000_000);
-            let pick = rng.random_range(1..=n);
-            TestCase { data: Box::new(GuessNumberTest { n, pick }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=1_000_000);
+                let pick = rng.random_range(1..=n);
+                TestCase {
+                    data: Box::new(GuessNumberTest { n, pick }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -366,10 +428,18 @@ struct RotatedArrayTest {
 }
 
 impl Problem for BinarySearchRotatedArray {
-    fn id(&self) -> &str { "binary_search_rotated_array" }
-    fn name(&self) -> &str { "Search in Rotated Sorted Array" }
-    fn topic(&self) -> &str { "binary_search" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "binary_search_rotated_array"
+    }
+    fn name(&self) -> &str {
+        "Search in Rotated Sorted Array"
+    }
+    fn topic(&self) -> &str {
+        "binary_search"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "An ascending sorted array of distinct integers was rotated at some pivot. \
          For example, [0,1,2,4,5,6,7] might become [4,5,6,7,0,1,2].\n\n\
@@ -383,20 +453,25 @@ impl Problem for BinarySearchRotatedArray {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=30);
-            let mut sorted = crate::problems::helpers::random_unique_vec(&mut rng, n, -500, 500);
-            sorted.sort();
-            let rot = rng.random_range(0..n);
-            let mut nums = sorted[rot..].to_vec();
-            nums.extend_from_slice(&sorted[..rot]);
-            let target = if rng.random_range(0..2) == 0 {
-                nums[rng.random_range(0..n)]
-            } else {
-                rng.random_range(-600..=600)
-            };
-            TestCase { data: Box::new(RotatedArrayTest { nums, target }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=30);
+                let mut sorted =
+                    crate::problems::helpers::random_unique_vec(&mut rng, n, -500, 500);
+                sorted.sort();
+                let rot = rng.random_range(0..n);
+                let mut nums = sorted[rot..].to_vec();
+                nums.extend_from_slice(&sorted[..rot]);
+                let target = if rng.random_range(0..2) == 0 {
+                    nums[rng.random_range(0..n)]
+                } else {
+                    rng.random_range(-600..=600)
+                };
+                TestCase {
+                    data: Box::new(RotatedArrayTest { nums, target }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -448,10 +523,18 @@ struct PeakElementTest {
 }
 
 impl Problem for BinarySearchPeakElement {
-    fn id(&self) -> &str { "binary_search_peak_element" }
-    fn name(&self) -> &str { "Find Peak Element" }
-    fn topic(&self) -> &str { "binary_search" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "binary_search_peak_element"
+    }
+    fn name(&self) -> &str {
+        "Find Peak Element"
+    }
+    fn topic(&self) -> &str {
+        "binary_search"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "A peak element is one that is strictly greater than its neighbors. \
          Given an array `nums`, find any peak element and return its index.\n\n\
@@ -464,20 +547,24 @@ impl Problem for BinarySearchPeakElement {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=30);
-            // Build array with no adjacent duplicates
-            let mut nums = Vec::with_capacity(n);
-            nums.push(rng.random_range(-1000..=1000));
-            for _ in 1..n {
-                let mut v = rng.random_range(-1000..=1000);
-                while v == *nums.last().unwrap() {
-                    v = rng.random_range(-1000..=1000);
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=30);
+                // Build array with no adjacent duplicates
+                let mut nums = Vec::with_capacity(n);
+                nums.push(rng.random_range(-1000..=1000));
+                for _ in 1..n {
+                    let mut v = rng.random_range(-1000..=1000);
+                    while v == *nums.last().unwrap() {
+                        v = rng.random_range(-1000..=1000);
+                    }
+                    nums.push(v);
                 }
-                nums.push(v);
-            }
-            TestCase { data: Box::new(PeakElementTest { nums }) }
-        }).collect()
+                TestCase {
+                    data: Box::new(PeakElementTest { nums }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -489,7 +576,14 @@ impl Problem for BinarySearchPeakElement {
             is_correct: is_peak,
             input_description: format!("nums={:?}", t.nums),
             expected: "any valid peak index".to_string(),
-            actual: format!("{actual} (value={})", if actual < t.nums.len() { t.nums[actual].to_string() } else { "OUT_OF_BOUNDS".to_string() }),
+            actual: format!(
+                "{actual} (value={})",
+                if actual < t.nums.len() {
+                    t.nums[actual].to_string()
+                } else {
+                    "OUT_OF_BOUNDS".to_string()
+                }
+            ),
         }
     }
 }
@@ -512,10 +606,18 @@ struct FindMinRotatedTest {
 }
 
 impl Problem for BinarySearchFindMinRotated {
-    fn id(&self) -> &str { "binary_search_find_min_rotated" }
-    fn name(&self) -> &str { "Find Minimum in Rotated Sorted Array" }
-    fn topic(&self) -> &str { "binary_search" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "binary_search_find_min_rotated"
+    }
+    fn name(&self) -> &str {
+        "Find Minimum in Rotated Sorted Array"
+    }
+    fn topic(&self) -> &str {
+        "binary_search"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "A sorted array of unique elements was rotated between 1 and n times. \
          Find the minimum element.\n\n\
@@ -528,15 +630,20 @@ impl Problem for BinarySearchFindMinRotated {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=30);
-            let mut sorted = crate::problems::helpers::random_unique_vec(&mut rng, n, -500, 500);
-            sorted.sort();
-            let rot = rng.random_range(0..n);
-            let mut nums = sorted[rot..].to_vec();
-            nums.extend_from_slice(&sorted[..rot]);
-            TestCase { data: Box::new(FindMinRotatedTest { nums }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=30);
+                let mut sorted =
+                    crate::problems::helpers::random_unique_vec(&mut rng, n, -500, 500);
+                sorted.sort();
+                let rot = rng.random_range(0..n);
+                let mut nums = sorted[rot..].to_vec();
+                nums.extend_from_slice(&sorted[..rot]);
+                TestCase {
+                    data: Box::new(FindMinRotatedTest { nums }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -562,10 +669,18 @@ struct Matrix2dTest {
 }
 
 impl Problem for BinarySearch2dMatrix {
-    fn id(&self) -> &str { "binary_search_2d_matrix" }
-    fn name(&self) -> &str { "Search a 2D Matrix" }
-    fn topic(&self) -> &str { "binary_search" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "binary_search_2d_matrix"
+    }
+    fn name(&self) -> &str {
+        "Search a 2D Matrix"
+    }
+    fn topic(&self) -> &str {
+        "binary_search"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "You are given an m x n integer matrix with the following properties:\n\
          - Each row is sorted in non-decreasing order.\n\
@@ -579,22 +694,25 @@ impl Problem for BinarySearch2dMatrix {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let rows = rng.random_range(1..=8);
-            let cols = rng.random_range(1..=8);
-            let total = rows * cols;
-            let mut flat = crate::problems::helpers::random_unique_vec(
-                &mut rng, total, -500, 500,
-            );
-            flat.sort();
-            let matrix: Vec<Vec<i32>> = flat.chunks(cols).map(|c| c.to_vec()).collect();
-            let target = if rng.random_range(0..2) == 0 {
-                flat[rng.random_range(0..total)]
-            } else {
-                rng.random_range(-600..=600)
-            };
-            TestCase { data: Box::new(Matrix2dTest { matrix, target }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let rows = rng.random_range(1..=8);
+                let cols = rng.random_range(1..=8);
+                let total = rows * cols;
+                let mut flat =
+                    crate::problems::helpers::random_unique_vec(&mut rng, total, -500, 500);
+                flat.sort();
+                let matrix: Vec<Vec<i32>> = flat.chunks(cols).map(|c| c.to_vec()).collect();
+                let target = if rng.random_range(0..2) == 0 {
+                    flat[rng.random_range(0..total)]
+                } else {
+                    rng.random_range(-600..=600)
+                };
+                TestCase {
+                    data: Box::new(Matrix2dTest { matrix, target }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -641,10 +759,18 @@ struct KokoTest {
 }
 
 impl Problem for BinarySearchKokoBananas {
-    fn id(&self) -> &str { "binary_search_koko_bananas" }
-    fn name(&self) -> &str { "Koko Eating Bananas" }
-    fn topic(&self) -> &str { "binary_search" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "binary_search_koko_bananas"
+    }
+    fn name(&self) -> &str {
+        "Koko Eating Bananas"
+    }
+    fn topic(&self) -> &str {
+        "binary_search"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Koko loves eating bananas. There are `n` piles of bananas, the i-th pile has \
          `piles[i]` bananas. The guards will come back in `h` hours.\n\n\
@@ -660,13 +786,17 @@ impl Problem for BinarySearchKokoBananas {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=20);
-            let piles: Vec<i32> = (0..n).map(|_| rng.random_range(1..=1000)).collect();
-            // h must be >= n (at minimum one hour per pile)
-            let h = rng.random_range(n as i32..=n as i32 * 10);
-            TestCase { data: Box::new(KokoTest { piles, h }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=20);
+                let piles: Vec<i32> = (0..n).map(|_| rng.random_range(1..=1000)).collect();
+                // h must be >= n (at minimum one hour per pile)
+                let h = rng.random_range(n as i32..=n as i32 * 10);
+                TestCase {
+                    data: Box::new(KokoTest { piles, h }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -707,10 +837,18 @@ struct MedianSortedTest {
 }
 
 impl Problem for BinarySearchMedianSortedArrays {
-    fn id(&self) -> &str { "binary_search_median_sorted_arrays" }
-    fn name(&self) -> &str { "Median of Two Sorted Arrays" }
-    fn topic(&self) -> &str { "binary_search" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "binary_search_median_sorted_arrays"
+    }
+    fn name(&self) -> &str {
+        "Median of Two Sorted Arrays"
+    }
+    fn topic(&self) -> &str {
+        "binary_search"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given two sorted arrays `nums1` and `nums2` of size m and n respectively, \
          return the median of the two sorted arrays.\n\n\
@@ -723,15 +861,19 @@ impl Problem for BinarySearchMedianSortedArrays {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let m = rng.random_range(0..=20);
-            let n = rng.random_range(1..=20);
-            let mut nums1 = crate::problems::helpers::random_vec(&mut rng, m, -100, 100);
-            let mut nums2 = crate::problems::helpers::random_vec(&mut rng, n, -100, 100);
-            nums1.sort();
-            nums2.sort();
-            TestCase { data: Box::new(MedianSortedTest { nums1, nums2 }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let m = rng.random_range(0..=20);
+                let n = rng.random_range(1..=20);
+                let mut nums1 = crate::problems::helpers::random_vec(&mut rng, m, -100, 100);
+                let mut nums2 = crate::problems::helpers::random_vec(&mut rng, n, -100, 100);
+                nums1.sort();
+                nums2.sort();
+                TestCase {
+                    data: Box::new(MedianSortedTest { nums1, nums2 }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -769,10 +911,18 @@ struct SplitArrayTest {
 }
 
 impl Problem for BinarySearchSplitArrayLargest {
-    fn id(&self) -> &str { "binary_search_split_array_largest" }
-    fn name(&self) -> &str { "Split Array Largest Sum" }
-    fn topic(&self) -> &str { "binary_search" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "binary_search_split_array_largest"
+    }
+    fn name(&self) -> &str {
+        "Split Array Largest Sum"
+    }
+    fn topic(&self) -> &str {
+        "binary_search"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given an integer array `nums` and an integer `m`, split the array into `m` \
          non-empty contiguous subarrays. Minimize the largest sum among these `m` \
@@ -785,12 +935,16 @@ impl Problem for BinarySearchSplitArrayLargest {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=20);
-            let nums: Vec<i32> = (0..n).map(|_| rng.random_range(0..=100)).collect();
-            let m = rng.random_range(1..=n as i32);
-            TestCase { data: Box::new(SplitArrayTest { nums, m }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=20);
+                let nums: Vec<i32> = (0..n).map(|_| rng.random_range(0..=100)).collect();
+                let m = rng.random_range(1..=n as i32);
+                TestCase {
+                    data: Box::new(SplitArrayTest { nums, m }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -846,10 +1000,18 @@ struct KthPairTest {
 }
 
 impl Problem for BinarySearchFindKthSmallestPair {
-    fn id(&self) -> &str { "binary_search_find_kth_smallest_pair" }
-    fn name(&self) -> &str { "Find K-th Smallest Pair Distance" }
-    fn topic(&self) -> &str { "binary_search" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "binary_search_find_kth_smallest_pair"
+    }
+    fn name(&self) -> &str {
+        "Find K-th Smallest Pair Distance"
+    }
+    fn topic(&self) -> &str {
+        "binary_search"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "The distance of a pair (nums[i], nums[j]) is |nums[i] - nums[j]|.\n\n\
          Given an integer array `nums` and an integer `k`, return the k-th smallest \
@@ -862,13 +1024,17 @@ impl Problem for BinarySearchFindKthSmallestPair {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(2..=15);
-            let nums: Vec<i32> = (0..n).map(|_| rng.random_range(0..=100)).collect();
-            let total_pairs = n * (n - 1) / 2;
-            let k = rng.random_range(1..=total_pairs as i32);
-            TestCase { data: Box::new(KthPairTest { nums, k }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(2..=15);
+                let nums: Vec<i32> = (0..n).map(|_| rng.random_range(0..=100)).collect();
+                let total_pairs = n * (n - 1) / 2;
+                let k = rng.random_range(1..=total_pairs as i32);
+                TestCase {
+                    data: Box::new(KthPairTest { nums, k }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -923,10 +1089,18 @@ struct CountSmallerTest {
 }
 
 impl Problem for BinarySearchCountSmallerAfter {
-    fn id(&self) -> &str { "binary_search_count_smaller_after" }
-    fn name(&self) -> &str { "Count of Smaller Numbers After Self" }
-    fn topic(&self) -> &str { "binary_search" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "binary_search_count_smaller_after"
+    }
+    fn name(&self) -> &str {
+        "Count of Smaller Numbers After Self"
+    }
+    fn topic(&self) -> &str {
+        "binary_search"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given an integer array `nums`, return an array `counts` where `counts[i]` is \
          the number of smaller elements to the right of `nums[i]`.\n\n\
@@ -938,11 +1112,15 @@ impl Problem for BinarySearchCountSmallerAfter {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=30);
-            let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-100..=100)).collect();
-            TestCase { data: Box::new(CountSmallerTest { nums }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=30);
+                let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-100..=100)).collect();
+                TestCase {
+                    data: Box::new(CountSmallerTest { nums }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -980,10 +1158,18 @@ struct EnvelopesTest {
 }
 
 impl Problem for BinarySearchRussianDollEnvelopes {
-    fn id(&self) -> &str { "binary_search_russian_doll_envelopes" }
-    fn name(&self) -> &str { "Russian Doll Envelopes" }
-    fn topic(&self) -> &str { "binary_search" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "binary_search_russian_doll_envelopes"
+    }
+    fn name(&self) -> &str {
+        "Russian Doll Envelopes"
+    }
+    fn topic(&self) -> &str {
+        "binary_search"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "You are given a 2D array of integers `envelopes` where \
          `envelopes[i] = (width_i, height_i)` represents the width and height of an \
@@ -1000,15 +1186,17 @@ impl Problem for BinarySearchRussianDollEnvelopes {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=30);
-            let envelopes: Vec<(i32, i32)> = (0..n)
-                .map(|_| {
-                    (rng.random_range(1..=100), rng.random_range(1..=100))
-                })
-                .collect();
-            TestCase { data: Box::new(EnvelopesTest { envelopes }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=30);
+                let envelopes: Vec<(i32, i32)> = (0..n)
+                    .map(|_| (rng.random_range(1..=100), rng.random_range(1..=100)))
+                    .collect();
+                TestCase {
+                    data: Box::new(EnvelopesTest { envelopes }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {

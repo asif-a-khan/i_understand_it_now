@@ -36,10 +36,18 @@ struct FibonacciTest {
 }
 
 impl Problem for Fibonacci {
-    fn id(&self) -> &str { "recursion_fibonacci" }
-    fn name(&self) -> &str { "Fibonacci Number" }
-    fn topic(&self) -> &str { "recursion" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "recursion_fibonacci"
+    }
+    fn name(&self) -> &str {
+        "Fibonacci Number"
+    }
+    fn topic(&self) -> &str {
+        "recursion"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Return the nth Fibonacci number.\n\n\
          F(0) = 0, F(1) = 1, F(n) = F(n-1) + F(n-2).\n\n\
@@ -53,7 +61,9 @@ impl Problem for Fibonacci {
         (0..10)
             .map(|_| {
                 let n = rng.random_range(0..=30);
-                TestCase { data: Box::new(FibonacciTest { n }) }
+                TestCase {
+                    data: Box::new(FibonacciTest { n }),
+                }
             })
             .collect()
     }
@@ -92,10 +102,18 @@ struct PowerOfTwoTest {
 }
 
 impl Problem for PowerOfTwo {
-    fn id(&self) -> &str { "recursion_power_of_two" }
-    fn name(&self) -> &str { "Power of Two" }
-    fn topic(&self) -> &str { "recursion" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "recursion_power_of_two"
+    }
+    fn name(&self) -> &str {
+        "Power of Two"
+    }
+    fn topic(&self) -> &str {
+        "recursion"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Check if `n` is a power of two using recursion.\n\n\
          A power of two is a number of the form 2^k where k >= 0.\n\n\
@@ -109,12 +127,16 @@ impl Problem for PowerOfTwo {
         let mut tests: Vec<TestCase> = (0..7)
             .map(|_| {
                 let n = rng.random_range(-100..=10000);
-                TestCase { data: Box::new(PowerOfTwoTest { n }) }
+                TestCase {
+                    data: Box::new(PowerOfTwoTest { n }),
+                }
             })
             .collect();
         // Ensure some known powers of two
         for &n in &[1, 2, 4, 16, 64, 1024, 0, -1] {
-            tests.push(TestCase { data: Box::new(PowerOfTwoTest { n }) });
+            tests.push(TestCase {
+                data: Box::new(PowerOfTwoTest { n }),
+            });
         }
         // Trim to 10
         tests.truncate(10);
@@ -146,10 +168,18 @@ struct ReverseStringTest {
 }
 
 impl Problem for ReverseString {
-    fn id(&self) -> &str { "recursion_reverse_string" }
-    fn name(&self) -> &str { "Reverse String Recursively" }
-    fn topic(&self) -> &str { "recursion" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "recursion_reverse_string"
+    }
+    fn name(&self) -> &str {
+        "Reverse String Recursively"
+    }
+    fn topic(&self) -> &str {
+        "recursion"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Reverse a string using recursion.\n\n\
          Do NOT use `.rev()` or `.chars().rev()`. Implement the reversal recursively.\n\n\
@@ -164,7 +194,9 @@ impl Problem for ReverseString {
             .map(|_| {
                 let len = rng.random_range(0..=20);
                 let s = helpers::random_string(&mut rng, len);
-                TestCase { data: Box::new(ReverseStringTest { s }) }
+                TestCase {
+                    data: Box::new(ReverseStringTest { s }),
+                }
             })
             .collect()
     }
@@ -190,10 +222,18 @@ struct SumListTest {
 }
 
 impl Problem for SumList {
-    fn id(&self) -> &str { "recursion_sum_list" }
-    fn name(&self) -> &str { "Sum List Recursively" }
-    fn topic(&self) -> &str { "recursion" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "recursion_sum_list"
+    }
+    fn name(&self) -> &str {
+        "Sum List Recursively"
+    }
+    fn topic(&self) -> &str {
+        "recursion"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Sum all elements in a list using recursion.\n\n\
          Do NOT use `.iter().sum()` or loops. Implement the sum recursively:\n\
@@ -209,7 +249,9 @@ impl Problem for SumList {
             .map(|_| {
                 let n = rng.random_range(0..=30);
                 let nums = helpers::random_vec(&mut rng, n, -1000, 1000);
-                TestCase { data: Box::new(SumListTest { nums }) }
+                TestCase {
+                    data: Box::new(SumListTest { nums }),
+                }
             })
             .collect()
     }
@@ -235,10 +277,18 @@ struct MaxDepthTreeTest {
 }
 
 impl Problem for MaxDepthTree {
-    fn id(&self) -> &str { "recursion_max_depth_tree" }
-    fn name(&self) -> &str { "Maximum Depth of Binary Tree" }
-    fn topic(&self) -> &str { "recursion" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "recursion_max_depth_tree"
+    }
+    fn name(&self) -> &str {
+        "Maximum Depth of Binary Tree"
+    }
+    fn topic(&self) -> &str {
+        "recursion"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given a binary tree represented as a level-order `Vec<Option<i32>>`, \
          return the maximum depth (number of nodes on the longest root-to-leaf path).\n\n\
@@ -255,13 +305,23 @@ impl Problem for MaxDepthTree {
             .map(|_| {
                 let size = rng.random_range(1..=15);
                 let level_order = helpers::random_tree(&mut rng, size, -100, 100);
-                TestCase { data: Box::new(MaxDepthTreeTest { level_order }) }
+                TestCase {
+                    data: Box::new(MaxDepthTreeTest { level_order }),
+                }
             })
             .collect();
         // Add edge case: empty tree
-        tests.push(TestCase { data: Box::new(MaxDepthTreeTest { level_order: vec![] }) });
+        tests.push(TestCase {
+            data: Box::new(MaxDepthTreeTest {
+                level_order: vec![],
+            }),
+        });
         // Add edge case: single node
-        tests.push(TestCase { data: Box::new(MaxDepthTreeTest { level_order: vec![Some(1)] }) });
+        tests.push(TestCase {
+            data: Box::new(MaxDepthTreeTest {
+                level_order: vec![Some(1)],
+            }),
+        });
         tests
     }
 
@@ -301,10 +361,18 @@ struct PermutationsTest {
 }
 
 impl Problem for Permutations {
-    fn id(&self) -> &str { "recursion_permutations" }
-    fn name(&self) -> &str { "Permutations" }
-    fn topic(&self) -> &str { "recursion" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "recursion_permutations"
+    }
+    fn name(&self) -> &str {
+        "Permutations"
+    }
+    fn topic(&self) -> &str {
+        "recursion"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given a vector of distinct integers, return all possible permutations.\n\n\
          Return the permutations sorted lexicographically.\n\n\
@@ -319,7 +387,9 @@ impl Problem for Permutations {
             .map(|_| {
                 let n = rng.random_range(1..=5);
                 let nums = helpers::random_unique_vec(&mut rng, n, -10, 10);
-                TestCase { data: Box::new(PermutationsTest { nums }) }
+                TestCase {
+                    data: Box::new(PermutationsTest { nums }),
+                }
             })
             .collect()
     }
@@ -364,10 +434,18 @@ struct SubsetsTest {
 }
 
 impl Problem for Subsets {
-    fn id(&self) -> &str { "recursion_subsets" }
-    fn name(&self) -> &str { "Subsets" }
-    fn topic(&self) -> &str { "recursion" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "recursion_subsets"
+    }
+    fn name(&self) -> &str {
+        "Subsets"
+    }
+    fn topic(&self) -> &str {
+        "recursion"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given a vector of distinct integers, return all possible subsets (the power set).\n\n\
          Return the subsets sorted: each subset sorted internally, then all subsets \
@@ -383,7 +461,9 @@ impl Problem for Subsets {
             .map(|_| {
                 let n = rng.random_range(1..=6);
                 let nums = helpers::random_unique_vec(&mut rng, n, -10, 10);
-                TestCase { data: Box::new(SubsetsTest { nums }) }
+                TestCase {
+                    data: Box::new(SubsetsTest { nums }),
+                }
             })
             .collect()
     }
@@ -427,10 +507,18 @@ struct LetterCombinationsTest {
 }
 
 impl Problem for LetterCombinations {
-    fn id(&self) -> &str { "recursion_letter_combinations" }
-    fn name(&self) -> &str { "Letter Combinations of a Phone Number" }
-    fn topic(&self) -> &str { "recursion" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "recursion_letter_combinations"
+    }
+    fn name(&self) -> &str {
+        "Letter Combinations of a Phone Number"
+    }
+    fn topic(&self) -> &str {
+        "recursion"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given a string containing digits from '2' to '9', return all possible letter \
          combinations that the number could represent (like a phone keypad).\n\n\
@@ -451,16 +539,22 @@ impl Problem for LetterCombinations {
                 let digits: String = (0..len)
                     .map(|_| (b'2' + rng.random_range(0..8u8)) as char)
                     .collect();
-                TestCase { data: Box::new(LetterCombinationsTest { digits }) }
+                TestCase {
+                    data: Box::new(LetterCombinationsTest { digits }),
+                }
             })
             .collect();
         // Edge case: empty string
         tests.push(TestCase {
-            data: Box::new(LetterCombinationsTest { digits: String::new() }),
+            data: Box::new(LetterCombinationsTest {
+                digits: String::new(),
+            }),
         });
         // Edge case: single digit
         tests.push(TestCase {
-            data: Box::new(LetterCombinationsTest { digits: "7".to_string() }),
+            data: Box::new(LetterCombinationsTest {
+                digits: "7".to_string(),
+            }),
         });
         tests
     }
@@ -517,10 +611,18 @@ struct PowTest {
 }
 
 impl Problem for Pow {
-    fn id(&self) -> &str { "recursion_pow" }
-    fn name(&self) -> &str { "Pow(x, n)" }
-    fn topic(&self) -> &str { "recursion" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "recursion_pow"
+    }
+    fn name(&self) -> &str {
+        "Pow(x, n)"
+    }
+    fn topic(&self) -> &str {
+        "recursion"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Implement pow(x, n), which calculates x raised to the power n (x^n).\n\n\
          Use recursive fast exponentiation:\n\
@@ -540,13 +642,21 @@ impl Problem for Pow {
             .map(|_| {
                 let x = (rng.random_range(-100..=100) as f64) / 10.0;
                 let n = rng.random_range(-15..=15);
-                TestCase { data: Box::new(PowTest { x, n }) }
+                TestCase {
+                    data: Box::new(PowTest { x, n }),
+                }
             })
             .collect();
         // Ensure some edge cases
-        tests.push(TestCase { data: Box::new(PowTest { x: 2.0, n: 10 }) });
-        tests.push(TestCase { data: Box::new(PowTest { x: 2.0, n: -2 }) });
-        tests.push(TestCase { data: Box::new(PowTest { x: 0.0, n: 5 }) });
+        tests.push(TestCase {
+            data: Box::new(PowTest { x: 2.0, n: 10 }),
+        });
+        tests.push(TestCase {
+            data: Box::new(PowTest { x: 2.0, n: -2 }),
+        });
+        tests.push(TestCase {
+            data: Box::new(PowTest { x: 0.0, n: 5 }),
+        });
         tests
     }
 
@@ -564,9 +674,11 @@ impl Problem for Pow {
         let expected = ref_pow(t.x, t.n);
         let actual = solutions::pow(t.x, t.n);
         let correct = if expected.is_infinite() || expected.is_nan() {
-            (actual.is_infinite() && expected.is_infinite()) || (actual.is_nan() && expected.is_nan())
+            (actual.is_infinite() && expected.is_infinite())
+                || (actual.is_nan() && expected.is_nan())
         } else {
-            (expected - actual).abs() < 1e-5 || (expected != 0.0 && ((expected - actual) / expected).abs() < 1e-5)
+            (expected - actual).abs() < 1e-5
+                || (expected != 0.0 && ((expected - actual) / expected).abs() < 1e-5)
         };
         SolutionResult {
             is_correct: correct,
@@ -600,10 +712,18 @@ struct TowerOfHanoiTest {
 }
 
 impl Problem for TowerOfHanoi {
-    fn id(&self) -> &str { "recursion_tower_of_hanoi" }
-    fn name(&self) -> &str { "Tower of Hanoi" }
-    fn topic(&self) -> &str { "recursion" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "recursion_tower_of_hanoi"
+    }
+    fn name(&self) -> &str {
+        "Tower of Hanoi"
+    }
+    fn topic(&self) -> &str {
+        "recursion"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Solve the Tower of Hanoi puzzle. Return the list of moves as `(from_peg, to_peg)` pairs.\n\n\
          Pegs are numbered 0, 1, 2. Move all disks from peg 0 to peg 2 using peg 1 as auxiliary.\n\n\
@@ -619,7 +739,9 @@ impl Problem for TowerOfHanoi {
         (0..10)
             .map(|_| {
                 let num_disks = rng.random_range(1..=8);
-                TestCase { data: Box::new(TowerOfHanoiTest { num_disks }) }
+                TestCase {
+                    data: Box::new(TowerOfHanoiTest { num_disks }),
+                }
             })
             .collect()
     }
@@ -632,7 +754,15 @@ impl Problem for TowerOfHanoi {
             is_correct: expected == actual,
             input_description: format!("num_disks={}", t.num_disks),
             expected: format!("{} moves", expected.len()),
-            actual: format!("{} moves, {:?}", actual.len(), if actual.len() <= 15 { &actual[..] } else { &actual[..15] }),
+            actual: format!(
+                "{} moves, {:?}",
+                actual.len(),
+                if actual.len() <= 15 {
+                    &actual[..]
+                } else {
+                    &actual[..15]
+                }
+            ),
         }
     }
 }
@@ -659,10 +789,18 @@ struct NQueensTest {
 }
 
 impl Problem for NQueens {
-    fn id(&self) -> &str { "recursion_n_queens" }
-    fn name(&self) -> &str { "N-Queens" }
-    fn topic(&self) -> &str { "recursion" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "recursion_n_queens"
+    }
+    fn name(&self) -> &str {
+        "N-Queens"
+    }
+    fn topic(&self) -> &str {
+        "recursion"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "The N-Queens puzzle: place N queens on an NxN chessboard so that no two \
          queens threaten each other.\n\n\
@@ -676,7 +814,9 @@ impl Problem for NQueens {
         let test_values = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
         test_values
             .iter()
-            .map(|&n| TestCase { data: Box::new(NQueensTest { n }) })
+            .map(|&n| TestCase {
+                data: Box::new(NQueensTest { n }),
+            })
             .collect()
     }
 
@@ -737,10 +877,18 @@ struct SudokuTest {
 }
 
 impl Problem for SudokuSolver {
-    fn id(&self) -> &str { "recursion_sudoku_solver" }
-    fn name(&self) -> &str { "Sudoku Solver" }
-    fn topic(&self) -> &str { "recursion" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "recursion_sudoku_solver"
+    }
+    fn name(&self) -> &str {
+        "Sudoku Solver"
+    }
+    fn topic(&self) -> &str {
+        "recursion"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Solve a 9x9 Sudoku puzzle using recursive backtracking.\n\n\
          Input: a 9x9 grid where 0 represents an empty cell.\n\
@@ -756,64 +904,66 @@ impl Problem for SudokuSolver {
         // Use a set of known solvable puzzles (generating random valid Sudoku is nontrivial).
         let puzzles = vec![
             vec![
-                vec![5,3,0,0,7,0,0,0,0],
-                vec![6,0,0,1,9,5,0,0,0],
-                vec![0,9,8,0,0,0,0,6,0],
-                vec![8,0,0,0,6,0,0,0,3],
-                vec![4,0,0,8,0,3,0,0,1],
-                vec![7,0,0,0,2,0,0,0,6],
-                vec![0,6,0,0,0,0,2,8,0],
-                vec![0,0,0,4,1,9,0,0,5],
-                vec![0,0,0,0,8,0,0,7,9],
+                vec![5, 3, 0, 0, 7, 0, 0, 0, 0],
+                vec![6, 0, 0, 1, 9, 5, 0, 0, 0],
+                vec![0, 9, 8, 0, 0, 0, 0, 6, 0],
+                vec![8, 0, 0, 0, 6, 0, 0, 0, 3],
+                vec![4, 0, 0, 8, 0, 3, 0, 0, 1],
+                vec![7, 0, 0, 0, 2, 0, 0, 0, 6],
+                vec![0, 6, 0, 0, 0, 0, 2, 8, 0],
+                vec![0, 0, 0, 4, 1, 9, 0, 0, 5],
+                vec![0, 0, 0, 0, 8, 0, 0, 7, 9],
             ],
             vec![
-                vec![0,0,0,2,6,0,7,0,1],
-                vec![6,8,0,0,7,0,0,9,0],
-                vec![1,9,0,0,0,4,5,0,0],
-                vec![8,2,0,1,0,0,0,4,0],
-                vec![0,0,4,6,0,2,9,0,0],
-                vec![0,5,0,0,0,3,0,2,8],
-                vec![0,0,9,3,0,0,0,7,4],
-                vec![0,4,0,0,5,0,0,3,6],
-                vec![7,0,3,0,1,8,0,0,0],
+                vec![0, 0, 0, 2, 6, 0, 7, 0, 1],
+                vec![6, 8, 0, 0, 7, 0, 0, 9, 0],
+                vec![1, 9, 0, 0, 0, 4, 5, 0, 0],
+                vec![8, 2, 0, 1, 0, 0, 0, 4, 0],
+                vec![0, 0, 4, 6, 0, 2, 9, 0, 0],
+                vec![0, 5, 0, 0, 0, 3, 0, 2, 8],
+                vec![0, 0, 9, 3, 0, 0, 0, 7, 4],
+                vec![0, 4, 0, 0, 5, 0, 0, 3, 6],
+                vec![7, 0, 3, 0, 1, 8, 0, 0, 0],
             ],
             vec![
-                vec![0,0,0,6,0,0,4,0,0],
-                vec![7,0,0,0,0,3,6,0,0],
-                vec![0,0,0,0,9,1,0,8,0],
-                vec![0,0,0,0,0,0,0,0,0],
-                vec![0,5,0,1,8,0,0,0,3],
-                vec![0,0,0,3,0,6,0,4,5],
-                vec![0,4,0,2,0,0,0,6,0],
-                vec![9,0,3,0,0,0,0,0,0],
-                vec![0,2,0,0,0,0,1,0,0],
+                vec![0, 0, 0, 6, 0, 0, 4, 0, 0],
+                vec![7, 0, 0, 0, 0, 3, 6, 0, 0],
+                vec![0, 0, 0, 0, 9, 1, 0, 8, 0],
+                vec![0, 0, 0, 0, 0, 0, 0, 0, 0],
+                vec![0, 5, 0, 1, 8, 0, 0, 0, 3],
+                vec![0, 0, 0, 3, 0, 6, 0, 4, 5],
+                vec![0, 4, 0, 2, 0, 0, 0, 6, 0],
+                vec![9, 0, 3, 0, 0, 0, 0, 0, 0],
+                vec![0, 2, 0, 0, 0, 0, 1, 0, 0],
             ],
             vec![
-                vec![2,0,0,3,0,0,0,0,0],
-                vec![8,0,4,0,6,2,0,0,3],
-                vec![0,1,3,8,0,0,2,0,0],
-                vec![0,0,0,0,2,0,3,9,0],
-                vec![5,0,7,0,0,0,6,2,1],
-                vec![0,3,2,0,0,6,0,0,0],
-                vec![0,2,0,0,0,9,1,4,0],
-                vec![6,0,1,2,5,0,8,0,9],
-                vec![0,0,0,0,0,1,0,0,2],
+                vec![2, 0, 0, 3, 0, 0, 0, 0, 0],
+                vec![8, 0, 4, 0, 6, 2, 0, 0, 3],
+                vec![0, 1, 3, 8, 0, 0, 2, 0, 0],
+                vec![0, 0, 0, 0, 2, 0, 3, 9, 0],
+                vec![5, 0, 7, 0, 0, 0, 6, 2, 1],
+                vec![0, 3, 2, 0, 0, 6, 0, 0, 0],
+                vec![0, 2, 0, 0, 0, 9, 1, 4, 0],
+                vec![6, 0, 1, 2, 5, 0, 8, 0, 9],
+                vec![0, 0, 0, 0, 0, 1, 0, 0, 2],
             ],
             vec![
-                vec![0,2,0,0,0,0,0,0,0],
-                vec![0,0,0,6,0,0,0,0,3],
-                vec![0,7,4,0,8,0,0,0,0],
-                vec![0,0,0,0,0,3,0,0,2],
-                vec![0,8,0,0,4,0,0,1,0],
-                vec![6,0,0,5,0,0,0,0,0],
-                vec![0,0,0,0,1,0,7,8,0],
-                vec![5,0,0,0,0,9,0,0,0],
-                vec![0,0,0,0,0,0,0,4,0],
+                vec![0, 2, 0, 0, 0, 0, 0, 0, 0],
+                vec![0, 0, 0, 6, 0, 0, 0, 0, 3],
+                vec![0, 7, 4, 0, 8, 0, 0, 0, 0],
+                vec![0, 0, 0, 0, 0, 3, 0, 0, 2],
+                vec![0, 8, 0, 0, 4, 0, 0, 1, 0],
+                vec![6, 0, 0, 5, 0, 0, 0, 0, 0],
+                vec![0, 0, 0, 0, 1, 0, 7, 8, 0],
+                vec![5, 0, 0, 0, 0, 9, 0, 0, 0],
+                vec![0, 0, 0, 0, 0, 0, 0, 4, 0],
             ],
         ];
         puzzles
             .into_iter()
-            .map(|board| TestCase { data: Box::new(SudokuTest { board }) })
+            .map(|board| TestCase {
+                data: Box::new(SudokuTest { board }),
+            })
             .collect()
     }
 
@@ -824,7 +974,10 @@ impl Problem for SudokuSolver {
         let correct = expected == actual && is_valid_sudoku(&actual);
         SolutionResult {
             is_correct: correct,
-            input_description: format!("sudoku ({}  empty cells)", t.board.iter().flatten().filter(|&&v| v == 0).count()),
+            input_description: format!(
+                "sudoku ({}  empty cells)",
+                t.board.iter().flatten().filter(|&&v| v == 0).count()
+            ),
             expected: format_sudoku(&expected),
             actual: format_sudoku(&actual),
         }
@@ -863,9 +1016,9 @@ fn ref_solve_sudoku(board: &[Vec<u8>]) -> Vec<Vec<u8>> {
         }
         let box_r = (row / 3) * 3;
         let box_c = (col / 3) * 3;
-        for r in box_r..box_r + 3 {
-            for c in box_c..box_c + 3 {
-                if grid[r][c] == num {
+        for row in grid.iter().skip(box_r).take(3) {
+            for &cell in row.iter().skip(box_c).take(3) {
+                if cell == num {
                     return false;
                 }
             }
@@ -889,7 +1042,7 @@ fn is_valid_sudoku(board: &[Vec<u8>]) -> bool {
     for row in board {
         let mut seen = [false; 10];
         for &val in row {
-            if val < 1 || val > 9 || seen[val as usize] {
+            if !(1..=9).contains(&val) || seen[val as usize] {
                 return false;
             }
             seen[val as usize] = true;
@@ -898,9 +1051,9 @@ fn is_valid_sudoku(board: &[Vec<u8>]) -> bool {
     // Check columns
     for c in 0..9 {
         let mut seen = [false; 10];
-        for r in 0..9 {
-            let val = board[r][c];
-            if val < 1 || val > 9 || seen[val as usize] {
+        for row in board.iter().take(9) {
+            let val = row[c];
+            if !(1..=9).contains(&val) || seen[val as usize] {
                 return false;
             }
             seen[val as usize] = true;
@@ -913,7 +1066,7 @@ fn is_valid_sudoku(board: &[Vec<u8>]) -> bool {
             for r in 0..3 {
                 for c in 0..3 {
                     let val = board[box_r * 3 + r][box_c * 3 + c];
-                    if val < 1 || val > 9 || seen[val as usize] {
+                    if !(1..=9).contains(&val) || seen[val as usize] {
                         return false;
                     }
                     seen[val as usize] = true;
@@ -946,10 +1099,18 @@ struct RegexMatchTest {
 }
 
 impl Problem for RegexMatch {
-    fn id(&self) -> &str { "recursion_regex_match" }
-    fn name(&self) -> &str { "Regular Expression Matching" }
-    fn topic(&self) -> &str { "recursion" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "recursion_regex_match"
+    }
+    fn name(&self) -> &str {
+        "Regular Expression Matching"
+    }
+    fn topic(&self) -> &str {
+        "recursion"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Implement regular expression matching with support for '.' and '*'.\n\n\
          '.' matches any single character.\n\
@@ -982,13 +1143,11 @@ impl Problem for RegexMatch {
         ];
         cases
             .into_iter()
-            .map(|(s, p)| {
-                TestCase {
-                    data: Box::new(RegexMatchTest {
-                        s: s.to_string(),
-                        p: p.to_string(),
-                    }),
-                }
+            .map(|(s, p)| TestCase {
+                data: Box::new(RegexMatchTest {
+                    s: s.to_string(),
+                    p: p.to_string(),
+                }),
             })
             .collect()
     }
@@ -1033,10 +1192,18 @@ struct WordSearchTest {
 }
 
 impl Problem for WordSearch {
-    fn id(&self) -> &str { "recursion_word_search" }
-    fn name(&self) -> &str { "Word Search" }
-    fn topic(&self) -> &str { "recursion" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "recursion_word_search"
+    }
+    fn name(&self) -> &str {
+        "Word Search"
+    }
+    fn topic(&self) -> &str {
+        "recursion"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given an m x n grid of characters `board` and a string `word`, return `true` if \
          `word` exists in the grid.\n\n\
@@ -1180,11 +1347,9 @@ fn ref_word_search(board: &[Vec<char>], word: &str) -> bool {
         for (dr, dc) in &dirs {
             let nr = r as i32 + dr;
             let nc = c as i32 + dc;
-            if nr >= 0 && nc >= 0 {
-                if dfs(board, word, idx + 1, nr as usize, nc as usize, visited) {
-                    visited[r][c] = false;
-                    return true;
-                }
+            if nr >= 0 && nc >= 0 && dfs(board, word, idx + 1, nr as usize, nc as usize, visited) {
+                visited[r][c] = false;
+                return true;
             }
         }
         // Also check if we are at the last character
@@ -1214,10 +1379,18 @@ struct StrobogrammaticTest {
 }
 
 impl Problem for StrobogrammaticIII {
-    fn id(&self) -> &str { "recursion_strobogrammatic_iii" }
-    fn name(&self) -> &str { "Strobogrammatic Number III" }
-    fn topic(&self) -> &str { "recursion" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "recursion_strobogrammatic_iii"
+    }
+    fn name(&self) -> &str {
+        "Strobogrammatic Number III"
+    }
+    fn topic(&self) -> &str {
+        "recursion"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "A strobogrammatic number is a number that looks the same when rotated 180 degrees \
          (looked at upside down). The strobogrammatic digits are: 0, 1, 8, and the pairs \
@@ -1246,13 +1419,11 @@ impl Problem for StrobogrammaticIII {
         ];
         cases
             .into_iter()
-            .map(|(low, high)| {
-                TestCase {
-                    data: Box::new(StrobogrammaticTest {
-                        low: low.to_string(),
-                        high: high.to_string(),
-                    }),
-                }
+            .map(|(low, high)| TestCase {
+                data: Box::new(StrobogrammaticTest {
+                    low: low.to_string(),
+                    high: high.to_string(),
+                }),
             })
             .collect()
     }

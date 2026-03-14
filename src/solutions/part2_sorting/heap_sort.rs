@@ -2,7 +2,7 @@
 // Edit these functions to solve each problem. Run with: cargo run -- solve <problem_id>
 
 #[allow(unused_imports)]
-use crate::tracker::{Tracked, tracked_swap};
+use crate::tracker::{tracked_swap, Tracked};
 
 /// Heap Sort (Basic): Sort the array in ascending order using heap sort.
 ///

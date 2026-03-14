@@ -34,10 +34,18 @@ struct AssignCookiesTest {
 }
 
 impl Problem for AssignCookies {
-    fn id(&self) -> &str { "greedy_assign_cookies" }
-    fn name(&self) -> &str { "Assign Cookies" }
-    fn topic(&self) -> &str { "greedy" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "greedy_assign_cookies"
+    }
+    fn name(&self) -> &str {
+        "Assign Cookies"
+    }
+    fn topic(&self) -> &str {
+        "greedy"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "You are a great parent and want to give cookies to your children. Each child i \
          has a greed factor g[i] — the minimum cookie size that will make them content. \
@@ -53,13 +61,17 @@ impl Problem for AssignCookies {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let nc = rng.random_range(1..=20);
-            let ns = rng.random_range(1..=20);
-            let children: Vec<i32> = (0..nc).map(|_| rng.random_range(1..=100)).collect();
-            let cookies: Vec<i32> = (0..ns).map(|_| rng.random_range(1..=100)).collect();
-            TestCase { data: Box::new(AssignCookiesTest { children, cookies }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let nc = rng.random_range(1..=20);
+                let ns = rng.random_range(1..=20);
+                let children: Vec<i32> = (0..nc).map(|_| rng.random_range(1..=100)).collect();
+                let cookies: Vec<i32> = (0..ns).map(|_| rng.random_range(1..=100)).collect();
+                TestCase {
+                    data: Box::new(AssignCookiesTest { children, cookies }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -100,10 +112,18 @@ struct BestTimeStockIITest {
 }
 
 impl Problem for BestTimeStockII {
-    fn id(&self) -> &str { "greedy_best_time_stock_ii" }
-    fn name(&self) -> &str { "Best Time to Buy and Sell Stock II" }
-    fn topic(&self) -> &str { "greedy" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "greedy_best_time_stock_ii"
+    }
+    fn name(&self) -> &str {
+        "Best Time to Buy and Sell Stock II"
+    }
+    fn topic(&self) -> &str {
+        "greedy"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given an array `prices` where prices[i] is the price of a stock on day i, \
          find the maximum profit. You may complete as many transactions as you like \
@@ -117,11 +137,15 @@ impl Problem for BestTimeStockII {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=30);
-            let prices: Vec<i32> = (0..n).map(|_| rng.random_range(0..=200)).collect();
-            TestCase { data: Box::new(BestTimeStockIITest { prices }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=30);
+                let prices: Vec<i32> = (0..n).map(|_| rng.random_range(0..=200)).collect();
+                TestCase {
+                    data: Box::new(BestTimeStockIITest { prices }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -156,10 +180,18 @@ struct LemonadeChangeTest {
 }
 
 impl Problem for LemonadeChange {
-    fn id(&self) -> &str { "greedy_lemonade_change" }
-    fn name(&self) -> &str { "Lemonade Change" }
-    fn topic(&self) -> &str { "greedy" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "greedy_lemonade_change"
+    }
+    fn name(&self) -> &str {
+        "Lemonade Change"
+    }
+    fn topic(&self) -> &str {
+        "greedy"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "At a lemonade stand, each lemonade costs $5. Customers stand in a queue and \
          pay with $5, $10, or $20 bills. You must provide the correct change for each \
@@ -174,16 +206,24 @@ impl Problem for LemonadeChange {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=30);
-            let bills: Vec<i32> = (0..n)
-                .map(|_| {
-                    let r = rng.random_range(0..3);
-                    match r { 0 => 5, 1 => 10, _ => 20 }
-                })
-                .collect();
-            TestCase { data: Box::new(LemonadeChangeTest { bills }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=30);
+                let bills: Vec<i32> = (0..n)
+                    .map(|_| {
+                        let r = rng.random_range(0..3);
+                        match r {
+                            0 => 5,
+                            1 => 10,
+                            _ => 20,
+                        }
+                    })
+                    .collect();
+                TestCase {
+                    data: Box::new(LemonadeChangeTest { bills }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -206,7 +246,9 @@ fn ref_lemonade_change(bills: &[i32]) -> bool {
         match bill {
             5 => fives += 1,
             10 => {
-                if fives == 0 { return false; }
+                if fives == 0 {
+                    return false;
+                }
                 fives -= 1;
                 tens += 1;
             }
@@ -236,10 +278,18 @@ struct MaximumUnitsTest {
 }
 
 impl Problem for MaximumUnits {
-    fn id(&self) -> &str { "greedy_maximum_units" }
-    fn name(&self) -> &str { "Maximum Units on a Truck" }
-    fn topic(&self) -> &str { "greedy" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "greedy_maximum_units"
+    }
+    fn name(&self) -> &str {
+        "Maximum Units on a Truck"
+    }
+    fn topic(&self) -> &str {
+        "greedy"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "You are assigned to put some boxes onto a truck. You are given a list of box types \
          where box_types[i] = (numberOfBoxes_i, numberOfUnitsPerBox_i). The truck can carry \
@@ -254,17 +304,22 @@ impl Problem for MaximumUnits {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=10);
-            let box_types: Vec<(i32, i32)> = (0..n)
-                .map(|_| {
-                    (rng.random_range(1..=20), rng.random_range(1..=50))
-                })
-                .collect();
-            let total_boxes: i32 = box_types.iter().map(|&(cnt, _)| cnt).sum();
-            let truck_size = rng.random_range(1..=total_boxes.max(1));
-            TestCase { data: Box::new(MaximumUnitsTest { box_types, truck_size }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=10);
+                let box_types: Vec<(i32, i32)> = (0..n)
+                    .map(|_| (rng.random_range(1..=20), rng.random_range(1..=50)))
+                    .collect();
+                let total_boxes: i32 = box_types.iter().map(|&(cnt, _)| cnt).sum();
+                let truck_size = rng.random_range(1..=total_boxes.max(1));
+                TestCase {
+                    data: Box::new(MaximumUnitsTest {
+                        box_types,
+                        truck_size,
+                    }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -290,7 +345,9 @@ fn ref_maximum_units(box_types: &[(i32, i32)], truck_size: i32) -> i32 {
         let take = (*count).min(remaining);
         total += take * units;
         remaining -= take;
-        if remaining == 0 { break; }
+        if remaining == 0 {
+            break;
+        }
     }
     total
 }
@@ -305,10 +362,18 @@ struct CanPlaceFlowersTest {
 }
 
 impl Problem for CanPlaceFlowers {
-    fn id(&self) -> &str { "greedy_can_place_flowers" }
-    fn name(&self) -> &str { "Can Place Flowers" }
-    fn topic(&self) -> &str { "greedy" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "greedy_can_place_flowers"
+    }
+    fn name(&self) -> &str {
+        "Can Place Flowers"
+    }
+    fn topic(&self) -> &str {
+        "greedy"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "You have a flowerbed (array of 0s and 1s). 1 means planted, 0 means empty. \
          Flowers cannot be planted in adjacent plots. Return true if n new flowers can \
@@ -323,22 +388,26 @@ impl Problem for CanPlaceFlowers {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let len = rng.random_range(1..=20);
-            let mut flowerbed = vec![0i32; len];
-            // Place some flowers respecting adjacency
-            let mut i = 0;
-            while i < len {
-                if rng.random_range(0..3) == 0 {
-                    flowerbed[i] = 1;
-                    i += 2; // skip next
-                } else {
-                    i += 1;
+        (0..10)
+            .map(|_| {
+                let len = rng.random_range(1..=20);
+                let mut flowerbed = vec![0i32; len];
+                // Place some flowers respecting adjacency
+                let mut i = 0;
+                while i < len {
+                    if rng.random_range(0..3) == 0 {
+                        flowerbed[i] = 1;
+                        i += 2; // skip next
+                    } else {
+                        i += 1;
+                    }
                 }
-            }
-            let n = rng.random_range(0..=len as i32 / 2 + 1);
-            TestCase { data: Box::new(CanPlaceFlowersTest { flowerbed, n }) }
-        }).collect()
+                let n = rng.random_range(0..=len as i32 / 2 + 1);
+                TestCase {
+                    data: Box::new(CanPlaceFlowersTest { flowerbed, n }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -379,10 +448,18 @@ struct JumpGameTest {
 }
 
 impl Problem for JumpGame {
-    fn id(&self) -> &str { "greedy_jump_game" }
-    fn name(&self) -> &str { "Jump Game" }
-    fn topic(&self) -> &str { "greedy" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "greedy_jump_game"
+    }
+    fn name(&self) -> &str {
+        "Jump Game"
+    }
+    fn topic(&self) -> &str {
+        "greedy"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "You are given an array of non-negative integers nums. You are initially at the \
          first index. Each element represents the maximum jump length from that position. \
@@ -396,11 +473,15 @@ impl Problem for JumpGame {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=30);
-            let nums: Vec<i32> = (0..n).map(|_| rng.random_range(0..=5)).collect();
-            TestCase { data: Box::new(JumpGameTest { nums }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=30);
+                let nums: Vec<i32> = (0..n).map(|_| rng.random_range(0..=5)).collect();
+                TestCase {
+                    data: Box::new(JumpGameTest { nums }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -419,9 +500,13 @@ impl Problem for JumpGame {
 fn ref_jump_game(nums: &[i32]) -> bool {
     let mut max_reach = 0usize;
     for (i, &jump) in nums.iter().enumerate() {
-        if i > max_reach { return false; }
+        if i > max_reach {
+            return false;
+        }
         max_reach = max_reach.max(i + jump as usize);
-        if max_reach >= nums.len() - 1 { return true; }
+        if max_reach >= nums.len() - 1 {
+            return true;
+        }
     }
     true
 }
@@ -435,10 +520,18 @@ struct JumpGameIITest {
 }
 
 impl Problem for JumpGameII {
-    fn id(&self) -> &str { "greedy_jump_game_ii" }
-    fn name(&self) -> &str { "Jump Game II" }
-    fn topic(&self) -> &str { "greedy" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "greedy_jump_game_ii"
+    }
+    fn name(&self) -> &str {
+        "Jump Game II"
+    }
+    fn topic(&self) -> &str {
+        "greedy"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given an array of non-negative integers nums, you are initially at the first \
          index. Each element represents the maximum jump length from that position. \
@@ -452,13 +545,19 @@ impl Problem for JumpGameII {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=30);
-            let mut nums: Vec<i32> = (0..n).map(|_| rng.random_range(1..=5)).collect();
-            // Ensure reachable: set last element to 0 (doesn't matter)
-            if n > 0 { nums[n - 1] = 0; }
-            TestCase { data: Box::new(JumpGameIITest { nums }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=30);
+                let mut nums: Vec<i32> = (0..n).map(|_| rng.random_range(1..=5)).collect();
+                // Ensure reachable: set last element to 0 (doesn't matter)
+                if n > 0 {
+                    nums[n - 1] = 0;
+                }
+                TestCase {
+                    data: Box::new(JumpGameIITest { nums }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -475,7 +574,9 @@ impl Problem for JumpGameII {
 }
 
 fn ref_jump_game_ii(nums: &[i32]) -> i32 {
-    if nums.len() <= 1 { return 0; }
+    if nums.len() <= 1 {
+        return 0;
+    }
     let mut jumps = 0;
     let mut current_end = 0usize;
     let mut farthest = 0usize;
@@ -484,7 +585,9 @@ fn ref_jump_game_ii(nums: &[i32]) -> i32 {
         if i == current_end {
             jumps += 1;
             current_end = farthest;
-            if current_end >= nums.len() - 1 { break; }
+            if current_end >= nums.len() - 1 {
+                break;
+            }
         }
     }
     jumps
@@ -500,10 +603,18 @@ struct GasStationTest {
 }
 
 impl Problem for GasStation {
-    fn id(&self) -> &str { "greedy_gas_station" }
-    fn name(&self) -> &str { "Gas Station" }
-    fn topic(&self) -> &str { "greedy" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "greedy_gas_station"
+    }
+    fn name(&self) -> &str {
+        "Gas Station"
+    }
+    fn topic(&self) -> &str {
+        "greedy"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "There are n gas stations along a circular route. gas[i] is the amount of gas at \
          station i, and cost[i] is the gas needed to travel from station i to i+1.\n\n\
@@ -517,12 +628,16 @@ impl Problem for GasStation {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(2..=20);
-            let gas: Vec<i32> = (0..n).map(|_| rng.random_range(0..=20)).collect();
-            let cost: Vec<i32> = (0..n).map(|_| rng.random_range(0..=20)).collect();
-            TestCase { data: Box::new(GasStationTest { gas, cost }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(2..=20);
+                let gas: Vec<i32> = (0..n).map(|_| rng.random_range(0..=20)).collect();
+                let cost: Vec<i32> = (0..n).map(|_| rng.random_range(0..=20)).collect();
+                TestCase {
+                    data: Box::new(GasStationTest { gas, cost }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -540,7 +655,9 @@ impl Problem for GasStation {
 
 fn ref_gas_station(gas: &[i32], cost: &[i32]) -> i32 {
     let total: i32 = gas.iter().sum::<i32>() - cost.iter().sum::<i32>();
-    if total < 0 { return -1; }
+    if total < 0 {
+        return -1;
+    }
     let mut tank = 0;
     let mut start = 0;
     for i in 0..gas.len() {
@@ -563,10 +680,18 @@ struct TaskSchedulerTest {
 }
 
 impl Problem for TaskScheduler {
-    fn id(&self) -> &str { "greedy_task_scheduler" }
-    fn name(&self) -> &str { "Task Scheduler" }
-    fn topic(&self) -> &str { "greedy" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "greedy_task_scheduler"
+    }
+    fn name(&self) -> &str {
+        "Task Scheduler"
+    }
+    fn topic(&self) -> &str {
+        "greedy"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given a list of CPU tasks (each represented by a character A-Z) and a cooldown \
          interval n, return the minimum number of intervals the CPU needs to execute all \
@@ -581,15 +706,19 @@ impl Problem for TaskScheduler {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let len = rng.random_range(1..=30);
-            let num_tasks = rng.random_range(1..=5);
-            let tasks: Vec<char> = (0..len)
-                .map(|_| (b'A' + rng.random_range(0..num_tasks as u8)) as char)
-                .collect();
-            let n = rng.random_range(0..=4);
-            TestCase { data: Box::new(TaskSchedulerTest { tasks, n }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let len = rng.random_range(1..=30);
+                let num_tasks = rng.random_range(1..=5);
+                let tasks: Vec<char> = (0..len)
+                    .map(|_| (b'A' + rng.random_range(0..num_tasks as u8)) as char)
+                    .collect();
+                let n = rng.random_range(0..=4);
+                TestCase {
+                    data: Box::new(TaskSchedulerTest { tasks, n }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -626,10 +755,18 @@ struct PartitionLabelsTest {
 }
 
 impl Problem for PartitionLabels {
-    fn id(&self) -> &str { "greedy_partition_labels" }
-    fn name(&self) -> &str { "Partition Labels" }
-    fn topic(&self) -> &str { "greedy" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "greedy_partition_labels"
+    }
+    fn name(&self) -> &str {
+        "Partition Labels"
+    }
+    fn topic(&self) -> &str {
+        "greedy"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given a string s, partition it so that each letter appears in at most one part. \
          Return a list of the sizes of these parts.\n\n\
@@ -642,11 +779,15 @@ impl Problem for PartitionLabels {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=40);
-            let s = crate::problems::helpers::random_string_from(&mut rng, n, b"abcdefgh");
-            TestCase { data: Box::new(PartitionLabelsTest { s }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=40);
+                let s = crate::problems::helpers::random_string_from(&mut rng, n, b"abcdefgh");
+                TestCase {
+                    data: Box::new(PartitionLabelsTest { s }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -690,10 +831,18 @@ struct CandyTest {
 }
 
 impl Problem for Candy {
-    fn id(&self) -> &str { "greedy_candy" }
-    fn name(&self) -> &str { "Candy" }
-    fn topic(&self) -> &str { "greedy" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "greedy_candy"
+    }
+    fn name(&self) -> &str {
+        "Candy"
+    }
+    fn topic(&self) -> &str {
+        "greedy"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "There are n children standing in a line. Each child has a rating. You give \
          candies to these children with these rules:\n\
@@ -708,11 +857,15 @@ impl Problem for Candy {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=30);
-            let ratings: Vec<i32> = (0..n).map(|_| rng.random_range(0..=20)).collect();
-            TestCase { data: Box::new(CandyTest { ratings }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=30);
+                let ratings: Vec<i32> = (0..n).map(|_| rng.random_range(0..=20)).collect();
+                TestCase {
+                    data: Box::new(CandyTest { ratings }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -730,7 +883,9 @@ impl Problem for Candy {
 
 fn ref_candy(ratings: &[i32]) -> i32 {
     let n = ratings.len();
-    if n == 0 { return 0; }
+    if n == 0 {
+        return 0;
+    }
     let mut candies = vec![1i32; n];
     // Left to right
     for i in 1..n {
@@ -756,10 +911,18 @@ struct MinArrowsTest {
 }
 
 impl Problem for MinArrowsBurstBalloons {
-    fn id(&self) -> &str { "greedy_min_number_arrows" }
-    fn name(&self) -> &str { "Minimum Number of Arrows to Burst Balloons" }
-    fn topic(&self) -> &str { "greedy" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "greedy_min_number_arrows"
+    }
+    fn name(&self) -> &str {
+        "Minimum Number of Arrows to Burst Balloons"
+    }
+    fn topic(&self) -> &str {
+        "greedy"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Balloons are represented as intervals [x_start, x_end]. An arrow shot at x \
          bursts all balloons where x_start <= x <= x_end. Return the minimum number \
@@ -772,17 +935,21 @@ impl Problem for MinArrowsBurstBalloons {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=20);
-            let points: Vec<(i32, i32)> = (0..n)
-                .map(|_| {
-                    let a = rng.random_range(-50..=50);
-                    let b = rng.random_range(a..=a + 30);
-                    (a, b)
-                })
-                .collect();
-            TestCase { data: Box::new(MinArrowsTest { points }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=20);
+                let points: Vec<(i32, i32)> = (0..n)
+                    .map(|_| {
+                        let a = rng.random_range(-50..=50);
+                        let b = rng.random_range(a..=a + 30);
+                        (a, b)
+                    })
+                    .collect();
+                TestCase {
+                    data: Box::new(MinArrowsTest { points }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -799,7 +966,9 @@ impl Problem for MinArrowsBurstBalloons {
 }
 
 fn ref_min_arrows(points: &[(i32, i32)]) -> i32 {
-    if points.is_empty() { return 0; }
+    if points.is_empty() {
+        return 0;
+    }
     let mut sorted = points.to_vec();
     sorted.sort_by_key(|&(_, end)| end);
     let mut arrows = 1;
@@ -822,10 +991,18 @@ struct NonOverlappingTest {
 }
 
 impl Problem for NonOverlappingIntervals {
-    fn id(&self) -> &str { "greedy_non_overlapping_intervals" }
-    fn name(&self) -> &str { "Non-overlapping Intervals" }
-    fn topic(&self) -> &str { "greedy" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "greedy_non_overlapping_intervals"
+    }
+    fn name(&self) -> &str {
+        "Non-overlapping Intervals"
+    }
+    fn topic(&self) -> &str {
+        "greedy"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given an array of intervals where intervals[i] = (start_i, end_i), return \
          the minimum number of intervals you need to remove to make the rest non-overlapping.\n\n\
@@ -837,17 +1014,21 @@ impl Problem for NonOverlappingIntervals {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=20);
-            let intervals: Vec<(i32, i32)> = (0..n)
-                .map(|_| {
-                    let a = rng.random_range(-20..=20);
-                    let b = rng.random_range(a + 1..=a + 15);
-                    (a, b)
-                })
-                .collect();
-            TestCase { data: Box::new(NonOverlappingTest { intervals }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=20);
+                let intervals: Vec<(i32, i32)> = (0..n)
+                    .map(|_| {
+                        let a = rng.random_range(-20..=20);
+                        let b = rng.random_range(a + 1..=a + 15);
+                        (a, b)
+                    })
+                    .collect();
+                TestCase {
+                    data: Box::new(NonOverlappingTest { intervals }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -864,7 +1045,9 @@ impl Problem for NonOverlappingIntervals {
 }
 
 fn ref_erase_overlap(intervals: &[(i32, i32)]) -> i32 {
-    if intervals.is_empty() { return 0; }
+    if intervals.is_empty() {
+        return 0;
+    }
     let mut sorted = intervals.to_vec();
     sorted.sort_by_key(|&(_, end)| end);
     let mut count = 0;
@@ -888,10 +1071,18 @@ struct QueueReconstructionTest {
 }
 
 impl Problem for QueueReconstruction {
-    fn id(&self) -> &str { "greedy_queue_reconstruction" }
-    fn name(&self) -> &str { "Queue Reconstruction by Height" }
-    fn topic(&self) -> &str { "greedy" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "greedy_queue_reconstruction"
+    }
+    fn name(&self) -> &str {
+        "Queue Reconstruction by Height"
+    }
+    fn topic(&self) -> &str {
+        "greedy"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "You are given an array of people where people[i] = (h_i, k_i). h_i is the \
          height and k_i is the number of people in front who have height >= h_i.\n\n\
@@ -906,44 +1097,52 @@ impl Problem for QueueReconstruction {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            // Build a valid queue, then shuffle to create the input
-            let n = rng.random_range(1..=15);
-            let mut heights: Vec<i32> = (0..n).map(|_| rng.random_range(1..=20)).collect();
-            heights.sort();
-            // Build the queue from shortest to tallest
-            let mut queue: Vec<(i32, i32)> = Vec::new();
-            for &h in &heights {
-                let taller_or_equal = queue.iter().filter(|&&(qh, _)| qh >= h).count() as i32;
-                let k = rng.random_range(0..=taller_or_equal);
-                // Insert at position k among those >= h
-                let mut pos = 0;
-                let mut count = 0;
-                while pos < queue.len() && count < k {
-                    if queue[pos].0 >= h {
-                        count += 1;
+        (0..10)
+            .map(|_| {
+                // Build a valid queue, then shuffle to create the input
+                let n = rng.random_range(1..=15);
+                let mut heights: Vec<i32> = (0..n).map(|_| rng.random_range(1..=20)).collect();
+                heights.sort();
+                // Build the queue from shortest to tallest
+                let mut queue: Vec<(i32, i32)> = Vec::new();
+                for &h in &heights {
+                    let taller_or_equal = queue.iter().filter(|&&(qh, _)| qh >= h).count() as i32;
+                    let k = rng.random_range(0..=taller_or_equal);
+                    // Insert at position k among those >= h
+                    let mut pos = 0;
+                    let mut count = 0;
+                    while pos < queue.len() && count < k {
+                        if queue[pos].0 >= h {
+                            count += 1;
+                        }
+                        pos += 1;
                     }
-                    pos += 1;
+                    // Find the insertion point
+                    while pos < queue.len() && queue[pos].0 < h {
+                        pos += 1;
+                    }
+                    queue.insert(pos, (h, k));
                 }
-                // Find the insertion point
-                while pos < queue.len() && queue[pos].0 < h {
-                    pos += 1;
+                // Compute k values from the actual queue
+                let people: Vec<(i32, i32)> = queue
+                    .iter()
+                    .enumerate()
+                    .map(|(i, &(h, _))| {
+                        let k = queue[..i].iter().filter(|&&(qh, _)| qh >= h).count() as i32;
+                        (h, k)
+                    })
+                    .collect();
+                // Shuffle the people array
+                let mut shuffled = people;
+                for i in (1..shuffled.len()).rev() {
+                    let j = rng.random_range(0..=i);
+                    shuffled.swap(i, j);
                 }
-                queue.insert(pos, (h, k));
-            }
-            // Compute k values from the actual queue
-            let people: Vec<(i32, i32)> = queue.iter().enumerate().map(|(i, &(h, _))| {
-                let k = queue[..i].iter().filter(|&&(qh, _)| qh >= h).count() as i32;
-                (h, k)
-            }).collect();
-            // Shuffle the people array
-            let mut shuffled = people;
-            for i in (1..shuffled.len()).rev() {
-                let j = rng.random_range(0..=i);
-                shuffled.swap(i, j);
-            }
-            TestCase { data: Box::new(QueueReconstructionTest { people: shuffled }) }
-        }).collect()
+                TestCase {
+                    data: Box::new(QueueReconstructionTest { people: shuffled }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -988,10 +1187,18 @@ struct IpoTest {
 }
 
 impl Problem for Ipo {
-    fn id(&self) -> &str { "greedy_ipo" }
-    fn name(&self) -> &str { "IPO" }
-    fn topic(&self) -> &str { "greedy" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "greedy_ipo"
+    }
+    fn name(&self) -> &str {
+        "IPO"
+    }
+    fn topic(&self) -> &str {
+        "greedy"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "You have initial capital w and can pick at most k projects. Each project i \
          requires capital[i] to start and yields profits[i] upon completion. Your capital \
@@ -1008,14 +1215,23 @@ impl Problem for Ipo {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=20);
-            let k = rng.random_range(1..=n as i32);
-            let w = rng.random_range(0..=50);
-            let profits: Vec<i32> = (0..n).map(|_| rng.random_range(0..=100)).collect();
-            let capital: Vec<i32> = (0..n).map(|_| rng.random_range(0..=50)).collect();
-            TestCase { data: Box::new(IpoTest { k, w, profits, capital }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=20);
+                let k = rng.random_range(1..=n as i32);
+                let w = rng.random_range(0..=50);
+                let profits: Vec<i32> = (0..n).map(|_| rng.random_range(0..=100)).collect();
+                let capital: Vec<i32> = (0..n).map(|_| rng.random_range(0..=50)).collect();
+                TestCase {
+                    data: Box::new(IpoTest {
+                        k,
+                        w,
+                        profits,
+                        capital,
+                    }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -1024,7 +1240,10 @@ impl Problem for Ipo {
         let actual = solutions::ipo(t.k, t.w, &t.profits, &t.capital);
         SolutionResult {
             is_correct: expected == actual,
-            input_description: format!("k={}, w={}, profits={:?}, capital={:?}", t.k, t.w, t.profits, t.capital),
+            input_description: format!(
+                "k={}, w={}, profits={:?}, capital={:?}",
+                t.k, t.w, t.profits, t.capital
+            ),
             expected: format!("{expected}"),
             actual: format!("{actual}"),
         }
@@ -1034,7 +1253,11 @@ impl Problem for Ipo {
 fn ref_ipo(k: i32, w: i32, profits: &[i32], capital: &[i32]) -> i32 {
     use std::collections::BinaryHeap;
     let n = profits.len();
-    let mut projects: Vec<(i32, i32)> = capital.iter().copied().zip(profits.iter().copied()).collect();
+    let mut projects: Vec<(i32, i32)> = capital
+        .iter()
+        .copied()
+        .zip(profits.iter().copied())
+        .collect();
     projects.sort_by_key(|&(c, _)| c);
     let mut current_w = w;
     let mut max_heap: BinaryHeap<i32> = BinaryHeap::new();

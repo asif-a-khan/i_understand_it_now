@@ -27,13 +27,23 @@ pub fn problems() -> Vec<Box<dyn Problem>> {
 // ── Easy 1: Max Subarray (D&C) ──────────────────────────────────────
 
 struct DcMaxSubarray;
-struct DcMaxSubarrayTest { nums: Vec<i32> }
+struct DcMaxSubarrayTest {
+    nums: Vec<i32>,
+}
 
 impl Problem for DcMaxSubarray {
-    fn id(&self) -> &str { "divide_conquer_max_subarray" }
-    fn name(&self) -> &str { "Max Subarray (Divide & Conquer)" }
-    fn topic(&self) -> &str { "divide_conquer" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "divide_conquer_max_subarray"
+    }
+    fn name(&self) -> &str {
+        "Max Subarray (Divide & Conquer)"
+    }
+    fn topic(&self) -> &str {
+        "divide_conquer"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Find the contiguous subarray with the largest sum using a divide and conquer \
          approach. Split the array in half, recursively solve both halves, and handle \
@@ -45,11 +55,15 @@ impl Problem for DcMaxSubarray {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=40);
-            let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-100..=100)).collect();
-            TestCase { data: Box::new(DcMaxSubarrayTest { nums }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=40);
+                let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-100..=100)).collect();
+                TestCase {
+                    data: Box::new(DcMaxSubarrayTest { nums }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -67,7 +81,9 @@ impl Problem for DcMaxSubarray {
 
 fn ref_max_subarray_dc(nums: &[i32]) -> i32 {
     fn helper(nums: &[i32], lo: usize, hi: usize) -> i32 {
-        if lo == hi { return nums[lo]; }
+        if lo == hi {
+            return nums[lo];
+        }
         let mid = lo + (hi - lo) / 2;
         let left_max = helper(nums, lo, mid);
         let right_max = helper(nums, mid + 1, hi);
@@ -80,26 +96,39 @@ fn ref_max_subarray_dc(nums: &[i32]) -> i32 {
         }
         let mut right_sum = i32::MIN;
         sum = 0;
-        for i in mid + 1..=hi {
-            sum += nums[i];
+        for &num in nums.iter().take(hi + 1).skip(mid + 1) {
+            sum += num;
             right_sum = right_sum.max(sum);
         }
         left_max.max(right_max).max(left_sum + right_sum)
     }
-    if nums.is_empty() { return 0; }
+    if nums.is_empty() {
+        return 0;
+    }
     helper(nums, 0, nums.len() - 1)
 }
 
 // ── Easy 2: Fast Power ──────────────────────────────────────────────
 
 struct DcPower;
-struct DcPowerTest { x: f64, n: i32 }
+struct DcPowerTest {
+    x: f64,
+    n: i32,
+}
 
 impl Problem for DcPower {
-    fn id(&self) -> &str { "divide_conquer_power" }
-    fn name(&self) -> &str { "Fast Power (x^n)" }
-    fn topic(&self) -> &str { "divide_conquer" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "divide_conquer_power"
+    }
+    fn name(&self) -> &str {
+        "Fast Power (x^n)"
+    }
+    fn topic(&self) -> &str {
+        "divide_conquer"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Compute x^n using fast exponentiation (divide and conquer). Handle negative \
          exponents.\n\n\
@@ -111,12 +140,16 @@ impl Problem for DcPower {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let x = rng.random_range(-10.0_f64..=10.0_f64);
-            let x = (x * 100.0).round() / 100.0; // 2 decimal places
-            let n = rng.random_range(-15..=15);
-            TestCase { data: Box::new(DcPowerTest { x, n }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let x = rng.random_range(-10.0_f64..=10.0_f64);
+                let x = (x * 100.0).round() / 100.0; // 2 decimal places
+                let n = rng.random_range(-15..=15);
+                TestCase {
+                    data: Box::new(DcPowerTest { x, n }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -140,22 +173,40 @@ impl Problem for DcPower {
 }
 
 fn ref_power(x: f64, n: i32) -> f64 {
-    if n == 0 { return 1.0; }
-    if n < 0 { return 1.0 / ref_power(x, -n); }
+    if n == 0 {
+        return 1.0;
+    }
+    if n < 0 {
+        return 1.0 / ref_power(x, -n);
+    }
     let half = ref_power(x, n / 2);
-    if n % 2 == 0 { half * half } else { half * half * x }
+    if n % 2 == 0 {
+        half * half
+    } else {
+        half * half * x
+    }
 }
 
 // ── Easy 3: Count Inversions ─────────────────────────────────────────
 
 struct DcCountInversions;
-struct DcCountInversionsTest { nums: Vec<i32> }
+struct DcCountInversionsTest {
+    nums: Vec<i32>,
+}
 
 impl Problem for DcCountInversions {
-    fn id(&self) -> &str { "divide_conquer_count_inversions" }
-    fn name(&self) -> &str { "Count Inversions" }
-    fn topic(&self) -> &str { "divide_conquer" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "divide_conquer_count_inversions"
+    }
+    fn name(&self) -> &str {
+        "Count Inversions"
+    }
+    fn topic(&self) -> &str {
+        "divide_conquer"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Count the number of inversions in an array. An inversion is a pair (i, j) \
          where i < j and nums[i] > nums[j]. Use a merge-sort-based approach.\n\n\
@@ -165,11 +216,15 @@ impl Problem for DcCountInversions {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=30);
-            let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-50..=50)).collect();
-            TestCase { data: Box::new(DcCountInversionsTest { nums }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=30);
+                let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-50..=50)).collect();
+                TestCase {
+                    data: Box::new(DcCountInversionsTest { nums }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -188,7 +243,9 @@ impl Problem for DcCountInversions {
 fn ref_count_inversions(nums: &[i32]) -> i64 {
     fn merge_count(arr: &mut [i32]) -> i64 {
         let n = arr.len();
-        if n <= 1 { return 0; }
+        if n <= 1 {
+            return 0;
+        }
         let mid = n / 2;
         let mut count = 0i64;
         count += merge_count(&mut arr[..mid]);
@@ -207,8 +264,16 @@ fn ref_count_inversions(nums: &[i32]) -> i64 {
             }
             k += 1;
         }
-        while i < left.len() { arr[k] = left[i]; i += 1; k += 1; }
-        while j < right.len() { arr[k] = right[j]; j += 1; k += 1; }
+        while i < left.len() {
+            arr[k] = left[i];
+            i += 1;
+            k += 1;
+        }
+        while j < right.len() {
+            arr[k] = right[j];
+            j += 1;
+            k += 1;
+        }
         count
     }
     let mut arr = nums.to_vec();
@@ -218,13 +283,24 @@ fn ref_count_inversions(nums: &[i32]) -> i64 {
 // ── Easy 4: Binary Search (D&C) ─────────────────────────────────────
 
 struct DcBinarySearch;
-struct DcBinarySearchTest { nums: Vec<i32>, target: i32 }
+struct DcBinarySearchTest {
+    nums: Vec<i32>,
+    target: i32,
+}
 
 impl Problem for DcBinarySearch {
-    fn id(&self) -> &str { "divide_conquer_binary_search" }
-    fn name(&self) -> &str { "Binary Search (Divide & Conquer)" }
-    fn topic(&self) -> &str { "divide_conquer" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "divide_conquer_binary_search"
+    }
+    fn name(&self) -> &str {
+        "Binary Search (Divide & Conquer)"
+    }
+    fn topic(&self) -> &str {
+        "divide_conquer"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given a sorted array and a target value, return the index if found, or -1 \
          if not present. Implement using a recursive divide and conquer approach.\n\n\
@@ -236,17 +312,21 @@ impl Problem for DcBinarySearch {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=30);
-            let mut nums: Vec<i32> = (0..n).map(|_| rng.random_range(-50..=50)).collect();
-            nums.sort();
-            let target = if rng.random_range(0..=2) == 0 {
-                rng.random_range(-60..=60)
-            } else {
-                nums[rng.random_range(0..n)]
-            };
-            TestCase { data: Box::new(DcBinarySearchTest { nums, target }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=30);
+                let mut nums: Vec<i32> = (0..n).map(|_| rng.random_range(-50..=50)).collect();
+                nums.sort();
+                let target = if rng.random_range(0..=2) == 0 {
+                    rng.random_range(-60..=60)
+                } else {
+                    nums[rng.random_range(0..n)]
+                };
+                TestCase {
+                    data: Box::new(DcBinarySearchTest { nums, target }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -275,13 +355,23 @@ impl Problem for DcBinarySearch {
 // ── Easy 5: Find Peak Element ────────────────────────────────────────
 
 struct DcFindPeak;
-struct DcFindPeakTest { nums: Vec<i32> }
+struct DcFindPeakTest {
+    nums: Vec<i32>,
+}
 
 impl Problem for DcFindPeak {
-    fn id(&self) -> &str { "divide_conquer_find_peak" }
-    fn name(&self) -> &str { "Find Peak Element" }
-    fn topic(&self) -> &str { "divide_conquer" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "divide_conquer_find_peak"
+    }
+    fn name(&self) -> &str {
+        "Find Peak Element"
+    }
+    fn topic(&self) -> &str {
+        "divide_conquer"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Find a peak element in the array. A peak is an element that is strictly \
          greater than its neighbors. Treat out-of-bounds as negative infinity. \
@@ -293,21 +383,25 @@ impl Problem for DcFindPeak {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=20);
-            // Generate distinct adjacent values
-            let mut nums: Vec<i32> = Vec::with_capacity(n);
-            for _ in 0..n {
-                loop {
-                    let v = rng.random_range(-100..=100);
-                    if nums.is_empty() || *nums.last().unwrap() != v {
-                        nums.push(v);
-                        break;
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=20);
+                // Generate distinct adjacent values
+                let mut nums: Vec<i32> = Vec::with_capacity(n);
+                for _ in 0..n {
+                    loop {
+                        let v = rng.random_range(-100..=100);
+                        if nums.is_empty() || *nums.last().unwrap() != v {
+                            nums.push(v);
+                            break;
+                        }
                     }
                 }
-            }
-            TestCase { data: Box::new(DcFindPeakTest { nums }) }
-        }).collect()
+                TestCase {
+                    data: Box::new(DcFindPeakTest { nums }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -329,13 +423,23 @@ impl Problem for DcFindPeak {
 // ── Medium 1: Merge Sort ────────────────────────────────────────────
 
 struct DcMergeSort;
-struct DcMergeSortTest { nums: Vec<i32> }
+struct DcMergeSortTest {
+    nums: Vec<i32>,
+}
 
 impl Problem for DcMergeSort {
-    fn id(&self) -> &str { "divide_conquer_merge_sort" }
-    fn name(&self) -> &str { "Merge Sort" }
-    fn topic(&self) -> &str { "divide_conquer" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "divide_conquer_merge_sort"
+    }
+    fn name(&self) -> &str {
+        "Merge Sort"
+    }
+    fn topic(&self) -> &str {
+        "divide_conquer"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Implement merge sort. Return a new sorted vector.\n\n\
          Constraints:\n\
@@ -344,11 +448,15 @@ impl Problem for DcMergeSort {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(0..=40);
-            let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-500..=500)).collect();
-            TestCase { data: Box::new(DcMergeSortTest { nums }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(0..=40);
+                let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-500..=500)).collect();
+                TestCase {
+                    data: Box::new(DcMergeSortTest { nums }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -368,13 +476,24 @@ impl Problem for DcMergeSort {
 // ── Medium 2: Kth Largest (Quickselect) ──────────────────────────────
 
 struct DcKthLargest;
-struct DcKthLargestTest { nums: Vec<i32>, k: usize }
+struct DcKthLargestTest {
+    nums: Vec<i32>,
+    k: usize,
+}
 
 impl Problem for DcKthLargest {
-    fn id(&self) -> &str { "divide_conquer_kth_largest" }
-    fn name(&self) -> &str { "Kth Largest Element" }
-    fn topic(&self) -> &str { "divide_conquer" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "divide_conquer_kth_largest"
+    }
+    fn name(&self) -> &str {
+        "Kth Largest Element"
+    }
+    fn topic(&self) -> &str {
+        "divide_conquer"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Find the kth largest element in an unsorted array using a quickselect \
          (divide and conquer) approach. k=1 means the largest element.\n\n\
@@ -384,12 +503,16 @@ impl Problem for DcKthLargest {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=30);
-            let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-100..=100)).collect();
-            let k = rng.random_range(1..=n);
-            TestCase { data: Box::new(DcKthLargestTest { nums, k }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=30);
+                let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-100..=100)).collect();
+                let k = rng.random_range(1..=n);
+                TestCase {
+                    data: Box::new(DcKthLargestTest { nums, k }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -411,13 +534,23 @@ impl Problem for DcKthLargest {
 // ── Medium 3: Closest Pair of Points ─────────────────────────────────
 
 struct DcClosestPair;
-struct DcClosestPairTest { points: Vec<(i64, i64)> }
+struct DcClosestPairTest {
+    points: Vec<(i64, i64)>,
+}
 
 impl Problem for DcClosestPair {
-    fn id(&self) -> &str { "divide_conquer_closest_pair" }
-    fn name(&self) -> &str { "Closest Pair of Points" }
-    fn topic(&self) -> &str { "divide_conquer" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "divide_conquer_closest_pair"
+    }
+    fn name(&self) -> &str {
+        "Closest Pair of Points"
+    }
+    fn topic(&self) -> &str {
+        "divide_conquer"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given a set of points in 2D space, find the Euclidean distance between the \
          closest pair of points. Use a divide and conquer approach for O(n log n).\n\n\
@@ -428,13 +561,22 @@ impl Problem for DcClosestPair {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(2..=20);
-            let points: Vec<(i64, i64)> = (0..n)
-                .map(|_| (rng.random_range(-1000..=1000i64), rng.random_range(-1000..=1000i64)))
-                .collect();
-            TestCase { data: Box::new(DcClosestPairTest { points }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(2..=20);
+                let points: Vec<(i64, i64)> = (0..n)
+                    .map(|_| {
+                        (
+                            rng.random_range(-1000..=1000i64),
+                            rng.random_range(-1000..=1000i64),
+                        )
+                    })
+                    .collect();
+                TestCase {
+                    data: Box::new(DcClosestPairTest { points }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -469,13 +611,23 @@ fn ref_closest_pair(points: &[(i64, i64)]) -> f64 {
 // ── Medium 4: Majority Element ──────────────────────────────────────
 
 struct DcMajorityElement;
-struct DcMajorityTest { nums: Vec<i32> }
+struct DcMajorityTest {
+    nums: Vec<i32>,
+}
 
 impl Problem for DcMajorityElement {
-    fn id(&self) -> &str { "divide_conquer_majority_element" }
-    fn name(&self) -> &str { "Majority Element (D&C)" }
-    fn topic(&self) -> &str { "divide_conquer" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "divide_conquer_majority_element"
+    }
+    fn name(&self) -> &str {
+        "Majority Element (D&C)"
+    }
+    fn topic(&self) -> &str {
+        "divide_conquer"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Find the majority element (appears more than n/2 times). A majority element \
          is guaranteed to exist. Solve using divide and conquer.\n\n\
@@ -486,21 +638,25 @@ impl Problem for DcMajorityElement {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=21) | 1; // odd for simplicity
-            let majority = rng.random_range(-50..=50);
-            let majority_count = n / 2 + 1;
-            let mut nums: Vec<i32> = vec![majority; majority_count];
-            for _ in majority_count..n {
-                nums.push(rng.random_range(-50..=50));
-            }
-            // Shuffle
-            for i in (1..nums.len()).rev() {
-                let j = rng.random_range(0..=i);
-                nums.swap(i, j);
-            }
-            TestCase { data: Box::new(DcMajorityTest { nums }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=21) | 1; // odd for simplicity
+                let majority = rng.random_range(-50..=50);
+                let majority_count = n / 2 + 1;
+                let mut nums: Vec<i32> = vec![majority; majority_count];
+                for _ in majority_count..n {
+                    nums.push(rng.random_range(-50..=50));
+                }
+                // Shuffle
+                for i in (1..nums.len()).rev() {
+                    let j = rng.random_range(0..=i);
+                    nums.swap(i, j);
+                }
+                TestCase {
+                    data: Box::new(DcMajorityTest { nums }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -521,9 +677,14 @@ fn ref_majority(nums: &[i32]) -> i32 {
     let mut candidate = nums[0];
     let mut count = 1;
     for &n in &nums[1..] {
-        if count == 0 { candidate = n; count = 1; }
-        else if n == candidate { count += 1; }
-        else { count -= 1; }
+        if count == 0 {
+            candidate = n;
+            count = 1;
+        } else if n == candidate {
+            count += 1;
+        } else {
+            count -= 1;
+        }
     }
     candidate
 }
@@ -531,13 +692,23 @@ fn ref_majority(nums: &[i32]) -> i32 {
 // ── Medium 5: Different Ways to Add Parentheses ──────────────────────
 
 struct DcDifferentWays;
-struct DcDifferentWaysTest { expression: String }
+struct DcDifferentWaysTest {
+    expression: String,
+}
 
 impl Problem for DcDifferentWays {
-    fn id(&self) -> &str { "divide_conquer_different_ways" }
-    fn name(&self) -> &str { "Different Ways to Add Parentheses" }
-    fn topic(&self) -> &str { "divide_conquer" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "divide_conquer_different_ways"
+    }
+    fn name(&self) -> &str {
+        "Different Ways to Add Parentheses"
+    }
+    fn topic(&self) -> &str {
+        "divide_conquer"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given a string expression of numbers and operators (+, -, *), return all \
          possible results from computing all different ways to group numbers and \
@@ -550,17 +721,21 @@ impl Problem for DcDifferentWays {
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
         let ops = ['+', '-', '*'];
-        (0..10).map(|_| {
-            let num_terms = rng.random_range(2..=4);
-            let mut expr = String::new();
-            for i in 0..num_terms {
-                if i > 0 {
-                    expr.push(ops[rng.random_range(0..3)]);
+        (0..10)
+            .map(|_| {
+                let num_terms = rng.random_range(2..=4);
+                let mut expr = String::new();
+                for i in 0..num_terms {
+                    if i > 0 {
+                        expr.push(ops[rng.random_range(0..3)]);
+                    }
+                    expr.push_str(&rng.random_range(1..=9).to_string());
                 }
-                expr.push_str(&rng.random_range(1..=9).to_string());
-            }
-            TestCase { data: Box::new(DcDifferentWaysTest { expression: expr }) }
-        }).collect()
+                TestCase {
+                    data: Box::new(DcDifferentWaysTest { expression: expr }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -606,13 +781,24 @@ fn ref_different_ways(expr: &str) -> Vec<i32> {
 // ── Hard 1: Median of Two Sorted Arrays ──────────────────────────────
 
 struct DcMedianTwoSorted;
-struct DcMedianTest { nums1: Vec<i32>, nums2: Vec<i32> }
+struct DcMedianTest {
+    nums1: Vec<i32>,
+    nums2: Vec<i32>,
+}
 
 impl Problem for DcMedianTwoSorted {
-    fn id(&self) -> &str { "divide_conquer_median_two_sorted" }
-    fn name(&self) -> &str { "Median of Two Sorted Arrays" }
-    fn topic(&self) -> &str { "divide_conquer" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "divide_conquer_median_two_sorted"
+    }
+    fn name(&self) -> &str {
+        "Median of Two Sorted Arrays"
+    }
+    fn topic(&self) -> &str {
+        "divide_conquer"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given two sorted arrays, return the median of the combined sorted array. \
          Use a divide and conquer / binary search approach for O(log(min(m,n))).\n\n\
@@ -623,15 +809,19 @@ impl Problem for DcMedianTwoSorted {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let m = rng.random_range(0..=15);
-            let n = rng.random_range(1..=15);
-            let mut nums1: Vec<i32> = (0..m).map(|_| rng.random_range(-100..=100)).collect();
-            let mut nums2: Vec<i32> = (0..n).map(|_| rng.random_range(-100..=100)).collect();
-            nums1.sort();
-            nums2.sort();
-            TestCase { data: Box::new(DcMedianTest { nums1, nums2 }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let m = rng.random_range(0..=15);
+                let n = rng.random_range(1..=15);
+                let mut nums1: Vec<i32> = (0..m).map(|_| rng.random_range(-100..=100)).collect();
+                let mut nums2: Vec<i32> = (0..n).map(|_| rng.random_range(-100..=100)).collect();
+                nums1.sort();
+                nums2.sort();
+                TestCase {
+                    data: Box::new(DcMedianTest { nums1, nums2 }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -658,13 +848,23 @@ impl Problem for DcMedianTwoSorted {
 // ── Hard 2: Skyline Problem ──────────────────────────────────────────
 
 struct DcSkyline;
-struct DcSkylineTest { buildings: Vec<(i32, i32, i32)> }
+struct DcSkylineTest {
+    buildings: Vec<(i32, i32, i32)>,
+}
 
 impl Problem for DcSkyline {
-    fn id(&self) -> &str { "divide_conquer_skyline" }
-    fn name(&self) -> &str { "The Skyline Problem" }
-    fn topic(&self) -> &str { "divide_conquer" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "divide_conquer_skyline"
+    }
+    fn name(&self) -> &str {
+        "The Skyline Problem"
+    }
+    fn topic(&self) -> &str {
+        "divide_conquer"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given buildings as (left, right, height) tuples, return the skyline as \
          key points (x, height). Use a divide and conquer approach.\n\n\
@@ -677,17 +877,23 @@ impl Problem for DcSkyline {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=8);
-            let mut buildings: Vec<(i32, i32, i32)> = (0..n).map(|_| {
-                let l = rng.random_range(0..=20);
-                let r = rng.random_range(l + 1..=l + 10);
-                let h = rng.random_range(1..=20);
-                (l, r, h)
-            }).collect();
-            buildings.sort_by_key(|b| b.0);
-            TestCase { data: Box::new(DcSkylineTest { buildings }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=8);
+                let mut buildings: Vec<(i32, i32, i32)> = (0..n)
+                    .map(|_| {
+                        let l = rng.random_range(0..=20);
+                        let r = rng.random_range(l + 1..=l + 10);
+                        let h = rng.random_range(1..=20);
+                        (l, r, h)
+                    })
+                    .collect();
+                buildings.sort_by_key(|b| b.0);
+                TestCase {
+                    data: Box::new(DcSkylineTest { buildings }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -705,7 +911,9 @@ impl Problem for DcSkyline {
 
 fn ref_skyline(buildings: &[(i32, i32, i32)]) -> Vec<(i32, i32)> {
     fn divide(buildings: &[(i32, i32, i32)]) -> Vec<(i32, i32)> {
-        if buildings.is_empty() { return vec![]; }
+        if buildings.is_empty() {
+            return vec![];
+        }
         if buildings.len() == 1 {
             let (l, r, h) = buildings[0];
             return vec![(l, h), (r, 0)];
@@ -763,13 +971,25 @@ fn ref_skyline(buildings: &[(i32, i32, i32)]) -> Vec<(i32, i32)> {
 // ── Hard 3: Count Range Sum ──────────────────────────────────────────
 
 struct DcCountRangeSum;
-struct DcCountRangeSumTest { nums: Vec<i32>, lower: i32, upper: i32 }
+struct DcCountRangeSumTest {
+    nums: Vec<i32>,
+    lower: i32,
+    upper: i32,
+}
 
 impl Problem for DcCountRangeSum {
-    fn id(&self) -> &str { "divide_conquer_count_range_sum" }
-    fn name(&self) -> &str { "Count of Range Sum" }
-    fn topic(&self) -> &str { "divide_conquer" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "divide_conquer_count_range_sum"
+    }
+    fn name(&self) -> &str {
+        "Count of Range Sum"
+    }
+    fn topic(&self) -> &str {
+        "divide_conquer"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given an integer array and two integers lower and upper, return the number \
          of range sums that lie in [lower, upper] inclusive. A range sum S(i,j) is \
@@ -782,15 +1002,19 @@ impl Problem for DcCountRangeSum {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=20);
-            let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-50..=50)).collect();
-            let a = rng.random_range(-100..=100);
-            let b = rng.random_range(-100..=100);
-            let lower = a.min(b);
-            let upper = a.max(b);
-            TestCase { data: Box::new(DcCountRangeSumTest { nums, lower, upper }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=20);
+                let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-50..=50)).collect();
+                let a = rng.random_range(-100..=100);
+                let b = rng.random_range(-100..=100);
+                let lower = a.min(b);
+                let upper = a.max(b);
+                TestCase {
+                    data: Box::new(DcCountRangeSumTest { nums, lower, upper }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -811,8 +1035,8 @@ fn ref_count_range_sum(nums: &[i32], lower: i32, upper: i32) -> i32 {
     let mut count = 0;
     for i in 0..n {
         let mut sum: i64 = 0;
-        for j in i..n {
-            sum += nums[j] as i64;
+        for &num in nums.iter().take(n).skip(i) {
+            sum += num as i64;
             if sum >= lower as i64 && sum <= upper as i64 {
                 count += 1;
             }
@@ -824,13 +1048,23 @@ fn ref_count_range_sum(nums: &[i32], lower: i32, upper: i32) -> i32 {
 // ── Hard 4: Reverse Pairs ───────────────────────────────────────────
 
 struct DcReversePairs;
-struct DcReversePairsTest { nums: Vec<i32> }
+struct DcReversePairsTest {
+    nums: Vec<i32>,
+}
 
 impl Problem for DcReversePairs {
-    fn id(&self) -> &str { "divide_conquer_reverse_pairs" }
-    fn name(&self) -> &str { "Reverse Pairs" }
-    fn topic(&self) -> &str { "divide_conquer" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "divide_conquer_reverse_pairs"
+    }
+    fn name(&self) -> &str {
+        "Reverse Pairs"
+    }
+    fn topic(&self) -> &str {
+        "divide_conquer"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given an array, return the number of important reverse pairs. \
          An important reverse pair is (i, j) where i < j and nums[i] > 2 * nums[j].\n\n\
@@ -840,11 +1074,15 @@ impl Problem for DcReversePairs {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=25);
-            let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-50..=50)).collect();
-            TestCase { data: Box::new(DcReversePairsTest { nums }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=25);
+                let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-50..=50)).collect();
+                TestCase {
+                    data: Box::new(DcReversePairsTest { nums }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -876,13 +1114,24 @@ fn ref_reverse_pairs(nums: &[i32]) -> i32 {
 // ── Hard 5: Kth Smallest in Sorted Matrix ────────────────────────────
 
 struct DcKthSmallestSortedMatrix;
-struct DcKthSmallestMatrixTest { matrix: Vec<Vec<i32>>, k: usize }
+struct DcKthSmallestMatrixTest {
+    matrix: Vec<Vec<i32>>,
+    k: usize,
+}
 
 impl Problem for DcKthSmallestSortedMatrix {
-    fn id(&self) -> &str { "divide_conquer_kth_smallest_sorted_matrix" }
-    fn name(&self) -> &str { "Kth Smallest Element in Sorted Matrix" }
-    fn topic(&self) -> &str { "divide_conquer" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "divide_conquer_kth_smallest_sorted_matrix"
+    }
+    fn name(&self) -> &str {
+        "Kth Smallest Element in Sorted Matrix"
+    }
+    fn topic(&self) -> &str {
+        "divide_conquer"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given an n x n matrix where each row and column is sorted in ascending order, \
          find the kth smallest element. Use a binary search / divide and conquer approach.\n\n\
@@ -893,23 +1142,28 @@ impl Problem for DcKthSmallestSortedMatrix {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=8);
-            // build a sorted matrix: each row sorted, each column sorted
-            let mut matrix = vec![vec![0i32; n]; n];
-            matrix[0][0] = rng.random_range(-50..=0);
-            for j in 1..n {
-                matrix[0][j] = matrix[0][j - 1] + rng.random_range(0..=10);
-            }
-            for i in 1..n {
-                matrix[i][0] = matrix[i - 1][0] + rng.random_range(0..=10);
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=8);
+                // build a sorted matrix: each row sorted, each column sorted
+                let mut matrix = vec![vec![0i32; n]; n];
+                matrix[0][0] = rng.random_range(-50..=0);
                 for j in 1..n {
-                    matrix[i][j] = matrix[i - 1][j].max(matrix[i][j - 1]) + rng.random_range(0..=5);
+                    matrix[0][j] = matrix[0][j - 1] + rng.random_range(0..=10);
                 }
-            }
-            let k = rng.random_range(1..=n * n);
-            TestCase { data: Box::new(DcKthSmallestMatrixTest { matrix, k }) }
-        }).collect()
+                for i in 1..n {
+                    matrix[i][0] = matrix[i - 1][0] + rng.random_range(0..=10);
+                    for j in 1..n {
+                        matrix[i][j] =
+                            matrix[i - 1][j].max(matrix[i][j - 1]) + rng.random_range(0..=5);
+                    }
+                }
+                let k = rng.random_range(1..=n * n);
+                TestCase {
+                    data: Box::new(DcKthSmallestMatrixTest { matrix, k }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {

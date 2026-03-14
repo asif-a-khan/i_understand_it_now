@@ -58,10 +58,18 @@ struct ReverseTest {
 }
 
 impl Problem for ReverseString {
-    fn id(&self) -> &str { "strings_reverse" }
-    fn name(&self) -> &str { "Reverse String" }
-    fn topic(&self) -> &str { "strings" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "strings_reverse"
+    }
+    fn name(&self) -> &str {
+        "Reverse String"
+    }
+    fn topic(&self) -> &str {
+        "strings"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given a string `s`, return the string reversed.\n\n\
          Constraints:\n\
@@ -75,7 +83,9 @@ impl Problem for ReverseString {
             .map(|_| {
                 let len = rng.random_range(1..=30);
                 let s = random_lower(&mut rng, len);
-                TestCase { data: Box::new(ReverseTest { s }) }
+                TestCase {
+                    data: Box::new(ReverseTest { s }),
+                }
             })
             .collect()
     }
@@ -101,10 +111,18 @@ struct ValidPalindromeTest {
 }
 
 impl Problem for ValidPalindrome {
-    fn id(&self) -> &str { "strings_valid_palindrome" }
-    fn name(&self) -> &str { "Valid Palindrome" }
-    fn topic(&self) -> &str { "strings" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "strings_valid_palindrome"
+    }
+    fn name(&self) -> &str {
+        "Valid Palindrome"
+    }
+    fn topic(&self) -> &str {
+        "strings"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given a string `s`, return `true` if it is a palindrome considering only \
          alphanumeric characters and ignoring case.\n\n\
@@ -137,7 +155,9 @@ impl Problem for ValidPalindrome {
                     let len = rng.random_range(1..=30);
                     random_alpha_mixed(&mut rng, len)
                 };
-                TestCase { data: Box::new(ValidPalindromeTest { s }) }
+                TestCase {
+                    data: Box::new(ValidPalindromeTest { s }),
+                }
             })
             .collect()
     }
@@ -174,10 +194,18 @@ struct IsAnagramTest {
 }
 
 impl Problem for IsAnagram {
-    fn id(&self) -> &str { "strings_is_anagram" }
-    fn name(&self) -> &str { "Valid Anagram" }
-    fn topic(&self) -> &str { "strings" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "strings_is_anagram"
+    }
+    fn name(&self) -> &str {
+        "Valid Anagram"
+    }
+    fn topic(&self) -> &str {
+        "strings"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given two strings `s` and `t`, return `true` if `t` is an anagram of `s`.\n\n\
          Constraints:\n\
@@ -204,7 +232,9 @@ impl Problem for IsAnagram {
                     let t_len = rng.random_range(1..=20);
                     random_lower(&mut rng, t_len)
                 };
-                TestCase { data: Box::new(IsAnagramTest { s, t }) }
+                TestCase {
+                    data: Box::new(IsAnagramTest { s, t }),
+                }
             })
             .collect()
     }
@@ -238,10 +268,18 @@ struct FirstUniqueCharTest {
 }
 
 impl Problem for FirstUniqueChar {
-    fn id(&self) -> &str { "strings_first_unique_char" }
-    fn name(&self) -> &str { "First Unique Character in a String" }
-    fn topic(&self) -> &str { "strings" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "strings_first_unique_char"
+    }
+    fn name(&self) -> &str {
+        "First Unique Character in a String"
+    }
+    fn topic(&self) -> &str {
+        "strings"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given a string `s` consisting of lowercase English letters, return the index \
          of the first non-repeating character. If no such character exists, return -1.\n\n\
@@ -258,7 +296,9 @@ impl Problem for FirstUniqueChar {
                 let s: String = (0..len)
                     .map(|_| (b'a' + rng.random_range(0..8u8)) as char)
                     .collect();
-                TestCase { data: Box::new(FirstUniqueCharTest { s }) }
+                TestCase {
+                    data: Box::new(FirstUniqueCharTest { s }),
+                }
             })
             .collect()
     }
@@ -297,10 +337,18 @@ struct LCPTest {
 }
 
 impl Problem for LongestCommonPrefix {
-    fn id(&self) -> &str { "strings_longest_common_prefix" }
-    fn name(&self) -> &str { "Longest Common Prefix" }
-    fn topic(&self) -> &str { "strings" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "strings_longest_common_prefix"
+    }
+    fn name(&self) -> &str {
+        "Longest Common Prefix"
+    }
+    fn topic(&self) -> &str {
+        "strings"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given an array of strings `strs`, return the longest common prefix.\n\
          If there is no common prefix, return an empty string.\n\n\
@@ -324,7 +372,9 @@ impl Problem for LongestCommonPrefix {
                         format!("{prefix}{suffix}")
                     })
                     .collect();
-                TestCase { data: Box::new(LCPTest { strs }) }
+                TestCase {
+                    data: Box::new(LCPTest { strs }),
+                }
             })
             .collect()
     }
@@ -350,8 +400,8 @@ fn ref_longest_common_prefix(strs: &[String]) -> String {
     let mut prefix_len = first.len();
     for s in &strs[1..] {
         prefix_len = prefix_len.min(s.len());
-        for i in 0..prefix_len {
-            if s.as_bytes()[i] != first[i] {
+        for (i, &byte) in first.iter().enumerate().take(prefix_len) {
+            if s.as_bytes()[i] != byte {
                 prefix_len = i;
                 break;
             }
@@ -368,10 +418,18 @@ struct LPSTest {
 }
 
 impl Problem for LongestPalindromicSubstring {
-    fn id(&self) -> &str { "strings_longest_palindromic_substring" }
-    fn name(&self) -> &str { "Longest Palindromic Substring" }
-    fn topic(&self) -> &str { "strings" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "strings_longest_palindromic_substring"
+    }
+    fn name(&self) -> &str {
+        "Longest Palindromic Substring"
+    }
+    fn topic(&self) -> &str {
+        "strings"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given a string `s`, return the longest palindromic substring in `s`.\n\
          If there are multiple answers of the same length, return any one.\n\n\
@@ -389,7 +447,9 @@ impl Problem for LongestPalindromicSubstring {
                 let s: String = (0..len)
                     .map(|_| (b'a' + rng.random_range(0..5u8)) as char)
                     .collect();
-                TestCase { data: Box::new(LPSTest { s }) }
+                TestCase {
+                    data: Box::new(LPSTest { s }),
+                }
             })
             .collect()
     }
@@ -401,7 +461,10 @@ impl Problem for LongestPalindromicSubstring {
 
         // Validate: actual must be a palindrome and same length as expected
         let actual_chars: Vec<char> = actual.chars().collect();
-        let is_palindrome = actual_chars.iter().copied().eq(actual_chars.iter().copied().rev());
+        let is_palindrome = actual_chars
+            .iter()
+            .copied()
+            .eq(actual_chars.iter().copied().rev());
         let is_substring = t.s.contains(&actual);
         let correct = is_palindrome && is_substring && actual.len() == expected.len();
 
@@ -426,7 +489,7 @@ fn ref_longest_palindromic_substring(s: &str) -> String {
     let expand = |mut l: usize, mut r: usize| -> (usize, usize) {
         while l < n && r < n && bytes[l] == bytes[r] {
             if l == 0 {
-                return (0, r - 0 + 1);
+                return (0, r + 1);
             }
             l -= 1;
             r += 1;
@@ -461,10 +524,18 @@ struct GroupAnagramsTest {
 }
 
 impl Problem for GroupAnagrams {
-    fn id(&self) -> &str { "strings_group_anagrams" }
-    fn name(&self) -> &str { "Group Anagrams" }
-    fn topic(&self) -> &str { "strings" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "strings_group_anagrams"
+    }
+    fn name(&self) -> &str {
+        "Group Anagrams"
+    }
+    fn topic(&self) -> &str {
+        "strings"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given an array of strings `strs`, group the anagrams together.\n\
          Return the groups where each group is sorted alphabetically, and \
@@ -489,7 +560,9 @@ impl Problem for GroupAnagrams {
                             .collect()
                     })
                     .collect();
-                TestCase { data: Box::new(GroupAnagramsTest { strs }) }
+                TestCase {
+                    data: Box::new(GroupAnagramsTest { strs }),
+                }
             })
             .collect()
     }
@@ -543,10 +616,18 @@ struct AtoiTest {
 }
 
 impl Problem for StringToInteger {
-    fn id(&self) -> &str { "strings_string_to_integer" }
-    fn name(&self) -> &str { "String to Integer (atoi)" }
-    fn topic(&self) -> &str { "strings" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "strings_string_to_integer"
+    }
+    fn name(&self) -> &str {
+        "String to Integer (atoi)"
+    }
+    fn topic(&self) -> &str {
+        "strings"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Implement `atoi` which converts a string to a 32-bit signed integer.\n\n\
          Rules:\n\
@@ -574,7 +655,7 @@ impl Problem for StringToInteger {
                 _ => {
                     // Random: optional whitespace + optional sign + digits + optional junk
                     let ws_len = rng.random_range(0..=3);
-                    let ws: String = std::iter::repeat(' ').take(ws_len).collect();
+                    let ws: String = " ".repeat(ws_len);
                     let sign = match rng.random_range(0..3u8) {
                         0 => "+",
                         1 => "-",
@@ -589,7 +670,9 @@ impl Problem for StringToInteger {
                     format!("{ws}{sign}{digits}{junk}")
                 }
             };
-            tests.push(TestCase { data: Box::new(AtoiTest { s }) });
+            tests.push(TestCase {
+                data: Box::new(AtoiTest { s }),
+            });
         }
         tests
     }
@@ -614,8 +697,14 @@ fn ref_string_to_integer(s: &str) -> i32 {
     }
     let mut chars = s.chars().peekable();
     let sign: i64 = match chars.peek() {
-        Some('+') => { chars.next(); 1 }
-        Some('-') => { chars.next(); -1 }
+        Some('+') => {
+            chars.next();
+            1
+        }
+        Some('-') => {
+            chars.next();
+            -1
+        }
         _ => 1,
     };
     let mut result: i64 = 0;
@@ -643,10 +732,18 @@ struct ZigzagTest {
 }
 
 impl Problem for ZigzagConversion {
-    fn id(&self) -> &str { "strings_zigzag_conversion" }
-    fn name(&self) -> &str { "Zigzag Conversion" }
-    fn topic(&self) -> &str { "strings" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "strings_zigzag_conversion"
+    }
+    fn name(&self) -> &str {
+        "Zigzag Conversion"
+    }
+    fn topic(&self) -> &str {
+        "strings"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "The string is written in a zigzag pattern on a given number of rows, \
          then read line by line.\n\n\
@@ -667,7 +764,9 @@ impl Problem for ZigzagConversion {
                 let len = rng.random_range(1..=50);
                 let s = random_lower(&mut rng, len);
                 let num_rows = rng.random_range(1..=6);
-                TestCase { data: Box::new(ZigzagTest { s, num_rows }) }
+                TestCase {
+                    data: Box::new(ZigzagTest { s, num_rows }),
+                }
             })
             .collect()
     }
@@ -715,10 +814,18 @@ struct CountAndSayTest {
 }
 
 impl Problem for CountAndSay {
-    fn id(&self) -> &str { "strings_count_and_say" }
-    fn name(&self) -> &str { "Count and Say" }
-    fn topic(&self) -> &str { "strings" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "strings_count_and_say"
+    }
+    fn name(&self) -> &str {
+        "Count and Say"
+    }
+    fn topic(&self) -> &str {
+        "strings"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "The count-and-say sequence is defined as follows:\n\
          - Term 1: \"1\"\n\
@@ -735,7 +842,9 @@ impl Problem for CountAndSay {
         (0..10)
             .map(|_| {
                 let n = rng.random_range(1..=15);
-                TestCase { data: Box::new(CountAndSayTest { n }) }
+                TestCase {
+                    data: Box::new(CountAndSayTest { n }),
+                }
             })
             .collect()
     }
@@ -782,10 +891,18 @@ struct LSNRTest {
 }
 
 impl Problem for LongestSubstringNoRepeat {
-    fn id(&self) -> &str { "strings_longest_substring_no_repeat" }
-    fn name(&self) -> &str { "Longest Substring Without Repeating Characters" }
-    fn topic(&self) -> &str { "strings" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "strings_longest_substring_no_repeat"
+    }
+    fn name(&self) -> &str {
+        "Longest Substring Without Repeating Characters"
+    }
+    fn topic(&self) -> &str {
+        "strings"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given a string `s`, find the length of the longest substring without \
          repeating characters.\n\n\
@@ -803,7 +920,9 @@ impl Problem for LongestSubstringNoRepeat {
                 let s: String = (0..len)
                     .map(|_| (b'a' + rng.random_range(0..10u8)) as char)
                     .collect();
-                TestCase { data: Box::new(LSNRTest { s }) }
+                TestCase {
+                    data: Box::new(LSNRTest { s }),
+                }
             })
             .collect()
     }
@@ -847,10 +966,18 @@ struct MWSTest {
 }
 
 impl Problem for MinimumWindowSubstring {
-    fn id(&self) -> &str { "strings_minimum_window_substring" }
-    fn name(&self) -> &str { "Minimum Window Substring" }
-    fn topic(&self) -> &str { "strings" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "strings_minimum_window_substring"
+    }
+    fn name(&self) -> &str {
+        "Minimum Window Substring"
+    }
+    fn topic(&self) -> &str {
+        "strings"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given two strings `s` and `t`, return the minimum window substring of `s` \
          such that every character in `t` (including duplicates) is included in the window. \
@@ -881,7 +1008,9 @@ impl Problem for MinimumWindowSubstring {
                         }
                     })
                     .collect();
-                TestCase { data: Box::new(MWSTest { s, t }) }
+                TestCase {
+                    data: Box::new(MWSTest { s, t }),
+                }
             })
             .collect()
     }
@@ -956,10 +1085,18 @@ struct RegexTest {
 }
 
 impl Problem for RegexMatching {
-    fn id(&self) -> &str { "strings_regex_matching" }
-    fn name(&self) -> &str { "Regular Expression Matching" }
-    fn topic(&self) -> &str { "strings" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "strings_regex_matching"
+    }
+    fn name(&self) -> &str {
+        "Regular Expression Matching"
+    }
+    fn topic(&self) -> &str {
+        "strings"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Implement regular expression matching with support for '.' and '*'.\n\n\
          - '.' matches any single character.\n\
@@ -1073,10 +1210,18 @@ struct EditDistanceTest {
 }
 
 impl Problem for EditDistance {
-    fn id(&self) -> &str { "strings_edit_distance" }
-    fn name(&self) -> &str { "Edit Distance" }
-    fn topic(&self) -> &str { "strings" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "strings_edit_distance"
+    }
+    fn name(&self) -> &str {
+        "Edit Distance"
+    }
+    fn topic(&self) -> &str {
+        "strings"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given two strings `word1` and `word2`, return the minimum number of operations \
          required to convert `word1` into `word2`.\n\n\
@@ -1094,7 +1239,9 @@ impl Problem for EditDistance {
                 let len2 = rng.random_range(0..=15);
                 let word1 = random_lower(&mut rng, len1);
                 let word2 = random_lower(&mut rng, len2);
-                TestCase { data: Box::new(EditDistanceTest { word1, word2 }) }
+                TestCase {
+                    data: Box::new(EditDistanceTest { word1, word2 }),
+                }
             })
             .collect()
     }
@@ -1118,8 +1265,8 @@ fn ref_edit_distance(word1: &str, word2: &str) -> i32 {
     let m = w1.len();
     let n = w2.len();
     let mut dp = vec![vec![0i32; n + 1]; m + 1];
-    for i in 0..=m {
-        dp[i][0] = i as i32;
+    for (i, row) in dp.iter_mut().enumerate().take(m + 1) {
+        row[0] = i as i32;
     }
     for j in 0..=n {
         dp[0][j] = j as i32;
@@ -1129,9 +1276,7 @@ fn ref_edit_distance(word1: &str, word2: &str) -> i32 {
             if w1[i - 1] == w2[j - 1] {
                 dp[i][j] = dp[i - 1][j - 1];
             } else {
-                dp[i][j] = 1 + dp[i - 1][j - 1]
-                    .min(dp[i - 1][j])
-                    .min(dp[i][j - 1]);
+                dp[i][j] = 1 + dp[i - 1][j - 1].min(dp[i - 1][j]).min(dp[i][j - 1]);
             }
         }
     }
@@ -1147,10 +1292,18 @@ struct WildcardTest {
 }
 
 impl Problem for WildcardMatching {
-    fn id(&self) -> &str { "strings_wildcard_matching" }
-    fn name(&self) -> &str { "Wildcard Matching" }
-    fn topic(&self) -> &str { "strings" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "strings_wildcard_matching"
+    }
+    fn name(&self) -> &str {
+        "Wildcard Matching"
+    }
+    fn topic(&self) -> &str {
+        "strings"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Implement wildcard pattern matching with support for '?' and '*'.\n\n\
          - '?' matches any single character.\n\

@@ -36,10 +36,18 @@ struct QuickSortBasicTest {
 }
 
 impl Problem for QuickSortBasic {
-    fn id(&self) -> &str { "quick_sort_basic" }
-    fn name(&self) -> &str { "Quick Sort (Tracked)" }
-    fn topic(&self) -> &str { "quick_sort" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "quick_sort_basic"
+    }
+    fn name(&self) -> &str {
+        "Quick Sort (Tracked)"
+    }
+    fn topic(&self) -> &str {
+        "quick_sort"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Implement quick sort on a slice of Tracked<i32>.\n\n\
          The function signature is:\n\
@@ -54,11 +62,15 @@ impl Problem for QuickSortBasic {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(0..=50);
-            let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-1000..=1000)).collect();
-            TestCase { data: Box::new(QuickSortBasicTest { nums }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(0..=50);
+                let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-1000..=1000)).collect();
+                TestCase {
+                    data: Box::new(QuickSortBasicTest { nums }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
@@ -69,9 +81,11 @@ impl Problem for QuickSortBasic {
         let shared_log = Rc::new(RefCell::new(OperationLog::new()));
         let mut tracked = track_slice(&t.nums, shared_log.clone());
         solutions::quick_sort_basic(&mut tracked);
-        let actual: Vec<i32> = tracked.iter().map(|t| t.value.clone()).collect();
+        let actual: Vec<i32> = tracked.iter().map(|t| t.value).collect();
         let inner = shared_log.borrow();
-        for op in inner.operations() { log.record(op.clone()); }
+        for op in inner.operations() {
+            log.record(op.clone());
+        }
 
         SolutionResult {
             is_correct: actual == expected,
@@ -91,10 +105,18 @@ struct PartitionTest {
 }
 
 impl Problem for Partition {
-    fn id(&self) -> &str { "quick_sort_partition" }
-    fn name(&self) -> &str { "Partition Array" }
-    fn topic(&self) -> &str { "quick_sort" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "quick_sort_partition"
+    }
+    fn name(&self) -> &str {
+        "Partition Array"
+    }
+    fn topic(&self) -> &str {
+        "quick_sort"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Partition an array around a pivot (the last element).\n\n\
          After partitioning:\n\
@@ -109,11 +131,15 @@ impl Problem for Partition {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=30);
-            let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-100..=100)).collect();
-            TestCase { data: Box::new(PartitionTest { nums }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=30);
+                let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-100..=100)).collect();
+                TestCase {
+                    data: Box::new(PartitionTest { nums }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -157,10 +183,18 @@ struct KthLargestTest {
 }
 
 impl Problem for KthLargest {
-    fn id(&self) -> &str { "quick_sort_kth_largest" }
-    fn name(&self) -> &str { "Kth Largest Element" }
-    fn topic(&self) -> &str { "quick_sort" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "quick_sort_kth_largest"
+    }
+    fn name(&self) -> &str {
+        "Kth Largest Element"
+    }
+    fn topic(&self) -> &str {
+        "quick_sort"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Find the kth largest element in an unsorted array.\n\n\
          k is 1-indexed: k=1 is the largest element.\n\n\
@@ -173,12 +207,16 @@ impl Problem for KthLargest {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=50);
-            let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-500..=500)).collect();
-            let k = rng.random_range(1..=n);
-            TestCase { data: Box::new(KthLargestTest { nums, k }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=50);
+                let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-500..=500)).collect();
+                let k = rng.random_range(1..=n);
+                TestCase {
+                    data: Box::new(KthLargestTest { nums, k }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -205,10 +243,18 @@ struct SortColorsTest {
 }
 
 impl Problem for SortColors {
-    fn id(&self) -> &str { "quick_sort_sort_colors" }
-    fn name(&self) -> &str { "Sort Colors (Dutch National Flag)" }
-    fn topic(&self) -> &str { "quick_sort" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "quick_sort_sort_colors"
+    }
+    fn name(&self) -> &str {
+        "Sort Colors (Dutch National Flag)"
+    }
+    fn topic(&self) -> &str {
+        "quick_sort"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given an array with values 0, 1, and 2 (representing red, white, blue), \
          sort them in-place so that all 0s come first, then 1s, then 2s.\n\n\
@@ -220,11 +266,15 @@ impl Problem for SortColors {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(0..=50);
-            let nums: Vec<i32> = (0..n).map(|_| rng.random_range(0..=2)).collect();
-            TestCase { data: Box::new(SortColorsTest { nums }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(0..=50);
+                let nums: Vec<i32> = (0..n).map(|_| rng.random_range(0..=2)).collect();
+                TestCase {
+                    data: Box::new(SortColorsTest { nums }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -251,10 +301,18 @@ struct TopKFrequentTest {
 }
 
 impl Problem for TopKFrequent {
-    fn id(&self) -> &str { "quick_sort_top_k_frequent" }
-    fn name(&self) -> &str { "Top K Frequent Elements" }
-    fn topic(&self) -> &str { "quick_sort" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "quick_sort_top_k_frequent"
+    }
+    fn name(&self) -> &str {
+        "Top K Frequent Elements"
+    }
+    fn topic(&self) -> &str {
+        "quick_sort"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given an integer array and an integer k, return the k most frequent elements.\n\n\
          Return them sorted in ascending order.\n\n\
@@ -266,13 +324,17 @@ impl Problem for TopKFrequent {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=40);
-            let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-20..=20)).collect();
-            let distinct: std::collections::HashSet<i32> = nums.iter().copied().collect();
-            let k = rng.random_range(1..=distinct.len());
-            TestCase { data: Box::new(TopKFrequentTest { nums, k }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=40);
+                let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-20..=20)).collect();
+                let distinct: std::collections::HashSet<i32> = nums.iter().copied().collect();
+                let k = rng.random_range(1..=distinct.len());
+                TestCase {
+                    data: Box::new(TopKFrequentTest { nums, k }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -290,7 +352,9 @@ impl Problem for TopKFrequent {
 
 fn ref_top_k_frequent(nums: &[i32], k: usize) -> Vec<i32> {
     let mut freq: HashMap<i32, usize> = HashMap::new();
-    for &n in nums { *freq.entry(n).or_insert(0) += 1; }
+    for &n in nums {
+        *freq.entry(n).or_insert(0) += 1;
+    }
     let mut entries: Vec<(i32, usize)> = freq.into_iter().collect();
     entries.sort_by(|a, b| b.1.cmp(&a.1).then(a.0.cmp(&b.0)));
     let mut result: Vec<i32> = entries.into_iter().take(k).map(|(v, _)| v).collect();
@@ -307,10 +371,18 @@ struct ThreeWayTest {
 }
 
 impl Problem for ThreeWayQuickSort {
-    fn id(&self) -> &str { "quick_sort_three_way" }
-    fn name(&self) -> &str { "Three-Way Quick Sort" }
-    fn topic(&self) -> &str { "quick_sort" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "quick_sort_three_way"
+    }
+    fn name(&self) -> &str {
+        "Three-Way Quick Sort"
+    }
+    fn topic(&self) -> &str {
+        "quick_sort"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Implement 3-way quicksort (Dutch National Flag partitioning) that handles \
          duplicate elements efficiently.\n\n\
@@ -324,12 +396,16 @@ impl Problem for ThreeWayQuickSort {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(0..=50);
-            // Use smaller range to create duplicates
-            let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-10..=10)).collect();
-            TestCase { data: Box::new(ThreeWayTest { nums }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(0..=50);
+                // Use smaller range to create duplicates
+                let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-10..=10)).collect();
+                TestCase {
+                    data: Box::new(ThreeWayTest { nums }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -355,10 +431,18 @@ struct WiggleSortTest {
 }
 
 impl Problem for WiggleSortII {
-    fn id(&self) -> &str { "quick_sort_wiggle_sort_ii" }
-    fn name(&self) -> &str { "Wiggle Sort II" }
-    fn topic(&self) -> &str { "quick_sort" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "quick_sort_wiggle_sort_ii"
+    }
+    fn name(&self) -> &str {
+        "Wiggle Sort II"
+    }
+    fn topic(&self) -> &str {
+        "quick_sort"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Reorder the array such that nums[0] < nums[1] > nums[2] < nums[3] > ...\n\n\
          Return the wiggle-sorted array. A valid solution is guaranteed to exist.\n\n\
@@ -370,12 +454,16 @@ impl Problem for WiggleSortII {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(2..=30);
-            // Ensure a valid wiggle sort exists: use enough distinct values
-            let nums: Vec<i32> = (0..n).map(|_| rng.random_range(0..=100)).collect();
-            TestCase { data: Box::new(WiggleSortTest { nums }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(2..=30);
+                // Ensure a valid wiggle sort exists: use enough distinct values
+                let nums: Vec<i32> = (0..n).map(|_| rng.random_range(0..=100)).collect();
+                TestCase {
+                    data: Box::new(WiggleSortTest { nums }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -429,10 +517,18 @@ struct KthSmallestMatrixTest {
 }
 
 impl Problem for KthSmallestMatrix {
-    fn id(&self) -> &str { "quick_sort_kth_smallest_matrix" }
-    fn name(&self) -> &str { "Kth Smallest in Sorted Matrix" }
-    fn topic(&self) -> &str { "quick_sort" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "quick_sort_kth_smallest_matrix"
+    }
+    fn name(&self) -> &str {
+        "Kth Smallest in Sorted Matrix"
+    }
+    fn topic(&self) -> &str {
+        "quick_sort"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given an n x n matrix where each row and column is sorted in ascending order, \
          find the kth smallest element.\n\n\
@@ -445,16 +541,20 @@ impl Problem for KthSmallestMatrix {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=8);
-            // Build a sorted matrix: start with sorted values, distribute into rows
-            let total = n * n;
-            let mut vals: Vec<i32> = (0..total).map(|_| rng.random_range(-100..=100)).collect();
-            vals.sort();
-            let matrix: Vec<Vec<i32>> = vals.chunks(n).map(|c| c.to_vec()).collect();
-            let k = rng.random_range(1..=total);
-            TestCase { data: Box::new(KthSmallestMatrixTest { matrix, k }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=8);
+                // Build a sorted matrix: start with sorted values, distribute into rows
+                let total = n * n;
+                let mut vals: Vec<i32> = (0..total).map(|_| rng.random_range(-100..=100)).collect();
+                vals.sort();
+                let matrix: Vec<Vec<i32>> = vals.chunks(n).map(|c| c.to_vec()).collect();
+                let k = rng.random_range(1..=total);
+                TestCase {
+                    data: Box::new(KthSmallestMatrixTest { matrix, k }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -483,10 +583,18 @@ struct FindKClosestTest {
 }
 
 impl Problem for FindKClosest {
-    fn id(&self) -> &str { "quick_sort_find_k_closest" }
-    fn name(&self) -> &str { "K Closest Elements" }
-    fn topic(&self) -> &str { "quick_sort" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "quick_sort_find_k_closest"
+    }
+    fn name(&self) -> &str {
+        "K Closest Elements"
+    }
+    fn topic(&self) -> &str {
+        "quick_sort"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given a sorted array, an integer k, and a target value, find the k closest \
          elements to target. Return them sorted in ascending order.\n\n\
@@ -499,14 +607,18 @@ impl Problem for FindKClosest {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=30);
-            let mut arr: Vec<i32> = (0..n).map(|_| rng.random_range(-100..=100)).collect();
-            arr.sort();
-            let k = rng.random_range(1..=n);
-            let target = rng.random_range(-120..=120);
-            TestCase { data: Box::new(FindKClosestTest { arr, k, target }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=30);
+                let mut arr: Vec<i32> = (0..n).map(|_| rng.random_range(-100..=100)).collect();
+                arr.sort();
+                let k = rng.random_range(1..=n);
+                let target = rng.random_range(-120..=120);
+                TestCase {
+                    data: Box::new(FindKClosestTest { arr, k, target }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -539,10 +651,18 @@ struct SortByParityIITest {
 }
 
 impl Problem for SortByParityII {
-    fn id(&self) -> &str { "quick_sort_sort_list_by_parity_ii" }
-    fn name(&self) -> &str { "Sort Array by Parity II" }
-    fn topic(&self) -> &str { "quick_sort" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "quick_sort_sort_list_by_parity_ii"
+    }
+    fn name(&self) -> &str {
+        "Sort Array by Parity II"
+    }
+    fn topic(&self) -> &str {
+        "quick_sort"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given an array where half the elements are even and half are odd, rearrange so \
          that nums[i] is even when i is even, and nums[i] is odd when i is odd.\n\n\
@@ -554,23 +674,27 @@ impl Problem for SortByParityII {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let half = rng.random_range(1..=15);
-            let n = half * 2;
-            let mut nums = Vec::with_capacity(n);
-            for _ in 0..half {
-                nums.push(rng.random_range(0..=50) * 2);     // even
-            }
-            for _ in 0..half {
-                nums.push(rng.random_range(0..=50) * 2 + 1); // odd
-            }
-            // Shuffle
-            for i in (1..nums.len()).rev() {
-                let j = rng.random_range(0..=i);
-                nums.swap(i, j);
-            }
-            TestCase { data: Box::new(SortByParityIITest { nums }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let half = rng.random_range(1..=15);
+                let n = half * 2;
+                let mut nums = Vec::with_capacity(n);
+                for _ in 0..half {
+                    nums.push(rng.random_range(0..=50) * 2); // even
+                }
+                for _ in 0..half {
+                    nums.push(rng.random_range(0..=50) * 2 + 1); // odd
+                }
+                // Shuffle
+                for i in (1..nums.len()).rev() {
+                    let j = rng.random_range(0..=i);
+                    nums.swap(i, j);
+                }
+                TestCase {
+                    data: Box::new(SortByParityIITest { nums }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -578,7 +702,10 @@ impl Problem for SortByParityII {
         let actual = solutions::sort_by_parity_ii(&t.nums);
 
         let same_len = actual.len() == t.nums.len();
-        let parity_ok = actual.iter().enumerate().all(|(i, &v)| v % 2 == i as i32 % 2);
+        let parity_ok = actual
+            .iter()
+            .enumerate()
+            .all(|(i, &v)| v % 2 == i as i32 % 2);
         let mut orig = t.nums.clone();
         orig.sort();
         let mut act = actual.clone();
@@ -606,10 +733,18 @@ struct MedianTwoSortedTest {
 }
 
 impl Problem for MedianTwoSorted {
-    fn id(&self) -> &str { "quick_sort_median_two_sorted" }
-    fn name(&self) -> &str { "Median of Two Sorted Arrays" }
-    fn topic(&self) -> &str { "quick_sort" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "quick_sort_median_two_sorted"
+    }
+    fn name(&self) -> &str {
+        "Median of Two Sorted Arrays"
+    }
+    fn topic(&self) -> &str {
+        "quick_sort"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given two sorted arrays nums1 and nums2, return the median of the combined \
          sorted array as f64.\n\n\
@@ -622,15 +757,19 @@ impl Problem for MedianTwoSorted {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let m = rng.random_range(0..=25);
-            let n = rng.random_range(1..=25);
-            let mut nums1: Vec<i32> = (0..m).map(|_| rng.random_range(-200..=200)).collect();
-            let mut nums2: Vec<i32> = (0..n).map(|_| rng.random_range(-200..=200)).collect();
-            nums1.sort();
-            nums2.sort();
-            TestCase { data: Box::new(MedianTwoSortedTest { nums1, nums2 }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let m = rng.random_range(0..=25);
+                let n = rng.random_range(1..=25);
+                let mut nums1: Vec<i32> = (0..m).map(|_| rng.random_range(-200..=200)).collect();
+                let mut nums2: Vec<i32> = (0..n).map(|_| rng.random_range(-200..=200)).collect();
+                nums1.sort();
+                nums2.sort();
+                TestCase {
+                    data: Box::new(MedianTwoSortedTest { nums1, nums2 }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -664,10 +803,18 @@ struct NutsAndBoltsTest {
 }
 
 impl Problem for NutsAndBolts {
-    fn id(&self) -> &str { "quick_sort_nuts_bolts" }
-    fn name(&self) -> &str { "Nuts and Bolts Problem" }
-    fn topic(&self) -> &str { "quick_sort" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "quick_sort_nuts_bolts"
+    }
+    fn name(&self) -> &str {
+        "Nuts and Bolts Problem"
+    }
+    fn topic(&self) -> &str {
+        "quick_sort"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given a set of nuts and a set of bolts (each nut matches exactly one bolt), \
          sort them so that nuts[i] matches bolts[i].\n\n\
@@ -680,22 +827,29 @@ impl Problem for NutsAndBolts {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=30);
-            let mut values: Vec<i32> = (1..=n as i32).collect();
-            // Shuffle for nuts
-            let mut nuts = values.clone();
-            for i in (1..nuts.len()).rev() {
-                let j = rng.random_range(0..=i);
-                nuts.swap(i, j);
-            }
-            // Shuffle for bolts
-            for i in (1..values.len()).rev() {
-                let j = rng.random_range(0..=i);
-                values.swap(i, j);
-            }
-            TestCase { data: Box::new(NutsAndBoltsTest { nuts, bolts: values }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=30);
+                let mut values: Vec<i32> = (1..=n as i32).collect();
+                // Shuffle for nuts
+                let mut nuts = values.clone();
+                for i in (1..nuts.len()).rev() {
+                    let j = rng.random_range(0..=i);
+                    nuts.swap(i, j);
+                }
+                // Shuffle for bolts
+                for i in (1..values.len()).rev() {
+                    let j = rng.random_range(0..=i);
+                    values.swap(i, j);
+                }
+                TestCase {
+                    data: Box::new(NutsAndBoltsTest {
+                        nuts,
+                        bolts: values,
+                    }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -722,10 +876,18 @@ struct KClosestOriginTest {
 }
 
 impl Problem for KClosestOrigin {
-    fn id(&self) -> &str { "quick_sort_k_closest_origin" }
-    fn name(&self) -> &str { "K Closest Points to Origin" }
-    fn topic(&self) -> &str { "quick_sort" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "quick_sort_k_closest_origin"
+    }
+    fn name(&self) -> &str {
+        "K Closest Points to Origin"
+    }
+    fn topic(&self) -> &str {
+        "quick_sort"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given an array of points (x, y) and an integer k, return the k closest points \
          to the origin (0, 0).\n\n\
@@ -738,14 +900,18 @@ impl Problem for KClosestOrigin {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=30);
-            let points: Vec<(i32, i32)> = (0..n)
-                .map(|_| (rng.random_range(-100..=100), rng.random_range(-100..=100)))
-                .collect();
-            let k = rng.random_range(1..=n);
-            TestCase { data: Box::new(KClosestOriginTest { points, k }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=30);
+                let points: Vec<(i32, i32)> = (0..n)
+                    .map(|_| (rng.random_range(-100..=100), rng.random_range(-100..=100)))
+                    .collect();
+                let k = rng.random_range(1..=n);
+                TestCase {
+                    data: Box::new(KClosestOriginTest { points, k }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -781,10 +947,18 @@ struct MaxGapTest {
 }
 
 impl Problem for MaxGap {
-    fn id(&self) -> &str { "quick_sort_max_gap" }
-    fn name(&self) -> &str { "Maximum Gap" }
-    fn topic(&self) -> &str { "quick_sort" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "quick_sort_max_gap"
+    }
+    fn name(&self) -> &str {
+        "Maximum Gap"
+    }
+    fn topic(&self) -> &str {
+        "quick_sort"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given an unsorted array, find the maximum difference between successive elements \
          in its sorted form.\n\n\
@@ -796,11 +970,15 @@ impl Problem for MaxGap {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(0..=50);
-            let nums: Vec<i32> = (0..n).map(|_| rng.random_range(0..=1000)).collect();
-            TestCase { data: Box::new(MaxGapTest { nums }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(0..=50);
+                let nums: Vec<i32> = (0..n).map(|_| rng.random_range(0..=1000)).collect();
+                TestCase {
+                    data: Box::new(MaxGapTest { nums }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -817,7 +995,9 @@ impl Problem for MaxGap {
 }
 
 fn ref_max_gap(nums: &[i32]) -> i32 {
-    if nums.len() < 2 { return 0; }
+    if nums.len() < 2 {
+        return 0;
+    }
     let mut sorted = nums.to_vec();
     sorted.sort();
     sorted.windows(2).map(|w| w[1] - w[0]).max().unwrap_or(0)
@@ -832,10 +1012,18 @@ struct FindDuplicateTest {
 }
 
 impl Problem for FindDuplicate {
-    fn id(&self) -> &str { "quick_sort_find_duplicate" }
-    fn name(&self) -> &str { "Find the Duplicate Number" }
-    fn topic(&self) -> &str { "quick_sort" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "quick_sort_find_duplicate"
+    }
+    fn name(&self) -> &str {
+        "Find the Duplicate Number"
+    }
+    fn topic(&self) -> &str {
+        "quick_sort"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given an array of n+1 integers where each integer is in the range [1, n], \
          there is exactly one duplicated number. Find and return it.\n\n\
@@ -849,18 +1037,22 @@ impl Problem for FindDuplicate {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(2..=50);
-            let dup = rng.random_range(1..=n as i32);
-            let mut nums: Vec<i32> = (1..=n as i32).collect();
-            nums.push(dup);
-            // Shuffle
-            for i in (1..nums.len()).rev() {
-                let j = rng.random_range(0..=i);
-                nums.swap(i, j);
-            }
-            TestCase { data: Box::new(FindDuplicateTest { nums }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(2..=50);
+                let dup = rng.random_range(1..=n as i32);
+                let mut nums: Vec<i32> = (1..=n as i32).collect();
+                nums.push(dup);
+                // Shuffle
+                for i in (1..nums.len()).rev() {
+                    let j = rng.random_range(0..=i);
+                    nums.swap(i, j);
+                }
+                TestCase {
+                    data: Box::new(FindDuplicateTest { nums }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -883,7 +1075,9 @@ fn ref_find_duplicate(nums: &[i32]) -> i32 {
     loop {
         slow = nums[slow] as usize;
         fast = nums[nums[fast] as usize] as usize;
-        if slow == fast { break; }
+        if slow == fast {
+            break;
+        }
     }
     let mut slow2 = nums[0] as usize;
     while slow2 != slow {

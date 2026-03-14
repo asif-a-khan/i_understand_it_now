@@ -10,7 +10,10 @@ mod visualizer;
 use clap::{Parser, Subcommand};
 
 #[derive(Parser)]
-#[command(name = "dsa-forge", about = "Learn data structures & algorithms in Rust")]
+#[command(
+    name = "iuin",
+    about = "I Understand It Now — learn data structures & algorithms in Rust"
+)]
 struct Cli {
     #[command(subcommand)]
     command: Option<Command>,
@@ -54,8 +57,15 @@ fn main() {
     let cli = Cli::parse();
 
     match cli.command {
-        Some(Command::Solve { problem, complexity }) => cli::solve(&problem, complexity),
-        Some(Command::Viz { algorithm, mode, delay }) => cli::viz(&algorithm, &mode, delay),
+        Some(Command::Solve {
+            problem,
+            complexity,
+        }) => cli::solve(&problem, complexity),
+        Some(Command::Viz {
+            algorithm,
+            mode,
+            delay,
+        }) => cli::viz(&algorithm, &mode, delay),
         Some(Command::List { topic, difficulty }) => {
             cli::list(topic.as_deref(), difficulty.as_deref());
         }

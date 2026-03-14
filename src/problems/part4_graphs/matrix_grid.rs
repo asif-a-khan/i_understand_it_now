@@ -36,10 +36,18 @@ struct FloodFillTest {
 }
 
 impl Problem for MatrixGridFloodFill {
-    fn id(&self) -> &str { "matrix_grid_flood_fill" }
-    fn name(&self) -> &str { "Flood Fill" }
-    fn topic(&self) -> &str { "matrix_grid" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "matrix_grid_flood_fill"
+    }
+    fn name(&self) -> &str {
+        "Flood Fill"
+    }
+    fn topic(&self) -> &str {
+        "matrix_grid"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given an m x n integer grid `image`, a starting pixel (sr, sc), and a `new_color`, \
          perform a flood fill. Starting from (sr, sc), color all connected pixels that share \
@@ -54,17 +62,26 @@ impl Problem for MatrixGridFloodFill {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let rows = rng.random_range(1..=8);
-            let cols = rng.random_range(1..=8);
-            let image: Vec<Vec<i32>> = (0..rows)
-                .map(|_| (0..cols).map(|_| rng.random_range(0..=3)).collect())
-                .collect();
-            let sr = rng.random_range(0..rows);
-            let sc = rng.random_range(0..cols);
-            let new_color = rng.random_range(0..=5);
-            TestCase { data: Box::new(FloodFillTest { image, sr, sc, new_color }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let rows = rng.random_range(1..=8);
+                let cols = rng.random_range(1..=8);
+                let image: Vec<Vec<i32>> = (0..rows)
+                    .map(|_| (0..cols).map(|_| rng.random_range(0..=3)).collect())
+                    .collect();
+                let sr = rng.random_range(0..rows);
+                let sc = rng.random_range(0..cols);
+                let new_color = rng.random_range(0..=5);
+                TestCase {
+                    data: Box::new(FloodFillTest {
+                        image,
+                        sr,
+                        sc,
+                        new_color,
+                    }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -74,7 +91,8 @@ impl Problem for MatrixGridFloodFill {
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!(
-                "image={:?}, sr={}, sc={}, new_color={}", t.image, t.sr, t.sc, t.new_color
+                "image={:?}, sr={}, sc={}, new_color={}",
+                t.image, t.sr, t.sc, t.new_color
             ),
             expected: format!("{expected:?}"),
             actual: format!("{actual:?}"),
@@ -93,10 +111,18 @@ fn ref_flood_fill(image: &[Vec<i32>], sr: usize, sc: usize, new_color: i32) -> V
             return;
         }
         grid[r][c] = new;
-        if r > 0 { dfs(grid, r - 1, c, orig, new); }
-        if r + 1 < grid.len() { dfs(grid, r + 1, c, orig, new); }
-        if c > 0 { dfs(grid, r, c - 1, orig, new); }
-        if c + 1 < grid[0].len() { dfs(grid, r, c + 1, orig, new); }
+        if r > 0 {
+            dfs(grid, r - 1, c, orig, new);
+        }
+        if r + 1 < grid.len() {
+            dfs(grid, r + 1, c, orig, new);
+        }
+        if c > 0 {
+            dfs(grid, r, c - 1, orig, new);
+        }
+        if c + 1 < grid[0].len() {
+            dfs(grid, r, c + 1, orig, new);
+        }
     }
     dfs(&mut result, sr, sc, orig, new_color);
     result
@@ -111,10 +137,18 @@ struct IslandPerimeterTest {
 }
 
 impl Problem for MatrixGridIslandPerimeter {
-    fn id(&self) -> &str { "matrix_grid_island_perimeter" }
-    fn name(&self) -> &str { "Island Perimeter" }
-    fn topic(&self) -> &str { "matrix_grid" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "matrix_grid_island_perimeter"
+    }
+    fn name(&self) -> &str {
+        "Island Perimeter"
+    }
+    fn topic(&self) -> &str {
+        "matrix_grid"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given a row x col grid where grid[i][j] = 1 represents land and 0 represents \
          water, determine the perimeter of the island. There is exactly one island (one or \
@@ -129,40 +163,44 @@ impl Problem for MatrixGridIslandPerimeter {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let rows = rng.random_range(2..=8);
-            let cols = rng.random_range(2..=8);
-            let mut grid = vec![vec![0i32; cols]; rows];
-            // Grow a connected island using BFS from a random start
-            let sr = rng.random_range(0..rows);
-            let sc = rng.random_range(0..cols);
-            grid[sr][sc] = 1;
-            let size = rng.random_range(1..=(rows * cols / 2).max(1));
-            let mut frontier: Vec<(usize, usize)> = vec![(sr, sc)];
-            let mut count = 1;
-            while count < size && !frontier.is_empty() {
-                let idx = rng.random_range(0..frontier.len());
-                let (r, c) = frontier[idx];
-                let dirs: [(i32, i32); 4] = [(-1,0),(1,0),(0,-1),(0,1)];
-                for (dr, dc) in dirs {
-                    let nr = r as i32 + dr;
-                    let nc = c as i32 + dc;
-                    if nr >= 0 && nr < rows as i32 && nc >= 0 && nc < cols as i32 {
-                        let nr = nr as usize;
-                        let nc = nc as usize;
-                        if grid[nr][nc] == 0 && count < size {
-                            grid[nr][nc] = 1;
-                            frontier.push((nr, nc));
-                            count += 1;
+        (0..10)
+            .map(|_| {
+                let rows = rng.random_range(2..=8);
+                let cols = rng.random_range(2..=8);
+                let mut grid = vec![vec![0i32; cols]; rows];
+                // Grow a connected island using BFS from a random start
+                let sr = rng.random_range(0..rows);
+                let sc = rng.random_range(0..cols);
+                grid[sr][sc] = 1;
+                let size = rng.random_range(1..=(rows * cols / 2).max(1));
+                let mut frontier: Vec<(usize, usize)> = vec![(sr, sc)];
+                let mut count = 1;
+                while count < size && !frontier.is_empty() {
+                    let idx = rng.random_range(0..frontier.len());
+                    let (r, c) = frontier[idx];
+                    let dirs: [(i32, i32); 4] = [(-1, 0), (1, 0), (0, -1), (0, 1)];
+                    for (dr, dc) in dirs {
+                        let nr = r as i32 + dr;
+                        let nc = c as i32 + dc;
+                        if nr >= 0 && nr < rows as i32 && nc >= 0 && nc < cols as i32 {
+                            let nr = nr as usize;
+                            let nc = nc as usize;
+                            if grid[nr][nc] == 0 && count < size {
+                                grid[nr][nc] = 1;
+                                frontier.push((nr, nc));
+                                count += 1;
+                            }
                         }
                     }
+                    if frontier.len() > 1 {
+                        frontier.swap_remove(idx);
+                    }
                 }
-                if frontier.len() > 1 {
-                    frontier.swap_remove(idx);
+                TestCase {
+                    data: Box::new(IslandPerimeterTest { grid }),
                 }
-            }
-            TestCase { data: Box::new(IslandPerimeterTest { grid }) }
-        }).collect()
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -186,8 +224,12 @@ fn ref_island_perimeter(grid: &[Vec<i32>]) -> i32 {
         for c in 0..cols {
             if grid[r][c] == 1 {
                 perimeter += 4;
-                if r > 0 && grid[r - 1][c] == 1 { perimeter -= 2; }
-                if c > 0 && grid[r][c - 1] == 1 { perimeter -= 2; }
+                if r > 0 && grid[r - 1][c] == 1 {
+                    perimeter -= 2;
+                }
+                if c > 0 && grid[r][c - 1] == 1 {
+                    perimeter -= 2;
+                }
             }
         }
     }
@@ -203,10 +245,18 @@ struct MaxAreaIslandTest {
 }
 
 impl Problem for MatrixGridMaxAreaIsland {
-    fn id(&self) -> &str { "matrix_grid_max_area_island" }
-    fn name(&self) -> &str { "Max Area of Island" }
-    fn topic(&self) -> &str { "matrix_grid" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "matrix_grid_max_area_island"
+    }
+    fn name(&self) -> &str {
+        "Max Area of Island"
+    }
+    fn topic(&self) -> &str {
+        "matrix_grid"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given a binary grid where 1 represents land and 0 represents water, return the \
          maximum area of an island. An island is a group of 1s connected 4-directionally. \
@@ -218,14 +268,18 @@ impl Problem for MatrixGridMaxAreaIsland {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let rows = rng.random_range(2..=8);
-            let cols = rng.random_range(2..=8);
-            let grid: Vec<Vec<i32>> = (0..rows)
-                .map(|_| (0..cols).map(|_| rng.random_range(0..=1)).collect())
-                .collect();
-            TestCase { data: Box::new(MaxAreaIslandTest { grid }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let rows = rng.random_range(2..=8);
+                let cols = rng.random_range(2..=8);
+                let grid: Vec<Vec<i32>> = (0..rows)
+                    .map(|_| (0..cols).map(|_| rng.random_range(0..=1)).collect())
+                    .collect();
+                TestCase {
+                    data: Box::new(MaxAreaIslandTest { grid }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -253,10 +307,18 @@ fn ref_max_area_island(grid: &[Vec<i32>]) -> i32 {
         }
         visited[r][c] = true;
         let mut area = 1;
-        if r > 0 { area += dfs(grid, visited, r - 1, c); }
-        if r + 1 < grid.len() { area += dfs(grid, visited, r + 1, c); }
-        if c > 0 { area += dfs(grid, visited, r, c - 1); }
-        if c + 1 < grid[0].len() { area += dfs(grid, visited, r, c + 1); }
+        if r > 0 {
+            area += dfs(grid, visited, r - 1, c);
+        }
+        if r + 1 < grid.len() {
+            area += dfs(grid, visited, r + 1, c);
+        }
+        if c > 0 {
+            area += dfs(grid, visited, r, c - 1);
+        }
+        if c + 1 < grid[0].len() {
+            area += dfs(grid, visited, r, c + 1);
+        }
         area
     }
 
@@ -279,10 +341,18 @@ struct CountIslandsTest {
 }
 
 impl Problem for MatrixGridCountIslands {
-    fn id(&self) -> &str { "matrix_grid_count_islands" }
-    fn name(&self) -> &str { "Number of Islands" }
-    fn topic(&self) -> &str { "matrix_grid" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "matrix_grid_count_islands"
+    }
+    fn name(&self) -> &str {
+        "Number of Islands"
+    }
+    fn topic(&self) -> &str {
+        "matrix_grid"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given an m x n binary grid where 1 represents land and 0 represents water, return \
          the number of islands. An island is surrounded by water and is formed by connecting \
@@ -294,14 +364,18 @@ impl Problem for MatrixGridCountIslands {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let rows = rng.random_range(2..=10);
-            let cols = rng.random_range(2..=10);
-            let grid: Vec<Vec<i32>> = (0..rows)
-                .map(|_| (0..cols).map(|_| rng.random_range(0..=1)).collect())
-                .collect();
-            TestCase { data: Box::new(CountIslandsTest { grid }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let rows = rng.random_range(2..=10);
+                let cols = rng.random_range(2..=10);
+                let grid: Vec<Vec<i32>> = (0..rows)
+                    .map(|_| (0..cols).map(|_| rng.random_range(0..=1)).collect())
+                    .collect();
+                TestCase {
+                    data: Box::new(CountIslandsTest { grid }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -328,10 +402,18 @@ fn ref_count_islands(grid: &[Vec<i32>]) -> i32 {
             return;
         }
         visited[r][c] = true;
-        if r > 0 { dfs(grid, visited, r - 1, c); }
-        if r + 1 < grid.len() { dfs(grid, visited, r + 1, c); }
-        if c > 0 { dfs(grid, visited, r, c - 1); }
-        if c + 1 < grid[0].len() { dfs(grid, visited, r, c + 1); }
+        if r > 0 {
+            dfs(grid, visited, r - 1, c);
+        }
+        if r + 1 < grid.len() {
+            dfs(grid, visited, r + 1, c);
+        }
+        if c > 0 {
+            dfs(grid, visited, r, c - 1);
+        }
+        if c + 1 < grid[0].len() {
+            dfs(grid, visited, r, c + 1);
+        }
     }
 
     for r in 0..rows {
@@ -354,10 +436,18 @@ struct SurroundedRegionsTest {
 }
 
 impl Problem for MatrixGridSurroundedRegions {
-    fn id(&self) -> &str { "matrix_grid_surrounded_regions" }
-    fn name(&self) -> &str { "Surrounded Regions" }
-    fn topic(&self) -> &str { "matrix_grid" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "matrix_grid_surrounded_regions"
+    }
+    fn name(&self) -> &str {
+        "Surrounded Regions"
+    }
+    fn topic(&self) -> &str {
+        "matrix_grid"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given an m x n board containing 'X' and 'O', capture all regions that are \
          4-directionally surrounded by 'X'. A region is captured by flipping all 'O's \
@@ -370,18 +460,28 @@ impl Problem for MatrixGridSurroundedRegions {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let rows = rng.random_range(3..=8);
-            let cols = rng.random_range(3..=8);
-            let board: Vec<Vec<char>> = (0..rows)
-                .map(|_| {
-                    (0..cols)
-                        .map(|_| if rng.random_range(0..3) == 0 { 'O' } else { 'X' })
-                        .collect()
-                })
-                .collect();
-            TestCase { data: Box::new(SurroundedRegionsTest { board }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let rows = rng.random_range(3..=8);
+                let cols = rng.random_range(3..=8);
+                let board: Vec<Vec<char>> = (0..rows)
+                    .map(|_| {
+                        (0..cols)
+                            .map(|_| {
+                                if rng.random_range(0..3) == 0 {
+                                    'O'
+                                } else {
+                                    'X'
+                                }
+                            })
+                            .collect()
+                    })
+                    .collect();
+                TestCase {
+                    data: Box::new(SurroundedRegionsTest { board }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -407,27 +507,43 @@ fn ref_surrounded_regions(board: &[Vec<char>]) -> Vec<Vec<char>> {
             return;
         }
         grid[r][c] = 'S'; // safe (connected to border)
-        if r > 0 { dfs(grid, r - 1, c); }
-        if r + 1 < grid.len() { dfs(grid, r + 1, c); }
-        if c > 0 { dfs(grid, r, c - 1); }
-        if c + 1 < grid[0].len() { dfs(grid, r, c + 1); }
+        if r > 0 {
+            dfs(grid, r - 1, c);
+        }
+        if r + 1 < grid.len() {
+            dfs(grid, r + 1, c);
+        }
+        if c > 0 {
+            dfs(grid, r, c - 1);
+        }
+        if c + 1 < grid[0].len() {
+            dfs(grid, r, c + 1);
+        }
     }
 
     // Mark all O's connected to border
     for r in 0..rows {
-        if result[r][0] == 'O' { dfs(&mut result, r, 0); }
-        if result[r][cols - 1] == 'O' { dfs(&mut result, r, cols - 1); }
+        if result[r][0] == 'O' {
+            dfs(&mut result, r, 0);
+        }
+        if result[r][cols - 1] == 'O' {
+            dfs(&mut result, r, cols - 1);
+        }
     }
     for c in 0..cols {
-        if result[0][c] == 'O' { dfs(&mut result, 0, c); }
-        if result[rows - 1][c] == 'O' { dfs(&mut result, rows - 1, c); }
+        if result[0][c] == 'O' {
+            dfs(&mut result, 0, c);
+        }
+        if result[rows - 1][c] == 'O' {
+            dfs(&mut result, rows - 1, c);
+        }
     }
 
-    for r in 0..rows {
-        for c in 0..cols {
-            match result[r][c] {
-                'O' => result[r][c] = 'X', // captured
-                'S' => result[r][c] = 'O', // restore safe
+    for row in result.iter_mut().take(rows) {
+        for cell in row.iter_mut().take(cols) {
+            match *cell {
+                'O' => *cell = 'X', // captured
+                'S' => *cell = 'O', // restore safe
                 _ => {}
             }
         }
@@ -444,10 +560,18 @@ struct RottingOrangesTest {
 }
 
 impl Problem for MatrixGridRottingOranges {
-    fn id(&self) -> &str { "matrix_grid_rotting_oranges" }
-    fn name(&self) -> &str { "Rotting Oranges" }
-    fn topic(&self) -> &str { "matrix_grid" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "matrix_grid_rotting_oranges"
+    }
+    fn name(&self) -> &str {
+        "Rotting Oranges"
+    }
+    fn topic(&self) -> &str {
+        "matrix_grid"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "In a grid, each cell can have one of three values:\n\
          - 0: empty cell\n\
@@ -463,14 +587,18 @@ impl Problem for MatrixGridRottingOranges {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let rows = rng.random_range(2..=6);
-            let cols = rng.random_range(2..=6);
-            let grid: Vec<Vec<i32>> = (0..rows)
-                .map(|_| (0..cols).map(|_| rng.random_range(0..=2)).collect())
-                .collect();
-            TestCase { data: Box::new(RottingOrangesTest { grid }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let rows = rng.random_range(2..=6);
+                let cols = rng.random_range(2..=6);
+                let grid: Vec<Vec<i32>> = (0..rows)
+                    .map(|_| (0..cols).map(|_| rng.random_range(0..=2)).collect())
+                    .collect();
+                TestCase {
+                    data: Box::new(RottingOrangesTest { grid }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -494,11 +622,11 @@ fn ref_rotting_oranges(grid: &[Vec<i32>]) -> i32 {
     let mut queue = VecDeque::new();
     let mut fresh = 0;
 
-    for r in 0..rows {
-        for c in 0..cols {
-            if g[r][c] == 2 {
+    for (r, row) in g.iter().enumerate().take(rows) {
+        for (c, &val) in row.iter().enumerate().take(cols) {
+            if val == 2 {
                 queue.push_back((r, c));
-            } else if g[r][c] == 1 {
+            } else if val == 1 {
                 fresh += 1;
             }
         }
@@ -508,7 +636,7 @@ fn ref_rotting_oranges(grid: &[Vec<i32>]) -> i32 {
         return 0;
     }
 
-    let dirs: [(i32, i32); 4] = [(-1,0),(1,0),(0,-1),(0,1)];
+    let dirs: [(i32, i32); 4] = [(-1, 0), (1, 0), (0, -1), (0, 1)];
     let mut minutes = 0;
 
     while !queue.is_empty() {
@@ -536,7 +664,11 @@ fn ref_rotting_oranges(grid: &[Vec<i32>]) -> i32 {
         }
     }
 
-    if fresh > 0 { -1 } else { minutes }
+    if fresh > 0 {
+        -1
+    } else {
+        minutes
+    }
 }
 
 // ── Medium 7: Walls and Gates ───────────────────────────────────────────
@@ -550,10 +682,18 @@ struct WallsAndGatesTest {
 const INF: i32 = 2_147_483_647;
 
 impl Problem for MatrixGridWallsAndGates {
-    fn id(&self) -> &str { "matrix_grid_walls_and_gates" }
-    fn name(&self) -> &str { "Walls and Gates" }
-    fn topic(&self) -> &str { "matrix_grid" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "matrix_grid_walls_and_gates"
+    }
+    fn name(&self) -> &str {
+        "Walls and Gates"
+    }
+    fn topic(&self) -> &str {
+        "matrix_grid"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given an m x n grid `rooms` initialized with these three possible values:\n\
          - -1: a wall or obstacle\n\
@@ -568,25 +708,29 @@ impl Problem for MatrixGridWallsAndGates {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let rows = rng.random_range(2..=8);
-            let cols = rng.random_range(2..=8);
-            let rooms: Vec<Vec<i32>> = (0..rows)
-                .map(|_| {
-                    (0..cols)
-                        .map(|_| {
-                            let r = rng.random_range(0..=4);
-                            match r {
-                                0 => 0,       // gate
-                                1 => -1,      // wall
-                                _ => INF,     // empty room
-                            }
-                        })
-                        .collect()
-                })
-                .collect();
-            TestCase { data: Box::new(WallsAndGatesTest { rooms }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let rows = rng.random_range(2..=8);
+                let cols = rng.random_range(2..=8);
+                let rooms: Vec<Vec<i32>> = (0..rows)
+                    .map(|_| {
+                        (0..cols)
+                            .map(|_| {
+                                let r = rng.random_range(0..=4);
+                                match r {
+                                    0 => 0,   // gate
+                                    1 => -1,  // wall
+                                    _ => INF, // empty room
+                                }
+                            })
+                            .collect()
+                    })
+                    .collect();
+                TestCase {
+                    data: Box::new(WallsAndGatesTest { rooms }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -609,15 +753,15 @@ fn ref_walls_and_gates(rooms: &[Vec<i32>]) -> Vec<Vec<i32>> {
     let mut result = rooms.to_vec();
     let mut queue = VecDeque::new();
 
-    for r in 0..rows {
-        for c in 0..cols {
-            if result[r][c] == 0 {
+    for (r, row) in result.iter().enumerate().take(rows) {
+        for (c, &val) in row.iter().enumerate().take(cols) {
+            if val == 0 {
                 queue.push_back((r, c));
             }
         }
     }
 
-    let dirs: [(i32, i32); 4] = [(-1,0),(1,0),(0,-1),(0,1)];
+    let dirs: [(i32, i32); 4] = [(-1, 0), (1, 0), (0, -1), (0, 1)];
     while let Some((r, c)) = queue.pop_front() {
         for (dr, dc) in &dirs {
             let nr = r as i32 + dr;
@@ -644,10 +788,18 @@ struct ZeroOneMatrixTest {
 }
 
 impl Problem for MatrixGrid01Matrix {
-    fn id(&self) -> &str { "matrix_grid_01_matrix" }
-    fn name(&self) -> &str { "01 Matrix" }
-    fn topic(&self) -> &str { "matrix_grid" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "matrix_grid_01_matrix"
+    }
+    fn name(&self) -> &str {
+        "01 Matrix"
+    }
+    fn topic(&self) -> &str {
+        "matrix_grid"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given an m x n binary matrix `mat`, return the distance of the nearest 0 for each \
          cell. The distance between two adjacent cells is 1 (4-directional).\n\n\
@@ -659,18 +811,22 @@ impl Problem for MatrixGrid01Matrix {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let rows = rng.random_range(2..=8);
-            let cols = rng.random_range(2..=8);
-            let mut mat: Vec<Vec<i32>> = (0..rows)
-                .map(|_| (0..cols).map(|_| rng.random_range(0..=1)).collect())
-                .collect();
-            // Ensure at least one zero
-            let zr = rng.random_range(0..rows);
-            let zc = rng.random_range(0..cols);
-            mat[zr][zc] = 0;
-            TestCase { data: Box::new(ZeroOneMatrixTest { mat }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let rows = rng.random_range(2..=8);
+                let cols = rng.random_range(2..=8);
+                let mut mat: Vec<Vec<i32>> = (0..rows)
+                    .map(|_| (0..cols).map(|_| rng.random_range(0..=1)).collect())
+                    .collect();
+                // Ensure at least one zero
+                let zr = rng.random_range(0..rows);
+                let zc = rng.random_range(0..cols);
+                mat[zr][zc] = 0;
+                TestCase {
+                    data: Box::new(ZeroOneMatrixTest { mat }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -702,7 +858,7 @@ fn ref_01_matrix(mat: &[Vec<i32>]) -> Vec<Vec<i32>> {
         }
     }
 
-    let dirs: [(i32, i32); 4] = [(-1,0),(1,0),(0,-1),(0,1)];
+    let dirs: [(i32, i32); 4] = [(-1, 0), (1, 0), (0, -1), (0, 1)];
     while let Some((r, c)) = queue.pop_front() {
         for (dr, dc) in &dirs {
             let nr = r as i32 + dr;
@@ -730,10 +886,18 @@ struct WordSearchTest {
 }
 
 impl Problem for MatrixGridWordSearch {
-    fn id(&self) -> &str { "matrix_grid_word_search" }
-    fn name(&self) -> &str { "Word Search" }
-    fn topic(&self) -> &str { "matrix_grid" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "matrix_grid_word_search"
+    }
+    fn name(&self) -> &str {
+        "Word Search"
+    }
+    fn topic(&self) -> &str {
+        "matrix_grid"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given an m x n grid of characters `board` and a string `word`, return true if \
          `word` exists in the grid. The word can be constructed from letters of sequentially \
@@ -747,53 +911,56 @@ impl Problem for MatrixGridWordSearch {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let rows = rng.random_range(2..=5);
-            let cols = rng.random_range(2..=5);
-            let board: Vec<Vec<char>> = (0..rows)
-                .map(|_| {
-                    (0..cols)
-                        .map(|_| (b'a' + rng.random_range(0..=5u8)) as char)
-                        .collect()
-                })
-                .collect();
-            // Sometimes create a word that exists in the board
-            let word_len = rng.random_range(2..=4);
-            let word = if rng.random_range(0..2) == 0 {
-                // Try to pick a path through the board
-                let mut w = String::new();
-                let mut r = rng.random_range(0..rows);
-                let mut c = rng.random_range(0..cols);
-                w.push(board[r][c]);
-                for _ in 1..word_len {
-                    let dirs: [(i32, i32); 4] = [(-1,0),(1,0),(0,-1),(0,1)];
-                    let valid: Vec<(usize, usize)> = dirs.iter()
-                        .filter_map(|(dr, dc)| {
-                            let nr = r as i32 + dr;
-                            let nc = c as i32 + dc;
-                            if nr >= 0 && nr < rows as i32 && nc >= 0 && nc < cols as i32 {
-                                Some((nr as usize, nc as usize))
-                            } else {
-                                None
-                            }
-                        })
-                        .collect();
-                    if valid.is_empty() {
-                        break;
-                    }
-                    let idx = rng.random_range(0..valid.len());
-                    r = valid[idx].0;
-                    c = valid[idx].1;
+        (0..10)
+            .map(|_| {
+                let rows = rng.random_range(2..=5);
+                let cols = rng.random_range(2..=5);
+                let board: Vec<Vec<char>> = (0..rows)
+                    .map(|_| {
+                        (0..cols)
+                            .map(|_| (b'a' + rng.random_range(0..=5u8)) as char)
+                            .collect()
+                    })
+                    .collect();
+                // Sometimes create a word that exists in the board
+                let word_len = rng.random_range(2..=4);
+                let word = if rng.random_range(0..2) == 0 {
+                    // Try to pick a path through the board
+                    let mut w = String::new();
+                    let mut r = rng.random_range(0..rows);
+                    let mut c = rng.random_range(0..cols);
                     w.push(board[r][c]);
+                    for _ in 1..word_len {
+                        let dirs: [(i32, i32); 4] = [(-1, 0), (1, 0), (0, -1), (0, 1)];
+                        let valid: Vec<(usize, usize)> = dirs
+                            .iter()
+                            .filter_map(|(dr, dc)| {
+                                let nr = r as i32 + dr;
+                                let nc = c as i32 + dc;
+                                if nr >= 0 && nr < rows as i32 && nc >= 0 && nc < cols as i32 {
+                                    Some((nr as usize, nc as usize))
+                                } else {
+                                    None
+                                }
+                            })
+                            .collect();
+                        if valid.is_empty() {
+                            break;
+                        }
+                        let idx = rng.random_range(0..valid.len());
+                        r = valid[idx].0;
+                        c = valid[idx].1;
+                        w.push(board[r][c]);
+                    }
+                    w
+                } else {
+                    crate::problems::helpers::random_string_from(&mut rng, word_len, b"abcdef")
+                };
+                TestCase {
+                    data: Box::new(WordSearchTest { board, word }),
                 }
-                w
-            } else {
-                crate::problems::helpers::random_string_from(
-                    &mut rng, word_len, b"abcdef",
-                )
-            };
-            TestCase { data: Box::new(WordSearchTest { board, word }) }
-        }).collect()
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -816,8 +983,12 @@ fn ref_word_search(board: &[Vec<char>], word: &str) -> bool {
     let mut visited = vec![vec![false; cols]; rows];
 
     fn dfs(
-        board: &[Vec<char>], chars: &[char], visited: &mut Vec<Vec<bool>>,
-        r: usize, c: usize, idx: usize,
+        board: &[Vec<char>],
+        chars: &[char],
+        visited: &mut Vec<Vec<bool>>,
+        r: usize,
+        c: usize,
+        idx: usize,
     ) -> bool {
         if idx == chars.len() {
             return true;
@@ -826,15 +997,13 @@ fn ref_word_search(board: &[Vec<char>], word: &str) -> bool {
             return false;
         }
         visited[r][c] = true;
-        let dirs: [(i32, i32); 4] = [(-1,0),(1,0),(0,-1),(0,1)];
+        let dirs: [(i32, i32); 4] = [(-1, 0), (1, 0), (0, -1), (0, 1)];
         for (dr, dc) in &dirs {
             let nr = r as i32 + dr;
             let nc = c as i32 + dc;
-            if nr >= 0 && nc >= 0 {
-                if dfs(board, chars, visited, nr as usize, nc as usize, idx + 1) {
-                    visited[r][c] = false;
-                    return true;
-                }
+            if nr >= 0 && nc >= 0 && dfs(board, chars, visited, nr as usize, nc as usize, idx + 1) {
+                visited[r][c] = false;
+                return true;
             }
         }
         visited[r][c] = false;
@@ -861,10 +1030,18 @@ struct UniquePathsTest {
 }
 
 impl Problem for MatrixGridUniquePaths {
-    fn id(&self) -> &str { "matrix_grid_unique_paths" }
-    fn name(&self) -> &str { "Unique Paths" }
-    fn topic(&self) -> &str { "matrix_grid" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "matrix_grid_unique_paths"
+    }
+    fn name(&self) -> &str {
+        "Unique Paths"
+    }
+    fn topic(&self) -> &str {
+        "matrix_grid"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "A robot is located at the top-left corner of an m x n grid. It can only move \
          either down or right at any point in time. The robot is trying to reach the \
@@ -875,11 +1052,15 @@ impl Problem for MatrixGridUniquePaths {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let m = rng.random_range(1..=15);
-            let n = rng.random_range(1..=15);
-            TestCase { data: Box::new(UniquePathsTest { m, n }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let m = rng.random_range(1..=15);
+                let n = rng.random_range(1..=15);
+                TestCase {
+                    data: Box::new(UniquePathsTest { m, n }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -915,10 +1096,18 @@ struct ShortestPathObstaclesTest {
 }
 
 impl Problem for MatrixGridShortestPathObstacles {
-    fn id(&self) -> &str { "matrix_grid_shortest_path_obstacles" }
-    fn name(&self) -> &str { "Shortest Path Eliminating Obstacles" }
-    fn topic(&self) -> &str { "matrix_grid" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "matrix_grid_shortest_path_obstacles"
+    }
+    fn name(&self) -> &str {
+        "Shortest Path Eliminating Obstacles"
+    }
+    fn topic(&self) -> &str {
+        "matrix_grid"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given an m x n grid where 0 is an empty cell and 1 is an obstacle, return the \
          minimum number of steps to walk from the upper-left corner (0,0) to the lower-right \
@@ -932,19 +1121,30 @@ impl Problem for MatrixGridShortestPathObstacles {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let rows = rng.random_range(2..=8);
-            let cols = rng.random_range(2..=8);
-            let grid: Vec<Vec<i32>> = (0..rows)
-                .map(|_| (0..cols).map(|_| if rng.random_range(0..=3) == 0 { 1 } else { 0 }).collect())
-                .collect();
-            let k = rng.random_range(0..=(rows * cols / 3) as i32);
-            TestCase { data: Box::new(ShortestPathObstaclesTest { grid, k }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let rows = rng.random_range(2..=8);
+                let cols = rng.random_range(2..=8);
+                let grid: Vec<Vec<i32>> = (0..rows)
+                    .map(|_| {
+                        (0..cols)
+                            .map(|_| if rng.random_range(0..=3) == 0 { 1 } else { 0 })
+                            .collect()
+                    })
+                    .collect();
+                let k = rng.random_range(0..=(rows * cols / 3) as i32);
+                TestCase {
+                    data: Box::new(ShortestPathObstaclesTest { grid, k }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
-        let t = test.data.downcast_ref::<ShortestPathObstaclesTest>().unwrap();
+        let t = test
+            .data
+            .downcast_ref::<ShortestPathObstaclesTest>()
+            .unwrap();
         let expected = ref_shortest_path_obstacles(&t.grid, t.k);
         let actual = solutions::shortest_path_eliminating_obstacles(&t.grid, t.k);
         SolutionResult {
@@ -970,7 +1170,7 @@ fn ref_shortest_path_obstacles(grid: &[Vec<i32>], k: i32) -> i32 {
     queue.push_back((0usize, 0usize, 0usize, 0i32)); // r, c, eliminated, steps
     visited[0][0][0] = true;
 
-    let dirs: [(i32, i32); 4] = [(-1,0),(1,0),(0,-1),(0,1)];
+    let dirs: [(i32, i32); 4] = [(-1, 0), (1, 0), (0, -1), (0, 1)];
     while let Some((r, c, elim, steps)) = queue.pop_front() {
         for (dr, dc) in &dirs {
             let nr = r as i32 + dr;
@@ -1003,10 +1203,18 @@ struct SwimInWaterTest {
 }
 
 impl Problem for MatrixGridSwimInWater {
-    fn id(&self) -> &str { "matrix_grid_swim_in_water" }
-    fn name(&self) -> &str { "Swim in Rising Water" }
-    fn topic(&self) -> &str { "matrix_grid" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "matrix_grid_swim_in_water"
+    }
+    fn name(&self) -> &str {
+        "Swim in Rising Water"
+    }
+    fn topic(&self) -> &str {
+        "matrix_grid"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given an n x n integer grid where grid[i][j] represents elevation, at time t the \
          depth of water everywhere is t. You can swim from one cell to another 4-directionally \
@@ -1020,17 +1228,21 @@ impl Problem for MatrixGridSwimInWater {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(2..=7);
-            let mut vals: Vec<i32> = (0..n * n).map(|i| i as i32).collect();
-            // Shuffle
-            for i in (1..vals.len()).rev() {
-                let j = rng.random_range(0..=i);
-                vals.swap(i, j);
-            }
-            let grid: Vec<Vec<i32>> = vals.chunks(n).map(|c| c.to_vec()).collect();
-            TestCase { data: Box::new(SwimInWaterTest { grid }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(2..=7);
+                let mut vals: Vec<i32> = (0..n * n).map(|i| i as i32).collect();
+                // Shuffle
+                for i in (1..vals.len()).rev() {
+                    let j = rng.random_range(0..=i);
+                    vals.swap(i, j);
+                }
+                let grid: Vec<Vec<i32>> = vals.chunks(n).map(|c| c.to_vec()).collect();
+                TestCase {
+                    data: Box::new(SwimInWaterTest { grid }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -1055,7 +1267,7 @@ fn ref_swim_in_water(grid: &[Vec<i32>]) -> i32 {
     dist[0][0] = grid[0][0];
     heap.push(Reverse((grid[0][0], 0usize, 0usize)));
 
-    let dirs: [(i32, i32); 4] = [(-1,0),(1,0),(0,-1),(0,1)];
+    let dirs: [(i32, i32); 4] = [(-1, 0), (1, 0), (0, -1), (0, 1)];
     while let Some(Reverse((cost, r, c))) = heap.pop() {
         if r == n - 1 && c == n - 1 {
             return cost;
@@ -1089,10 +1301,18 @@ struct MakingLargeIslandTest {
 }
 
 impl Problem for MatrixGridMakingLargeIsland {
-    fn id(&self) -> &str { "matrix_grid_making_large_island" }
-    fn name(&self) -> &str { "Making A Large Island" }
-    fn topic(&self) -> &str { "matrix_grid" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "matrix_grid_making_large_island"
+    }
+    fn name(&self) -> &str {
+        "Making A Large Island"
+    }
+    fn topic(&self) -> &str {
+        "matrix_grid"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given an n x n binary grid, return the size of the largest island after changing \
          at most one 0 to 1. An island is a 4-directionally connected group of 1s.\n\n\
@@ -1103,13 +1323,17 @@ impl Problem for MatrixGridMakingLargeIsland {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(2..=8);
-            let grid: Vec<Vec<i32>> = (0..n)
-                .map(|_| (0..n).map(|_| rng.random_range(0..=1)).collect())
-                .collect();
-            TestCase { data: Box::new(MakingLargeIslandTest { grid }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(2..=8);
+                let grid: Vec<Vec<i32>> = (0..n)
+                    .map(|_| (0..n).map(|_| rng.random_range(0..=1)).collect())
+                    .collect();
+                TestCase {
+                    data: Box::new(MakingLargeIslandTest { grid }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -1133,8 +1357,11 @@ fn ref_making_large_island(grid: &[Vec<i32>]) -> i32 {
     let mut id = 0usize;
 
     fn dfs(
-        grid: &[Vec<i32>], island_id: &mut Vec<Vec<usize>>,
-        r: usize, c: usize, id: usize,
+        grid: &[Vec<i32>],
+        island_id: &mut Vec<Vec<usize>>,
+        r: usize,
+        c: usize,
+        id: usize,
     ) -> i32 {
         if island_id[r][c] != 0 || grid[r][c] == 0 {
             return 0;
@@ -1142,10 +1369,18 @@ fn ref_making_large_island(grid: &[Vec<i32>]) -> i32 {
         island_id[r][c] = id;
         let mut size = 1;
         let n = grid.len();
-        if r > 0 { size += dfs(grid, island_id, r - 1, c, id); }
-        if r + 1 < n { size += dfs(grid, island_id, r + 1, c, id); }
-        if c > 0 { size += dfs(grid, island_id, r, c - 1, id); }
-        if c + 1 < n { size += dfs(grid, island_id, r, c + 1, id); }
+        if r > 0 {
+            size += dfs(grid, island_id, r - 1, c, id);
+        }
+        if r + 1 < n {
+            size += dfs(grid, island_id, r + 1, c, id);
+        }
+        if c > 0 {
+            size += dfs(grid, island_id, r, c - 1, id);
+        }
+        if c + 1 < n {
+            size += dfs(grid, island_id, r, c + 1, id);
+        }
         size
     }
 
@@ -1162,10 +1397,10 @@ fn ref_making_large_island(grid: &[Vec<i32>]) -> i32 {
 
     let mut max_size = *island_sizes.iter().skip(1).max().unwrap_or(&0);
 
-    let dirs: [(i32, i32); 4] = [(-1,0),(1,0),(0,-1),(0,1)];
-    for r in 0..n {
-        for c in 0..n {
-            if grid[r][c] == 0 {
+    let dirs: [(i32, i32); 4] = [(-1, 0), (1, 0), (0, -1), (0, 1)];
+    for (r, grid_row) in grid.iter().enumerate().take(n) {
+        for (c, &cell) in grid_row.iter().enumerate().take(n) {
+            if cell == 0 {
                 let mut seen = HashSet::new();
                 let mut total = 1; // the flipped cell
                 for (dr, dc) in &dirs {
@@ -1196,10 +1431,18 @@ struct LongestIncreasingPathTest {
 }
 
 impl Problem for MatrixGridLongestIncreasingPath {
-    fn id(&self) -> &str { "matrix_grid_longest_increasing_path" }
-    fn name(&self) -> &str { "Longest Increasing Path in a Matrix" }
-    fn topic(&self) -> &str { "matrix_grid" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "matrix_grid_longest_increasing_path"
+    }
+    fn name(&self) -> &str {
+        "Longest Increasing Path in a Matrix"
+    }
+    fn topic(&self) -> &str {
+        "matrix_grid"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given an m x n integers matrix, return the length of the longest increasing path \
          in the matrix. From each cell, you can move in 4 directions. You may not move \
@@ -1212,18 +1455,25 @@ impl Problem for MatrixGridLongestIncreasingPath {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let rows = rng.random_range(2..=8);
-            let cols = rng.random_range(2..=8);
-            let matrix: Vec<Vec<i32>> = (0..rows)
-                .map(|_| (0..cols).map(|_| rng.random_range(0..=20)).collect())
-                .collect();
-            TestCase { data: Box::new(LongestIncreasingPathTest { matrix }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let rows = rng.random_range(2..=8);
+                let cols = rng.random_range(2..=8);
+                let matrix: Vec<Vec<i32>> = (0..rows)
+                    .map(|_| (0..cols).map(|_| rng.random_range(0..=20)).collect())
+                    .collect();
+                TestCase {
+                    data: Box::new(LongestIncreasingPathTest { matrix }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
-        let t = test.data.downcast_ref::<LongestIncreasingPathTest>().unwrap();
+        let t = test
+            .data
+            .downcast_ref::<LongestIncreasingPathTest>()
+            .unwrap();
         let expected = ref_longest_increasing_path(&t.matrix);
         let actual = solutions::longest_increasing_path(&t.matrix);
         SolutionResult {
@@ -1245,7 +1495,7 @@ fn ref_longest_increasing_path(matrix: &[Vec<i32>]) -> i32 {
             return memo[r][c];
         }
         let mut best = 1;
-        let dirs: [(i32, i32); 4] = [(-1,0),(1,0),(0,-1),(0,1)];
+        let dirs: [(i32, i32); 4] = [(-1, 0), (1, 0), (0, -1), (0, 1)];
         for (dr, dc) in &dirs {
             let nr = r as i32 + dr;
             let nc = c as i32 + dc;
@@ -1279,10 +1529,18 @@ struct TreasureIslandTest {
 }
 
 impl Problem for MatrixGridTreasureIsland {
-    fn id(&self) -> &str { "matrix_grid_treasure_island" }
-    fn name(&self) -> &str { "Treasure Island" }
-    fn topic(&self) -> &str { "matrix_grid" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "matrix_grid_treasure_island"
+    }
+    fn name(&self) -> &str {
+        "Treasure Island"
+    }
+    fn topic(&self) -> &str {
+        "matrix_grid"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "You are given a grid of characters where:\n\
          - 'S' is the starting cell (always at (0,0))\n\
@@ -1298,30 +1556,38 @@ impl Problem for MatrixGridTreasureIsland {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let rows = rng.random_range(3..=8);
-            let cols = rng.random_range(3..=8);
-            let mut grid: Vec<Vec<char>> = (0..rows)
-                .map(|_| {
-                    (0..cols)
-                        .map(|_| {
-                            let r = rng.random_range(0..=4);
-                            if r == 0 { 'D' } else { 'O' }
-                        })
-                        .collect()
-                })
-                .collect();
-            grid[0][0] = 'S';
-            // Place treasure somewhere not at start
-            let tr = rng.random_range(0..rows);
-            let tc = rng.random_range(0..cols);
-            if tr != 0 || tc != 0 {
-                grid[tr][tc] = 'T';
-            } else {
-                grid[rows - 1][cols - 1] = 'T';
-            }
-            TestCase { data: Box::new(TreasureIslandTest { grid }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let rows = rng.random_range(3..=8);
+                let cols = rng.random_range(3..=8);
+                let mut grid: Vec<Vec<char>> = (0..rows)
+                    .map(|_| {
+                        (0..cols)
+                            .map(|_| {
+                                let r = rng.random_range(0..=4);
+                                if r == 0 {
+                                    'D'
+                                } else {
+                                    'O'
+                                }
+                            })
+                            .collect()
+                    })
+                    .collect();
+                grid[0][0] = 'S';
+                // Place treasure somewhere not at start
+                let tr = rng.random_range(0..rows);
+                let tc = rng.random_range(0..cols);
+                if tr != 0 || tc != 0 {
+                    grid[tr][tc] = 'T';
+                } else {
+                    grid[rows - 1][cols - 1] = 'T';
+                }
+                TestCase {
+                    data: Box::new(TreasureIslandTest { grid }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -1346,7 +1612,7 @@ fn ref_treasure_island(grid: &[Vec<char>]) -> i32 {
     queue.push_back((0usize, 0usize, 0i32));
     visited[0][0] = true;
 
-    let dirs: [(i32, i32); 4] = [(-1,0),(1,0),(0,-1),(0,1)];
+    let dirs: [(i32, i32); 4] = [(-1, 0), (1, 0), (0, -1), (0, 1)];
     while let Some((r, c, steps)) = queue.pop_front() {
         if grid[r][c] == 'T' {
             return steps;

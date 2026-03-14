@@ -95,11 +95,7 @@ pub fn optimize_network(_n: usize, _edges: &[(usize, usize, i32)]) -> i32 {
 /// Approximate Steiner Tree: connect all terminal nodes with minimum weight.
 /// Approximation: compute shortest paths between all terminal pairs (Dijkstra),
 /// then find MST of the complete graph on terminals. Return that MST weight.
-pub fn steiner_tree(
-    _n: usize,
-    _edges: &[(usize, usize, i32)],
-    _terminals: &[usize],
-) -> i32 {
+pub fn steiner_tree(_n: usize, _edges: &[(usize, usize, i32)], _terminals: &[usize]) -> i32 {
     todo!()
 }
 

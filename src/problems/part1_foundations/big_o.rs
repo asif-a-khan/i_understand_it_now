@@ -40,12 +40,7 @@ fn single_test(id: u32) -> Vec<TestCase> {
 }
 
 /// Helper: compare a user answer to the expected answer, normalizing whitespace.
-fn check(
-    test: &TestCase,
-    expected: &str,
-    actual: &str,
-    snippet: &str,
-) -> SolutionResult {
+fn check(test: &TestCase, expected: &str, actual: &str, snippet: &str) -> SolutionResult {
     let _t = test.data.downcast_ref::<BigOTest>().unwrap();
     let norm_expected = expected.replace(' ', "");
     let norm_actual = actual.replace(' ', "");
@@ -62,10 +57,18 @@ fn check(
 struct BigOSingleLoop;
 
 impl Problem for BigOSingleLoop {
-    fn id(&self) -> &str { "big_o_single_loop" }
-    fn name(&self) -> &str { "Single Loop Complexity" }
-    fn topic(&self) -> &str { "big_o" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "big_o_single_loop"
+    }
+    fn name(&self) -> &str {
+        "Single Loop Complexity"
+    }
+    fn topic(&self) -> &str {
+        "big_o"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
 
     fn description(&self) -> &str {
         "What is the time complexity of a single for-loop iterating from 0 to n?\n\n\
@@ -77,7 +80,9 @@ impl Problem for BigOSingleLoop {
          Return a string like \"O(n)\", \"O(1)\", \"O(n^2)\", etc."
     }
 
-    fn generate_tests(&self) -> Vec<TestCase> { single_test(1) }
+    fn generate_tests(&self) -> Vec<TestCase> {
+        single_test(1)
+    }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
         let expected = "O(n)";
@@ -91,10 +96,18 @@ impl Problem for BigOSingleLoop {
 struct BigOConstant;
 
 impl Problem for BigOConstant {
-    fn id(&self) -> &str { "big_o_constant" }
-    fn name(&self) -> &str { "Constant Time Access" }
-    fn topic(&self) -> &str { "big_o" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "big_o_constant"
+    }
+    fn name(&self) -> &str {
+        "Constant Time Access"
+    }
+    fn topic(&self) -> &str {
+        "big_o"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
 
     fn description(&self) -> &str {
         "What is the time complexity of accessing an array element by index?\n\n\
@@ -104,7 +117,9 @@ impl Problem for BigOConstant {
          Return the Big-O as a string."
     }
 
-    fn generate_tests(&self) -> Vec<TestCase> { single_test(2) }
+    fn generate_tests(&self) -> Vec<TestCase> {
+        single_test(2)
+    }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
         let expected = "O(1)";
@@ -118,10 +133,18 @@ impl Problem for BigOConstant {
 struct BigONestedLoop;
 
 impl Problem for BigONestedLoop {
-    fn id(&self) -> &str { "big_o_nested_loop" }
-    fn name(&self) -> &str { "Nested Loop Complexity" }
-    fn topic(&self) -> &str { "big_o" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "big_o_nested_loop"
+    }
+    fn name(&self) -> &str {
+        "Nested Loop Complexity"
+    }
+    fn topic(&self) -> &str {
+        "big_o"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
 
     fn description(&self) -> &str {
         "What is the time complexity of two nested loops, each iterating from 0 to n?\n\n\
@@ -135,7 +158,9 @@ impl Problem for BigONestedLoop {
          Return the Big-O as a string."
     }
 
-    fn generate_tests(&self) -> Vec<TestCase> { single_test(3) }
+    fn generate_tests(&self) -> Vec<TestCase> {
+        single_test(3)
+    }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
         let expected = "O(n^2)";
@@ -154,10 +179,18 @@ impl Problem for BigONestedLoop {
 struct BigOBinarySearch;
 
 impl Problem for BigOBinarySearch {
-    fn id(&self) -> &str { "big_o_binary_search" }
-    fn name(&self) -> &str { "Binary Search Complexity" }
-    fn topic(&self) -> &str { "big_o" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "big_o_binary_search"
+    }
+    fn name(&self) -> &str {
+        "Binary Search Complexity"
+    }
+    fn topic(&self) -> &str {
+        "big_o"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
 
     fn description(&self) -> &str {
         "What is the time complexity of binary search on a sorted array of n elements?\n\n\
@@ -173,12 +206,19 @@ impl Problem for BigOBinarySearch {
          Return the Big-O as a string."
     }
 
-    fn generate_tests(&self) -> Vec<TestCase> { single_test(4) }
+    fn generate_tests(&self) -> Vec<TestCase> {
+        single_test(4)
+    }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
         let expected = "O(log n)";
         let actual = solutions::binary_search();
-        check(test, expected, actual, "Binary search: halve the range each step")
+        check(
+            test,
+            expected,
+            actual,
+            "Binary search: halve the range each step",
+        )
     }
 }
 
@@ -187,10 +227,18 @@ impl Problem for BigOBinarySearch {
 struct BigOSequential;
 
 impl Problem for BigOSequential {
-    fn id(&self) -> &str { "big_o_sequential" }
-    fn name(&self) -> &str { "Sequential Loops" }
-    fn topic(&self) -> &str { "big_o" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "big_o_sequential"
+    }
+    fn name(&self) -> &str {
+        "Sequential Loops"
+    }
+    fn topic(&self) -> &str {
+        "big_o"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
 
     fn description(&self) -> &str {
         "What is the time complexity when two sequential (non-nested) loops each run O(n) times?\n\n\
@@ -206,7 +254,9 @@ impl Problem for BigOSequential {
          Return the Big-O as a string."
     }
 
-    fn generate_tests(&self) -> Vec<TestCase> { single_test(5) }
+    fn generate_tests(&self) -> Vec<TestCase> {
+        single_test(5)
+    }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
         let expected = "O(n)";
@@ -225,10 +275,18 @@ impl Problem for BigOSequential {
 struct BigOTripleNested;
 
 impl Problem for BigOTripleNested {
-    fn id(&self) -> &str { "big_o_triple_nested" }
-    fn name(&self) -> &str { "Triple Nested Loop" }
-    fn topic(&self) -> &str { "big_o" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "big_o_triple_nested"
+    }
+    fn name(&self) -> &str {
+        "Triple Nested Loop"
+    }
+    fn topic(&self) -> &str {
+        "big_o"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
 
     fn description(&self) -> &str {
         "What is the time complexity of three nested loops, each iterating up to n?\n\n\
@@ -244,7 +302,9 @@ impl Problem for BigOTripleNested {
          Return the Big-O as a string."
     }
 
-    fn generate_tests(&self) -> Vec<TestCase> { single_test(6) }
+    fn generate_tests(&self) -> Vec<TestCase> {
+        single_test(6)
+    }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
         let expected = "O(n^3)";
@@ -263,10 +323,18 @@ impl Problem for BigOTripleNested {
 struct BigOLogLinear;
 
 impl Problem for BigOLogLinear {
-    fn id(&self) -> &str { "big_o_log_linear" }
-    fn name(&self) -> &str { "Log-Linear Complexity" }
-    fn topic(&self) -> &str { "big_o" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "big_o_log_linear"
+    }
+    fn name(&self) -> &str {
+        "Log-Linear Complexity"
+    }
+    fn topic(&self) -> &str {
+        "big_o"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
 
     fn description(&self) -> &str {
         "What is the time complexity of a loop that runs n times, where each iteration \
@@ -280,7 +348,9 @@ impl Problem for BigOLogLinear {
          Return the Big-O as a string."
     }
 
-    fn generate_tests(&self) -> Vec<TestCase> { single_test(7) }
+    fn generate_tests(&self) -> Vec<TestCase> {
+        single_test(7)
+    }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
         let expected = "O(n log n)";
@@ -299,10 +369,18 @@ impl Problem for BigOLogLinear {
 struct BigOSqrt;
 
 impl Problem for BigOSqrt {
-    fn id(&self) -> &str { "big_o_sqrt" }
-    fn name(&self) -> &str { "Square Root Loop" }
-    fn topic(&self) -> &str { "big_o" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "big_o_sqrt"
+    }
+    fn name(&self) -> &str {
+        "Square Root Loop"
+    }
+    fn topic(&self) -> &str {
+        "big_o"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
 
     fn description(&self) -> &str {
         "What is the time complexity of a loop that iterates from 1 to sqrt(n)?\n\n\
@@ -317,17 +395,14 @@ impl Problem for BigOSqrt {
          Return the Big-O as a string."
     }
 
-    fn generate_tests(&self) -> Vec<TestCase> { single_test(8) }
+    fn generate_tests(&self) -> Vec<TestCase> {
+        single_test(8)
+    }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
         let expected = "O(sqrt(n))";
         let actual = solutions::sqrt_loop();
-        check(
-            test,
-            expected,
-            actual,
-            "while i * i <= n { O(1); i += 1; }",
-        )
+        check(test, expected, actual, "while i * i <= n { O(1); i += 1; }")
     }
 }
 
@@ -336,10 +411,18 @@ impl Problem for BigOSqrt {
 struct BigOTwoInputs;
 
 impl Problem for BigOTwoInputs {
-    fn id(&self) -> &str { "big_o_two_inputs" }
-    fn name(&self) -> &str { "Two Different Inputs" }
-    fn topic(&self) -> &str { "big_o" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "big_o_two_inputs"
+    }
+    fn name(&self) -> &str {
+        "Two Different Inputs"
+    }
+    fn topic(&self) -> &str {
+        "big_o"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
 
     fn description(&self) -> &str {
         "What is the time complexity of nested loops with TWO different input sizes?\n\n\
@@ -355,7 +438,9 @@ impl Problem for BigOTwoInputs {
          Return the Big-O as a string."
     }
 
-    fn generate_tests(&self) -> Vec<TestCase> { single_test(9) }
+    fn generate_tests(&self) -> Vec<TestCase> {
+        single_test(9)
+    }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
         let expected = "O(m*n)";
@@ -374,10 +459,18 @@ impl Problem for BigOTwoInputs {
 struct BigOHalfEachTime;
 
 impl Problem for BigOHalfEachTime {
-    fn id(&self) -> &str { "big_o_half_each_time" }
-    fn name(&self) -> &str { "Halving Loop" }
-    fn topic(&self) -> &str { "big_o" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "big_o_half_each_time"
+    }
+    fn name(&self) -> &str {
+        "Halving Loop"
+    }
+    fn topic(&self) -> &str {
+        "big_o"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
 
     fn description(&self) -> &str {
         "What is the time complexity of a loop that halves the input each iteration?\n\n\
@@ -392,17 +485,14 @@ impl Problem for BigOHalfEachTime {
          Return the Big-O as a string."
     }
 
-    fn generate_tests(&self) -> Vec<TestCase> { single_test(10) }
+    fn generate_tests(&self) -> Vec<TestCase> {
+        single_test(10)
+    }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
         let expected = "O(log n)";
         let actual = solutions::half_each_time();
-        check(
-            test,
-            expected,
-            actual,
-            "while x > 1 { O(1); x /= 2; }",
-        )
+        check(test, expected, actual, "while x > 1 { O(1); x /= 2; }")
     }
 }
 
@@ -411,10 +501,18 @@ impl Problem for BigOHalfEachTime {
 struct BigOFibonacciNaive;
 
 impl Problem for BigOFibonacciNaive {
-    fn id(&self) -> &str { "big_o_fibonacci_naive" }
-    fn name(&self) -> &str { "Naive Recursive Fibonacci" }
-    fn topic(&self) -> &str { "big_o" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "big_o_fibonacci_naive"
+    }
+    fn name(&self) -> &str {
+        "Naive Recursive Fibonacci"
+    }
+    fn topic(&self) -> &str {
+        "big_o"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
 
     fn description(&self) -> &str {
         "What is the time complexity of the naive recursive Fibonacci implementation?\n\n\
@@ -430,7 +528,9 @@ impl Problem for BigOFibonacciNaive {
          Return the Big-O as a string."
     }
 
-    fn generate_tests(&self) -> Vec<TestCase> { single_test(11) }
+    fn generate_tests(&self) -> Vec<TestCase> {
+        single_test(11)
+    }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
         let expected = "O(2^n)";
@@ -449,10 +549,18 @@ impl Problem for BigOFibonacciNaive {
 struct BigOPermutations;
 
 impl Problem for BigOPermutations {
-    fn id(&self) -> &str { "big_o_permutations" }
-    fn name(&self) -> &str { "Generating All Permutations" }
-    fn topic(&self) -> &str { "big_o" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "big_o_permutations"
+    }
+    fn name(&self) -> &str {
+        "Generating All Permutations"
+    }
+    fn topic(&self) -> &str {
+        "big_o"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
 
     fn description(&self) -> &str {
         "What is the time complexity of generating all permutations of n elements?\n\n\
@@ -473,7 +581,9 @@ impl Problem for BigOPermutations {
          Return the Big-O as a string."
     }
 
-    fn generate_tests(&self) -> Vec<TestCase> { single_test(12) }
+    fn generate_tests(&self) -> Vec<TestCase> {
+        single_test(12)
+    }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
         let expected = "O(n!)";
@@ -492,10 +602,18 @@ impl Problem for BigOPermutations {
 struct BigOMatrixMultiply;
 
 impl Problem for BigOMatrixMultiply {
-    fn id(&self) -> &str { "big_o_matrix_multiply" }
-    fn name(&self) -> &str { "Standard Matrix Multiplication" }
-    fn topic(&self) -> &str { "big_o" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "big_o_matrix_multiply"
+    }
+    fn name(&self) -> &str {
+        "Standard Matrix Multiplication"
+    }
+    fn topic(&self) -> &str {
+        "big_o"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
 
     fn description(&self) -> &str {
         "What is the time complexity of standard (naive) multiplication of two n x n matrices?\n\n\
@@ -513,7 +631,9 @@ impl Problem for BigOMatrixMultiply {
          Return the Big-O as a string."
     }
 
-    fn generate_tests(&self) -> Vec<TestCase> { single_test(13) }
+    fn generate_tests(&self) -> Vec<TestCase> {
+        single_test(13)
+    }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
         let expected = "O(n^3)";
@@ -532,10 +652,18 @@ impl Problem for BigOMatrixMultiply {
 struct BigOAmortizedDynamicArray;
 
 impl Problem for BigOAmortizedDynamicArray {
-    fn id(&self) -> &str { "big_o_amortized_dynamic_array" }
-    fn name(&self) -> &str { "Amortized Dynamic Array Push" }
-    fn topic(&self) -> &str { "big_o" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "big_o_amortized_dynamic_array"
+    }
+    fn name(&self) -> &str {
+        "Amortized Dynamic Array Push"
+    }
+    fn topic(&self) -> &str {
+        "big_o"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
 
     fn description(&self) -> &str {
         "What is the AMORTIZED time complexity of a single push operation on a dynamic\n\
@@ -548,7 +676,9 @@ impl Problem for BigOAmortizedDynamicArray {
          Return the Big-O as a string."
     }
 
-    fn generate_tests(&self) -> Vec<TestCase> { single_test(14) }
+    fn generate_tests(&self) -> Vec<TestCase> {
+        single_test(14)
+    }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
         let expected = "O(1)";
@@ -567,10 +697,18 @@ impl Problem for BigOAmortizedDynamicArray {
 struct BigOBfsGraph;
 
 impl Problem for BigOBfsGraph {
-    fn id(&self) -> &str { "big_o_bfs_graph" }
-    fn name(&self) -> &str { "BFS Graph Traversal" }
-    fn topic(&self) -> &str { "big_o" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "big_o_bfs_graph"
+    }
+    fn name(&self) -> &str {
+        "BFS Graph Traversal"
+    }
+    fn topic(&self) -> &str {
+        "big_o"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
 
     fn description(&self) -> &str {
         "What is the time complexity of BFS on a graph with V vertices and E edges\n\
@@ -596,7 +734,9 @@ impl Problem for BigOBfsGraph {
          Return the Big-O as a string."
     }
 
-    fn generate_tests(&self) -> Vec<TestCase> { single_test(15) }
+    fn generate_tests(&self) -> Vec<TestCase> {
+        single_test(15)
+    }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
         let expected = "O(V+E)";

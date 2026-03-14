@@ -81,14 +81,14 @@ pub fn launch_external_editor(
 
     match status {
         Ok(s) if s.success() => Ok(()),
-        Ok(s) => Err(io::Error::new(
-            io::ErrorKind::Other,
-            format!("Editor exited with status: {}", s),
-        )),
-        Err(e) => Err(io::Error::new(
-            io::ErrorKind::Other,
-            format!("Failed to launch editor '{}': {}", editor, e),
-        )),
+        Ok(s) => Err(io::Error::other(format!(
+            "Editor exited with status: {}",
+            s
+        ))),
+        Err(e) => Err(io::Error::other(format!(
+            "Failed to launch editor '{}': {}",
+            editor, e
+        ))),
     }
 }
 
@@ -361,9 +361,7 @@ impl InTuiEditorState {
         // Position cursor
         let cursor_screen_row = (self.cursor_row - scroll_row) as u16 + inner.y;
         let cursor_screen_col = self.cursor_col as u16 + inner.x + gutter_width;
-        if cursor_screen_row < inner.y + inner.height
-            && cursor_screen_col < inner.x + inner.width
-        {
+        if cursor_screen_row < inner.y + inner.height && cursor_screen_col < inner.x + inner.width {
             f.set_cursor_position(Position {
                 x: cursor_screen_col,
                 y: cursor_screen_row,
@@ -390,7 +388,12 @@ impl InTuiEditorState {
 
         let status = Line::from(vec![
             Span::styled(
-                format!(" Ln {}, Col {}{}", self.cursor_row + 1, self.cursor_col + 1, modified_indicator),
+                format!(
+                    " Ln {}, Col {}{}",
+                    self.cursor_row + 1,
+                    self.cursor_col + 1,
+                    modified_indicator
+                ),
                 theme::muted_style(),
             ),
             Span::styled(status_text, status_style),

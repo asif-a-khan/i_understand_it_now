@@ -36,10 +36,18 @@ struct ValidParenthesesTest {
 }
 
 impl Problem for ValidParentheses {
-    fn id(&self) -> &str { "stacks_valid_parentheses" }
-    fn name(&self) -> &str { "Valid Parentheses" }
-    fn topic(&self) -> &str { "stacks_queues" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "stacks_valid_parentheses"
+    }
+    fn name(&self) -> &str {
+        "Valid Parentheses"
+    }
+    fn topic(&self) -> &str {
+        "stacks_queues"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given a string `s` containing only the characters '(', ')', '{', '}', '[' and ']',\n\
          determine if the input string is valid.\n\n\
@@ -55,13 +63,17 @@ impl Problem for ValidParentheses {
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
         let brackets = [b'(', b')', b'[', b']', b'{', b'}'];
-        (0..10).map(|_| {
-            let len = rng.random_range(0..=20);
-            let s: String = (0..len)
-                .map(|_| brackets[rng.random_range(0..brackets.len())] as char)
-                .collect();
-            TestCase { data: Box::new(ValidParenthesesTest { s }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let len = rng.random_range(0..=20);
+                let s: String = (0..len)
+                    .map(|_| brackets[rng.random_range(0..brackets.len())] as char)
+                    .collect();
+                TestCase {
+                    data: Box::new(ValidParenthesesTest { s }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -105,10 +117,18 @@ struct MinStackTest {
 }
 
 impl Problem for MinStack {
-    fn id(&self) -> &str { "stacks_min_stack" }
-    fn name(&self) -> &str { "Min Stack" }
-    fn topic(&self) -> &str { "stacks_queues" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "stacks_min_stack"
+    }
+    fn name(&self) -> &str {
+        "Min Stack"
+    }
+    fn topic(&self) -> &str {
+        "stacks_queues"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Design a stack that supports push, pop, top, and retrieving the minimum element \
          in constant time.\n\n\
@@ -125,39 +145,43 @@ impl Problem for MinStack {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let mut ops = Vec::new();
-            let mut stack_size = 0usize;
-            let num_ops = rng.random_range(5..=30);
-            for _ in 0..num_ops {
-                if stack_size == 0 {
-                    // Must push when stack is empty
-                    let val = rng.random_range(-100..=100);
-                    ops.push(("push".to_string(), Some(val)));
-                    stack_size += 1;
-                } else {
-                    let choice = rng.random_range(0..4);
-                    match choice {
-                        0 => {
-                            let val = rng.random_range(-100..=100);
-                            ops.push(("push".to_string(), Some(val)));
-                            stack_size += 1;
-                        }
-                        1 => {
-                            ops.push(("pop".to_string(), None));
-                            stack_size -= 1;
-                        }
-                        2 => {
-                            ops.push(("top".to_string(), None));
-                        }
-                        _ => {
-                            ops.push(("getMin".to_string(), None));
+        (0..10)
+            .map(|_| {
+                let mut ops = Vec::new();
+                let mut stack_size = 0usize;
+                let num_ops = rng.random_range(5..=30);
+                for _ in 0..num_ops {
+                    if stack_size == 0 {
+                        // Must push when stack is empty
+                        let val = rng.random_range(-100..=100);
+                        ops.push(("push".to_string(), Some(val)));
+                        stack_size += 1;
+                    } else {
+                        let choice = rng.random_range(0..4);
+                        match choice {
+                            0 => {
+                                let val = rng.random_range(-100..=100);
+                                ops.push(("push".to_string(), Some(val)));
+                                stack_size += 1;
+                            }
+                            1 => {
+                                ops.push(("pop".to_string(), None));
+                                stack_size -= 1;
+                            }
+                            2 => {
+                                ops.push(("top".to_string(), None));
+                            }
+                            _ => {
+                                ops.push(("getMin".to_string(), None));
+                            }
                         }
                     }
                 }
-            }
-            TestCase { data: Box::new(MinStackTest { operations: ops }) }
-        }).collect()
+                TestCase {
+                    data: Box::new(MinStackTest { operations: ops }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -215,10 +239,18 @@ struct QueueUsingStacksTest {
 }
 
 impl Problem for QueueUsingStacks {
-    fn id(&self) -> &str { "stacks_queue_using_stacks" }
-    fn name(&self) -> &str { "Queue Using Two Stacks" }
-    fn topic(&self) -> &str { "stacks_queues" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "stacks_queue_using_stacks"
+    }
+    fn name(&self) -> &str {
+        "Queue Using Two Stacks"
+    }
+    fn topic(&self) -> &str {
+        "stacks_queues"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Implement a FIFO queue using only two stacks.\n\n\
          Implement the function `queue_using_stacks(ops)` that takes operations:\n\
@@ -234,38 +266,42 @@ impl Problem for QueueUsingStacks {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let mut ops = Vec::new();
-            let mut queue_size = 0usize;
-            let num_ops = rng.random_range(5..=30);
-            for _ in 0..num_ops {
-                if queue_size == 0 {
-                    let val = rng.random_range(-100..=100);
-                    ops.push(("push".to_string(), Some(val)));
-                    queue_size += 1;
-                } else {
-                    let choice = rng.random_range(0..4);
-                    match choice {
-                        0 => {
-                            let val = rng.random_range(-100..=100);
-                            ops.push(("push".to_string(), Some(val)));
-                            queue_size += 1;
-                        }
-                        1 => {
-                            ops.push(("pop".to_string(), None));
-                            queue_size -= 1;
-                        }
-                        2 => {
-                            ops.push(("peek".to_string(), None));
-                        }
-                        _ => {
-                            ops.push(("empty".to_string(), None));
+        (0..10)
+            .map(|_| {
+                let mut ops = Vec::new();
+                let mut queue_size = 0usize;
+                let num_ops = rng.random_range(5..=30);
+                for _ in 0..num_ops {
+                    if queue_size == 0 {
+                        let val = rng.random_range(-100..=100);
+                        ops.push(("push".to_string(), Some(val)));
+                        queue_size += 1;
+                    } else {
+                        let choice = rng.random_range(0..4);
+                        match choice {
+                            0 => {
+                                let val = rng.random_range(-100..=100);
+                                ops.push(("push".to_string(), Some(val)));
+                                queue_size += 1;
+                            }
+                            1 => {
+                                ops.push(("pop".to_string(), None));
+                                queue_size -= 1;
+                            }
+                            2 => {
+                                ops.push(("peek".to_string(), None));
+                            }
+                            _ => {
+                                ops.push(("empty".to_string(), None));
+                            }
                         }
                     }
                 }
-            }
-            TestCase { data: Box::new(QueueUsingStacksTest { operations: ops }) }
-        }).collect()
+                TestCase {
+                    data: Box::new(QueueUsingStacksTest { operations: ops }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -309,7 +345,11 @@ fn ref_queue_using_stacks(ops: &[(String, Option<i32>)]) -> Vec<Option<i32>> {
                 results.push(Some(*out_stack.last().unwrap()));
             }
             "empty" => {
-                let empty = if in_stack.is_empty() && out_stack.is_empty() { 1 } else { 0 };
+                let empty = if in_stack.is_empty() && out_stack.is_empty() {
+                    1
+                } else {
+                    0
+                };
                 results.push(Some(empty));
             }
             _ => results.push(None),
@@ -326,10 +366,18 @@ struct BaseballGameTest {
 }
 
 impl Problem for BaseballGame {
-    fn id(&self) -> &str { "stacks_baseball_game" }
-    fn name(&self) -> &str { "Baseball Game" }
-    fn topic(&self) -> &str { "stacks_queues" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "stacks_baseball_game"
+    }
+    fn name(&self) -> &str {
+        "Baseball Game"
+    }
+    fn topic(&self) -> &str {
+        "stacks_queues"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "You are keeping score for a baseball game with strange rules. Given a list of \
          string operations, apply them in order:\n\n\
@@ -346,42 +394,46 @@ impl Problem for BaseballGame {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let mut ops = Vec::new();
-            let mut stack_size = 0usize;
-            let num_ops = rng.random_range(3..=20);
-            for _ in 0..num_ops {
-                if stack_size < 2 {
-                    // Push a number to build up the stack
-                    let val = rng.random_range(-100..=100);
-                    ops.push(val.to_string());
-                    stack_size += 1;
-                } else {
-                    let choice = rng.random_range(0..4);
-                    match choice {
-                        0 => {
-                            let val = rng.random_range(-100..=100);
-                            ops.push(val.to_string());
-                            stack_size += 1;
+        (0..10)
+            .map(|_| {
+                let mut ops = Vec::new();
+                let mut stack_size = 0usize;
+                let num_ops = rng.random_range(3..=20);
+                for _ in 0..num_ops {
+                    if stack_size < 2 {
+                        // Push a number to build up the stack
+                        let val = rng.random_range(-100..=100);
+                        ops.push(val.to_string());
+                        stack_size += 1;
+                    } else {
+                        let choice = rng.random_range(0..4);
+                        match choice {
+                            0 => {
+                                let val = rng.random_range(-100..=100);
+                                ops.push(val.to_string());
+                                stack_size += 1;
+                            }
+                            1 => {
+                                ops.push("+".to_string());
+                                stack_size += 1;
+                            }
+                            2 => {
+                                ops.push("D".to_string());
+                                stack_size += 1;
+                            }
+                            3 => {
+                                ops.push("C".to_string());
+                                stack_size -= 1;
+                            }
+                            _ => unreachable!(),
                         }
-                        1 => {
-                            ops.push("+".to_string());
-                            stack_size += 1;
-                        }
-                        2 => {
-                            ops.push("D".to_string());
-                            stack_size += 1;
-                        }
-                        3 => {
-                            ops.push("C".to_string());
-                            stack_size -= 1;
-                        }
-                        _ => unreachable!(),
                     }
                 }
-            }
-            TestCase { data: Box::new(BaseballGameTest { ops }) }
-        }).collect()
+                TestCase {
+                    data: Box::new(BaseballGameTest { ops }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -429,10 +481,18 @@ struct NextGreaterElementTest {
 }
 
 impl Problem for NextGreaterElement {
-    fn id(&self) -> &str { "stacks_next_greater_element" }
-    fn name(&self) -> &str { "Next Greater Element" }
-    fn topic(&self) -> &str { "stacks_queues" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "stacks_next_greater_element"
+    }
+    fn name(&self) -> &str {
+        "Next Greater Element"
+    }
+    fn topic(&self) -> &str {
+        "stacks_queues"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given a circular array `nums`, find the next greater element for each element.\n\
          The next greater element of element nums[i] is the first element that is greater \
@@ -445,11 +505,15 @@ impl Problem for NextGreaterElement {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=30);
-            let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-100..=100)).collect();
-            TestCase { data: Box::new(NextGreaterElementTest { nums }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=30);
+                let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-100..=100)).collect();
+                TestCase {
+                    data: Box::new(NextGreaterElementTest { nums }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -494,10 +558,18 @@ struct DailyTemperaturesTest {
 }
 
 impl Problem for DailyTemperatures {
-    fn id(&self) -> &str { "stacks_daily_temperatures" }
-    fn name(&self) -> &str { "Daily Temperatures" }
-    fn topic(&self) -> &str { "stacks_queues" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "stacks_daily_temperatures"
+    }
+    fn name(&self) -> &str {
+        "Daily Temperatures"
+    }
+    fn topic(&self) -> &str {
+        "stacks_queues"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given an array of integers `temperatures` representing daily temperatures, \
          return an array `answer` such that `answer[i]` is the number of days you have to \
@@ -511,11 +583,15 @@ impl Problem for DailyTemperatures {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=50);
-            let temperatures: Vec<i32> = (0..n).map(|_| rng.random_range(30..=100)).collect();
-            TestCase { data: Box::new(DailyTemperaturesTest { temperatures }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=50);
+                let temperatures: Vec<i32> = (0..n).map(|_| rng.random_range(30..=100)).collect();
+                TestCase {
+                    data: Box::new(DailyTemperaturesTest { temperatures }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -557,10 +633,18 @@ struct EvalRPNTest {
 }
 
 impl Problem for EvalRPN {
-    fn id(&self) -> &str { "stacks_eval_rpn" }
-    fn name(&self) -> &str { "Evaluate Reverse Polish Notation" }
-    fn topic(&self) -> &str { "stacks_queues" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "stacks_eval_rpn"
+    }
+    fn name(&self) -> &str {
+        "Evaluate Reverse Polish Notation"
+    }
+    fn topic(&self) -> &str {
+        "stacks_queues"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Evaluate the value of an arithmetic expression in Reverse Polish Notation.\n\n\
          Valid operators are +, -, *, /. Each operand may be an integer or another expression.\n\
@@ -575,10 +659,14 @@ impl Problem for EvalRPN {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let tokens = gen_rpn_expression(&mut rng);
-            TestCase { data: Box::new(EvalRPNTest { tokens }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let tokens = gen_rpn_expression(&mut rng);
+                TestCase {
+                    data: Box::new(EvalRPNTest { tokens }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -643,10 +731,18 @@ struct DecodeStringTest {
 }
 
 impl Problem for DecodeString {
-    fn id(&self) -> &str { "stacks_decode_string" }
-    fn name(&self) -> &str { "Decode String" }
-    fn topic(&self) -> &str { "stacks_queues" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "stacks_decode_string"
+    }
+    fn name(&self) -> &str {
+        "Decode String"
+    }
+    fn topic(&self) -> &str {
+        "stacks_queues"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given an encoded string, return its decoded string.\n\n\
          The encoding rule is: k[encoded_string], where the encoded_string inside the \
@@ -664,10 +760,14 @@ impl Problem for DecodeString {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let s = gen_encoded_string(&mut rng, 2);
-            TestCase { data: Box::new(DecodeStringTest { s }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let s = gen_encoded_string(&mut rng, 2);
+                TestCase {
+                    data: Box::new(DecodeStringTest { s }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -688,7 +788,11 @@ fn gen_encoded_string(rng: &mut impl Rng, max_depth: usize) -> String {
     let mut result = String::new();
     let parts = rng.random_range(1..=3);
     for _ in 0..parts {
-        let choice = if max_depth == 0 { 0 } else { rng.random_range(0..2) };
+        let choice = if max_depth == 0 {
+            0
+        } else {
+            rng.random_range(0..2)
+        };
         match choice {
             0 => {
                 // Plain letters
@@ -746,10 +850,18 @@ struct AsteroidCollisionTest {
 }
 
 impl Problem for AsteroidCollision {
-    fn id(&self) -> &str { "stacks_asteroid_collision" }
-    fn name(&self) -> &str { "Asteroid Collision" }
-    fn topic(&self) -> &str { "stacks_queues" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "stacks_asteroid_collision"
+    }
+    fn name(&self) -> &str {
+        "Asteroid Collision"
+    }
+    fn topic(&self) -> &str {
+        "stacks_queues"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "We are given an array `asteroids` of integers representing asteroids in a row.\n\n\
          For each asteroid, the absolute value represents its size, and the sign represents \
@@ -764,14 +876,24 @@ impl Problem for AsteroidCollision {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=20);
-            let asteroids: Vec<i32> = (0..n).map(|_| {
-                let size = rng.random_range(1..=50);
-                if rng.random_range(0..2) == 0 { size } else { -size }
-            }).collect();
-            TestCase { data: Box::new(AsteroidCollisionTest { asteroids }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=20);
+                let asteroids: Vec<i32> = (0..n)
+                    .map(|_| {
+                        let size = rng.random_range(1..=50);
+                        if rng.random_range(0..2) == 0 {
+                            size
+                        } else {
+                            -size
+                        }
+                    })
+                    .collect();
+                TestCase {
+                    data: Box::new(AsteroidCollisionTest { asteroids }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -817,10 +939,18 @@ struct OnlineStockSpanTest {
 }
 
 impl Problem for OnlineStockSpan {
-    fn id(&self) -> &str { "stacks_online_stock_span" }
-    fn name(&self) -> &str { "Online Stock Span" }
-    fn topic(&self) -> &str { "stacks_queues" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "stacks_online_stock_span"
+    }
+    fn name(&self) -> &str {
+        "Online Stock Span"
+    }
+    fn topic(&self) -> &str {
+        "stacks_queues"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given a series of daily stock prices, for each day compute the \"span\" of the \
          stock's price: the maximum number of consecutive days (starting from today and \
@@ -837,11 +967,15 @@ impl Problem for OnlineStockSpan {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=30);
-            let prices: Vec<i32> = (0..n).map(|_| rng.random_range(1..=200)).collect();
-            TestCase { data: Box::new(OnlineStockSpanTest { prices }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=30);
+                let prices: Vec<i32> = (0..n).map(|_| rng.random_range(1..=200)).collect();
+                TestCase {
+                    data: Box::new(OnlineStockSpanTest { prices }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -886,10 +1020,18 @@ struct SlidingWindowMaxTest {
 }
 
 impl Problem for SlidingWindowMax {
-    fn id(&self) -> &str { "stacks_sliding_window_max" }
-    fn name(&self) -> &str { "Sliding Window Maximum" }
-    fn topic(&self) -> &str { "stacks_queues" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "stacks_sliding_window_max"
+    }
+    fn name(&self) -> &str {
+        "Sliding Window Maximum"
+    }
+    fn topic(&self) -> &str {
+        "stacks_queues"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given an array of integers `nums` and a sliding window of size `k`, \
          return the maximum value in each window as the window slides from left to right.\n\n\
@@ -903,12 +1045,16 @@ impl Problem for SlidingWindowMax {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=50);
-            let k = rng.random_range(1..=n);
-            let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-100..=100)).collect();
-            TestCase { data: Box::new(SlidingWindowMaxTest { nums, k }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=50);
+                let k = rng.random_range(1..=n);
+                let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-100..=100)).collect();
+                TestCase {
+                    data: Box::new(SlidingWindowMaxTest { nums, k }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -961,10 +1107,18 @@ struct LargestRectangleHistogramTest {
 }
 
 impl Problem for LargestRectangleHistogram {
-    fn id(&self) -> &str { "stacks_largest_rectangle_histogram" }
-    fn name(&self) -> &str { "Largest Rectangle in Histogram" }
-    fn topic(&self) -> &str { "stacks_queues" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "stacks_largest_rectangle_histogram"
+    }
+    fn name(&self) -> &str {
+        "Largest Rectangle in Histogram"
+    }
+    fn topic(&self) -> &str {
+        "stacks_queues"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given an array of integers `heights` representing the histogram's bar heights \
          where the width of each bar is 1, return the area of the largest rectangle \
@@ -978,15 +1132,22 @@ impl Problem for LargestRectangleHistogram {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=40);
-            let heights: Vec<i32> = (0..n).map(|_| rng.random_range(0..=50)).collect();
-            TestCase { data: Box::new(LargestRectangleHistogramTest { heights }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=40);
+                let heights: Vec<i32> = (0..n).map(|_| rng.random_range(0..=50)).collect();
+                TestCase {
+                    data: Box::new(LargestRectangleHistogramTest { heights }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
-        let t = test.data.downcast_ref::<LargestRectangleHistogramTest>().unwrap();
+        let t = test
+            .data
+            .downcast_ref::<LargestRectangleHistogramTest>()
+            .unwrap();
         let expected = ref_largest_rectangle_histogram(&t.heights);
         let actual = solutions::largest_rectangle_histogram(&t.heights);
         SolutionResult {
@@ -1031,10 +1192,18 @@ struct TrappingRainWaterStackTest {
 }
 
 impl Problem for TrappingRainWaterStack {
-    fn id(&self) -> &str { "stacks_trapping_rain_water_stack" }
-    fn name(&self) -> &str { "Trapping Rain Water (Stack)" }
-    fn topic(&self) -> &str { "stacks_queues" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "stacks_trapping_rain_water_stack"
+    }
+    fn name(&self) -> &str {
+        "Trapping Rain Water (Stack)"
+    }
+    fn topic(&self) -> &str {
+        "stacks_queues"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given `n` non-negative integers representing an elevation map where the width \
          of each bar is 1, compute how much water it can trap after raining.\n\n\
@@ -1048,15 +1217,22 @@ impl Problem for TrappingRainWaterStack {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(0..=40);
-            let height: Vec<i32> = (0..n).map(|_| rng.random_range(0..=20)).collect();
-            TestCase { data: Box::new(TrappingRainWaterStackTest { height }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(0..=40);
+                let height: Vec<i32> = (0..n).map(|_| rng.random_range(0..=20)).collect();
+                TestCase {
+                    data: Box::new(TrappingRainWaterStackTest { height }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
-        let t = test.data.downcast_ref::<TrappingRainWaterStackTest>().unwrap();
+        let t = test
+            .data
+            .downcast_ref::<TrappingRainWaterStackTest>()
+            .unwrap();
         let expected = ref_trapping_rain_water_stack(&t.height);
         let actual = solutions::trapping_rain_water_stack(&t.height);
         SolutionResult {
@@ -1098,10 +1274,18 @@ struct BasicCalculatorTest {
 }
 
 impl Problem for BasicCalculator {
-    fn id(&self) -> &str { "stacks_basic_calculator" }
-    fn name(&self) -> &str { "Basic Calculator" }
-    fn topic(&self) -> &str { "stacks_queues" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "stacks_basic_calculator"
+    }
+    fn name(&self) -> &str {
+        "Basic Calculator"
+    }
+    fn topic(&self) -> &str {
+        "stacks_queues"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given a string `s` representing a valid expression, implement a basic calculator \
          to evaluate it and return the result.\n\n\
@@ -1118,10 +1302,14 @@ impl Problem for BasicCalculator {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let s = gen_calc_expression(&mut rng, 2);
-            TestCase { data: Box::new(BasicCalculatorTest { s }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let s = gen_calc_expression(&mut rng, 2);
+                TestCase {
+                    data: Box::new(BasicCalculatorTest { s }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -1142,7 +1330,11 @@ fn gen_calc_expression(rng: &mut impl Rng, max_depth: usize) -> String {
     let terms = rng.random_range(1..=3);
     let mut result = gen_calc_term(rng, max_depth);
     for _ in 1..terms {
-        let op = if rng.random_range(0..2) == 0 { " + " } else { " - " };
+        let op = if rng.random_range(0..2) == 0 {
+            " + "
+        } else {
+            " - "
+        };
         result.push_str(op);
         result.push_str(&gen_calc_term(rng, max_depth));
     }
@@ -1206,10 +1398,18 @@ struct MaxFrequencyStackTest {
 }
 
 impl Problem for MaxFrequencyStack {
-    fn id(&self) -> &str { "stacks_max_frequency_stack" }
-    fn name(&self) -> &str { "Maximum Frequency Stack" }
-    fn topic(&self) -> &str { "stacks_queues" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "stacks_max_frequency_stack"
+    }
+    fn name(&self) -> &str {
+        "Maximum Frequency Stack"
+    }
+    fn topic(&self) -> &str {
+        "stacks_queues"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Implement FreqStack, a stack-like data structure that pops the most frequent element.\n\n\
          If there is a tie for the most frequent element, pop the element closest to the \
@@ -1226,30 +1426,34 @@ impl Problem for MaxFrequencyStack {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let mut ops = Vec::new();
-            let mut size = 0usize;
-            let num_ops = rng.random_range(5..=30);
-            // Push some values first to build diversity
-            let num_pushes_first = rng.random_range(3..=num_ops.min(8));
-            for _ in 0..num_pushes_first {
-                // Use a small range to create frequency ties
-                let val = rng.random_range(0..=10);
-                ops.push(("push".to_string(), Some(val)));
-                size += 1;
-            }
-            for _ in num_pushes_first..num_ops {
-                if size == 0 || rng.random_range(0..3) != 0 {
+        (0..10)
+            .map(|_| {
+                let mut ops = Vec::new();
+                let mut size = 0usize;
+                let num_ops = rng.random_range(5..=30);
+                // Push some values first to build diversity
+                let num_pushes_first = rng.random_range(3..=num_ops.min(8));
+                for _ in 0..num_pushes_first {
+                    // Use a small range to create frequency ties
                     let val = rng.random_range(0..=10);
                     ops.push(("push".to_string(), Some(val)));
                     size += 1;
-                } else {
-                    ops.push(("pop".to_string(), None));
-                    size -= 1;
                 }
-            }
-            TestCase { data: Box::new(MaxFrequencyStackTest { operations: ops }) }
-        }).collect()
+                for _ in num_pushes_first..num_ops {
+                    if size == 0 || rng.random_range(0..3) != 0 {
+                        let val = rng.random_range(0..=10);
+                        ops.push(("push".to_string(), Some(val)));
+                        size += 1;
+                    } else {
+                        ops.push(("pop".to_string(), None));
+                        size -= 1;
+                    }
+                }
+                TestCase {
+                    data: Box::new(MaxFrequencyStackTest { operations: ops }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {

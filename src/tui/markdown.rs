@@ -54,9 +54,7 @@ pub fn render_markdown(input: &str) -> Vec<Line<'static>> {
             lines.push(Line::raw(""));
             lines.push(Line::from(Span::styled(
                 format!("   {}", rest),
-                Style::new()
-                    .fg(Color::Cyan)
-                    .add_modifier(Modifier::BOLD),
+                Style::new().fg(Color::Cyan).add_modifier(Modifier::BOLD),
             )));
             continue;
         }
@@ -173,26 +171,22 @@ fn parse_inline(text: &str) -> Vec<Span<'static>> {
             }
             '*' => {
                 // Check for **bold**
-                if chars.peek().map_or(false, |(_, c)| *c == '*') {
+                if chars.peek().is_some_and(|(_, c)| *c == '*') {
                     chars.next(); // consume second *
                     if !current.is_empty() {
                         spans.push(Span::raw(std::mem::take(&mut current)));
                     }
                     let mut bold = String::new();
                     while let Some((_, c)) = chars.next() {
-                        if c == '*' {
-                            if chars.peek().map_or(false, |(_, c2)| *c2 == '*') {
-                                chars.next(); // consume closing **
-                                break;
-                            }
+                        if c == '*' && chars.peek().is_some_and(|(_, c2)| *c2 == '*') {
+                            chars.next(); // consume closing **
+                            break;
                         }
                         bold.push(c);
                     }
                     spans.push(Span::styled(
                         bold,
-                        Style::new()
-                            .fg(Color::White)
-                            .add_modifier(Modifier::BOLD),
+                        Style::new().fg(Color::White).add_modifier(Modifier::BOLD),
                     ));
                 } else {
                     // *italic*

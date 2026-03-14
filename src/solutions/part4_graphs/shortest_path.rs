@@ -9,7 +9,10 @@
 /// Example: n=4, edges=[(0,1),(1,2),(2,3)], src=0, dst=3 => 3
 /// Example: n=4, edges=[(0,1),(2,3)], src=0, dst=3 => -1 (disconnected)
 pub fn shortest_path_unweighted(
-    _n: usize, _edges: &[(usize, usize)], _src: usize, _dst: usize,
+    _n: usize,
+    _edges: &[(usize, usize)],
+    _src: usize,
+    _dst: usize,
 ) -> i32 {
     todo!()
 }
@@ -45,9 +48,7 @@ pub fn network_delay(_n: usize, _edges: &[(usize, usize, i32)], _src: usize) -> 
 /// by picking highest-numbered city.
 ///
 /// Example: n=4, edges=[(0,1,3),(1,2,1),(1,3,4),(2,3,1)], threshold=4 => 3
-pub fn city_fewest_neighbors(
-    _n: usize, _edges: &[(usize, usize, i32)], _threshold: i32,
-) -> i32 {
+pub fn city_fewest_neighbors(_n: usize, _edges: &[(usize, usize, i32)], _threshold: i32) -> i32 {
     todo!()
 }
 
@@ -75,7 +76,11 @@ pub fn bellman_ford(_n: usize, _edges: &[(usize, usize, i32)], _src: usize) -> V
 /// Example: n=3, flights=[(0,1,100),(1,2,100),(0,2,500)], src=0, dst=2, k=1 => 200
 /// Example: n=3, flights=[(0,1,100),(1,2,100),(0,2,500)], src=0, dst=2, k=0 => 500
 pub fn cheapest_flights(
-    _n: usize, _edges: &[(usize, usize, i32)], _src: usize, _dst: usize, _k: usize,
+    _n: usize,
+    _edges: &[(usize, usize, i32)],
+    _src: usize,
+    _dst: usize,
+    _k: usize,
 ) -> i32 {
     todo!()
 }
@@ -94,7 +99,9 @@ pub fn path_with_min_effort(_heights: &[Vec<i32>]) -> i32 {
 /// Example: maze=[[0,0,1,0,0],[0,0,0,0,0],[0,0,0,1,0],[1,1,0,1,1],[0,0,0,0,0]],
 ///          start=(0,4), dest=(4,4) => 12
 pub fn shortest_path_maze(
-    _maze: &[Vec<i32>], _start: (usize, usize), _dest: (usize, usize),
+    _maze: &[Vec<i32>],
+    _start: (usize, usize),
+    _dest: (usize, usize),
 ) -> i32 {
     todo!()
 }
@@ -114,7 +121,11 @@ pub fn floyd_warshall(_n: usize, _edges: &[(usize, usize, i32)]) -> Vec<Vec<i32>
 ///
 /// Example: n=3, edges=[(0,1,1),(1,2,1),(0,2,3)], src=0, dst=2, k=2 => [2, 3]
 pub fn k_shortest_paths(
-    _n: usize, _edges: &[(usize, usize, i32)], _src: usize, _dst: usize, _k: usize,
+    _n: usize,
+    _edges: &[(usize, usize, i32)],
+    _src: usize,
+    _dst: usize,
+    _k: usize,
 ) -> Vec<i32> {
     todo!()
 }
@@ -132,7 +143,10 @@ pub fn min_cost_connect_all(_points: &[(i32, i32)]) -> i32 {
 ///
 /// Example: n=4, edges=[(0,1,1),(1,2,2),(0,2,4),(2,3,1)], src=0, dst=3 => [0,1,2,3]
 pub fn reconstruct_shortest_path(
-    _n: usize, _edges: &[(usize, usize, i32)], _src: usize, _dst: usize,
+    _n: usize,
+    _edges: &[(usize, usize, i32)],
+    _src: usize,
+    _dst: usize,
 ) -> Vec<usize> {
     todo!()
 }
@@ -143,7 +157,9 @@ pub fn reconstruct_shortest_path(
 ///
 /// Example: n=3, red=[(0,1),(1,2)], blue=[(0,2)] => [0, 1, 2]
 pub fn shortest_path_alternating_colors(
-    _n: usize, _red_edges: &[(usize, usize)], _blue_edges: &[(usize, usize)],
+    _n: usize,
+    _red_edges: &[(usize, usize)],
+    _blue_edges: &[(usize, usize)],
 ) -> Vec<i32> {
     todo!()
 }

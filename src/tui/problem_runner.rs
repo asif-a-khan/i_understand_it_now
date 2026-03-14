@@ -56,9 +56,7 @@ pub enum TestMessage {
         ops: usize,
     },
     /// All tests done. Includes operation log from first test for replay.
-    Done {
-        replay_ops: Vec<Operation>,
-    },
+    Done { replay_ops: Vec<Operation> },
     /// A panic occurred (e.g., todo!()).
     Panicked(String),
 }
@@ -124,11 +122,7 @@ impl ProblemListState {
         entries
     }
 
-    pub fn handle_key(
-        &mut self,
-        key: KeyEvent,
-        problems: &[ProblemInfo],
-    ) -> Action {
+    pub fn handle_key(&mut self, key: KeyEvent, problems: &[ProblemInfo]) -> Action {
         let entries = self.filtered_indices(problems);
         let len = entries.len();
         if len == 0 && key.code == KeyCode::Esc {
@@ -156,7 +150,10 @@ impl ProblemListState {
                 }
                 // If we landed on a header at 0, find next problem
                 if matches!(entries.get(prev), Some(FilteredEntry::Header(_))) {
-                    if let Some(pos) = entries.iter().position(|e| matches!(e, FilteredEntry::Problem(_))) {
+                    if let Some(pos) = entries
+                        .iter()
+                        .position(|e| matches!(e, FilteredEntry::Problem(_)))
+                    {
                         prev = pos;
                     }
                 }
@@ -166,9 +163,7 @@ impl ProblemListState {
             KeyCode::Enter => {
                 if let Some(idx) = self.list_state.selected() {
                     if let Some(FilteredEntry::Problem(pidx)) = entries.get(idx) {
-                        return Action::Push(Screen::ProblemDetail {
-                            problem_idx: *pidx,
-                        });
+                        return Action::Push(Screen::ProblemDetail { problem_idx: *pidx });
                     }
                 }
                 Action::None
@@ -182,7 +177,10 @@ impl ProblemListState {
                 self.list_state.select(Some(0));
                 // Skip to first problem entry
                 let entries = self.filtered_indices(problems);
-                if let Some(pos) = entries.iter().position(|e| matches!(e, FilteredEntry::Problem(_))) {
+                if let Some(pos) = entries
+                    .iter()
+                    .position(|e| matches!(e, FilteredEntry::Problem(_)))
+                {
                     self.list_state.select(Some(pos));
                 }
                 Action::None
@@ -196,7 +194,10 @@ impl ProblemListState {
                 };
                 self.list_state.select(Some(0));
                 let entries = self.filtered_indices(problems);
-                if let Some(pos) = entries.iter().position(|e| matches!(e, FilteredEntry::Problem(_))) {
+                if let Some(pos) = entries
+                    .iter()
+                    .position(|e| matches!(e, FilteredEntry::Problem(_)))
+                {
                     self.list_state.select(Some(pos));
                 }
                 Action::None
@@ -218,20 +219,13 @@ impl ProblemListState {
         let items: Vec<ListItem> = entries
             .iter()
             .map(|entry| match entry {
-                FilteredEntry::Header(topic) => {
-                    ListItem::new(Line::from(Span::styled(
-                        format!("── {} ──", topic),
-                        Style::new()
-                            .fg(Color::White)
-                            .add_modifier(Modifier::BOLD),
-                    )))
-                }
+                FilteredEntry::Header(topic) => ListItem::new(Line::from(Span::styled(
+                    format!("── {} ──", topic),
+                    Style::new().fg(Color::White).add_modifier(Modifier::BOLD),
+                ))),
                 FilteredEntry::Problem(idx) => {
                     let p = &problems[*idx];
-                    let solved = progress
-                        .problems
-                        .get(&p.id)
-                        .map_or(false, |pp| pp.solved);
+                    let solved = progress.problems.get(&p.id).is_some_and(|pp| pp.solved);
                     let check = if solved { "[x]" } else { "[ ]" };
                     let check_style = if solved {
                         Style::new().fg(Color::Green)
@@ -256,7 +250,7 @@ impl ProblemListState {
         // Build title with active filters
         let solved_count = problems
             .iter()
-            .filter(|p| progress.problems.get(&p.id).map_or(false, |pp| pp.solved))
+            .filter(|p| progress.problems.get(&p.id).is_some_and(|pp| pp.solved))
             .count();
         let mut title_parts = format!(" Problems ({solved_count}/{}) ", problems.len());
         if let Some(ti) = self.topic_filter {
@@ -343,9 +337,7 @@ impl ProblemDetailState {
             Line::raw(""),
             Line::styled(
                 "  Description:",
-                Style::new()
-                    .fg(Color::White)
-                    .add_modifier(Modifier::BOLD),
+                Style::new().fg(Color::White).add_modifier(Modifier::BOLD),
             ),
             Line::raw(""),
         ];
@@ -392,13 +384,25 @@ impl ProblemDetailState {
         lines.push(Line::raw(""));
         lines.push(Line::from(vec![
             Span::raw("  "),
-            Span::styled("[R]", Style::new().fg(theme::ACCENT).add_modifier(Modifier::BOLD)),
+            Span::styled(
+                "[R]",
+                Style::new().fg(theme::ACCENT).add_modifier(Modifier::BOLD),
+            ),
             Span::raw(" Run tests  "),
-            Span::styled("[E]", Style::new().fg(theme::ACCENT).add_modifier(Modifier::BOLD)),
+            Span::styled(
+                "[E]",
+                Style::new().fg(theme::ACCENT).add_modifier(Modifier::BOLD),
+            ),
             Span::raw(" Edit ($EDITOR)  "),
-            Span::styled("[I]", Style::new().fg(theme::ACCENT).add_modifier(Modifier::BOLD)),
+            Span::styled(
+                "[I]",
+                Style::new().fg(theme::ACCENT).add_modifier(Modifier::BOLD),
+            ),
             Span::raw(" Edit (in-TUI)  "),
-            Span::styled("[Esc]", Style::new().fg(theme::ACCENT).add_modifier(Modifier::BOLD)),
+            Span::styled(
+                "[Esc]",
+                Style::new().fg(theme::ACCENT).add_modifier(Modifier::BOLD),
+            ),
             Span::raw(" Back"),
         ]));
 
@@ -446,13 +450,7 @@ impl ProblemRunningState {
         self.scroll_offset = 0;
     }
 
-    pub fn render(
-        &self,
-        f: &mut Frame,
-        area: Rect,
-        problem_idx: usize,
-        problems: &[ProblemInfo],
-    ) {
+    pub fn render(&self, f: &mut Frame, area: Rect, problem_idx: usize, problems: &[ProblemInfo]) {
         let p = &problems[problem_idx];
         let mut lines = vec![
             Line::raw(""),
@@ -477,7 +475,10 @@ impl ProblemRunningState {
 
             if r.ops > 0 {
                 test_line.push(Span::styled(
-                    format!(" | ops: {} (cmp: {}, swap: {})", r.ops, r.comparisons, r.swaps),
+                    format!(
+                        " | ops: {} (cmp: {}, swap: {})",
+                        r.ops, r.comparisons, r.swaps
+                    ),
                     Style::new().fg(Color::DarkGray),
                 ));
             }
@@ -504,9 +505,7 @@ impl ProblemRunningState {
             lines.push(Line::raw(""));
             lines.push(Line::from(Span::styled(
                 "  Running tests...",
-                Style::new()
-                    .fg(Color::Yellow)
-                    .add_modifier(Modifier::BOLD),
+                Style::new().fg(Color::Yellow).add_modifier(Modifier::BOLD),
             )));
         }
 
@@ -608,7 +607,10 @@ impl ProblemResultState {
 
             if r.ops > 0 {
                 test_line.push(Span::styled(
-                    format!(" | ops: {} (cmp: {}, swap: {})", r.ops, r.comparisons, r.swaps),
+                    format!(
+                        " | ops: {} (cmp: {}, swap: {})",
+                        r.ops, r.comparisons, r.swaps
+                    ),
                     Style::new().fg(Color::DarkGray),
                 ));
             }
@@ -661,17 +663,35 @@ impl ProblemResultState {
         lines.push(Line::raw(""));
         lines.push(Line::from(vec![
             Span::raw("  "),
-            Span::styled("[R]", Style::new().fg(theme::ACCENT).add_modifier(Modifier::BOLD)),
+            Span::styled(
+                "[R]",
+                Style::new().fg(theme::ACCENT).add_modifier(Modifier::BOLD),
+            ),
             Span::raw(" Run again  "),
-            Span::styled("[E]", Style::new().fg(theme::ACCENT).add_modifier(Modifier::BOLD)),
+            Span::styled(
+                "[E]",
+                Style::new().fg(theme::ACCENT).add_modifier(Modifier::BOLD),
+            ),
             Span::raw(" Edit  "),
-            Span::styled("[I]", Style::new().fg(theme::ACCENT).add_modifier(Modifier::BOLD)),
+            Span::styled(
+                "[I]",
+                Style::new().fg(theme::ACCENT).add_modifier(Modifier::BOLD),
+            ),
             Span::raw(" In-TUI edit  "),
-            Span::styled("[W]", Style::new().fg(theme::ACCENT).add_modifier(Modifier::BOLD)),
+            Span::styled(
+                "[W]",
+                Style::new().fg(theme::ACCENT).add_modifier(Modifier::BOLD),
+            ),
             Span::raw(" Watch replay  "),
-            Span::styled("[C]", Style::new().fg(theme::ACCENT).add_modifier(Modifier::BOLD)),
+            Span::styled(
+                "[C]",
+                Style::new().fg(theme::ACCENT).add_modifier(Modifier::BOLD),
+            ),
             Span::raw(" Complexity  "),
-            Span::styled("[Esc]", Style::new().fg(theme::ACCENT).add_modifier(Modifier::BOLD)),
+            Span::styled(
+                "[Esc]",
+                Style::new().fg(theme::ACCENT).add_modifier(Modifier::BOLD),
+            ),
             Span::raw(" Back"),
         ]));
 
@@ -759,7 +779,9 @@ pub fn spawn_test_runner(problem_id: String) -> mpsc::Receiver<TestMessage> {
                     }
                 }
             }
-            let _ = tx.send(TestMessage::Done { replay_ops: first_ops });
+            let _ = tx.send(TestMessage::Done {
+                replay_ops: first_ops,
+            });
         }));
 
         if let Err(panic_info) = result {
@@ -858,13 +880,7 @@ impl ComplexityViewState {
         }
     }
 
-    pub fn render(
-        &self,
-        f: &mut Frame,
-        area: Rect,
-        problem_idx: usize,
-        problems: &[ProblemInfo],
-    ) {
+    pub fn render(&self, f: &mut Frame, area: Rect, problem_idx: usize, problems: &[ProblemInfo]) {
         let p = &problems[problem_idx];
         let mut lines = vec![
             Line::raw(""),
@@ -878,9 +894,7 @@ impl ComplexityViewState {
         if self.loading {
             lines.push(Line::from(Span::styled(
                 "  Measuring empirical complexity...",
-                Style::new()
-                    .fg(Color::Yellow)
-                    .add_modifier(Modifier::BOLD),
+                Style::new().fg(Color::Yellow).add_modifier(Modifier::BOLD),
             )));
             lines.push(Line::from(Span::styled(
                 "  Running solution at multiple input sizes (this may take a few seconds)",
@@ -896,9 +910,7 @@ impl ComplexityViewState {
                 Span::styled("  Estimated: ", Style::new().fg(Color::DarkGray)),
                 Span::styled(
                     &self.estimated,
-                    Style::new()
-                        .fg(Color::Cyan)
-                        .add_modifier(Modifier::BOLD),
+                    Style::new().fg(Color::Cyan).add_modifier(Modifier::BOLD),
                 ),
             ]));
             lines.push(Line::raw(""));
@@ -911,7 +923,10 @@ impl ComplexityViewState {
         lines.push(Line::raw(""));
         lines.push(Line::from(vec![
             Span::raw("  "),
-            Span::styled("[Esc]", Style::new().fg(theme::ACCENT).add_modifier(Modifier::BOLD)),
+            Span::styled(
+                "[Esc]",
+                Style::new().fg(theme::ACCENT).add_modifier(Modifier::BOLD),
+            ),
             Span::raw(" Back"),
         ]));
 

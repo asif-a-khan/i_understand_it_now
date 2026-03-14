@@ -78,11 +78,7 @@ impl RefUF {
 
 // ── Helpers ──────────────────────────────────────────────────────────
 
-fn random_unweighted_edges(
-    rng: &mut impl Rng,
-    n: usize,
-    count: usize,
-) -> Vec<(usize, usize)> {
+fn random_unweighted_edges(rng: &mut impl Rng, n: usize, count: usize) -> Vec<(usize, usize)> {
     let mut edges = Vec::new();
     for _ in 0..count {
         let u = rng.random_range(0..n);
@@ -104,10 +100,18 @@ struct UfConnectedComponentsTest {
 }
 
 impl Problem for UfConnectedComponents {
-    fn id(&self) -> &str { "union_find_connected_components" }
-    fn name(&self) -> &str { "Connected Components (Union-Find)" }
-    fn topic(&self) -> &str { "union_find" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "union_find_connected_components"
+    }
+    fn name(&self) -> &str {
+        "Connected Components (Union-Find)"
+    }
+    fn topic(&self) -> &str {
+        "union_find"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Count the number of connected components in an undirected graph using Union-Find.\n\n\
          Input: (n, edges) where n is the number of nodes (0-indexed) and edges is a list \
@@ -120,16 +124,23 @@ impl Problem for UfConnectedComponents {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(2..=30);
-            let edge_count = rng.random_range(0..=(n * 2));
-            let edges = random_unweighted_edges(&mut rng, n, edge_count);
-            TestCase { data: Box::new(UfConnectedComponentsTest { n, edges }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(2..=30);
+                let edge_count = rng.random_range(0..=(n * 2));
+                let edges = random_unweighted_edges(&mut rng, n, edge_count);
+                TestCase {
+                    data: Box::new(UfConnectedComponentsTest { n, edges }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
-        let t = test.data.downcast_ref::<UfConnectedComponentsTest>().unwrap();
+        let t = test
+            .data
+            .downcast_ref::<UfConnectedComponentsTest>()
+            .unwrap();
         let expected = ref_uf_connected_components(t.n, &t.edges);
         let actual = solutions::connected_components(t.n, &t.edges);
         SolutionResult {
@@ -161,10 +172,18 @@ struct UfIsConnectedTest {
 }
 
 impl Problem for UfIsConnected {
-    fn id(&self) -> &str { "union_find_is_connected" }
-    fn name(&self) -> &str { "Check If Two Nodes Connected" }
-    fn topic(&self) -> &str { "union_find" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "union_find_is_connected"
+    }
+    fn name(&self) -> &str {
+        "Check If Two Nodes Connected"
+    }
+    fn topic(&self) -> &str {
+        "union_find"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Check if two nodes u and v are connected in an undirected graph using Union-Find.\n\n\
          Input: (n, edges, u, v).\n\n\
@@ -176,14 +195,18 @@ impl Problem for UfIsConnected {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(2..=30);
-            let edge_count = rng.random_range(0..=(n * 2));
-            let edges = random_unweighted_edges(&mut rng, n, edge_count);
-            let u = rng.random_range(0..n);
-            let v = rng.random_range(0..n);
-            TestCase { data: Box::new(UfIsConnectedTest { n, edges, u, v }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(2..=30);
+                let edge_count = rng.random_range(0..=(n * 2));
+                let edges = random_unweighted_edges(&mut rng, n, edge_count);
+                let u = rng.random_range(0..n);
+                let v = rng.random_range(0..n);
+                TestCase {
+                    data: Box::new(UfIsConnectedTest { n, edges, u, v }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -216,10 +239,18 @@ struct UfFriendCirclesTest {
 }
 
 impl Problem for UfFriendCircles {
-    fn id(&self) -> &str { "union_find_friend_circles" }
-    fn name(&self) -> &str { "Number of Friend Circles" }
-    fn topic(&self) -> &str { "union_find" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "union_find_friend_circles"
+    }
+    fn name(&self) -> &str {
+        "Number of Friend Circles"
+    }
+    fn topic(&self) -> &str {
+        "union_find"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given an n x n adjacency matrix where matrix[i][j] = 1 means person i and j are \
          friends (friendship is transitive), find the number of friend circles.\n\n\
@@ -232,22 +263,26 @@ impl Problem for UfFriendCircles {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(2..=15);
-            let mut matrix = vec![vec![0i32; n]; n];
-            for i in 0..n {
-                matrix[i][i] = 1;
-            }
-            // Add random friendships
-            let friendships = rng.random_range(0..=(n * n / 3));
-            for _ in 0..friendships {
-                let a = rng.random_range(0..n);
-                let b = rng.random_range(0..n);
-                matrix[a][b] = 1;
-                matrix[b][a] = 1;
-            }
-            TestCase { data: Box::new(UfFriendCirclesTest { matrix }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(2..=15);
+                let mut matrix = vec![vec![0i32; n]; n];
+                for (i, row) in matrix.iter_mut().enumerate() {
+                    row[i] = 1;
+                }
+                // Add random friendships
+                let friendships = rng.random_range(0..=(n * n / 3));
+                for _ in 0..friendships {
+                    let a = rng.random_range(0..n);
+                    let b = rng.random_range(0..n);
+                    matrix[a][b] = 1;
+                    matrix[b][a] = 1;
+                }
+                TestCase {
+                    data: Box::new(UfFriendCirclesTest { matrix }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -266,9 +301,9 @@ impl Problem for UfFriendCircles {
 fn ref_friend_circles(matrix: &[Vec<i32>]) -> i32 {
     let n = matrix.len();
     let mut uf = RefUF::new(n);
-    for i in 0..n {
-        for j in (i + 1)..n {
-            if matrix[i][j] == 1 {
+    for (i, row) in matrix.iter().enumerate() {
+        for (j, &val) in row.iter().enumerate().skip(i + 1) {
+            if val == 1 {
                 uf.union(i, j);
             }
         }
@@ -285,10 +320,18 @@ struct UfRedundantConnectionTest {
 }
 
 impl Problem for UfRedundantConnection {
-    fn id(&self) -> &str { "union_find_redundant_connection" }
-    fn name(&self) -> &str { "Redundant Connection" }
-    fn topic(&self) -> &str { "union_find" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "union_find_redundant_connection"
+    }
+    fn name(&self) -> &str {
+        "Redundant Connection"
+    }
+    fn topic(&self) -> &str {
+        "union_find"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given a graph that started as a tree with n nodes and had one extra edge added, \
          find the redundant edge that creates a cycle.\n\n\
@@ -302,29 +345,36 @@ impl Problem for UfRedundantConnection {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(3..=20);
-            // Build a random tree on nodes 1..=n
-            let mut edges = Vec::new();
-            for i in 2..=n {
-                let parent = rng.random_range(1..i);
-                edges.push((parent, i));
-            }
-            // Add one extra edge creating a cycle
-            let u = rng.random_range(1..=n);
-            let mut v = rng.random_range(1..=n);
-            while v == u {
-                v = rng.random_range(1..=n);
-            }
-            edges.push((u, v));
-            // Shuffle (but keep the order deterministic for consistent answer)
-            // Actually, we should keep them in a specific order so the "last" redundant edge is well-defined
-            TestCase { data: Box::new(UfRedundantConnectionTest { edges }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(3..=20);
+                // Build a random tree on nodes 1..=n
+                let mut edges = Vec::new();
+                for i in 2..=n {
+                    let parent = rng.random_range(1..i);
+                    edges.push((parent, i));
+                }
+                // Add one extra edge creating a cycle
+                let u = rng.random_range(1..=n);
+                let mut v = rng.random_range(1..=n);
+                while v == u {
+                    v = rng.random_range(1..=n);
+                }
+                edges.push((u, v));
+                // Shuffle (but keep the order deterministic for consistent answer)
+                // Actually, we should keep them in a specific order so the "last" redundant edge is well-defined
+                TestCase {
+                    data: Box::new(UfRedundantConnectionTest { edges }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
-        let t = test.data.downcast_ref::<UfRedundantConnectionTest>().unwrap();
+        let t = test
+            .data
+            .downcast_ref::<UfRedundantConnectionTest>()
+            .unwrap();
         let expected = ref_redundant_connection(&t.edges);
         let actual = solutions::redundant_connection(&t.edges);
         SolutionResult {
@@ -358,10 +408,18 @@ struct UfEarliestConnectionTest {
 }
 
 impl Problem for UfEarliestConnection {
-    fn id(&self) -> &str { "union_find_earliest_connection" }
-    fn name(&self) -> &str { "Earliest Time All Connected" }
-    fn topic(&self) -> &str { "union_find" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "union_find_earliest_connection"
+    }
+    fn name(&self) -> &str {
+        "Earliest Time All Connected"
+    }
+    fn topic(&self) -> &str {
+        "union_find"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given n people and a list of (timestamp, person_a, person_b) indicating when two \
          people became friends, find the earliest time when all people are connected.\n\n\
@@ -375,31 +433,38 @@ impl Problem for UfEarliestConnection {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|i| {
-            let n = rng.random_range(2..=15);
-            let log_count = if i < 7 {
-                rng.random_range(n..=(n * 3))
-            } else {
-                rng.random_range(0..n) // may not connect all
-            };
-            let mut logs: Vec<(i32, usize, usize)> = (0..log_count)
-                .map(|_| {
-                    let t = rng.random_range(0..=1000);
-                    let a = rng.random_range(0..n);
-                    let mut b = rng.random_range(0..n);
-                    while b == a {
-                        b = rng.random_range(0..n);
-                    }
-                    (t, a, b)
-                })
-                .collect();
-            logs.sort_by_key(|l| l.0);
-            TestCase { data: Box::new(UfEarliestConnectionTest { n, logs }) }
-        }).collect()
+        (0..10)
+            .map(|i| {
+                let n = rng.random_range(2..=15);
+                let log_count = if i < 7 {
+                    rng.random_range(n..=(n * 3))
+                } else {
+                    rng.random_range(0..n) // may not connect all
+                };
+                let mut logs: Vec<(i32, usize, usize)> = (0..log_count)
+                    .map(|_| {
+                        let t = rng.random_range(0..=1000);
+                        let a = rng.random_range(0..n);
+                        let mut b = rng.random_range(0..n);
+                        while b == a {
+                            b = rng.random_range(0..n);
+                        }
+                        (t, a, b)
+                    })
+                    .collect();
+                logs.sort_by_key(|l| l.0);
+                TestCase {
+                    data: Box::new(UfEarliestConnectionTest { n, logs }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
-        let t = test.data.downcast_ref::<UfEarliestConnectionTest>().unwrap();
+        let t = test
+            .data
+            .downcast_ref::<UfEarliestConnectionTest>()
+            .unwrap();
         let expected = ref_earliest_connection(t.n, &t.logs);
         let actual = solutions::earliest_connection(t.n, &t.logs);
         SolutionResult {
@@ -431,10 +496,18 @@ struct UfAccountsMergeTest {
 }
 
 impl Problem for UfAccountsMerge {
-    fn id(&self) -> &str { "union_find_accounts_merge" }
-    fn name(&self) -> &str { "Accounts Merge" }
-    fn topic(&self) -> &str { "union_find" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "union_find_accounts_merge"
+    }
+    fn name(&self) -> &str {
+        "Accounts Merge"
+    }
+    fn topic(&self) -> &str {
+        "union_find"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given a list of accounts where each account is [name, email1, email2, ...], \
          merge accounts that share at least one email.\n\n\
@@ -447,37 +520,41 @@ impl Problem for UfAccountsMerge {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let names = ["Alice", "Bob", "Charlie", "Diana", "Eve"];
-            let n_accounts = rng.random_range(2..=10);
-            let mut accounts = Vec::new();
-            let mut all_emails: Vec<String> = Vec::new();
+        (0..10)
+            .map(|_| {
+                let names = ["Alice", "Bob", "Charlie", "Diana", "Eve"];
+                let n_accounts = rng.random_range(2..=10);
+                let mut accounts = Vec::new();
+                let mut all_emails: Vec<String> = Vec::new();
 
-            for _ in 0..n_accounts {
-                let name = names[rng.random_range(0..names.len())].to_string();
-                let n_emails = rng.random_range(1..=3);
-                let mut emails = Vec::new();
-                for _ in 0..n_emails {
-                    // Sometimes reuse existing emails to create merges
-                    if !all_emails.is_empty() && rng.random_range(0..3) == 0 {
-                        let idx = rng.random_range(0..all_emails.len());
-                        emails.push(all_emails[idx].clone());
-                    } else {
-                        let email = format!(
-                            "{}{}@test.com",
-                            (b'a' + rng.random_range(0..26u8)) as char,
-                            rng.random_range(0..100)
-                        );
-                        all_emails.push(email.clone());
-                        emails.push(email);
+                for _ in 0..n_accounts {
+                    let name = names[rng.random_range(0..names.len())].to_string();
+                    let n_emails = rng.random_range(1..=3);
+                    let mut emails = Vec::new();
+                    for _ in 0..n_emails {
+                        // Sometimes reuse existing emails to create merges
+                        if !all_emails.is_empty() && rng.random_range(0..3) == 0 {
+                            let idx = rng.random_range(0..all_emails.len());
+                            emails.push(all_emails[idx].clone());
+                        } else {
+                            let email = format!(
+                                "{}{}@test.com",
+                                (b'a' + rng.random_range(0..26u8)) as char,
+                                rng.random_range(0..100)
+                            );
+                            all_emails.push(email.clone());
+                            emails.push(email);
+                        }
                     }
+                    let mut account = vec![name];
+                    account.extend(emails);
+                    accounts.push(account);
                 }
-                let mut account = vec![name];
-                account.extend(emails);
-                accounts.push(account);
-            }
-            TestCase { data: Box::new(UfAccountsMergeTest { accounts }) }
-        }).collect()
+                TestCase {
+                    data: Box::new(UfAccountsMergeTest { accounts }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -550,10 +627,18 @@ struct UfNumIslandsIITest {
 }
 
 impl Problem for UfNumIslandsII {
-    fn id(&self) -> &str { "union_find_num_islands_ii" }
-    fn name(&self) -> &str { "Number of Islands II" }
-    fn topic(&self) -> &str { "union_find" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "union_find_num_islands_ii"
+    }
+    fn name(&self) -> &str {
+        "Number of Islands II"
+    }
+    fn topic(&self) -> &str {
+        "union_find"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given a grid of water, add land one cell at a time. After each addition, \
          return the number of islands.\n\n\
@@ -568,15 +653,23 @@ impl Problem for UfNumIslandsII {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let rows = rng.random_range(2..=10);
-            let cols = rng.random_range(2..=10);
-            let count = rng.random_range(3..=20);
-            let positions: Vec<(usize, usize)> = (0..count)
-                .map(|_| (rng.random_range(0..rows), rng.random_range(0..cols)))
-                .collect();
-            TestCase { data: Box::new(UfNumIslandsIITest { rows, cols, positions }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let rows = rng.random_range(2..=10);
+                let cols = rng.random_range(2..=10);
+                let count = rng.random_range(3..=20);
+                let positions: Vec<(usize, usize)> = (0..count)
+                    .map(|_| (rng.random_range(0..rows), rng.random_range(0..cols)))
+                    .collect();
+                TestCase {
+                    data: Box::new(UfNumIslandsIITest {
+                        rows,
+                        cols,
+                        positions,
+                    }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -656,10 +749,18 @@ struct UfSatisfiabilityTest {
 }
 
 impl Problem for UfSatisfiability {
-    fn id(&self) -> &str { "union_find_satisfiability" }
-    fn name(&self) -> &str { "Equations Satisfiability" }
-    fn topic(&self) -> &str { "union_find" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "union_find_satisfiability"
+    }
+    fn name(&self) -> &str {
+        "Equations Satisfiability"
+    }
+    fn topic(&self) -> &str {
+        "union_find"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given a list of equations like \"a==b\" or \"a!=b\", determine if all equations \
          can be satisfied simultaneously.\n\n\
@@ -673,19 +774,27 @@ impl Problem for UfSatisfiability {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=15);
-            let vars: Vec<u8> = (b'a'..=b'a' + rng.random_range(2..=5u8)).collect();
-            let equations: Vec<String> = (0..n)
-                .map(|_| {
-                    let a = vars[rng.random_range(0..vars.len())] as char;
-                    let b = vars[rng.random_range(0..vars.len())] as char;
-                    let op = if rng.random_range(0..2) == 0 { "==" } else { "!=" };
-                    format!("{a}{op}{b}")
-                })
-                .collect();
-            TestCase { data: Box::new(UfSatisfiabilityTest { equations }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=15);
+                let vars: Vec<u8> = (b'a'..=b'a' + rng.random_range(2..=5u8)).collect();
+                let equations: Vec<String> = (0..n)
+                    .map(|_| {
+                        let a = vars[rng.random_range(0..vars.len())] as char;
+                        let b = vars[rng.random_range(0..vars.len())] as char;
+                        let op = if rng.random_range(0..2) == 0 {
+                            "=="
+                        } else {
+                            "!="
+                        };
+                        format!("{a}{op}{b}")
+                    })
+                    .collect();
+                TestCase {
+                    data: Box::new(UfSatisfiabilityTest { equations }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -735,10 +844,18 @@ struct UfRegionsBySlashesTest {
 }
 
 impl Problem for UfRegionsBySlashes {
-    fn id(&self) -> &str { "union_find_regions_by_slashes" }
-    fn name(&self) -> &str { "Regions Cut by Slashes" }
-    fn topic(&self) -> &str { "union_find" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "union_find_regions_by_slashes"
+    }
+    fn name(&self) -> &str {
+        "Regions Cut by Slashes"
+    }
+    fn topic(&self) -> &str {
+        "union_find"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "An n x n grid is composed of 1x1 squares. Each square can be ' ', '/', or '\\\\'.\n\n\
          '/' divides the square from bottom-left to top-right.\n\
@@ -755,23 +872,25 @@ impl Problem for UfRegionsBySlashes {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=6);
-            let grid: Vec<String> = (0..n)
-                .map(|_| {
-                    (0..n)
-                        .map(|_| {
-                            match rng.random_range(0..3) {
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=6);
+                let grid: Vec<String> = (0..n)
+                    .map(|_| {
+                        (0..n)
+                            .map(|_| match rng.random_range(0..3) {
                                 0 => ' ',
                                 1 => '/',
                                 _ => '\\',
-                            }
-                        })
-                        .collect()
-                })
-                .collect();
-            TestCase { data: Box::new(UfRegionsBySlashesTest { grid }) }
-        }).collect()
+                            })
+                            .collect()
+                    })
+                    .collect();
+                TestCase {
+                    data: Box::new(UfRegionsBySlashesTest { grid }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -825,11 +944,7 @@ fn ref_regions_by_slashes(grid: &[String]) -> i32 {
                     for (dr, dc) in &[(-1i32, 0), (1, 0), (0, -1), (0, 1)] {
                         let nr = r as i32 + dr;
                         let nc = c as i32 + dc;
-                        if nr >= 0
-                            && nr < size as i32
-                            && nc >= 0
-                            && nc < size as i32
-                        {
+                        if nr >= 0 && nr < size as i32 && nc >= 0 && nc < size as i32 {
                             let nr = nr as usize;
                             let nc = nc as usize;
                             if expanded[nr][nc] == 0 && !visited[nr][nc] {
@@ -854,10 +969,18 @@ struct UfLongestConsecutiveTest {
 }
 
 impl Problem for UfLongestConsecutive {
-    fn id(&self) -> &str { "union_find_longest_consecutive" }
-    fn name(&self) -> &str { "Longest Consecutive Sequence (UF)" }
-    fn topic(&self) -> &str { "union_find" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "union_find_longest_consecutive"
+    }
+    fn name(&self) -> &str {
+        "Longest Consecutive Sequence (UF)"
+    }
+    fn topic(&self) -> &str {
+        "union_find"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given an unsorted array of integers, find the length of the longest consecutive \
          elements sequence using Union-Find.\n\n\
@@ -871,15 +994,22 @@ impl Problem for UfLongestConsecutive {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(0..=50);
-            let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-100..=100)).collect();
-            TestCase { data: Box::new(UfLongestConsecutiveTest { nums }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(0..=50);
+                let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-100..=100)).collect();
+                TestCase {
+                    data: Box::new(UfLongestConsecutiveTest { nums }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
-        let t = test.data.downcast_ref::<UfLongestConsecutiveTest>().unwrap();
+        let t = test
+            .data
+            .downcast_ref::<UfLongestConsecutiveTest>()
+            .unwrap();
         let expected = ref_longest_consecutive(&t.nums);
         let actual = solutions::longest_consecutive(&t.nums);
         SolutionResult {
@@ -921,10 +1051,18 @@ struct UfNumberOfIslandsRemovalTest {
 }
 
 impl Problem for UfNumberOfIslandsRemoval {
-    fn id(&self) -> &str { "union_find_number_of_islands_removal" }
-    fn name(&self) -> &str { "Components After Each Edge Removal" }
-    fn topic(&self) -> &str { "union_find" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "union_find_number_of_islands_removal"
+    }
+    fn name(&self) -> &str {
+        "Components After Each Edge Removal"
+    }
+    fn topic(&self) -> &str {
+        "union_find"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given n nodes and a list of edges, remove edges one at a time from the END \
          of the list. After each removal, report the number of connected components.\n\n\
@@ -940,35 +1078,42 @@ impl Problem for UfNumberOfIslandsRemoval {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(2..=15);
-            let edge_count = rng.random_range(n..=(n * 3));
-            let mut edges = Vec::new();
-            // Build spanning tree first
-            for i in 1..n {
-                let j = rng.random_range(0..i);
-                edges.push((j, i));
-            }
-            // Add extra edges
-            for _ in 0..(edge_count - (n - 1)) {
-                let u = rng.random_range(0..n);
-                let mut v = rng.random_range(0..n);
-                while v == u {
-                    v = rng.random_range(0..n);
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(2..=15);
+                let edge_count = rng.random_range(n..=(n * 3));
+                let mut edges = Vec::new();
+                // Build spanning tree first
+                for i in 1..n {
+                    let j = rng.random_range(0..i);
+                    edges.push((j, i));
                 }
-                edges.push((u, v));
-            }
-            // Shuffle
-            for i in (1..edges.len()).rev() {
-                let j = rng.random_range(0..=i);
-                edges.swap(i, j);
-            }
-            TestCase { data: Box::new(UfNumberOfIslandsRemovalTest { n, edges }) }
-        }).collect()
+                // Add extra edges
+                for _ in 0..(edge_count - (n - 1)) {
+                    let u = rng.random_range(0..n);
+                    let mut v = rng.random_range(0..n);
+                    while v == u {
+                        v = rng.random_range(0..n);
+                    }
+                    edges.push((u, v));
+                }
+                // Shuffle
+                for i in (1..edges.len()).rev() {
+                    let j = rng.random_range(0..=i);
+                    edges.swap(i, j);
+                }
+                TestCase {
+                    data: Box::new(UfNumberOfIslandsRemovalTest { n, edges }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
-        let t = test.data.downcast_ref::<UfNumberOfIslandsRemovalTest>().unwrap();
+        let t = test
+            .data
+            .downcast_ref::<UfNumberOfIslandsRemovalTest>()
+            .unwrap();
         let expected = ref_components_after_removal(t.n, &t.edges);
         let actual = solutions::number_of_islands_removal(t.n, &t.edges);
         SolutionResult {
@@ -1004,10 +1149,18 @@ struct UfSwimInWaterTest {
 }
 
 impl Problem for UfSwimInWater {
-    fn id(&self) -> &str { "union_find_swim_in_water" }
-    fn name(&self) -> &str { "Swim in Rising Water" }
-    fn topic(&self) -> &str { "union_find" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "union_find_swim_in_water"
+    }
+    fn name(&self) -> &str {
+        "Swim in Rising Water"
+    }
+    fn topic(&self) -> &str {
+        "union_find"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given an n x n grid where grid[i][j] represents the elevation, find the minimum \
          time t such that you can swim from (0,0) to (n-1,n-1).\n\n\
@@ -1022,17 +1175,21 @@ impl Problem for UfSwimInWater {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(2..=8);
-            let mut vals: Vec<i32> = (0..(n * n) as i32).collect();
-            // Fisher-Yates shuffle
-            for i in (1..vals.len()).rev() {
-                let j = rng.random_range(0..=i);
-                vals.swap(i, j);
-            }
-            let grid: Vec<Vec<i32>> = vals.chunks(n).map(|c| c.to_vec()).collect();
-            TestCase { data: Box::new(UfSwimInWaterTest { grid }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(2..=8);
+                let mut vals: Vec<i32> = (0..(n * n) as i32).collect();
+                // Fisher-Yates shuffle
+                for i in (1..vals.len()).rev() {
+                    let j = rng.random_range(0..=i);
+                    vals.swap(i, j);
+                }
+                let grid: Vec<Vec<i32>> = vals.chunks(n).map(|c| c.to_vec()).collect();
+                TestCase {
+                    data: Box::new(UfSwimInWaterTest { grid }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -1051,9 +1208,9 @@ impl Problem for UfSwimInWater {
 fn ref_swim_in_water(grid: &[Vec<i32>]) -> i32 {
     let n = grid.len();
     let mut cells: Vec<(i32, usize, usize)> = Vec::new();
-    for i in 0..n {
-        for j in 0..n {
-            cells.push((grid[i][j], i, j));
+    for (i, row) in grid.iter().enumerate() {
+        for (j, &val) in row.iter().enumerate() {
+            cells.push((val, i, j));
         }
     }
     cells.sort();
@@ -1092,10 +1249,18 @@ struct UfMinCostConnectCitiesTest {
 }
 
 impl Problem for UfMinCostConnectCities {
-    fn id(&self) -> &str { "union_find_min_cost_connect_cities" }
-    fn name(&self) -> &str { "Min Cost to Connect All Cities (UF)" }
-    fn topic(&self) -> &str { "union_find" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "union_find_min_cost_connect_cities"
+    }
+    fn name(&self) -> &str {
+        "Min Cost to Connect All Cities (UF)"
+    }
+    fn topic(&self) -> &str {
+        "union_find"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given n cities and weighted edges, find the minimum cost to connect all cities \
          using Union-Find (Kruskal's algorithm).\n\n\
@@ -1109,45 +1274,52 @@ impl Problem for UfMinCostConnectCities {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|i| {
-            let n = rng.random_range(2..=25);
-            let edges = if i < 7 {
-                // Connected graph
-                let extra = rng.random_range(0..=(n * 2));
-                let mut edges = Vec::new();
-                for node in 1..n {
-                    let parent = rng.random_range(0..node);
-                    let w = rng.random_range(1..=100);
-                    edges.push((parent, node, w));
-                }
-                for _ in 0..extra {
-                    let u = rng.random_range(0..n);
-                    let v = rng.random_range(0..n);
-                    if u != v {
+        (0..10)
+            .map(|i| {
+                let n = rng.random_range(2..=25);
+                let edges = if i < 7 {
+                    // Connected graph
+                    let extra = rng.random_range(0..=(n * 2));
+                    let mut edges = Vec::new();
+                    for node in 1..n {
+                        let parent = rng.random_range(0..node);
                         let w = rng.random_range(1..=100);
-                        edges.push((u, v, w));
+                        edges.push((parent, node, w));
                     }
-                }
-                edges
-            } else {
-                // Possibly disconnected
-                let count = rng.random_range(0..n);
-                (0..count)
-                    .map(|_| {
+                    for _ in 0..extra {
                         let u = rng.random_range(0..n);
                         let v = rng.random_range(0..n);
-                        let w = rng.random_range(1..=100);
-                        (u, v, w)
-                    })
-                    .filter(|(u, v, _)| u != v)
-                    .collect()
-            };
-            TestCase { data: Box::new(UfMinCostConnectCitiesTest { n, edges }) }
-        }).collect()
+                        if u != v {
+                            let w = rng.random_range(1..=100);
+                            edges.push((u, v, w));
+                        }
+                    }
+                    edges
+                } else {
+                    // Possibly disconnected
+                    let count = rng.random_range(0..n);
+                    (0..count)
+                        .map(|_| {
+                            let u = rng.random_range(0..n);
+                            let v = rng.random_range(0..n);
+                            let w = rng.random_range(1..=100);
+                            (u, v, w)
+                        })
+                        .filter(|(u, v, _)| u != v)
+                        .collect()
+                };
+                TestCase {
+                    data: Box::new(UfMinCostConnectCitiesTest { n, edges }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
-        let t = test.data.downcast_ref::<UfMinCostConnectCitiesTest>().unwrap();
+        let t = test
+            .data
+            .downcast_ref::<UfMinCostConnectCitiesTest>()
+            .unwrap();
         let expected = ref_min_cost_connect_cities(t.n, &t.edges);
         let actual = solutions::min_cost_connect_cities(t.n, &t.edges);
         SolutionResult {
@@ -1169,7 +1341,11 @@ fn ref_min_cost_connect_cities(n: usize, edges: &[(usize, usize, i32)]) -> i32 {
             total += w;
         }
     }
-    if uf.components() == 1 { total } else { -1 }
+    if uf.components() == 1 {
+        total
+    } else {
+        -1
+    }
 }
 
 // ── Hard 4: Most Stones Removed ──────────────────────────────────────
@@ -1181,10 +1357,18 @@ struct UfRemoveStonesTest {
 }
 
 impl Problem for UfRemoveStones {
-    fn id(&self) -> &str { "union_find_remove_stones" }
-    fn name(&self) -> &str { "Most Stones Removed" }
-    fn topic(&self) -> &str { "union_find" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "union_find_remove_stones"
+    }
+    fn name(&self) -> &str {
+        "Most Stones Removed"
+    }
+    fn topic(&self) -> &str {
+        "union_find"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given stones at 2D coordinates, a stone can be removed if it shares a row or \
          column with another stone that has NOT been removed.\n\n\
@@ -1199,17 +1383,21 @@ impl Problem for UfRemoveStones {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=25);
-            let mut stone_set = HashSet::new();
-            while stone_set.len() < n {
-                let r = rng.random_range(0..=50);
-                let c = rng.random_range(0..=50);
-                stone_set.insert((r, c));
-            }
-            let stones: Vec<(i32, i32)> = stone_set.into_iter().collect();
-            TestCase { data: Box::new(UfRemoveStonesTest { stones }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=25);
+                let mut stone_set = HashSet::new();
+                while stone_set.len() < n {
+                    let r = rng.random_range(0..=50);
+                    let c = rng.random_range(0..=50);
+                    stone_set.insert((r, c));
+                }
+                let stones: Vec<(i32, i32)> = stone_set.into_iter().collect();
+                TestCase {
+                    data: Box::new(UfRemoveStonesTest { stones }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -1253,10 +1441,18 @@ struct UfCheckingExistenceEdgeLengthTest {
 }
 
 impl Problem for UfCheckingExistenceEdgeLength {
-    fn id(&self) -> &str { "union_find_checking_existence_edge_length" }
-    fn name(&self) -> &str { "Edge-Length Limited Path Queries" }
-    fn topic(&self) -> &str { "union_find" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "union_find_checking_existence_edge_length"
+    }
+    fn name(&self) -> &str {
+        "Edge-Length Limited Path Queries"
+    }
+    fn topic(&self) -> &str {
+        "union_find"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given an undirected graph and queries (u, v, limit), determine for each query \
          whether there exists a path from u to v using only edges with weight strictly \
@@ -1273,46 +1469,48 @@ impl Problem for UfCheckingExistenceEdgeLength {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(2..=20);
-            let edge_count = rng.random_range(0..=(n * 3));
-            let mut edges = Vec::new();
-            for _ in 0..edge_count {
-                let u = rng.random_range(0..n);
-                let v = rng.random_range(0..n);
-                if u != v {
-                    let w = rng.random_range(1..=100);
-                    edges.push((u, v, w));
-                }
-            }
-            let query_count = rng.random_range(1..=20);
-            let queries: Vec<(usize, usize, i32)> = (0..query_count)
-                .map(|_| {
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(2..=20);
+                let edge_count = rng.random_range(0..=(n * 3));
+                let mut edges = Vec::new();
+                for _ in 0..edge_count {
                     let u = rng.random_range(0..n);
-                    let mut v = rng.random_range(0..n);
-                    while v == u {
-                        v = rng.random_range(0..n);
+                    let v = rng.random_range(0..n);
+                    if u != v {
+                        let w = rng.random_range(1..=100);
+                        edges.push((u, v, w));
                     }
-                    let limit = rng.random_range(1..=150);
-                    (u, v, limit)
-                })
-                .collect();
-            TestCase {
-                data: Box::new(UfCheckingExistenceEdgeLengthTest { n, edges, queries }),
-            }
-        }).collect()
+                }
+                let query_count = rng.random_range(1..=20);
+                let queries: Vec<(usize, usize, i32)> = (0..query_count)
+                    .map(|_| {
+                        let u = rng.random_range(0..n);
+                        let mut v = rng.random_range(0..n);
+                        while v == u {
+                            v = rng.random_range(0..n);
+                        }
+                        let limit = rng.random_range(1..=150);
+                        (u, v, limit)
+                    })
+                    .collect();
+                TestCase {
+                    data: Box::new(UfCheckingExistenceEdgeLengthTest { n, edges, queries }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
-        let t = test.data.downcast_ref::<UfCheckingExistenceEdgeLengthTest>().unwrap();
+        let t = test
+            .data
+            .downcast_ref::<UfCheckingExistenceEdgeLengthTest>()
+            .unwrap();
         let expected = ref_checking_edge_length(t.n, &t.edges, &t.queries);
         let actual = solutions::checking_existence_edge_length(t.n, &t.edges, &t.queries);
         SolutionResult {
             is_correct: actual == expected,
-            input_description: format!(
-                "n={}, edges={:?}, queries={:?}",
-                t.n, t.edges, t.queries
-            ),
+            input_description: format!("n={}, edges={:?}, queries={:?}", t.n, t.edges, t.queries),
             expected: format!("{expected:?}"),
             actual: format!("{actual:?}"),
         }

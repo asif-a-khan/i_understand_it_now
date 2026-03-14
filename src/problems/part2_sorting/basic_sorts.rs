@@ -70,7 +70,7 @@ fn run_tracked_sort(
 
     sort_fn(&mut tracked);
 
-    let actual: Vec<i32> = tracked.iter().map(|t| t.value.clone()).collect();
+    let actual: Vec<i32> = tracked.iter().map(|t| t.value).collect();
 
     let inner = shared_log.borrow();
     for op in inner.operations() {
@@ -92,10 +92,18 @@ fn run_tracked_sort(
 struct BubbleSort;
 
 impl Problem for BubbleSort {
-    fn id(&self) -> &str { "basic_sorts_bubble" }
-    fn name(&self) -> &str { "Bubble Sort" }
-    fn topic(&self) -> &str { "basic_sorts" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "basic_sorts_bubble"
+    }
+    fn name(&self) -> &str {
+        "Bubble Sort"
+    }
+    fn topic(&self) -> &str {
+        "basic_sorts"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Implement bubble sort on a tracked slice of integers.\n\n\
          Use `tracked_swap(arr, i, j)` to swap elements.\n\
@@ -113,7 +121,9 @@ impl Problem for BubbleSort {
             .map(|_| {
                 let n = rng.random_range(0..=30);
                 let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-1000..=1000)).collect();
-                TestCase { data: Box::new(SortTest { nums }) }
+                TestCase {
+                    data: Box::new(SortTest { nums }),
+                }
             })
             .collect()
     }
@@ -130,10 +140,18 @@ impl Problem for BubbleSort {
 struct SelectionSort;
 
 impl Problem for SelectionSort {
-    fn id(&self) -> &str { "basic_sorts_selection" }
-    fn name(&self) -> &str { "Selection Sort" }
-    fn topic(&self) -> &str { "basic_sorts" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "basic_sorts_selection"
+    }
+    fn name(&self) -> &str {
+        "Selection Sort"
+    }
+    fn topic(&self) -> &str {
+        "basic_sorts"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Implement selection sort on a tracked slice of integers.\n\n\
          Use `tracked_swap(arr, i, j)` to swap elements.\n\
@@ -151,7 +169,9 @@ impl Problem for SelectionSort {
             .map(|_| {
                 let n = rng.random_range(0..=30);
                 let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-1000..=1000)).collect();
-                TestCase { data: Box::new(SortTest { nums }) }
+                TestCase {
+                    data: Box::new(SortTest { nums }),
+                }
             })
             .collect()
     }
@@ -168,10 +188,18 @@ impl Problem for SelectionSort {
 struct InsertionSort;
 
 impl Problem for InsertionSort {
-    fn id(&self) -> &str { "basic_sorts_insertion" }
-    fn name(&self) -> &str { "Insertion Sort" }
-    fn topic(&self) -> &str { "basic_sorts" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "basic_sorts_insertion"
+    }
+    fn name(&self) -> &str {
+        "Insertion Sort"
+    }
+    fn topic(&self) -> &str {
+        "basic_sorts"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Implement insertion sort on a tracked slice of integers.\n\n\
          Use `tracked_swap(arr, i, j)` to swap elements.\n\
@@ -189,7 +217,9 @@ impl Problem for InsertionSort {
             .map(|_| {
                 let n = rng.random_range(0..=30);
                 let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-1000..=1000)).collect();
-                TestCase { data: Box::new(SortTest { nums }) }
+                TestCase {
+                    data: Box::new(SortTest { nums }),
+                }
             })
             .collect()
     }
@@ -206,10 +236,18 @@ impl Problem for InsertionSort {
 struct IsSorted;
 
 impl Problem for IsSorted {
-    fn id(&self) -> &str { "basic_sorts_is_sorted" }
-    fn name(&self) -> &str { "Is Sorted" }
-    fn topic(&self) -> &str { "basic_sorts" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "basic_sorts_is_sorted"
+    }
+    fn name(&self) -> &str {
+        "Is Sorted"
+    }
+    fn topic(&self) -> &str {
+        "basic_sorts"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Check if an array is sorted in non-decreasing order.\n\n\
          Return `true` if sorted, `false` otherwise.\n\n\
@@ -224,13 +262,14 @@ impl Problem for IsSorted {
         (0..10)
             .map(|i| {
                 let n = rng.random_range(0..=30);
-                let mut nums: Vec<i32> =
-                    (0..n).map(|_| rng.random_range(-100..=100)).collect();
+                let mut nums: Vec<i32> = (0..n).map(|_| rng.random_range(-100..=100)).collect();
                 // Make ~half the tests already sorted
                 if i % 2 == 0 {
                     nums.sort();
                 }
-                TestCase { data: Box::new(SortTest { nums }) }
+                TestCase {
+                    data: Box::new(SortTest { nums }),
+                }
             })
             .collect()
     }
@@ -255,10 +294,18 @@ impl Problem for IsSorted {
 struct SortColors;
 
 impl Problem for SortColors {
-    fn id(&self) -> &str { "basic_sorts_sort_colors" }
-    fn name(&self) -> &str { "Sort Colors (Dutch National Flag)" }
-    fn topic(&self) -> &str { "basic_sorts" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "basic_sorts_sort_colors"
+    }
+    fn name(&self) -> &str {
+        "Sort Colors (Dutch National Flag)"
+    }
+    fn topic(&self) -> &str {
+        "basic_sorts"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given an array containing only 0s, 1s, and 2s, sort it in-place.\n\n\
          This is the Dutch National Flag problem. Try to solve it in one pass \
@@ -274,7 +321,9 @@ impl Problem for SortColors {
             .map(|_| {
                 let n = rng.random_range(0..=30);
                 let nums: Vec<i32> = (0..n).map(|_| rng.random_range(0..=2)).collect();
-                TestCase { data: Box::new(SortTest { nums }) }
+                TestCase {
+                    data: Box::new(SortTest { nums }),
+                }
             })
             .collect()
     }
@@ -300,10 +349,18 @@ impl Problem for SortColors {
 struct SortByParity;
 
 impl Problem for SortByParity {
-    fn id(&self) -> &str { "basic_sorts_sort_by_parity" }
-    fn name(&self) -> &str { "Sort by Parity" }
-    fn topic(&self) -> &str { "basic_sorts" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "basic_sorts_sort_by_parity"
+    }
+    fn name(&self) -> &str {
+        "Sort by Parity"
+    }
+    fn topic(&self) -> &str {
+        "basic_sorts"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given an integer array `nums`, rearrange it so that all even numbers come \
          before all odd numbers.\n\n\
@@ -319,7 +376,9 @@ impl Problem for SortByParity {
             .map(|_| {
                 let n = rng.random_range(0..=30);
                 let nums: Vec<i32> = (0..n).map(|_| rng.random_range(0..=100)).collect();
-                TestCase { data: Box::new(SortTest { nums }) }
+                TestCase {
+                    data: Box::new(SortTest { nums }),
+                }
             })
             .collect()
     }
@@ -335,8 +394,15 @@ impl Problem for SortByParity {
         sorted_actual.sort();
         let same_elements = sorted_input == sorted_actual;
 
-        let first_odd = actual.iter().position(|x| x % 2 != 0).unwrap_or(actual.len());
-        let last_even = actual.iter().rposition(|x| x % 2 == 0).map(|i| i + 1).unwrap_or(0);
+        let first_odd = actual
+            .iter()
+            .position(|x| x % 2 != 0)
+            .unwrap_or(actual.len());
+        let last_even = actual
+            .iter()
+            .rposition(|x| x % 2 == 0)
+            .map(|i| i + 1)
+            .unwrap_or(0);
         let valid_order = last_even <= first_odd || first_odd == actual.len();
 
         SolutionResult {
@@ -355,10 +421,18 @@ impl Problem for SortByParity {
 struct RelativeSort;
 
 impl Problem for RelativeSort {
-    fn id(&self) -> &str { "basic_sorts_relative_sort" }
-    fn name(&self) -> &str { "Relative Sort Array" }
-    fn topic(&self) -> &str { "basic_sorts" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "basic_sorts_relative_sort"
+    }
+    fn name(&self) -> &str {
+        "Relative Sort Array"
+    }
+    fn topic(&self) -> &str {
+        "basic_sorts"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Sort `arr1` such that the relative ordering of items in `arr1` follows \
          the order defined by `arr2`.\n\n\
@@ -378,8 +452,12 @@ impl Problem for RelativeSort {
                 let n1 = rng.random_range(1..=20);
                 let arr1: Vec<i32> = (0..n1).map(|_| rng.random_range(0..=20)).collect();
                 // arr2 is a subset of unique values from arr1
-                let mut unique: Vec<i32> = arr1.iter().copied().collect::<std::collections::HashSet<_>>()
-                    .into_iter().collect();
+                let mut unique: Vec<i32> = arr1
+                    .iter()
+                    .copied()
+                    .collect::<std::collections::HashSet<_>>()
+                    .into_iter()
+                    .collect();
                 // Shuffle unique values
                 for i in (1..unique.len()).rev() {
                     let j = rng.random_range(0..=i);
@@ -387,7 +465,9 @@ impl Problem for RelativeSort {
                 }
                 let n2 = rng.random_range(0..=unique.len());
                 let arr2: Vec<i32> = unique[..n2].to_vec();
-                TestCase { data: Box::new(TwoVecTest { arr1, arr2 }) }
+                TestCase {
+                    data: Box::new(TwoVecTest { arr1, arr2 }),
+                }
             })
             .collect()
     }
@@ -408,13 +488,11 @@ impl Problem for RelativeSort {
 fn ref_relative_sort(arr1: &[i32], arr2: &[i32]) -> Vec<i32> {
     let order_map: HashMap<i32, usize> = arr2.iter().enumerate().map(|(i, &v)| (v, i)).collect();
     let mut result = arr1.to_vec();
-    result.sort_by(|a, b| {
-        match (order_map.get(a), order_map.get(b)) {
-            (Some(ia), Some(ib)) => ia.cmp(ib),
-            (Some(_), None) => std::cmp::Ordering::Less,
-            (None, Some(_)) => std::cmp::Ordering::Greater,
-            (None, None) => a.cmp(b),
-        }
+    result.sort_by(|a, b| match (order_map.get(a), order_map.get(b)) {
+        (Some(ia), Some(ib)) => ia.cmp(ib),
+        (Some(_), None) => std::cmp::Ordering::Less,
+        (None, Some(_)) => std::cmp::Ordering::Greater,
+        (None, None) => a.cmp(b),
     });
     result
 }
@@ -426,10 +504,18 @@ fn ref_relative_sort(arr1: &[i32], arr2: &[i32]) -> Vec<i32> {
 struct LargestNumber;
 
 impl Problem for LargestNumber {
-    fn id(&self) -> &str { "basic_sorts_largest_number" }
-    fn name(&self) -> &str { "Largest Number" }
-    fn topic(&self) -> &str { "basic_sorts" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "basic_sorts_largest_number"
+    }
+    fn name(&self) -> &str {
+        "Largest Number"
+    }
+    fn topic(&self) -> &str {
+        "basic_sorts"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given a list of non-negative integers `nums`, arrange them such that they \
          form the largest number and return it as a string.\n\n\
@@ -447,7 +533,9 @@ impl Problem for LargestNumber {
             .map(|_| {
                 let n = rng.random_range(1..=15);
                 let nums: Vec<i32> = (0..n).map(|_| rng.random_range(0..=999)).collect();
-                TestCase { data: Box::new(SortTest { nums }) }
+                TestCase {
+                    data: Box::new(SortTest { nums }),
+                }
             })
             .collect()
     }
@@ -488,10 +576,18 @@ fn ref_largest_number(nums: &[i32]) -> String {
 struct WiggleSort;
 
 impl Problem for WiggleSort {
-    fn id(&self) -> &str { "basic_sorts_wiggle_sort" }
-    fn name(&self) -> &str { "Wiggle Sort" }
-    fn topic(&self) -> &str { "basic_sorts" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "basic_sorts_wiggle_sort"
+    }
+    fn name(&self) -> &str {
+        "Wiggle Sort"
+    }
+    fn topic(&self) -> &str {
+        "basic_sorts"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Rearrange `nums` into wiggle order: nums[0] <= nums[1] >= nums[2] <= nums[3] ...\n\n\
          Multiple valid answers may exist; any valid wiggle arrangement is accepted.\n\n\
@@ -506,7 +602,9 @@ impl Problem for WiggleSort {
             .map(|_| {
                 let n = rng.random_range(1..=30);
                 let nums: Vec<i32> = (0..n).map(|_| rng.random_range(0..=100)).collect();
-                TestCase { data: Box::new(SortTest { nums }) }
+                TestCase {
+                    data: Box::new(SortTest { nums }),
+                }
             })
             .collect()
     }
@@ -561,10 +659,18 @@ fn same_multiset(a: &[i32], b: &[i32]) -> bool {
 struct PancakeSort;
 
 impl Problem for PancakeSort {
-    fn id(&self) -> &str { "basic_sorts_pancake_sort" }
-    fn name(&self) -> &str { "Pancake Sort" }
-    fn topic(&self) -> &str { "basic_sorts" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "basic_sorts_pancake_sort"
+    }
+    fn name(&self) -> &str {
+        "Pancake Sort"
+    }
+    fn topic(&self) -> &str {
+        "basic_sorts"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Sort the array using only \"pancake flips\".\n\n\
          A pancake flip of length `k` reverses the first `k` elements of the array.\n\
@@ -587,7 +693,9 @@ impl Problem for PancakeSort {
                     let j = rng.random_range(0..=i);
                     nums.swap(i, j);
                 }
-                TestCase { data: Box::new(SortTest { nums }) }
+                TestCase {
+                    data: Box::new(SortTest { nums }),
+                }
             })
             .collect()
     }
@@ -613,10 +721,18 @@ impl Problem for PancakeSort {
 struct CountInversions;
 
 impl Problem for CountInversions {
-    fn id(&self) -> &str { "basic_sorts_count_inversions" }
-    fn name(&self) -> &str { "Count Inversions" }
-    fn topic(&self) -> &str { "basic_sorts" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "basic_sorts_count_inversions"
+    }
+    fn name(&self) -> &str {
+        "Count Inversions"
+    }
+    fn topic(&self) -> &str {
+        "basic_sorts"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Count the number of inversions in an array.\n\n\
          An inversion is a pair (i, j) where i < j but nums[i] > nums[j].\n\n\
@@ -634,7 +750,9 @@ impl Problem for CountInversions {
             .map(|_| {
                 let n = rng.random_range(0..=50);
                 let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-1000..=1000)).collect();
-                TestCase { data: Box::new(SortTest { nums }) }
+                TestCase {
+                    data: Box::new(SortTest { nums }),
+                }
             })
             .collect()
     }
@@ -671,10 +789,18 @@ fn ref_count_inversions(nums: &[i32]) -> i64 {
 struct HIndex;
 
 impl Problem for HIndex {
-    fn id(&self) -> &str { "basic_sorts_h_index" }
-    fn name(&self) -> &str { "H-Index" }
-    fn topic(&self) -> &str { "basic_sorts" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "basic_sorts_h_index"
+    }
+    fn name(&self) -> &str {
+        "H-Index"
+    }
+    fn topic(&self) -> &str {
+        "basic_sorts"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given an array of integers `citations` where citations[i] is the number of \
          citations a researcher received for their i-th paper, return the researcher's \
@@ -692,7 +818,9 @@ impl Problem for HIndex {
             .map(|_| {
                 let n = rng.random_range(0..=30);
                 let nums: Vec<i32> = (0..n).map(|_| rng.random_range(0..=20)).collect();
-                TestCase { data: Box::new(SortTest { nums }) }
+                TestCase {
+                    data: Box::new(SortTest { nums }),
+                }
             })
             .collect()
     }
@@ -731,10 +859,18 @@ fn ref_h_index(citations: &[i32]) -> i32 {
 struct CustomSortString;
 
 impl Problem for CustomSortString {
-    fn id(&self) -> &str { "basic_sorts_custom_sort_string" }
-    fn name(&self) -> &str { "Custom Sort String" }
-    fn topic(&self) -> &str { "basic_sorts" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "basic_sorts_custom_sort_string"
+    }
+    fn name(&self) -> &str {
+        "Custom Sort String"
+    }
+    fn topic(&self) -> &str {
+        "basic_sorts"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "You are given two strings `order` and `s`.\n\n\
          All characters of `order` are unique and represent a custom ordering of \
@@ -781,8 +917,7 @@ impl Problem for CustomSortString {
         let actual = solutions::custom_sort_string(&t.order, &t.s);
 
         // Validate: same character multiset and respects order
-        let valid = same_char_multiset(&expected, &actual)
-            && respects_order(&t.order, &actual);
+        let valid = same_char_multiset(&expected, &actual) && respects_order(&t.order, &actual);
 
         SolutionResult {
             is_correct: valid,
@@ -829,10 +964,18 @@ fn respects_order(order: &str, s: &str) -> bool {
 struct MinimumSwaps;
 
 impl Problem for MinimumSwaps {
-    fn id(&self) -> &str { "basic_sorts_minimum_swaps" }
-    fn name(&self) -> &str { "Minimum Swaps to Sort" }
-    fn topic(&self) -> &str { "basic_sorts" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "basic_sorts_minimum_swaps"
+    }
+    fn name(&self) -> &str {
+        "Minimum Swaps to Sort"
+    }
+    fn topic(&self) -> &str {
+        "basic_sorts"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given a permutation of integers from 1 to n, find the minimum number of \
          swaps required to sort the array.\n\n\
@@ -855,7 +998,9 @@ impl Problem for MinimumSwaps {
                     let j = rng.random_range(0..=i);
                     nums.swap(i, j);
                 }
-                TestCase { data: Box::new(SortTest { nums }) }
+                TestCase {
+                    data: Box::new(SortTest { nums }),
+                }
             })
             .collect()
     }
@@ -900,10 +1045,18 @@ fn ref_minimum_swaps(nums: &[i32]) -> i32 {
 struct SortNearlySorted;
 
 impl Problem for SortNearlySorted {
-    fn id(&self) -> &str { "basic_sorts_sort_nearly_sorted" }
-    fn name(&self) -> &str { "Sort Nearly Sorted (K-Sorted) Array" }
-    fn topic(&self) -> &str { "basic_sorts" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "basic_sorts_sort_nearly_sorted"
+    }
+    fn name(&self) -> &str {
+        "Sort Nearly Sorted (K-Sorted) Array"
+    }
+    fn topic(&self) -> &str {
+        "basic_sorts"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given a k-sorted array where each element is at most `k` positions away \
          from its sorted position, sort the array efficiently.\n\n\
@@ -922,16 +1075,19 @@ impl Problem for SortNearlySorted {
         let mut rng = rand::rng();
         (0..10)
             .map(|_| {
-                let n = rng.random_range(0..=40);
-                let k = if n == 0 { 0 } else { rng.random_range(1..=n.min(10)) };
+                let n: usize = rng.random_range(0..=40);
+                let k: usize = if n == 0 {
+                    0
+                } else {
+                    rng.random_range(1..=n.min(10))
+                };
                 // Generate a k-sorted array
-                let mut sorted: Vec<i32> =
-                    (0..n).map(|_| rng.random_range(-100..=100)).collect();
+                let mut sorted: Vec<i32> = (0..n).map(|_| rng.random_range(-100..=100)).collect();
                 sorted.sort();
                 // Perturb positions by at most k
                 let mut nums = sorted.clone();
                 for i in 0..n {
-                    let lo = if i >= k { i - k } else { 0 };
+                    let lo = i.saturating_sub(k);
                     let hi = (i + k).min(n - 1);
                     let j = rng.random_range(lo..=hi);
                     nums.swap(i, j);

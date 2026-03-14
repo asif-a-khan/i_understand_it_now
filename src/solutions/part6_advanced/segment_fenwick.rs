@@ -90,9 +90,6 @@ pub fn max_subarray_in_range(_arr: &[i32], _queries: &[(usize, usize)]) -> Vec<i
 /// Dynamic segment tree with coordinate compression.
 /// updates: (position, value) — add value at position.
 /// queries: (l, r) — sum of values in [l, r].
-pub fn dynamic_segment_tree(
-    _updates: &[(i32, i32)],
-    _queries: &[(i32, i32)],
-) -> Vec<i32> {
+pub fn dynamic_segment_tree(_updates: &[(i32, i32)], _queries: &[(i32, i32)]) -> Vec<i32> {
     todo!()
 }

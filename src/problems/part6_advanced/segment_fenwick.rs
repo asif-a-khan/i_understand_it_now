@@ -97,8 +97,8 @@ fn ref_range_update_point_query(arr: &[i32], ops: &[(bool, usize, usize, i32)]) 
     let mut results = Vec::new();
     for &(is_update, x, y, val) in ops {
         if is_update {
-            for i in x..=y {
-                a[i] += val;
+            for item in a.iter_mut().take(y + 1).skip(x) {
+                *item += val;
             }
         } else {
             results.push(a[x]);
@@ -120,10 +120,7 @@ fn ref_count_smaller_after(nums: &[i32]) -> Vec<i32> {
     result
 }
 
-fn ref_2d_sum(
-    matrix: &[Vec<i32>],
-    ops: &[(bool, usize, usize, usize, usize, i32)],
-) -> Vec<i32> {
+fn ref_2d_sum(matrix: &[Vec<i32>], ops: &[(bool, usize, usize, usize, usize, i32)]) -> Vec<i32> {
     let rows = matrix.len();
     let cols = if rows > 0 { matrix[0].len() } else { 0 };
     let mut mat: Vec<Vec<i32>> = matrix.to_vec();
@@ -133,10 +130,10 @@ fn ref_2d_sum(
             mat[r1][c1] += val;
         } else {
             let mut sum = 0i32;
-            for r in r1..=r2 {
-                for c in c1..=c2 {
+            for (r, row) in mat.iter().enumerate().take(r2 + 1).skip(r1) {
+                for (c, &val) in row.iter().enumerate().take(c2 + 1).skip(c1) {
                     if r < rows && c < cols {
-                        sum += mat[r][c];
+                        sum += val;
                     }
                 }
             }
@@ -158,8 +155,8 @@ fn ref_lazy_range_update_query(arr: &[i32], ops: &[(bool, usize, usize, i32)]) -
     let mut results = Vec::new();
     for &(is_update, x, y, val) in ops {
         if is_update {
-            for i in x..=y {
-                a[i] += val;
+            for item in a.iter_mut().take(y + 1).skip(x) {
+                *item += val;
             }
         } else {
             let sum: i32 = a[x..=y].iter().sum();
@@ -202,8 +199,8 @@ fn ref_fenwick_range_update_range_query(
     let mut results = Vec::new();
     for &(is_update, x, y, val) in ops {
         if is_update {
-            for i in x..=y {
-                a[i] += val;
+            for item in a.iter_mut().take(y + 1).skip(x) {
+                *item += val;
             }
         } else {
             let sum: i32 = a[x..=y].iter().sum();
@@ -220,8 +217,8 @@ fn ref_max_subarray_range(arr: &[i32], queries: &[(usize, usize)]) -> Vec<i32> {
             let mut max_sum = arr[l];
             for i in l..=r {
                 let mut cur_sum = 0;
-                for j in i..=r {
-                    cur_sum += arr[j];
+                for &val in arr.iter().take(r + 1).skip(i) {
+                    cur_sum += val;
                     max_sum = max_sum.max(cur_sum);
                 }
             }
@@ -230,10 +227,7 @@ fn ref_max_subarray_range(arr: &[i32], queries: &[(usize, usize)]) -> Vec<i32> {
         .collect()
 }
 
-fn ref_dynamic_segment(
-    updates: &[(i32, i32)],
-    queries: &[(i32, i32)],
-) -> Vec<i32> {
+fn ref_dynamic_segment(updates: &[(i32, i32)], queries: &[(i32, i32)]) -> Vec<i32> {
     use std::collections::BTreeMap;
     let mut map = BTreeMap::new();
     for &(pos, val) in updates {
@@ -241,9 +235,7 @@ fn ref_dynamic_segment(
     }
     queries
         .iter()
-        .map(|&(l, r)| {
-            map.range(l..=r).map(|(_, &v)| v).sum()
-        })
+        .map(|&(l, r)| map.range(l..=r).map(|(_, &v)| v).sum())
         .collect()
 }
 
@@ -257,10 +249,18 @@ struct RangeSumTest {
 }
 
 impl Problem for SegmentRangeSumQuery {
-    fn id(&self) -> &str { "segment_range_sum_query" }
-    fn name(&self) -> &str { "Range Sum Query (Mutable)" }
-    fn topic(&self) -> &str { "segment_fenwick" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "segment_range_sum_query"
+    }
+    fn name(&self) -> &str {
+        "Range Sum Query (Mutable)"
+    }
+    fn topic(&self) -> &str {
+        "segment_fenwick"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Implement a data structure that supports point updates and range sum queries.\n\n\
          Given an array and a list of operations:\n\
@@ -322,10 +322,18 @@ struct PrefixSumTest {
 }
 
 impl Problem for FenwickPrefixSum {
-    fn id(&self) -> &str { "fenwick_prefix_sum" }
-    fn name(&self) -> &str { "Prefix Sum with Point Updates" }
-    fn topic(&self) -> &str { "segment_fenwick" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "fenwick_prefix_sum"
+    }
+    fn name(&self) -> &str {
+        "Prefix Sum with Point Updates"
+    }
+    fn topic(&self) -> &str {
+        "segment_fenwick"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Implement prefix sum queries with point updates using a Fenwick tree (BIT).\n\n\
          Operations:\n\
@@ -383,10 +391,18 @@ struct RangeMinTest {
 }
 
 impl Problem for SegmentRangeMinQuery {
-    fn id(&self) -> &str { "segment_range_min_query" }
-    fn name(&self) -> &str { "Range Minimum Query" }
-    fn topic(&self) -> &str { "segment_fenwick" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "segment_range_min_query"
+    }
+    fn name(&self) -> &str {
+        "Range Minimum Query"
+    }
+    fn topic(&self) -> &str {
+        "segment_fenwick"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Build a segment tree on an array to answer range minimum queries.\n\n\
          Input: (arr: Vec<i32>, queries: Vec<(usize, usize)>)\n\
@@ -437,10 +453,18 @@ struct InversionsTest {
 }
 
 impl Problem for FenwickCountInversions {
-    fn id(&self) -> &str { "fenwick_count_inversions" }
-    fn name(&self) -> &str { "Count Inversions" }
-    fn topic(&self) -> &str { "segment_fenwick" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "fenwick_count_inversions"
+    }
+    fn name(&self) -> &str {
+        "Count Inversions"
+    }
+    fn topic(&self) -> &str {
+        "segment_fenwick"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Count the number of inversions in an array using a BIT (Fenwick tree).\n\n\
          An inversion is a pair (i, j) where i < j but arr[i] > arr[j].\n\n\
@@ -484,10 +508,18 @@ struct PointUpdateTest {
 }
 
 impl Problem for SegmentPointUpdate {
-    fn id(&self) -> &str { "segment_point_update" }
-    fn name(&self) -> &str { "Point Update, Range Query" }
-    fn topic(&self) -> &str { "segment_fenwick" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "segment_point_update"
+    }
+    fn name(&self) -> &str {
+        "Point Update, Range Query"
+    }
+    fn topic(&self) -> &str {
+        "segment_fenwick"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Implement a segment tree supporting point update (add delta) and range sum query.\n\n\
          Operations:\n\
@@ -546,10 +578,18 @@ struct RangeUpdatePointQueryTest {
 }
 
 impl Problem for SegmentRangeUpdatePointQuery {
-    fn id(&self) -> &str { "segment_range_update_point_query" }
-    fn name(&self) -> &str { "Range Update, Point Query" }
-    fn topic(&self) -> &str { "segment_fenwick" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "segment_range_update_point_query"
+    }
+    fn name(&self) -> &str {
+        "Range Update, Point Query"
+    }
+    fn topic(&self) -> &str {
+        "segment_fenwick"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Support range updates (add delta to all elements in [l,r]) and point queries.\n\n\
          Operations:\n\
@@ -586,7 +626,10 @@ impl Problem for SegmentRangeUpdatePointQuery {
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
-        let t = test.data.downcast_ref::<RangeUpdatePointQueryTest>().unwrap();
+        let t = test
+            .data
+            .downcast_ref::<RangeUpdatePointQueryTest>()
+            .unwrap();
         let expected = ref_range_update_point_query(&t.arr, &t.ops);
         let actual = solutions::range_update_point_query(&t.arr, &t.ops);
         SolutionResult {
@@ -607,10 +650,18 @@ struct CountSmallerTest {
 }
 
 impl Problem for SegmentCountSmallerAfter {
-    fn id(&self) -> &str { "segment_count_smaller_after" }
-    fn name(&self) -> &str { "Count of Smaller Numbers After Self" }
-    fn topic(&self) -> &str { "segment_fenwick" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "segment_count_smaller_after"
+    }
+    fn name(&self) -> &str {
+        "Count of Smaller Numbers After Self"
+    }
+    fn topic(&self) -> &str {
+        "segment_fenwick"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given an array, for each element count how many elements to its right are smaller.\n\n\
          Input: Vec<i32>\n\
@@ -657,10 +708,18 @@ struct Fenwick2dTest {
 }
 
 impl Problem for Fenwick2dSum {
-    fn id(&self) -> &str { "fenwick_2d_sum" }
-    fn name(&self) -> &str { "2D Prefix Sum with Updates" }
-    fn topic(&self) -> &str { "segment_fenwick" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "fenwick_2d_sum"
+    }
+    fn name(&self) -> &str {
+        "2D Prefix Sum with Updates"
+    }
+    fn topic(&self) -> &str {
+        "segment_fenwick"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Implement a 2D Fenwick tree supporting point updates and rectangle sum queries.\n\n\
          Operations tuple: (is_update, r1, c1, r2, c2, val)\n\
@@ -725,10 +784,18 @@ struct MergeSortTreeTest {
 }
 
 impl Problem for SegmentMergeSortTree {
-    fn id(&self) -> &str { "segment_merge_sort_tree" }
-    fn name(&self) -> &str { "Merge Sort Tree" }
-    fn topic(&self) -> &str { "segment_fenwick" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "segment_merge_sort_tree"
+    }
+    fn name(&self) -> &str {
+        "Merge Sort Tree"
+    }
+    fn topic(&self) -> &str {
+        "segment_fenwick"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Build a merge sort tree (segment tree where each node stores a sorted list).\n\
          Answer queries: count elements in arr[l..=r] that are less than k.\n\n\
@@ -781,10 +848,18 @@ struct LazyPropTest {
 }
 
 impl Problem for SegmentLazyPropagation {
-    fn id(&self) -> &str { "segment_lazy_propagation" }
-    fn name(&self) -> &str { "Lazy Propagation" }
-    fn topic(&self) -> &str { "segment_fenwick" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "segment_lazy_propagation"
+    }
+    fn name(&self) -> &str {
+        "Lazy Propagation"
+    }
+    fn topic(&self) -> &str {
+        "segment_fenwick"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Implement a segment tree with lazy propagation for range update and range query.\n\n\
          Operations:\n\
@@ -842,10 +917,18 @@ struct PersistentTest {
 }
 
 impl Problem for SegmentPersistent {
-    fn id(&self) -> &str { "segment_persistent" }
-    fn name(&self) -> &str { "Persistent Segment Tree: Kth Smallest in Range" }
-    fn topic(&self) -> &str { "segment_fenwick" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "segment_persistent"
+    }
+    fn name(&self) -> &str {
+        "Persistent Segment Tree: Kth Smallest in Range"
+    }
+    fn topic(&self) -> &str {
+        "segment_fenwick"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Find the kth smallest element in a subarray using a persistent segment tree.\n\n\
          Input: (arr: Vec<i32>, queries: Vec<(usize, usize, usize)>)\n\
@@ -897,10 +980,18 @@ struct IntervalSchedTest {
 }
 
 impl Problem for SegmentIntervalScheduling {
-    fn id(&self) -> &str { "segment_interval_scheduling" }
-    fn name(&self) -> &str { "Max Non-Overlapping Intervals" }
-    fn topic(&self) -> &str { "segment_fenwick" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "segment_interval_scheduling"
+    }
+    fn name(&self) -> &str {
+        "Max Non-Overlapping Intervals"
+    }
+    fn topic(&self) -> &str {
+        "segment_fenwick"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Find the maximum number of non-overlapping intervals.\n\
          Two intervals [a,b) and [c,d) are non-overlapping if b <= c or d <= a.\n\n\
@@ -950,10 +1041,18 @@ struct FenwickRURQTest {
 }
 
 impl Problem for FenwickRangeUpdateRangeQuery {
-    fn id(&self) -> &str { "fenwick_range_update_range_query" }
-    fn name(&self) -> &str { "Range Update + Range Query (BIT)" }
-    fn topic(&self) -> &str { "segment_fenwick" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "fenwick_range_update_range_query"
+    }
+    fn name(&self) -> &str {
+        "Range Update + Range Query (BIT)"
+    }
+    fn topic(&self) -> &str {
+        "segment_fenwick"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Implement range update and range query using two Fenwick trees.\n\n\
          Operations:\n\
@@ -1011,10 +1110,18 @@ struct MaxSubarrayRangeTest {
 }
 
 impl Problem for SegmentMaxSubarrayRange {
-    fn id(&self) -> &str { "segment_max_subarray_range" }
-    fn name(&self) -> &str { "Max Subarray Sum in Range" }
-    fn topic(&self) -> &str { "segment_fenwick" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "segment_max_subarray_range"
+    }
+    fn name(&self) -> &str {
+        "Max Subarray Sum in Range"
+    }
+    fn topic(&self) -> &str {
+        "segment_fenwick"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Build a segment tree where each node stores prefix max, suffix max, total, and max \
          subarray sum. Answer queries for max subarray sum in arr[l..=r].\n\n\
@@ -1066,10 +1173,18 @@ struct DynamicSegTest {
 }
 
 impl Problem for SegmentDynamic {
-    fn id(&self) -> &str { "segment_dynamic" }
-    fn name(&self) -> &str { "Dynamic Segment Tree with Coordinate Compression" }
-    fn topic(&self) -> &str { "segment_fenwick" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "segment_dynamic"
+    }
+    fn name(&self) -> &str {
+        "Dynamic Segment Tree with Coordinate Compression"
+    }
+    fn topic(&self) -> &str {
+        "segment_fenwick"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Implement a dynamic segment tree (or use coordinate compression) to handle \
          sparse updates and range sum queries over a large coordinate space.\n\n\

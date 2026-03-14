@@ -20,7 +20,11 @@ pub fn build_list(vals: &[i32]) -> (Vec<ListNode>, Option<usize>) {
         .enumerate()
         .map(|(i, &val)| ListNode {
             val,
-            next: if i + 1 < vals.len() { Some(i + 1) } else { None },
+            next: if i + 1 < vals.len() {
+                Some(i + 1)
+            } else {
+                None
+            },
         })
         .collect();
     let _ = &mut nodes; // suppress unused warning
@@ -325,7 +329,13 @@ fn bst_from_sorted(sorted: &[i32]) -> Vec<Option<i32>> {
 }
 
 /// Generate a 2D grid of given dimensions filled with random values.
-pub fn random_grid(rng: &mut impl Rng, rows: usize, cols: usize, lo: i32, hi: i32) -> Vec<Vec<i32>> {
+pub fn random_grid(
+    rng: &mut impl Rng,
+    rows: usize,
+    cols: usize,
+    lo: i32,
+    hi: i32,
+) -> Vec<Vec<i32>> {
     (0..rows)
         .map(|_| (0..cols).map(|_| rng.random_range(lo..=hi)).collect())
         .collect()

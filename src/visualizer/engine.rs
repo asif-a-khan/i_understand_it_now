@@ -1,10 +1,11 @@
-use std::io::{self, Write};
 use crossterm::{
-    cursor, execute, queue,
+    cursor,
     event::{self, Event, KeyCode, KeyEvent},
+    execute, queue,
     style::{self, Color, Stylize},
     terminal::{self, ClearType},
 };
+use std::io::{self, Write};
 
 use super::{HighlightKind, VizFrame};
 
@@ -43,26 +44,43 @@ fn play_step_by_step(stdout: &mut io::Stdout, frames: &[VizFrame]) -> io::Result
     let mut idx = 0;
     loop {
         render_frame(stdout, &frames[idx], idx, frames.len())?;
-        render_controls(stdout, "Step-by-step: [Right/Enter] next  [Left] prev  [q] quit")?;
+        render_controls(
+            stdout,
+            "Step-by-step: [Right/Enter] next  [Left] prev  [q] quit",
+        )?;
         stdout.flush()?;
 
         match event::read()? {
-            Event::Key(KeyEvent { code: KeyCode::Char('q'), .. }) => break,
-            Event::Key(KeyEvent { code: KeyCode::Esc, .. }) => break,
-            Event::Key(KeyEvent { code: KeyCode::Right | KeyCode::Enter | KeyCode::Char(' '), .. }) => {
+            Event::Key(KeyEvent {
+                code: KeyCode::Char('q'),
+                ..
+            }) => break,
+            Event::Key(KeyEvent {
+                code: KeyCode::Esc, ..
+            }) => break,
+            Event::Key(KeyEvent {
+                code: KeyCode::Right | KeyCode::Enter | KeyCode::Char(' '),
+                ..
+            }) => {
                 if idx + 1 < frames.len() {
                     idx += 1;
                 }
             }
-            Event::Key(KeyEvent { code: KeyCode::Left, .. }) => {
-                if idx > 0 {
-                    idx -= 1;
-                }
+            Event::Key(KeyEvent {
+                code: KeyCode::Left,
+                ..
+            }) => {
+                idx = idx.saturating_sub(1);
             }
-            Event::Key(KeyEvent { code: KeyCode::Home, .. }) => {
+            Event::Key(KeyEvent {
+                code: KeyCode::Home,
+                ..
+            }) => {
                 idx = 0;
             }
-            Event::Key(KeyEvent { code: KeyCode::End, .. }) => {
+            Event::Key(KeyEvent {
+                code: KeyCode::End, ..
+            }) => {
                 idx = frames.len() - 1;
             }
             _ => {}
@@ -88,7 +106,10 @@ fn play_auto(stdout: &mut io::Stdout, frames: &[VizFrame], delay_ms: u64) -> io:
                         KeyCode::Char('q') | KeyCode::Esc => return Ok(()),
                         KeyCode::Char(' ') => {
                             // Pause: switch to step-by-step for remaining frames
-                            render_controls(stdout, "Paused: [Right/Enter] next  [Left] prev  [q] quit")?;
+                            render_controls(
+                                stdout,
+                                "Paused: [Right/Enter] next  [Left] prev  [q] quit",
+                            )?;
                             stdout.flush()?;
                             return play_step_by_step_from(stdout, frames, idx);
                         }
@@ -102,14 +123,22 @@ fn play_auto(stdout: &mut io::Stdout, frames: &[VizFrame], delay_ms: u64) -> io:
     render_controls(stdout, "Done! Press [q] to quit")?;
     stdout.flush()?;
     loop {
-        if let Event::Key(KeyEvent { code: KeyCode::Char('q') | KeyCode::Esc | KeyCode::Enter, .. }) = event::read()? {
+        if let Event::Key(KeyEvent {
+            code: KeyCode::Char('q') | KeyCode::Esc | KeyCode::Enter,
+            ..
+        }) = event::read()?
+        {
             break;
         }
     }
     Ok(())
 }
 
-fn play_step_by_step_from(stdout: &mut io::Stdout, frames: &[VizFrame], start_idx: usize) -> io::Result<()> {
+fn play_step_by_step_from(
+    stdout: &mut io::Stdout,
+    frames: &[VizFrame],
+    start_idx: usize,
+) -> io::Result<()> {
     let mut idx = start_idx;
     loop {
         render_frame(stdout, &frames[idx], idx, frames.len())?;
@@ -117,17 +146,26 @@ fn play_step_by_step_from(stdout: &mut io::Stdout, frames: &[VizFrame], start_id
         stdout.flush()?;
 
         match event::read()? {
-            Event::Key(KeyEvent { code: KeyCode::Char('q'), .. }) => break,
-            Event::Key(KeyEvent { code: KeyCode::Esc, .. }) => break,
-            Event::Key(KeyEvent { code: KeyCode::Right | KeyCode::Enter | KeyCode::Char(' '), .. }) => {
+            Event::Key(KeyEvent {
+                code: KeyCode::Char('q'),
+                ..
+            }) => break,
+            Event::Key(KeyEvent {
+                code: KeyCode::Esc, ..
+            }) => break,
+            Event::Key(KeyEvent {
+                code: KeyCode::Right | KeyCode::Enter | KeyCode::Char(' '),
+                ..
+            }) => {
                 if idx + 1 < frames.len() {
                     idx += 1;
                 }
             }
-            Event::Key(KeyEvent { code: KeyCode::Left, .. }) => {
-                if idx > 0 {
-                    idx -= 1;
-                }
+            Event::Key(KeyEvent {
+                code: KeyCode::Left,
+                ..
+            }) => {
+                idx = idx.saturating_sub(1);
             }
             _ => {}
         }
@@ -135,15 +173,23 @@ fn play_step_by_step_from(stdout: &mut io::Stdout, frames: &[VizFrame], start_id
     Ok(())
 }
 
-fn render_frame(stdout: &mut io::Stdout, frame: &VizFrame, idx: usize, total: usize) -> io::Result<()> {
-    queue!(stdout, terminal::Clear(ClearType::All), cursor::MoveTo(0, 0))?;
+fn render_frame(
+    stdout: &mut io::Stdout,
+    frame: &VizFrame,
+    idx: usize,
+    total: usize,
+) -> io::Result<()> {
+    queue!(
+        stdout,
+        terminal::Clear(ClearType::All),
+        cursor::MoveTo(0, 0)
+    )?;
 
     // Header
     queue!(
         stdout,
         style::PrintStyledContent(
-            format!("  Step {}/{}\n\n", idx + 1, total)
-                .with(Color::DarkGrey)
+            format!("  Step {}/{}\n\n", idx + 1, total).with(Color::DarkGrey)
         )
     )?;
 

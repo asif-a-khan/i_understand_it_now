@@ -35,10 +35,18 @@ struct CountingSortBasicTest {
 }
 
 impl Problem for CountingSortBasic {
-    fn id(&self) -> &str { "counting_sort_basic" }
-    fn name(&self) -> &str { "Counting Sort" }
-    fn topic(&self) -> &str { "counting_radix" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "counting_sort_basic"
+    }
+    fn name(&self) -> &str {
+        "Counting Sort"
+    }
+    fn topic(&self) -> &str {
+        "counting_radix"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Implement counting sort for non-negative integers.\n\n\
          Return a new sorted vector.\n\n\
@@ -84,10 +92,18 @@ struct SortColorsTest {
 }
 
 impl Problem for SortColors {
-    fn id(&self) -> &str { "counting_sort_sort_colors" }
-    fn name(&self) -> &str { "Sort Colors" }
-    fn topic(&self) -> &str { "counting_radix" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "counting_sort_sort_colors"
+    }
+    fn name(&self) -> &str {
+        "Sort Colors"
+    }
+    fn topic(&self) -> &str {
+        "counting_radix"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given an array containing only 0s, 1s, and 2s, sort it in-place.\n\n\
          Return the sorted array.\n\n\
@@ -135,10 +151,18 @@ struct RelativeSortTest {
 }
 
 impl Problem for RelativeSort {
-    fn id(&self) -> &str { "counting_sort_relative_sort" }
-    fn name(&self) -> &str { "Relative Sort Array" }
-    fn topic(&self) -> &str { "counting_radix" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "counting_sort_relative_sort"
+    }
+    fn name(&self) -> &str {
+        "Relative Sort Array"
+    }
+    fn topic(&self) -> &str {
+        "counting_radix"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Sort `arr1` such that the relative ordering of items in `arr1` matches `arr2`.\n\n\
          Elements not in `arr2` should be placed at the end in ascending order.\n\n\
@@ -156,7 +180,12 @@ impl Problem for RelativeSort {
                 let n = rng.random_range(1..=20);
                 let arr1: Vec<i32> = (0..n).map(|_| rng.random_range(0..=30)).collect();
                 // arr2 is a subset of unique values from arr1
-                let mut unique: Vec<i32> = arr1.iter().copied().collect::<std::collections::HashSet<_>>().into_iter().collect();
+                let mut unique: Vec<i32> = arr1
+                    .iter()
+                    .copied()
+                    .collect::<std::collections::HashSet<_>>()
+                    .into_iter()
+                    .collect();
                 // Shuffle unique
                 for i in (1..unique.len()).rev() {
                     let j = rng.random_range(0..=i);
@@ -187,13 +216,11 @@ impl Problem for RelativeSort {
 fn ref_relative_sort(arr1: &[i32], arr2: &[i32]) -> Vec<i32> {
     let order: HashMap<i32, usize> = arr2.iter().enumerate().map(|(i, &v)| (v, i)).collect();
     let mut arr = arr1.to_vec();
-    arr.sort_by(|a, b| {
-        match (order.get(a), order.get(b)) {
-            (Some(ia), Some(ib)) => ia.cmp(ib),
-            (Some(_), None) => std::cmp::Ordering::Less,
-            (None, Some(_)) => std::cmp::Ordering::Greater,
-            (None, None) => a.cmp(b),
-        }
+    arr.sort_by(|a, b| match (order.get(a), order.get(b)) {
+        (Some(ia), Some(ib)) => ia.cmp(ib),
+        (Some(_), None) => std::cmp::Ordering::Less,
+        (None, Some(_)) => std::cmp::Ordering::Greater,
+        (None, None) => a.cmp(b),
     });
     arr
 }
@@ -208,10 +235,18 @@ struct HeightCheckerTest {
 }
 
 impl Problem for HeightChecker {
-    fn id(&self) -> &str { "counting_sort_height_checker" }
-    fn name(&self) -> &str { "Height Checker" }
-    fn topic(&self) -> &str { "counting_radix" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "counting_sort_height_checker"
+    }
+    fn name(&self) -> &str {
+        "Height Checker"
+    }
+    fn topic(&self) -> &str {
+        "counting_radix"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Students are asked to stand in non-decreasing order of height. \
          Return the number of students not standing in the correct position.\n\n\
@@ -264,10 +299,18 @@ struct SortByFrequencyTest {
 }
 
 impl Problem for SortByFrequency {
-    fn id(&self) -> &str { "counting_sort_sort_by_frequency" }
-    fn name(&self) -> &str { "Sort Characters By Frequency" }
-    fn topic(&self) -> &str { "counting_radix" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "counting_sort_sort_by_frequency"
+    }
+    fn name(&self) -> &str {
+        "Sort Characters By Frequency"
+    }
+    fn topic(&self) -> &str {
+        "counting_radix"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given a string, sort its characters by frequency (most frequent first).\n\n\
          Characters with the same frequency should be grouped together. \
@@ -309,9 +352,7 @@ fn ref_sort_by_frequency(s: &str) -> String {
         *freq.entry(c).or_insert(0) += 1;
     }
     let mut chars: Vec<char> = s.chars().collect();
-    chars.sort_by(|a, b| {
-        freq[b].cmp(&freq[a]).then(a.cmp(b))
-    });
+    chars.sort_by(|a, b| freq[b].cmp(&freq[a]).then(a.cmp(b)));
     chars.into_iter().collect()
 }
 
@@ -325,10 +366,18 @@ struct RadixSortBasicTest {
 }
 
 impl Problem for RadixSortBasic {
-    fn id(&self) -> &str { "radix_sort_basic" }
-    fn name(&self) -> &str { "Radix Sort" }
-    fn topic(&self) -> &str { "counting_radix" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "radix_sort_basic"
+    }
+    fn name(&self) -> &str {
+        "Radix Sort"
+    }
+    fn topic(&self) -> &str {
+        "counting_radix"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Implement radix sort (LSD) for non-negative integers.\n\n\
          Process digits from least significant to most significant, using \
@@ -376,10 +425,18 @@ struct MaximumGapTest {
 }
 
 impl Problem for MaximumGap {
-    fn id(&self) -> &str { "counting_sort_maximum_gap" }
-    fn name(&self) -> &str { "Maximum Gap" }
-    fn topic(&self) -> &str { "counting_radix" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "counting_sort_maximum_gap"
+    }
+    fn name(&self) -> &str {
+        "Maximum Gap"
+    }
+    fn topic(&self) -> &str {
+        "counting_radix"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given an unsorted array of non-negative integers, find the maximum difference \
          between successive elements in the sorted form.\n\n\
@@ -422,11 +479,7 @@ fn ref_maximum_gap(nums: &[i32]) -> i32 {
     }
     let mut sorted = nums.to_vec();
     sorted.sort();
-    sorted
-        .windows(2)
-        .map(|w| w[1] - w[0])
-        .max()
-        .unwrap_or(0)
+    sorted.windows(2).map(|w| w[1] - w[0]).max().unwrap_or(0)
 }
 
 // ═══════════════════════════════════════════════════════════════════════
@@ -439,10 +492,18 @@ struct BucketSortBasicTest {
 }
 
 impl Problem for BucketSortBasic {
-    fn id(&self) -> &str { "bucket_sort_basic" }
-    fn name(&self) -> &str { "Bucket Sort" }
-    fn topic(&self) -> &str { "counting_radix" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "bucket_sort_basic"
+    }
+    fn name(&self) -> &str {
+        "Bucket Sort"
+    }
+    fn topic(&self) -> &str {
+        "counting_radix"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Implement bucket sort for floating-point numbers in the range [0.0, 1.0).\n\n\
          Distribute elements into n buckets, sort each bucket, then concatenate.\n\n\
@@ -458,10 +519,7 @@ impl Problem for BucketSortBasic {
             .map(|_| {
                 let n = rng.random_range(0..=30);
                 let nums: Vec<f64> = (0..n)
-                    .map(|_| {
-                        let val = rng.random_range(0..1000) as f64 / 1000.0;
-                        val
-                    })
+                    .map(|_| rng.random_range(0..1000) as f64 / 1000.0)
                     .collect();
                 TestCase {
                     data: Box::new(BucketSortBasicTest { nums }),
@@ -500,10 +558,18 @@ struct TopKFrequentWordsTest {
 }
 
 impl Problem for TopKFrequentWords {
-    fn id(&self) -> &str { "counting_sort_top_k_frequent_words" }
-    fn name(&self) -> &str { "Top K Frequent Words" }
-    fn topic(&self) -> &str { "counting_radix" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "counting_sort_top_k_frequent_words"
+    }
+    fn name(&self) -> &str {
+        "Top K Frequent Words"
+    }
+    fn topic(&self) -> &str {
+        "counting_radix"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given a list of words and an integer k, return the k most frequent words.\n\n\
          Sort by frequency (descending). Ties broken by lexicographic order (ascending).\n\n\
@@ -570,10 +636,18 @@ struct ReorganizeStringTest {
 }
 
 impl Problem for ReorganizeString {
-    fn id(&self) -> &str { "counting_sort_reorganize_string" }
-    fn name(&self) -> &str { "Reorganize String" }
-    fn topic(&self) -> &str { "counting_radix" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "counting_sort_reorganize_string"
+    }
+    fn name(&self) -> &str {
+        "Reorganize String"
+    }
+    fn topic(&self) -> &str {
+        "counting_radix"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given a string s, rearrange the characters so that no two adjacent \
          characters are the same.\n\n\
@@ -624,10 +698,7 @@ impl Problem for ReorganizeString {
             res.sort();
             orig == res
         };
-        let valid_no_adjacent = actual
-            .as_bytes()
-            .windows(2)
-            .all(|w| w[0] != w[1]);
+        let valid_no_adjacent = actual.as_bytes().windows(2).all(|w| w[0] != w[1]);
 
         SolutionResult {
             is_correct: valid_len && valid_chars && valid_no_adjacent,
@@ -644,7 +715,7 @@ fn ref_is_reorganize_possible(s: &str) -> bool {
         freq[(b - b'a') as usize] += 1;
     }
     let max_freq = *freq.iter().max().unwrap();
-    max_freq <= (s.len() + 1) / 2
+    max_freq <= s.len().div_ceil(2)
 }
 
 // ═══════════════════════════════════════════════════════════════════════
@@ -657,10 +728,18 @@ struct RadixSortMaxGapTest {
 }
 
 impl Problem for RadixSortMaxGap {
-    fn id(&self) -> &str { "radix_sort_max_gap" }
-    fn name(&self) -> &str { "Maximum Gap (Radix Sort)" }
-    fn topic(&self) -> &str { "counting_radix" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "radix_sort_max_gap"
+    }
+    fn name(&self) -> &str {
+        "Maximum Gap (Radix Sort)"
+    }
+    fn topic(&self) -> &str {
+        "counting_radix"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given an unsorted array of non-negative integers, find the maximum difference \
          between successive elements in sorted form using a radix sort or bucket sort \
@@ -710,10 +789,18 @@ struct SmallestMissingPositiveTest {
 }
 
 impl Problem for SmallestMissingPositive {
-    fn id(&self) -> &str { "counting_sort_smallest_missing_positive" }
-    fn name(&self) -> &str { "First Missing Positive" }
-    fn topic(&self) -> &str { "counting_radix" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "counting_sort_smallest_missing_positive"
+    }
+    fn name(&self) -> &str {
+        "First Missing Positive"
+    }
+    fn topic(&self) -> &str {
+        "counting_radix"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given an unsorted integer array, return the smallest missing positive integer.\n\n\
          Use a counting/placement approach: place each value v at index v-1 \
@@ -730,8 +817,9 @@ impl Problem for SmallestMissingPositive {
         (0..10)
             .map(|_| {
                 let n = rng.random_range(1..=30);
-                let nums: Vec<i32> =
-                    (0..n).map(|_| rng.random_range(-10..=n as i32 + 5)).collect();
+                let nums: Vec<i32> = (0..n)
+                    .map(|_| rng.random_range(-10..=n as i32 + 5))
+                    .collect();
                 TestCase {
                     data: Box::new(SmallestMissingPositiveTest { nums }),
                 }
@@ -740,7 +828,10 @@ impl Problem for SmallestMissingPositive {
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
-        let t = test.data.downcast_ref::<SmallestMissingPositiveTest>().unwrap();
+        let t = test
+            .data
+            .downcast_ref::<SmallestMissingPositiveTest>()
+            .unwrap();
         let set: std::collections::HashSet<i32> = t.nums.iter().copied().collect();
         let mut expected = 1;
         while set.contains(&expected) {
@@ -768,10 +859,18 @@ struct CreateMaximumNumberTest {
 }
 
 impl Problem for CreateMaximumNumber {
-    fn id(&self) -> &str { "counting_sort_create_maximum_number" }
-    fn name(&self) -> &str { "Create Maximum Number" }
-    fn topic(&self) -> &str { "counting_radix" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "counting_sort_create_maximum_number"
+    }
+    fn name(&self) -> &str {
+        "Create Maximum Number"
+    }
+    fn topic(&self) -> &str {
+        "counting_radix"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given two arrays of digits and an integer k, create the maximum number of \
          length k by selecting digits from both arrays while preserving relative order.\n\n\
@@ -832,10 +931,7 @@ fn ref_merge_sequences(a: &[i32], b: &[i32]) -> Vec<i32> {
         if i >= a.len() {
             result.push(b[j]);
             j += 1;
-        } else if j >= b.len() {
-            result.push(a[i]);
-            i += 1;
-        } else if a[i..] > b[j..] {
+        } else if j >= b.len() || a[i..] > b[j..] {
             result.push(a[i]);
             i += 1;
         } else {
@@ -850,7 +946,7 @@ fn ref_create_max_number(nums1: &[i32], nums2: &[i32], k: usize) -> Vec<i32> {
     let n1 = nums1.len();
     let n2 = nums2.len();
     let mut best = Vec::new();
-    let lo = if k > n2 { k - n2 } else { 0 };
+    let lo = k.saturating_sub(n2);
     let hi = std::cmp::min(k, n1);
     for i in lo..=hi {
         let sub1 = ref_max_subsequence(nums1, i);
@@ -873,10 +969,18 @@ struct RadixSortSuffixArrayTest {
 }
 
 impl Problem for RadixSortSuffixArray {
-    fn id(&self) -> &str { "radix_sort_suffix_array" }
-    fn name(&self) -> &str { "Suffix Array" }
-    fn topic(&self) -> &str { "counting_radix" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "radix_sort_suffix_array"
+    }
+    fn name(&self) -> &str {
+        "Suffix Array"
+    }
+    fn topic(&self) -> &str {
+        "counting_radix"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Build a suffix array for the given string using radix sort.\n\n\
          A suffix array is a sorted array of all suffix indices. suffix_array[i] \
@@ -900,7 +1004,10 @@ impl Problem for RadixSortSuffixArray {
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
-        let t = test.data.downcast_ref::<RadixSortSuffixArrayTest>().unwrap();
+        let t = test
+            .data
+            .downcast_ref::<RadixSortSuffixArrayTest>()
+            .unwrap();
         let expected = ref_suffix_array(&t.s);
         let actual = solutions::suffix_array(&t.s);
         SolutionResult {
@@ -932,10 +1039,18 @@ struct SortTransformedTest {
 }
 
 impl Problem for SortTransformed {
-    fn id(&self) -> &str { "counting_sort_sort_transformed" }
-    fn name(&self) -> &str { "Sort Transformed Array" }
-    fn topic(&self) -> &str { "counting_radix" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "counting_sort_sort_transformed"
+    }
+    fn name(&self) -> &str {
+        "Sort Transformed Array"
+    }
+    fn topic(&self) -> &str {
+        "counting_radix"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given a sorted integer array `nums` and integers a, b, c, apply the \
          function f(x) = a*x*x + b*x + c to each element, and return the result \
@@ -973,10 +1088,7 @@ impl Problem for SortTransformed {
         let actual = solutions::sort_transformed(&t.nums, t.a, t.b, t.c);
         SolutionResult {
             is_correct: expected == actual,
-            input_description: format!(
-                "nums={:?}, a={}, b={}, c={}",
-                t.nums, t.a, t.b, t.c
-            ),
+            input_description: format!("nums={:?}, a={}, b={}, c={}", t.nums, t.a, t.b, t.c),
             expected: format!("{expected:?}"),
             actual: format!("{actual:?}"),
         }

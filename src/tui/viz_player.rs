@@ -64,9 +64,7 @@ impl VizPickerState {
                 ListItem::new(Line::from(vec![
                     Span::styled(
                         format!("  {:20}", name),
-                        Style::new()
-                            .fg(Color::Cyan)
-                            .add_modifier(Modifier::BOLD),
+                        Style::new().fg(Color::Cyan).add_modifier(Modifier::BOLD),
                     ),
                     Span::styled(desc, Style::new().fg(Color::DarkGray)),
                 ]))
@@ -85,7 +83,6 @@ impl VizPickerState {
 
         f.render_stateful_widget(list, area, &mut self.list_state);
     }
-
 }
 
 // ─── Viz Player ───────────────────────────────────────────
@@ -143,14 +140,15 @@ impl VizPlayerState {
     }
 
     pub fn tick(&mut self) {
-        if self.auto_play && !self.frames.is_empty() {
-            if self.last_tick.elapsed().as_millis() >= self.delay_ms as u128 {
-                self.last_tick = std::time::Instant::now();
-                if self.current_frame + 1 < self.frames.len() {
-                    self.current_frame += 1;
-                } else {
-                    self.auto_play = false;
-                }
+        if self.auto_play
+            && !self.frames.is_empty()
+            && self.last_tick.elapsed().as_millis() >= self.delay_ms as u128
+        {
+            self.last_tick = std::time::Instant::now();
+            if self.current_frame + 1 < self.frames.len() {
+                self.current_frame += 1;
+            } else {
+                self.auto_play = false;
             }
         }
     }
@@ -220,16 +218,13 @@ impl VizPlayerState {
                 .borders(Borders::ALL)
                 .title(" Visualization ")
                 .title_style(theme::title_style());
-            f.render_widget(
-                Paragraph::new("  No frames to display.").block(block),
-                area,
-            );
+            f.render_widget(Paragraph::new("  No frames to display.").block(block), area);
             return;
         }
 
         let chunks = Layout::vertical([
             Constraint::Length(2), // Header
-            Constraint::Min(6),   // Bar chart
+            Constraint::Min(6),    // Bar chart
             Constraint::Length(3), // Annotation
             Constraint::Length(1), // Metrics
             Constraint::Length(2), // Legend
@@ -247,10 +242,7 @@ impl VizPlayerState {
             "Step-by-step".to_string()
         };
         let header = Paragraph::new(Line::from(vec![
-            Span::styled(
-                format!("  {} ", self.viz_name),
-                theme::title_style(),
-            ),
+            Span::styled(format!("  {} ", self.viz_name), theme::title_style()),
             Span::styled(
                 format!(
                     "  Step {}/{}  |  {}",
@@ -269,9 +261,7 @@ impl VizPlayerState {
         // Annotation
         let annotation = Paragraph::new(Line::from(Span::styled(
             format!("  {}", frame.annotation),
-            Style::new()
-                .fg(Color::White)
-                .add_modifier(Modifier::BOLD),
+            Style::new().fg(Color::White).add_modifier(Modifier::BOLD),
         )));
         f.render_widget(annotation, chunks[2]);
 
@@ -353,7 +343,7 @@ fn render_bar_chart(f: &mut Frame, area: Rect, frame: &VizFrame) {
 
     // Calculate bar width based on available space
     let available_width = inner.width as usize;
-    let bar_width = ((available_width / num_bars).max(1)).min(4);
+    let bar_width = (available_width / num_bars).clamp(1, 4);
     let gap = if bar_width >= 2 { 1 } else { 0 };
 
     let highlight_map: std::collections::HashMap<usize, HighlightKind> =

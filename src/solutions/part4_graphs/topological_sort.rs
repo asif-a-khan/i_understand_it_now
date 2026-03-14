@@ -130,7 +130,10 @@ pub fn critical_connections(_n: usize, _edges: &[(usize, usize)]) -> Vec<(usize,
 ///          before_items=[[],[6],[5],[6],[3,6],[],[],[]]
 ///          => [6,3,4,1,5,2,0,7] (or any valid ordering)
 pub fn sort_items_by_groups(
-    _n: usize, _m: usize, _group: &[i32], _before_items: &[Vec<i32>],
+    _n: usize,
+    _m: usize,
+    _group: &[i32],
+    _before_items: &[Vec<i32>],
 ) -> Vec<i32> {
     todo!()
 }

@@ -104,17 +104,16 @@ impl App {
             Action::Quit => true,
             Action::Push(screen) => {
                 // When re-running from ProblemResult, pop the old result first
-                if matches!(&screen, Screen::ProblemRunning { .. }) {
-                    if matches!(self.current_screen(), Screen::ProblemResult { .. }) {
-                        self.screen_stack.pop();
-                    }
+                if matches!(&screen, Screen::ProblemRunning { .. })
+                    && matches!(self.current_screen(), Screen::ProblemResult { .. })
+                {
+                    self.screen_stack.pop();
                 }
                 // Special handling: when pushing ProblemRunning, start tests
                 if let Screen::ProblemRunning { problem_idx } = &screen {
                     self.problem_running.reset();
                     let problem_id = self.problems[*problem_idx].id.clone();
-                    self.test_receiver =
-                        Some(problem_runner::spawn_test_runner(problem_id));
+                    self.test_receiver = Some(problem_runner::spawn_test_runner(problem_id));
                 }
                 // When pushing LessonReader, load the lesson
                 if let Screen::LessonReader { lesson_idx } = &screen {
@@ -127,8 +126,7 @@ impl App {
                 // When pushing ReplayPlayer, build replay frames from saved ops
                 if let Screen::ReplayPlayer { problem_idx } = &screen {
                     let name = format!("Replay: {}", self.problems[*problem_idx].id);
-                    let frames =
-                        visualizer::instrumented::replay_from_ops(&self.replay_ops);
+                    let frames = visualizer::instrumented::replay_from_ops(&self.replay_ops);
                     self.viz_player.load_replay_frames(frames, name);
                 }
                 // When pushing ComplexityView, start measurement
@@ -290,8 +288,7 @@ impl App {
                 .iter()
                 .map(|r| r.comparisons)
                 .sum();
-            let total_swaps: usize =
-                self.problem_running.results.iter().map(|r| r.swaps).sum();
+            let total_swaps: usize = self.problem_running.results.iter().map(|r| r.swaps).sum();
             let solved = passed == total && total > 0;
 
             let entry = self
@@ -335,7 +332,9 @@ impl App {
 
             // Ctrl+C always quits
             if key.code == KeyCode::Char('c')
-                && key.modifiers.contains(crossterm::event::KeyModifiers::CONTROL)
+                && key
+                    .modifiers
+                    .contains(crossterm::event::KeyModifiers::CONTROL)
             {
                 return true;
             }
@@ -369,13 +368,18 @@ impl App {
                         .size()
                         .map(|s| s.height.saturating_sub(4))
                         .unwrap_or(20);
-                    self.lesson_reader
-                        .handle_key(key, &self.lessons, &mut self.progress, visible_height)
+                    self.lesson_reader.handle_key(
+                        key,
+                        &self.lessons,
+                        &mut self.progress,
+                        visible_height,
+                    )
                 }
                 Screen::ProblemList => self.problem_list.handle_key(key, &self.problems),
-                Screen::ProblemDetail { problem_idx } => self
-                    .problem_detail
-                    .handle_key(key, problem_idx, &self.problems),
+                Screen::ProblemDetail { problem_idx } => {
+                    self.problem_detail
+                        .handle_key(key, problem_idx, &self.problems)
+                }
                 Screen::ProblemRunning { .. } => Action::None,
                 Screen::ProblemResult { problem_idx } => {
                     let visible_height = terminal

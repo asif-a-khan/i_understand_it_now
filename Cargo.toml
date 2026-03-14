@@ -1,7 +1,13 @@
 [package]
-name = "dsa-forge"
+name = "iuin"
 version = "0.1.0"
 edition = "2021"
+description = "I Understand It Now — an interactive terminal app for learning data structures and algorithms in Rust"
+license = "MIT"
+keywords = ["algorithms", "data-structures", "tui", "education", "rust"]
+categories = ["command-line-utilities", "algorithms"]
+repository = "https://github.com/asif-a-khan/i_understand_it_now"
+authors = ["asif-a-khan"]
 
 [dependencies]
 clap = { version = "4", features = ["derive"] }

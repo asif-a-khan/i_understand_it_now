@@ -56,19 +56,13 @@ pub fn index_of_min(_arr: &[i32], _queries: &[(usize, usize)]) -> Vec<usize> {
 }
 
 /// 2D range minimum query on a matrix.
-pub fn rmq_2d(
-    _matrix: &[Vec<i32>],
-    _queries: &[(usize, usize, usize, usize)],
-) -> Vec<i32> {
+pub fn rmq_2d(_matrix: &[Vec<i32>], _queries: &[(usize, usize, usize, usize)]) -> Vec<i32> {
     todo!()
 }
 
 /// Kth ancestor of a node using binary lifting.
 /// parents[i] = parent of node i, None for root.
-pub fn kth_ancestor(
-    _parents: &[Option<usize>],
-    _queries: &[(usize, usize)],
-) -> Vec<Option<usize>> {
+pub fn kth_ancestor(_parents: &[Option<usize>], _queries: &[(usize, usize)]) -> Vec<Option<usize>> {
     todo!()
 }
 

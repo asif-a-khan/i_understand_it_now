@@ -21,15 +21,16 @@ pub fn is_connected(_n: usize, _edges: &[(usize, usize)]) -> bool {
 /// Shortest Path (Unweighted): return shortest path length from src to dst.
 /// Return -1 if unreachable.
 pub fn shortest_path_unweighted(
-    _n: usize, _edges: &[(usize, usize)], _src: usize, _dst: usize,
+    _n: usize,
+    _edges: &[(usize, usize)],
+    _src: usize,
+    _dst: usize,
 ) -> i32 {
     todo!()
 }
 
 /// Find Any Path: return any valid path from src to dst, or empty vec if none.
-pub fn find_path(
-    _n: usize, _edges: &[(usize, usize)], _src: usize, _dst: usize,
-) -> Vec<usize> {
+pub fn find_path(_n: usize, _edges: &[(usize, usize)], _src: usize, _dst: usize) -> Vec<usize> {
     todo!()
 }
 
@@ -64,9 +65,7 @@ pub fn word_ladder(_begin: &str, _end: &str, _word_list: &[String]) -> i32 {
 }
 
 /// Word Ladder II: return ALL shortest transformation sequences, sorted.
-pub fn word_ladder_ii(
-    _begin: &str, _end: &str, _word_list: &[String],
-) -> Vec<Vec<String>> {
+pub fn word_ladder_ii(_begin: &str, _end: &str, _word_list: &[String]) -> Vec<Vec<String>> {
     todo!()
 }
 

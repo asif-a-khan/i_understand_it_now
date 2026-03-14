@@ -57,9 +57,7 @@ fn ref_range_max(arr: &[i32], queries: &[(usize, usize)]) -> Vec<i32> {
 fn ref_range_gcd(arr: &[i32], queries: &[(usize, usize)]) -> Vec<i32> {
     queries
         .iter()
-        .map(|&(l, r)| {
-            arr[l..=r].iter().copied().reduce(gcd).unwrap()
-        })
+        .map(|&(l, r)| arr[l..=r].iter().copied().reduce(gcd).unwrap())
         .collect()
 }
 
@@ -84,7 +82,11 @@ fn ref_second_minimum(arr: &[i32], queries: &[(usize, usize)]) -> Vec<i32> {
             let mut vals: Vec<i32> = arr[l..=r].to_vec();
             vals.sort();
             vals.dedup();
-            if vals.len() >= 2 { vals[1] } else { vals[0] }
+            if vals.len() >= 2 {
+                vals[1]
+            } else {
+                vals[0]
+            }
         })
         .collect()
 }
@@ -104,17 +106,14 @@ fn ref_index_of_min(arr: &[i32], queries: &[(usize, usize)]) -> Vec<usize> {
         .collect()
 }
 
-fn ref_2d_rmq(
-    matrix: &[Vec<i32>],
-    queries: &[(usize, usize, usize, usize)],
-) -> Vec<i32> {
+fn ref_2d_rmq(matrix: &[Vec<i32>], queries: &[(usize, usize, usize, usize)]) -> Vec<i32> {
     queries
         .iter()
         .map(|&(r1, c1, r2, c2)| {
             let mut min_val = i32::MAX;
-            for r in r1..=r2 {
-                for c in c1..=c2 {
-                    min_val = min_val.min(matrix[r][c]);
+            for row in matrix.iter().take(r2 + 1).skip(r1) {
+                for &val in row.iter().take(c2 + 1).skip(c1) {
+                    min_val = min_val.min(val);
                 }
             }
             min_val
@@ -122,10 +121,7 @@ fn ref_2d_rmq(
         .collect()
 }
 
-fn ref_kth_ancestor(
-    parents: &[Option<usize>],
-    queries: &[(usize, usize)],
-) -> Vec<Option<usize>> {
+fn ref_kth_ancestor(parents: &[Option<usize>], queries: &[(usize, usize)]) -> Vec<Option<usize>> {
     queries
         .iter()
         .map(|&(node, k)| {
@@ -188,9 +184,7 @@ fn ref_lcp_queries(s: &str, queries: &[(usize, usize)]) -> Vec<i32> {
                 h += 1;
             }
             lcp_arr[rank[i] - 1] = h as i32;
-            if h > 0 {
-                h -= 1;
-            }
+            h = h.saturating_sub(1);
         } else {
             h = 0;
         }
@@ -221,10 +215,7 @@ fn ref_distinct_in_range(arr: &[i32], queries: &[(usize, usize)]) -> Vec<i32> {
 }
 
 // Build a tree from parents and compute LCA using brute force
-fn ref_lca(
-    tree_vals: &[Option<i32>],
-    queries: &[(i32, i32)],
-) -> Vec<i32> {
+fn ref_lca(tree_vals: &[Option<i32>], queries: &[(i32, i32)]) -> Vec<i32> {
     // Build adjacency from level-order tree
     use crate::problems::helpers::build_tree;
     let (arena, _root) = build_tree(tree_vals);
@@ -244,11 +235,8 @@ fn ref_lca(
     }
 
     // Map val -> first node index with that val
-    let val_to_idx: HashMap<i32, usize> = arena
-        .iter()
-        .enumerate()
-        .map(|(i, n)| (n.val, i))
-        .collect();
+    let val_to_idx: HashMap<i32, usize> =
+        arena.iter().enumerate().map(|(i, n)| (n.val, i)).collect();
 
     queries
         .iter()
@@ -286,10 +274,18 @@ struct RangeMinTest {
 }
 
 impl Problem for SparseTableRangeMin {
-    fn id(&self) -> &str { "sparse_table_range_min" }
-    fn name(&self) -> &str { "Range Minimum Query" }
-    fn topic(&self) -> &str { "sparse_tables" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "sparse_table_range_min"
+    }
+    fn name(&self) -> &str {
+        "Range Minimum Query"
+    }
+    fn topic(&self) -> &str {
+        "sparse_tables"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Build a sparse table to answer range minimum queries in O(1) per query.\n\n\
          Input: (arr: Vec<i32>, queries: Vec<(usize, usize)>)\n\
@@ -341,10 +337,18 @@ struct RangeMaxTest {
 }
 
 impl Problem for SparseTableRangeMax {
-    fn id(&self) -> &str { "sparse_table_range_max" }
-    fn name(&self) -> &str { "Range Maximum Query" }
-    fn topic(&self) -> &str { "sparse_tables" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "sparse_table_range_max"
+    }
+    fn name(&self) -> &str {
+        "Range Maximum Query"
+    }
+    fn topic(&self) -> &str {
+        "sparse_tables"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Build a sparse table to answer range maximum queries in O(1) per query.\n\n\
          Input: (arr: Vec<i32>, queries: Vec<(usize, usize)>)\n\
@@ -396,10 +400,18 @@ struct RangeGcdTest {
 }
 
 impl Problem for SparseTableRangeGcd {
-    fn id(&self) -> &str { "sparse_table_range_gcd" }
-    fn name(&self) -> &str { "Range GCD Query" }
-    fn topic(&self) -> &str { "sparse_tables" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "sparse_table_range_gcd"
+    }
+    fn name(&self) -> &str {
+        "Range GCD Query"
+    }
+    fn topic(&self) -> &str {
+        "sparse_tables"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Build a sparse table to answer range GCD queries.\n\n\
          Input: (arr: Vec<i32>, queries: Vec<(usize, usize)>)\n\
@@ -451,10 +463,18 @@ struct BuildTest {
 }
 
 impl Problem for SparseTableBuild {
-    fn id(&self) -> &str { "sparse_table_build" }
-    fn name(&self) -> &str { "Build Sparse Table" }
-    fn topic(&self) -> &str { "sparse_tables" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "sparse_table_build"
+    }
+    fn name(&self) -> &str {
+        "Build Sparse Table"
+    }
+    fn topic(&self) -> &str {
+        "sparse_tables"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Build a sparse table and answer range minimum queries.\n\
          This is the same as sparse_table_range_min but focuses on the building step.\n\n\
@@ -506,10 +526,18 @@ struct StaticRmqTest {
 }
 
 impl Problem for SparseTableStaticRmq {
-    fn id(&self) -> &str { "sparse_table_static_rmq" }
-    fn name(&self) -> &str { "Static RMQ (No Updates)" }
-    fn topic(&self) -> &str { "sparse_tables" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "sparse_table_static_rmq"
+    }
+    fn name(&self) -> &str {
+        "Static RMQ (No Updates)"
+    }
+    fn topic(&self) -> &str {
+        "sparse_tables"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Answer static range minimum queries (no updates allowed).\n\
          Build once in O(n log n), query each in O(1).\n\n\
@@ -561,10 +589,18 @@ struct LcaTest {
 }
 
 impl Problem for SparseTableLca {
-    fn id(&self) -> &str { "sparse_table_lca" }
-    fn name(&self) -> &str { "LCA using Sparse Table + Euler Tour" }
-    fn topic(&self) -> &str { "sparse_tables" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "sparse_table_lca"
+    }
+    fn name(&self) -> &str {
+        "LCA using Sparse Table + Euler Tour"
+    }
+    fn topic(&self) -> &str {
+        "sparse_tables"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Find the Lowest Common Ancestor (LCA) of two nodes in a binary tree \
          using Euler tour + sparse table for RMQ.\n\n\
@@ -620,10 +656,18 @@ struct RangeAndTest {
 }
 
 impl Problem for SparseTableRangeAnd {
-    fn id(&self) -> &str { "sparse_table_range_and" }
-    fn name(&self) -> &str { "Range Bitwise AND" }
-    fn topic(&self) -> &str { "sparse_tables" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "sparse_table_range_and"
+    }
+    fn name(&self) -> &str {
+        "Range Bitwise AND"
+    }
+    fn topic(&self) -> &str {
+        "sparse_tables"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Build a sparse table for range bitwise AND queries.\n\n\
          Input: (arr: Vec<i32>, queries: Vec<(usize, usize)>)\n\
@@ -675,10 +719,18 @@ struct RangeOrTest {
 }
 
 impl Problem for SparseTableRangeOr {
-    fn id(&self) -> &str { "sparse_table_range_or" }
-    fn name(&self) -> &str { "Range Bitwise OR" }
-    fn topic(&self) -> &str { "sparse_tables" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "sparse_table_range_or"
+    }
+    fn name(&self) -> &str {
+        "Range Bitwise OR"
+    }
+    fn topic(&self) -> &str {
+        "sparse_tables"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Build a sparse table for range bitwise OR queries.\n\n\
          Input: (arr: Vec<i32>, queries: Vec<(usize, usize)>)\n\
@@ -730,10 +782,18 @@ struct SecondMinTest {
 }
 
 impl Problem for SparseTableSecondMinimum {
-    fn id(&self) -> &str { "sparse_table_second_minimum" }
-    fn name(&self) -> &str { "Second Minimum in Range" }
-    fn topic(&self) -> &str { "sparse_tables" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "sparse_table_second_minimum"
+    }
+    fn name(&self) -> &str {
+        "Second Minimum in Range"
+    }
+    fn topic(&self) -> &str {
+        "sparse_tables"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Find the second smallest distinct value in a range.\n\
          If all elements in the range are equal, return that value.\n\n\
@@ -786,10 +846,18 @@ struct IndexOfMinTest {
 }
 
 impl Problem for SparseTableIndexOfMin {
-    fn id(&self) -> &str { "sparse_table_index_of_min" }
-    fn name(&self) -> &str { "Index of Minimum in Range" }
-    fn topic(&self) -> &str { "sparse_tables" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "sparse_table_index_of_min"
+    }
+    fn name(&self) -> &str {
+        "Index of Minimum in Range"
+    }
+    fn topic(&self) -> &str {
+        "sparse_tables"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Return the index (not value) of the minimum element in a range.\n\
          If there are ties, return the leftmost index.\n\n\
@@ -842,10 +910,18 @@ struct Rmq2dTest {
 }
 
 impl Problem for SparseTable2dRmq {
-    fn id(&self) -> &str { "sparse_table_2d_rmq" }
-    fn name(&self) -> &str { "2D Range Minimum Query" }
-    fn topic(&self) -> &str { "sparse_tables" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "sparse_table_2d_rmq"
+    }
+    fn name(&self) -> &str {
+        "2D Range Minimum Query"
+    }
+    fn topic(&self) -> &str {
+        "sparse_tables"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Build a 2D sparse table for range minimum queries on a matrix.\n\n\
          Input: (matrix: Vec<Vec<i32>>, queries: Vec<(r1, c1, r2, c2)>)\n\
@@ -902,10 +978,18 @@ struct KthAncestorTest {
 }
 
 impl Problem for SparseTableKthAncestor {
-    fn id(&self) -> &str { "sparse_table_kth_ancestor" }
-    fn name(&self) -> &str { "Kth Ancestor of Node" }
-    fn topic(&self) -> &str { "sparse_tables" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "sparse_table_kth_ancestor"
+    }
+    fn name(&self) -> &str {
+        "Kth Ancestor of Node"
+    }
+    fn topic(&self) -> &str {
+        "sparse_tables"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given a rooted tree (as parent array), find the kth ancestor of a node \
          using binary lifting (sparse table on ancestors).\n\n\
@@ -921,8 +1005,8 @@ impl Problem for SparseTableKthAncestor {
             .map(|_| {
                 let n = rng.random_range(5..=20);
                 let mut parents: Vec<Option<usize>> = vec![None; n];
-                for i in 1..n {
-                    parents[i] = Some(rng.random_range(0..i));
+                for (i, parent) in parents.iter_mut().enumerate().take(n).skip(1) {
+                    *parent = Some(rng.random_range(0..i));
                 }
                 let q = rng.random_range(3..=10);
                 let queries: Vec<(usize, usize)> = (0..q)
@@ -962,10 +1046,18 @@ struct RangeFreqTest {
 }
 
 impl Problem for SparseTableRangeFrequency {
-    fn id(&self) -> &str { "sparse_table_range_frequency" }
-    fn name(&self) -> &str { "Most Frequent Element in Range" }
-    fn topic(&self) -> &str { "sparse_tables" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "sparse_table_range_frequency"
+    }
+    fn name(&self) -> &str {
+        "Most Frequent Element in Range"
+    }
+    fn topic(&self) -> &str {
+        "sparse_tables"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Find the most frequent element in a range. Ties broken by smallest value.\n\n\
          Input: (arr: Vec<i32>, queries: Vec<(usize, usize)>)\n\
@@ -1017,10 +1109,18 @@ struct LcpArrayTest {
 }
 
 impl Problem for SparseTableLcpArray {
-    fn id(&self) -> &str { "sparse_table_longest_common_prefix_array" }
-    fn name(&self) -> &str { "LCP Array Queries" }
-    fn topic(&self) -> &str { "sparse_tables" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "sparse_table_longest_common_prefix_array"
+    }
+    fn name(&self) -> &str {
+        "LCP Array Queries"
+    }
+    fn topic(&self) -> &str {
+        "sparse_tables"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Build a suffix array and LCP array, then use a sparse table for RMQ \
          on the LCP array to answer queries.\n\n\
@@ -1075,10 +1175,18 @@ struct DistinctTest {
 }
 
 impl Problem for SparseTableDistinctInRange {
-    fn id(&self) -> &str { "sparse_table_distinct_in_range" }
-    fn name(&self) -> &str { "Count Distinct Elements in Range" }
-    fn topic(&self) -> &str { "sparse_tables" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "sparse_table_distinct_in_range"
+    }
+    fn name(&self) -> &str {
+        "Count Distinct Elements in Range"
+    }
+    fn topic(&self) -> &str {
+        "sparse_tables"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Count the number of distinct elements in a range.\n\n\
          Input: (arr: Vec<i32>, queries: Vec<(usize, usize)>)\n\

@@ -106,8 +106,8 @@ fn ref_largest_rectangle(heights: &[i32]) -> i32 {
     let mut max_area = 0;
     for i in 0..n {
         let mut min_h = heights[i];
-        for j in i..n {
-            min_h = min_h.min(heights[j]);
+        for (j, &h) in heights.iter().enumerate().take(n).skip(i) {
+            min_h = min_h.min(h);
             max_area = max_area.max(min_h * (j - i + 1) as i32);
         }
     }
@@ -122,12 +122,12 @@ fn ref_maximal_rectangle(matrix: &[Vec<i32>]) -> i32 {
     let cols = matrix[0].len();
     let mut heights = vec![0i32; cols];
     let mut max_area = 0;
-    for r in 0..rows {
-        for c in 0..cols {
-            if matrix[r][c] == 1 {
-                heights[c] += 1;
+    for row in matrix.iter().take(rows) {
+        for (c, h) in heights.iter_mut().enumerate().take(cols) {
+            if row[c] == 1 {
+                *h += 1;
             } else {
-                heights[c] = 0;
+                *h = 0;
             }
         }
         max_area = max_area.max(ref_largest_rectangle(&heights));
@@ -168,8 +168,8 @@ fn ref_sum_of_subarray_minimums(arr: &[i32]) -> i32 {
     let mut total: i64 = 0;
     for i in 0..n {
         let mut min_val = arr[i];
-        for j in i..n {
-            min_val = min_val.min(arr[j]);
+        for &val in arr.iter().take(n).skip(i) {
+            min_val = min_val.min(val);
             total = (total + min_val as i64) % modulo;
         }
     }
@@ -232,9 +232,9 @@ fn ref_sum_subarray_ranges(nums: &[i32]) -> i64 {
     for i in 0..n {
         let mut min_val = nums[i];
         let mut max_val = nums[i];
-        for j in i..n {
-            min_val = min_val.min(nums[j]);
-            max_val = max_val.max(nums[j]);
+        for &num in nums.iter().take(n).skip(i) {
+            min_val = min_val.min(num);
+            max_val = max_val.max(num);
             total += (max_val - min_val) as i64;
         }
     }
@@ -246,15 +246,19 @@ fn ref_shortest_subarray_sum_k(nums: &[i32], k: i32) -> i32 {
     let mut min_len = i32::MAX;
     for i in 0..n {
         let mut sum: i64 = 0;
-        for j in i..n {
-            sum += nums[j] as i64;
+        for (j, &num) in nums.iter().enumerate().take(n).skip(i) {
+            sum += num as i64;
             if sum >= k as i64 {
                 min_len = min_len.min((j - i + 1) as i32);
                 break;
             }
         }
     }
-    if min_len == i32::MAX { -1 } else { min_len }
+    if min_len == i32::MAX {
+        -1
+    } else {
+        min_len
+    }
 }
 
 fn ref_max_binary_string(s: &str) -> String {
@@ -286,10 +290,18 @@ struct NextGreaterTest {
 }
 
 impl Problem for MonotonicNextGreater {
-    fn id(&self) -> &str { "monotonic_next_greater" }
-    fn name(&self) -> &str { "Next Greater Element" }
-    fn topic(&self) -> &str { "monotonic" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "monotonic_next_greater"
+    }
+    fn name(&self) -> &str {
+        "Next Greater Element"
+    }
+    fn topic(&self) -> &str {
+        "monotonic"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "For each element, find the next greater element to its right.\n\
          Return -1 if no greater element exists.\n\n\
@@ -303,7 +315,9 @@ impl Problem for MonotonicNextGreater {
             .map(|_| {
                 let n = rng.random_range(3..=20);
                 let nums: Vec<i32> = (0..n).map(|_| rng.random_range(1..=100)).collect();
-                TestCase { data: Box::new(NextGreaterTest { nums }) }
+                TestCase {
+                    data: Box::new(NextGreaterTest { nums }),
+                }
             })
             .collect()
     }
@@ -330,10 +344,18 @@ struct NextSmallerTest {
 }
 
 impl Problem for MonotonicNextSmaller {
-    fn id(&self) -> &str { "monotonic_next_smaller" }
-    fn name(&self) -> &str { "Next Smaller Element" }
-    fn topic(&self) -> &str { "monotonic" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "monotonic_next_smaller"
+    }
+    fn name(&self) -> &str {
+        "Next Smaller Element"
+    }
+    fn topic(&self) -> &str {
+        "monotonic"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "For each element, find the next smaller element to its right.\n\
          Return -1 if no smaller element exists.\n\n\
@@ -347,7 +369,9 @@ impl Problem for MonotonicNextSmaller {
             .map(|_| {
                 let n = rng.random_range(3..=20);
                 let nums: Vec<i32> = (0..n).map(|_| rng.random_range(1..=100)).collect();
-                TestCase { data: Box::new(NextSmallerTest { nums }) }
+                TestCase {
+                    data: Box::new(NextSmallerTest { nums }),
+                }
             })
             .collect()
     }
@@ -374,10 +398,18 @@ struct DailyTempsTest {
 }
 
 impl Problem for MonotonicDailyTemperatures {
-    fn id(&self) -> &str { "monotonic_daily_temperatures" }
-    fn name(&self) -> &str { "Daily Temperatures" }
-    fn topic(&self) -> &str { "monotonic" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "monotonic_daily_temperatures"
+    }
+    fn name(&self) -> &str {
+        "Daily Temperatures"
+    }
+    fn topic(&self) -> &str {
+        "monotonic"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given daily temperatures, for each day find how many days you have to wait \
          until a warmer temperature. Return 0 if no warmer day exists.\n\n\
@@ -391,7 +423,9 @@ impl Problem for MonotonicDailyTemperatures {
             .map(|_| {
                 let n = rng.random_range(3..=20);
                 let temps: Vec<i32> = (0..n).map(|_| rng.random_range(60..=100)).collect();
-                TestCase { data: Box::new(DailyTempsTest { temps }) }
+                TestCase {
+                    data: Box::new(DailyTempsTest { temps }),
+                }
             })
             .collect()
     }
@@ -418,10 +452,18 @@ struct StockSpanTest {
 }
 
 impl Problem for MonotonicStockSpan {
-    fn id(&self) -> &str { "monotonic_stock_span" }
-    fn name(&self) -> &str { "Stock Span" }
-    fn topic(&self) -> &str { "monotonic" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "monotonic_stock_span"
+    }
+    fn name(&self) -> &str {
+        "Stock Span"
+    }
+    fn topic(&self) -> &str {
+        "monotonic"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "The stock span for day i is the number of consecutive days up to and including i \
          where the price was <= price[i].\n\n\
@@ -435,7 +477,9 @@ impl Problem for MonotonicStockSpan {
             .map(|_| {
                 let n = rng.random_range(3..=20);
                 let prices: Vec<i32> = (0..n).map(|_| rng.random_range(10..=200)).collect();
-                TestCase { data: Box::new(StockSpanTest { prices }) }
+                TestCase {
+                    data: Box::new(StockSpanTest { prices }),
+                }
             })
             .collect()
     }
@@ -463,10 +507,18 @@ struct SlidingMaxTest {
 }
 
 impl Problem for MonotonicSlidingWindowMax {
-    fn id(&self) -> &str { "monotonic_sliding_window_max" }
-    fn name(&self) -> &str { "Sliding Window Maximum" }
-    fn topic(&self) -> &str { "monotonic" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "monotonic_sliding_window_max"
+    }
+    fn name(&self) -> &str {
+        "Sliding Window Maximum"
+    }
+    fn topic(&self) -> &str {
+        "monotonic"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Return the maximum value in each sliding window of size k.\n\n\
          Input: (nums: Vec<i32>, k: usize)\n\
@@ -480,7 +532,9 @@ impl Problem for MonotonicSlidingWindowMax {
                 let n = rng.random_range(5..=25);
                 let k = rng.random_range(1..=n);
                 let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-50..=50)).collect();
-                TestCase { data: Box::new(SlidingMaxTest { nums, k }) }
+                TestCase {
+                    data: Box::new(SlidingMaxTest { nums, k }),
+                }
             })
             .collect()
     }
@@ -507,10 +561,18 @@ struct LargestRectTest {
 }
 
 impl Problem for MonotonicLargestRectangle {
-    fn id(&self) -> &str { "monotonic_largest_rectangle" }
-    fn name(&self) -> &str { "Largest Rectangle in Histogram" }
-    fn topic(&self) -> &str { "monotonic" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "monotonic_largest_rectangle"
+    }
+    fn name(&self) -> &str {
+        "Largest Rectangle in Histogram"
+    }
+    fn topic(&self) -> &str {
+        "monotonic"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given an array of bar heights, find the largest rectangular area.\n\n\
          Input: Vec<i32>\n\
@@ -523,7 +585,9 @@ impl Problem for MonotonicLargestRectangle {
             .map(|_| {
                 let n = rng.random_range(3..=20);
                 let heights: Vec<i32> = (0..n).map(|_| rng.random_range(0..=30)).collect();
-                TestCase { data: Box::new(LargestRectTest { heights }) }
+                TestCase {
+                    data: Box::new(LargestRectTest { heights }),
+                }
             })
             .collect()
     }
@@ -550,10 +614,18 @@ struct MaxRectTest {
 }
 
 impl Problem for MonotonicMaximalRectangle {
-    fn id(&self) -> &str { "monotonic_maximal_rectangle" }
-    fn name(&self) -> &str { "Maximal Rectangle in Binary Matrix" }
-    fn topic(&self) -> &str { "monotonic" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "monotonic_maximal_rectangle"
+    }
+    fn name(&self) -> &str {
+        "Maximal Rectangle in Binary Matrix"
+    }
+    fn topic(&self) -> &str {
+        "monotonic"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given a binary matrix (0s and 1s), find the area of the largest rectangle \
          containing only 1s.\n\n\
@@ -570,7 +642,9 @@ impl Problem for MonotonicMaximalRectangle {
                 let matrix: Vec<Vec<i32>> = (0..rows)
                     .map(|_| (0..cols).map(|_| rng.random_range(0..=1)).collect())
                     .collect();
-                TestCase { data: Box::new(MaxRectTest { matrix }) }
+                TestCase {
+                    data: Box::new(MaxRectTest { matrix }),
+                }
             })
             .collect()
     }
@@ -598,10 +672,18 @@ struct RemoveKTest {
 }
 
 impl Problem for MonotonicRemoveKDigits {
-    fn id(&self) -> &str { "monotonic_remove_k_digits" }
-    fn name(&self) -> &str { "Remove K Digits" }
-    fn topic(&self) -> &str { "monotonic" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "monotonic_remove_k_digits"
+    }
+    fn name(&self) -> &str {
+        "Remove K Digits"
+    }
+    fn topic(&self) -> &str {
+        "monotonic"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Remove k digits from the number string to make the smallest possible number.\n\
          Return as a string with no leading zeros (return \"0\" if result is empty).\n\n\
@@ -624,7 +706,9 @@ impl Problem for MonotonicRemoveKDigits {
                     })
                     .collect();
                 let k = rng.random_range(1..len);
-                TestCase { data: Box::new(RemoveKTest { num, k }) }
+                TestCase {
+                    data: Box::new(RemoveKTest { num, k }),
+                }
             })
             .collect()
     }
@@ -651,10 +735,18 @@ struct SubMinTest {
 }
 
 impl Problem for MonotonicSumOfSubarrayMinimums {
-    fn id(&self) -> &str { "monotonic_sum_of_subarray_minimums" }
-    fn name(&self) -> &str { "Sum of Subarray Minimums" }
-    fn topic(&self) -> &str { "monotonic" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "monotonic_sum_of_subarray_minimums"
+    }
+    fn name(&self) -> &str {
+        "Sum of Subarray Minimums"
+    }
+    fn topic(&self) -> &str {
+        "monotonic"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Return the sum of min(subarray) for all contiguous subarrays, modulo 10^9 + 7.\n\n\
          Input: Vec<i32>\n\
@@ -667,7 +759,9 @@ impl Problem for MonotonicSumOfSubarrayMinimums {
             .map(|_| {
                 let n = rng.random_range(2..=15);
                 let arr: Vec<i32> = (0..n).map(|_| rng.random_range(1..=100)).collect();
-                TestCase { data: Box::new(SubMinTest { arr }) }
+                TestCase {
+                    data: Box::new(SubMinTest { arr }),
+                }
             })
             .collect()
     }
@@ -695,10 +789,18 @@ struct SlidingMinTest {
 }
 
 impl Problem for MonotonicSlidingWindowMin {
-    fn id(&self) -> &str { "monotonic_sliding_window_min" }
-    fn name(&self) -> &str { "Sliding Window Minimum" }
-    fn topic(&self) -> &str { "monotonic" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "monotonic_sliding_window_min"
+    }
+    fn name(&self) -> &str {
+        "Sliding Window Minimum"
+    }
+    fn topic(&self) -> &str {
+        "monotonic"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Return the minimum value in each sliding window of size k.\n\n\
          Input: (nums: Vec<i32>, k: usize)\n\
@@ -712,7 +814,9 @@ impl Problem for MonotonicSlidingWindowMin {
                 let n = rng.random_range(5..=25);
                 let k = rng.random_range(1..=n);
                 let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-50..=50)).collect();
-                TestCase { data: Box::new(SlidingMinTest { nums, k }) }
+                TestCase {
+                    data: Box::new(SlidingMinTest { nums, k }),
+                }
             })
             .collect()
     }
@@ -739,10 +843,18 @@ struct TrapTest {
 }
 
 impl Problem for MonotonicTrappingRainWater {
-    fn id(&self) -> &str { "monotonic_trapping_rain_water" }
-    fn name(&self) -> &str { "Trapping Rain Water (Monotonic Stack)" }
-    fn topic(&self) -> &str { "monotonic" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "monotonic_trapping_rain_water"
+    }
+    fn name(&self) -> &str {
+        "Trapping Rain Water (Monotonic Stack)"
+    }
+    fn topic(&self) -> &str {
+        "monotonic"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Compute trapped rain water using a monotonic stack approach.\n\n\
          Input: Vec<i32>\n\
@@ -755,7 +867,9 @@ impl Problem for MonotonicTrappingRainWater {
             .map(|_| {
                 let n = rng.random_range(3..=25);
                 let height: Vec<i32> = (0..n).map(|_| rng.random_range(0..=20)).collect();
-                TestCase { data: Box::new(TrapTest { height }) }
+                TestCase {
+                    data: Box::new(TrapTest { height }),
+                }
             })
             .collect()
     }
@@ -782,10 +896,18 @@ struct MaxRampTest {
 }
 
 impl Problem for MonotonicMaxWidthRamp {
-    fn id(&self) -> &str { "monotonic_max_width_ramp" }
-    fn name(&self) -> &str { "Maximum Width Ramp" }
-    fn topic(&self) -> &str { "monotonic" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "monotonic_max_width_ramp"
+    }
+    fn name(&self) -> &str {
+        "Maximum Width Ramp"
+    }
+    fn topic(&self) -> &str {
+        "monotonic"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Find the maximum j - i such that nums[i] <= nums[j] where i < j.\n\
          Return 0 if no such pair exists.\n\n\
@@ -799,7 +921,9 @@ impl Problem for MonotonicMaxWidthRamp {
             .map(|_| {
                 let n = rng.random_range(3..=25);
                 let nums: Vec<i32> = (0..n).map(|_| rng.random_range(0..=50)).collect();
-                TestCase { data: Box::new(MaxRampTest { nums }) }
+                TestCase {
+                    data: Box::new(MaxRampTest { nums }),
+                }
             })
             .collect()
     }
@@ -826,10 +950,18 @@ struct SubRangesTest {
 }
 
 impl Problem for MonotonicSumSubarrayRanges {
-    fn id(&self) -> &str { "monotonic_sum_subarray_ranges" }
-    fn name(&self) -> &str { "Sum of Subarray Ranges" }
-    fn topic(&self) -> &str { "monotonic" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "monotonic_sum_subarray_ranges"
+    }
+    fn name(&self) -> &str {
+        "Sum of Subarray Ranges"
+    }
+    fn topic(&self) -> &str {
+        "monotonic"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "The range of a subarray is max - min. Return the sum of ranges \
          over all subarrays.\n\n\
@@ -843,7 +975,9 @@ impl Problem for MonotonicSumSubarrayRanges {
             .map(|_| {
                 let n = rng.random_range(2..=15);
                 let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-50..=50)).collect();
-                TestCase { data: Box::new(SubRangesTest { nums }) }
+                TestCase {
+                    data: Box::new(SubRangesTest { nums }),
+                }
             })
             .collect()
     }
@@ -871,10 +1005,18 @@ struct ShortestSubSumTest {
 }
 
 impl Problem for MonotonicShortestSubarraySumK {
-    fn id(&self) -> &str { "monotonic_shortest_subarray_sum_k" }
-    fn name(&self) -> &str { "Shortest Subarray with Sum >= K" }
-    fn topic(&self) -> &str { "monotonic" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "monotonic_shortest_subarray_sum_k"
+    }
+    fn name(&self) -> &str {
+        "Shortest Subarray with Sum >= K"
+    }
+    fn topic(&self) -> &str {
+        "monotonic"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Find the length of the shortest non-empty subarray with sum >= k.\n\
          Array may contain negative numbers. Return -1 if impossible.\n\n\
@@ -889,7 +1031,9 @@ impl Problem for MonotonicShortestSubarraySumK {
                 let n = rng.random_range(3..=15);
                 let nums: Vec<i32> = (0..n).map(|_| rng.random_range(-20..=50)).collect();
                 let k = rng.random_range(1..=100);
-                TestCase { data: Box::new(ShortestSubSumTest { nums, k }) }
+                TestCase {
+                    data: Box::new(ShortestSubSumTest { nums, k }),
+                }
             })
             .collect()
     }
@@ -916,10 +1060,18 @@ struct MaxBinStringTest {
 }
 
 impl Problem for MonotonicMaxBinaryString {
-    fn id(&self) -> &str { "monotonic_max_binary_string" }
-    fn name(&self) -> &str { "Maximum Binary String After Operations" }
-    fn topic(&self) -> &str { "monotonic" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "monotonic_max_binary_string"
+    }
+    fn name(&self) -> &str {
+        "Maximum Binary String After Operations"
+    }
+    fn topic(&self) -> &str {
+        "monotonic"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given a binary string, you can apply operations:\n\
          - \"00\" -> \"10\"\n\
@@ -935,9 +1087,17 @@ impl Problem for MonotonicMaxBinaryString {
             .map(|_| {
                 let len = rng.random_range(2..=15);
                 let s: String = (0..len)
-                    .map(|_| if rng.random_range(0..2) == 0 { '0' } else { '1' })
+                    .map(|_| {
+                        if rng.random_range(0..2) == 0 {
+                            '0'
+                        } else {
+                            '1'
+                        }
+                    })
                     .collect();
-                TestCase { data: Box::new(MaxBinStringTest { s }) }
+                TestCase {
+                    data: Box::new(MaxBinStringTest { s }),
+                }
             })
             .collect()
     }

@@ -163,7 +163,11 @@ fn ref_multiply_strings(num1: &str, num2: &str) -> String {
     while result.len() > 1 && *result.last().unwrap() == 0 {
         result.pop();
     }
-    result.iter().rev().map(|&d| (d as u8 + b'0') as char).collect()
+    result
+        .iter()
+        .rev()
+        .map(|&d| (d as u8 + b'0') as char)
+        .collect()
 }
 
 fn ref_max_points_on_line(points: &[(i32, i32)]) -> i32 {
@@ -198,19 +202,27 @@ fn ref_max_points_on_line(points: &[(i32, i32)]) -> i32 {
 }
 
 fn gcd_i32(a: i32, b: i32) -> i32 {
-    if b == 0 { a } else { gcd_i32(b, a % b) }
+    if b == 0 {
+        a
+    } else {
+        gcd_i32(b, a % b)
+    }
 }
 
 fn ref_ugly_number(n: i32) -> i32 {
     let mut uglies = vec![1i64];
     let (mut i2, mut i3, mut i5) = (0usize, 0usize, 0usize);
     for _ in 1..n {
-        let next = (uglies[i2] * 2)
-            .min(uglies[i3] * 3)
-            .min(uglies[i5] * 5);
-        if next == uglies[i2] * 2 { i2 += 1; }
-        if next == uglies[i3] * 3 { i3 += 1; }
-        if next == uglies[i5] * 5 { i5 += 1; }
+        let next = (uglies[i2] * 2).min(uglies[i3] * 3).min(uglies[i5] * 5);
+        if next == uglies[i2] * 2 {
+            i2 += 1;
+        }
+        if next == uglies[i3] * 3 {
+            i3 += 1;
+        }
+        if next == uglies[i5] * 5 {
+            i5 += 1;
+        }
         uglies.push(next);
     }
     *uglies.last().unwrap() as i32
@@ -263,8 +275,7 @@ fn ref_convex_hull(points: &[(i64, i64)]) -> Vec<(i64, i64)> {
     // Upper hull
     let lower_len = hull.len() + 1;
     for &p in pts.iter().rev().skip(1) {
-        while hull.len() >= lower_len && cross(hull[hull.len() - 2], hull[hull.len() - 1], p) <= 0
-        {
+        while hull.len() >= lower_len && cross(hull[hull.len() - 2], hull[hull.len() - 1], p) <= 0 {
             hull.pop();
         }
         hull.push(p);
@@ -297,16 +308,16 @@ fn ref_matrix_exp(mat: &[Vec<i64>], exp: i64, m: i64) -> Vec<Vec<i64>> {
         let mut c = vec![vec![0i64; n]; n];
         for i in 0..n {
             for j in 0..n {
-                for k in 0..n {
-                    c[i][j] = (c[i][j] + a[i][k] * b[k][j]) % m;
+                for (k, b_row) in b.iter().enumerate().take(n) {
+                    c[i][j] = (c[i][j] + a[i][k] * b_row[j]) % m;
                 }
             }
         }
         c
     };
     let mut result = vec![vec![0i64; n]; n];
-    for i in 0..n {
-        result[i][i] = 1;
+    for (i, row) in result.iter_mut().enumerate().take(n) {
+        row[i] = 1;
     }
     let mut base = mat.to_vec();
     let mut exp = exp;
@@ -365,10 +376,18 @@ struct GcdTest {
 }
 
 impl Problem for MathGcd {
-    fn id(&self) -> &str { "math_gcd" }
-    fn name(&self) -> &str { "GCD of Two Numbers" }
-    fn topic(&self) -> &str { "math_geometry" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "math_gcd"
+    }
+    fn name(&self) -> &str {
+        "GCD of Two Numbers"
+    }
+    fn topic(&self) -> &str {
+        "math_geometry"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Compute the greatest common divisor of two numbers using Euclidean algorithm.\n\n\
          Input: (i64, i64)\n\
@@ -381,7 +400,9 @@ impl Problem for MathGcd {
             .map(|_| {
                 let a = rng.random_range(1..=10000i64);
                 let b = rng.random_range(1..=10000i64);
-                TestCase { data: Box::new(GcdTest { a, b }) }
+                TestCase {
+                    data: Box::new(GcdTest { a, b }),
+                }
             })
             .collect()
     }
@@ -408,10 +429,18 @@ struct IsPrimeTest {
 }
 
 impl Problem for MathIsPrime {
-    fn id(&self) -> &str { "math_is_prime" }
-    fn name(&self) -> &str { "Primality Test" }
-    fn topic(&self) -> &str { "math_geometry" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "math_is_prime"
+    }
+    fn name(&self) -> &str {
+        "Primality Test"
+    }
+    fn topic(&self) -> &str {
+        "math_geometry"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Determine if a number is prime.\n\n\
          Input: i64\n\
@@ -423,7 +452,9 @@ impl Problem for MathIsPrime {
         (0..10)
             .map(|_| {
                 let n = rng.random_range(0..=1000i64);
-                TestCase { data: Box::new(IsPrimeTest { n }) }
+                TestCase {
+                    data: Box::new(IsPrimeTest { n }),
+                }
             })
             .collect()
     }
@@ -450,10 +481,18 @@ struct CountPrimesTest {
 }
 
 impl Problem for MathCountPrimes {
-    fn id(&self) -> &str { "math_count_primes" }
-    fn name(&self) -> &str { "Count Primes Less Than N" }
-    fn topic(&self) -> &str { "math_geometry" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "math_count_primes"
+    }
+    fn name(&self) -> &str {
+        "Count Primes Less Than N"
+    }
+    fn topic(&self) -> &str {
+        "math_geometry"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Count the number of primes strictly less than n.\n\n\
          Input: i32\n\
@@ -465,7 +504,9 @@ impl Problem for MathCountPrimes {
         (0..10)
             .map(|_| {
                 let n = rng.random_range(0..=1000);
-                TestCase { data: Box::new(CountPrimesTest { n }) }
+                TestCase {
+                    data: Box::new(CountPrimesTest { n }),
+                }
             })
             .collect()
     }
@@ -494,10 +535,18 @@ struct PowerModTest {
 }
 
 impl Problem for MathPowerMod {
-    fn id(&self) -> &str { "math_power_mod" }
-    fn name(&self) -> &str { "Modular Exponentiation" }
-    fn topic(&self) -> &str { "math_geometry" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "math_power_mod"
+    }
+    fn name(&self) -> &str {
+        "Modular Exponentiation"
+    }
+    fn topic(&self) -> &str {
+        "math_geometry"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Compute (base^exp) mod m using fast exponentiation.\n\n\
          Input: (base: i64, exp: i64, m: i64)\n\
@@ -540,10 +589,18 @@ struct ReverseIntTest {
 }
 
 impl Problem for MathReverseInteger {
-    fn id(&self) -> &str { "math_reverse_integer" }
-    fn name(&self) -> &str { "Reverse Integer" }
-    fn topic(&self) -> &str { "math_geometry" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "math_reverse_integer"
+    }
+    fn name(&self) -> &str {
+        "Reverse Integer"
+    }
+    fn topic(&self) -> &str {
+        "math_geometry"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Reverse the digits of an integer. Return 0 if the result overflows i32.\n\n\
          Input: i32\n\
@@ -555,7 +612,9 @@ impl Problem for MathReverseInteger {
         (0..10)
             .map(|_| {
                 let x = rng.random_range(i32::MIN / 10..=i32::MAX / 10);
-                TestCase { data: Box::new(ReverseIntTest { x }) }
+                TestCase {
+                    data: Box::new(ReverseIntTest { x }),
+                }
             })
             .collect()
     }
@@ -582,10 +641,18 @@ struct SieveTest {
 }
 
 impl Problem for MathSieveOfEratosthenes {
-    fn id(&self) -> &str { "math_sieve_of_eratosthenes" }
-    fn name(&self) -> &str { "Sieve of Eratosthenes" }
-    fn topic(&self) -> &str { "math_geometry" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "math_sieve_of_eratosthenes"
+    }
+    fn name(&self) -> &str {
+        "Sieve of Eratosthenes"
+    }
+    fn topic(&self) -> &str {
+        "math_geometry"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "List all primes up to and including n.\n\n\
          Input: i32\n\
@@ -597,7 +664,9 @@ impl Problem for MathSieveOfEratosthenes {
         (0..10)
             .map(|_| {
                 let n = rng.random_range(2..=200);
-                TestCase { data: Box::new(SieveTest { n }) }
+                TestCase {
+                    data: Box::new(SieveTest { n }),
+                }
             })
             .collect()
     }
@@ -625,10 +694,18 @@ struct MulStrTest {
 }
 
 impl Problem for MathMultiplyStrings {
-    fn id(&self) -> &str { "math_multiply_strings" }
-    fn name(&self) -> &str { "Multiply Two Large Numbers" }
-    fn topic(&self) -> &str { "math_geometry" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "math_multiply_strings"
+    }
+    fn name(&self) -> &str {
+        "Multiply Two Large Numbers"
+    }
+    fn topic(&self) -> &str {
+        "math_geometry"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Multiply two numbers represented as strings. Do not use BigInt.\n\n\
          Input: (num1: String, num2: String)\n\
@@ -688,10 +765,18 @@ struct MaxPointsTest {
 }
 
 impl Problem for MathMaxPointsOnLine {
-    fn id(&self) -> &str { "math_max_points_on_line" }
-    fn name(&self) -> &str { "Max Collinear Points" }
-    fn topic(&self) -> &str { "math_geometry" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "math_max_points_on_line"
+    }
+    fn name(&self) -> &str {
+        "Max Collinear Points"
+    }
+    fn topic(&self) -> &str {
+        "math_geometry"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Find the maximum number of points that lie on the same straight line.\n\n\
          Input: Vec<(i32, i32)>\n\
@@ -704,12 +789,7 @@ impl Problem for MathMaxPointsOnLine {
             .map(|_| {
                 let n = rng.random_range(2..=10);
                 let points: Vec<(i32, i32)> = (0..n)
-                    .map(|_| {
-                        (
-                            rng.random_range(-20..=20),
-                            rng.random_range(-20..=20),
-                        )
-                    })
+                    .map(|_| (rng.random_range(-20..=20), rng.random_range(-20..=20)))
                     .collect();
                 TestCase {
                     data: Box::new(MaxPointsTest { points }),
@@ -740,10 +820,18 @@ struct UglyNumTest {
 }
 
 impl Problem for MathUglyNumber {
-    fn id(&self) -> &str { "math_ugly_number" }
-    fn name(&self) -> &str { "Nth Ugly Number" }
-    fn topic(&self) -> &str { "math_geometry" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "math_ugly_number"
+    }
+    fn name(&self) -> &str {
+        "Nth Ugly Number"
+    }
+    fn topic(&self) -> &str {
+        "math_geometry"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Find the nth ugly number. Ugly numbers have only prime factors 2, 3, and 5.\n\
          The sequence starts: 1, 2, 3, 4, 5, 6, 8, 9, 10, 12, ...\n\n\
@@ -756,7 +844,9 @@ impl Problem for MathUglyNumber {
         (0..10)
             .map(|_| {
                 let n = rng.random_range(1..=200);
-                TestCase { data: Box::new(UglyNumTest { n }) }
+                TestCase {
+                    data: Box::new(UglyNumTest { n }),
+                }
             })
             .collect()
     }
@@ -783,10 +873,18 @@ struct NextPermTest {
 }
 
 impl Problem for MathNextPermutation {
-    fn id(&self) -> &str { "math_next_permutation" }
-    fn name(&self) -> &str { "Next Lexicographic Permutation" }
-    fn topic(&self) -> &str { "math_geometry" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "math_next_permutation"
+    }
+    fn name(&self) -> &str {
+        "Next Lexicographic Permutation"
+    }
+    fn topic(&self) -> &str {
+        "math_geometry"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Rearrange numbers into the lexicographically next greater permutation.\n\
          If at the largest permutation, return the sorted (smallest) order.\n\n\
@@ -800,7 +898,9 @@ impl Problem for MathNextPermutation {
             .map(|_| {
                 let n = rng.random_range(1..=8);
                 let nums: Vec<i32> = (0..n).map(|_| rng.random_range(0..=5)).collect();
-                TestCase { data: Box::new(NextPermTest { nums }) }
+                TestCase {
+                    data: Box::new(NextPermTest { nums }),
+                }
             })
             .collect()
     }
@@ -827,10 +927,18 @@ struct ConvexHullTest {
 }
 
 impl Problem for MathConvexHull {
-    fn id(&self) -> &str { "math_convex_hull" }
-    fn name(&self) -> &str { "Convex Hull" }
-    fn topic(&self) -> &str { "math_geometry" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "math_convex_hull"
+    }
+    fn name(&self) -> &str {
+        "Convex Hull"
+    }
+    fn topic(&self) -> &str {
+        "math_geometry"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Compute the convex hull of a set of 2D points.\n\
          Return the hull vertices sorted by coordinates.\n\n\
@@ -883,10 +991,18 @@ struct ModInvTest {
 }
 
 impl Problem for MathModularInverse {
-    fn id(&self) -> &str { "math_modular_inverse" }
-    fn name(&self) -> &str { "Modular Multiplicative Inverse" }
-    fn topic(&self) -> &str { "math_geometry" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "math_modular_inverse"
+    }
+    fn name(&self) -> &str {
+        "Modular Multiplicative Inverse"
+    }
+    fn topic(&self) -> &str {
+        "math_geometry"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Find x such that (a * x) mod m = 1. Return -1 if no inverse exists.\n\n\
          Input: (a: i64, m: i64)\n\
@@ -899,7 +1015,9 @@ impl Problem for MathModularInverse {
             .map(|_| {
                 let m = rng.random_range(2..=1000i64);
                 let a = rng.random_range(1..=m - 1);
-                TestCase { data: Box::new(ModInvTest { a, m }) }
+                TestCase {
+                    data: Box::new(ModInvTest { a, m }),
+                }
             })
             .collect()
     }
@@ -934,10 +1052,18 @@ struct MatExpTest {
 }
 
 impl Problem for MathMatrixExponentiation {
-    fn id(&self) -> &str { "math_matrix_exponentiation" }
-    fn name(&self) -> &str { "Matrix Exponentiation" }
-    fn topic(&self) -> &str { "math_geometry" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "math_matrix_exponentiation"
+    }
+    fn name(&self) -> &str {
+        "Matrix Exponentiation"
+    }
+    fn topic(&self) -> &str {
+        "math_geometry"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Compute matrix^exp mod m using fast exponentiation.\n\
          Matrix is 2x2.\n\n\
@@ -985,10 +1111,18 @@ struct CrtTest {
 }
 
 impl Problem for MathChineseRemainder {
-    fn id(&self) -> &str { "math_chinese_remainder" }
-    fn name(&self) -> &str { "Chinese Remainder Theorem" }
-    fn topic(&self) -> &str { "math_geometry" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "math_chinese_remainder"
+    }
+    fn name(&self) -> &str {
+        "Chinese Remainder Theorem"
+    }
+    fn topic(&self) -> &str {
+        "math_geometry"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Solve the system of congruences:\n\
          x = remainders[i] (mod moduli[i]) for all i.\n\
@@ -1015,10 +1149,7 @@ impl Problem for MathChineseRemainder {
         coprime_sets
             .into_iter()
             .map(|moduli| {
-                let remainders: Vec<i64> = moduli
-                    .iter()
-                    .map(|&m| rng.random_range(0..m))
-                    .collect();
+                let remainders: Vec<i64> = moduli.iter().map(|&m| rng.random_range(0..m)).collect();
                 TestCase {
                     data: Box::new(CrtTest { remainders, moduli }),
                 }
@@ -1042,10 +1173,7 @@ impl Problem for MathChineseRemainder {
         };
         SolutionResult {
             is_correct: valid,
-            input_description: format!(
-                "remainders={:?}, moduli={:?}",
-                t.remainders, t.moduli
-            ),
+            input_description: format!("remainders={:?}, moduli={:?}", t.remainders, t.moduli),
             expected: format!("{expected}"),
             actual: format!("{actual}"),
         }
@@ -1062,10 +1190,18 @@ struct TrapIntTest {
 }
 
 impl Problem for MathTrapezoidalIntegral {
-    fn id(&self) -> &str { "math_largest_rectangle_under_curve" }
-    fn name(&self) -> &str { "Trapezoidal Integration" }
-    fn topic(&self) -> &str { "math_geometry" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "math_largest_rectangle_under_curve"
+    }
+    fn name(&self) -> &str {
+        "Trapezoidal Integration"
+    }
+    fn topic(&self) -> &str {
+        "math_geometry"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Approximate the integral using the trapezoidal rule.\n\
          Given y-values at equally spaced x-points with spacing dx.\n\n\

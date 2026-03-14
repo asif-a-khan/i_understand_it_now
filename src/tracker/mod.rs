@@ -1,7 +1,7 @@
 use std::cell::RefCell;
 use std::fmt;
 use std::hash::{Hash, Hasher};
-use std::ops::{Add, Sub, Mul, Rem, Neg};
+use std::ops::{Add, Mul, Neg, Rem, Sub};
 use std::rc::Rc;
 
 /// Records all operations performed by a solution for visualization and metrics.
@@ -106,13 +106,17 @@ impl<T> Tracked<T> {
 
     /// Get the inner value by reference (records a Read).
     pub fn get(&self) -> &T {
-        self.log.borrow_mut().record(Operation::Read { idx: self.idx });
+        self.log
+            .borrow_mut()
+            .record(Operation::Read { idx: self.idx });
         &self.value
     }
 
     /// Set the inner value (records a Write).
     pub fn set(&mut self, value: T) {
-        self.log.borrow_mut().record(Operation::Write { idx: self.idx });
+        self.log
+            .borrow_mut()
+            .record(Operation::Write { idx: self.idx });
         self.value = value;
     }
 
@@ -146,12 +150,10 @@ impl<T: fmt::Display> fmt::Display for Tracked<T> {
 
 impl<T: PartialEq> PartialEq for Tracked<T> {
     fn eq(&self, other: &Self) -> bool {
-        self.log
-            .borrow_mut()
-            .record(Operation::Compare {
-                left_idx: self.idx,
-                right_idx: other.idx,
-            });
+        self.log.borrow_mut().record(Operation::Compare {
+            left_idx: self.idx,
+            right_idx: other.idx,
+        });
         self.value == other.value
     }
 }
@@ -160,24 +162,20 @@ impl<T: Eq + PartialEq> Eq for Tracked<T> {}
 
 impl<T: PartialOrd> PartialOrd for Tracked<T> {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        self.log
-            .borrow_mut()
-            .record(Operation::Compare {
-                left_idx: self.idx,
-                right_idx: other.idx,
-            });
+        self.log.borrow_mut().record(Operation::Compare {
+            left_idx: self.idx,
+            right_idx: other.idx,
+        });
         self.value.partial_cmp(&other.value)
     }
 }
 
 impl<T: Ord + Eq> Ord for Tracked<T> {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        self.log
-            .borrow_mut()
-            .record(Operation::Compare {
-                left_idx: self.idx,
-                right_idx: other.idx,
-            });
+        self.log.borrow_mut().record(Operation::Compare {
+            left_idx: self.idx,
+            right_idx: other.idx,
+        });
         self.value.cmp(&other.value)
     }
 }

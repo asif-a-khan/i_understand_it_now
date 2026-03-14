@@ -62,9 +62,9 @@ fn ref_subsets_bitmask(nums: &[i32]) -> Vec<Vec<i32>> {
     let mut result = Vec::new();
     for mask in 0..total {
         let mut subset = Vec::new();
-        for i in 0..n {
+        for (i, &num) in nums.iter().enumerate().take(n) {
             if mask & (1 << i) != 0 {
-                subset.push(nums[i]);
+                subset.push(num);
             }
         }
         result.push(subset);
@@ -138,7 +138,10 @@ fn ref_max_and_pair(nums: &[i32]) -> i32 {
     let mut result = 0;
     for bit in (0..30).rev() {
         let candidate = result | (1 << bit);
-        let count = nums.iter().filter(|&&x| (x & candidate) == candidate).count();
+        let count = nums
+            .iter()
+            .filter(|&&x| (x & candidate) == candidate)
+            .count();
         if count >= 2 {
             result = candidate;
         }
@@ -164,10 +167,18 @@ struct SingleNumTest {
 }
 
 impl Problem for BitsSingleNumber {
-    fn id(&self) -> &str { "bits_single_number" }
-    fn name(&self) -> &str { "Single Number" }
-    fn topic(&self) -> &str { "bit_manipulation" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "bits_single_number"
+    }
+    fn name(&self) -> &str {
+        "Single Number"
+    }
+    fn topic(&self) -> &str {
+        "bit_manipulation"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Every element appears twice except one. Find the element that appears once.\n\n\
          Input: Vec<i32>\n\
@@ -192,7 +203,9 @@ impl Problem for BitsSingleNumber {
                     let j = rng.random_range(0..=i);
                     nums.swap(i, j);
                 }
-                TestCase { data: Box::new(SingleNumTest { nums }) }
+                TestCase {
+                    data: Box::new(SingleNumTest { nums }),
+                }
             })
             .collect()
     }
@@ -219,10 +232,18 @@ struct CountOnesTest {
 }
 
 impl Problem for BitsCountOnes {
-    fn id(&self) -> &str { "bits_count_ones" }
-    fn name(&self) -> &str { "Count Set Bits (Hamming Weight)" }
-    fn topic(&self) -> &str { "bit_manipulation" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "bits_count_ones"
+    }
+    fn name(&self) -> &str {
+        "Count Set Bits (Hamming Weight)"
+    }
+    fn topic(&self) -> &str {
+        "bit_manipulation"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Count the number of set bits (1s) in a 32-bit unsigned integer.\n\n\
          Input: u32\n\
@@ -234,7 +255,9 @@ impl Problem for BitsCountOnes {
         (0..10)
             .map(|_| {
                 let n = rng.random_range(0..=u32::MAX);
-                TestCase { data: Box::new(CountOnesTest { n }) }
+                TestCase {
+                    data: Box::new(CountOnesTest { n }),
+                }
             })
             .collect()
     }
@@ -261,10 +284,18 @@ struct PowerOfTwoTest {
 }
 
 impl Problem for BitsIsPowerOfTwo {
-    fn id(&self) -> &str { "bits_is_power_of_two" }
-    fn name(&self) -> &str { "Is Power of Two" }
-    fn topic(&self) -> &str { "bit_manipulation" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "bits_is_power_of_two"
+    }
+    fn name(&self) -> &str {
+        "Is Power of Two"
+    }
+    fn topic(&self) -> &str {
+        "bit_manipulation"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Check if a given integer is a power of two.\n\n\
          Input: i32\n\
@@ -276,7 +307,9 @@ impl Problem for BitsIsPowerOfTwo {
         let mut tests: Vec<TestCase> = (0..7)
             .map(|_| {
                 let n = rng.random_range(-10..=1000);
-                TestCase { data: Box::new(PowerOfTwoTest { n }) }
+                TestCase {
+                    data: Box::new(PowerOfTwoTest { n }),
+                }
             })
             .collect();
         // Ensure some powers of two are included
@@ -313,10 +346,18 @@ struct ReverseBitsTest {
 }
 
 impl Problem for BitsReverseBits {
-    fn id(&self) -> &str { "bits_reverse_bits" }
-    fn name(&self) -> &str { "Reverse Bits" }
-    fn topic(&self) -> &str { "bit_manipulation" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "bits_reverse_bits"
+    }
+    fn name(&self) -> &str {
+        "Reverse Bits"
+    }
+    fn topic(&self) -> &str {
+        "bit_manipulation"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Reverse the bits of a 32-bit unsigned integer.\n\n\
          Input: u32\n\
@@ -328,7 +369,9 @@ impl Problem for BitsReverseBits {
         (0..10)
             .map(|_| {
                 let n = rng.random_range(0..=u32::MAX);
-                TestCase { data: Box::new(ReverseBitsTest { n }) }
+                TestCase {
+                    data: Box::new(ReverseBitsTest { n }),
+                }
             })
             .collect()
     }
@@ -355,10 +398,18 @@ struct MissingNumTest {
 }
 
 impl Problem for BitsMissingNumber {
-    fn id(&self) -> &str { "bits_missing_number" }
-    fn name(&self) -> &str { "Missing Number" }
-    fn topic(&self) -> &str { "bit_manipulation" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "bits_missing_number"
+    }
+    fn name(&self) -> &str {
+        "Missing Number"
+    }
+    fn topic(&self) -> &str {
+        "bit_manipulation"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given an array containing n distinct numbers from [0, n], find the missing one.\n\
          Use XOR for O(1) space.\n\n\
@@ -378,7 +429,9 @@ impl Problem for BitsMissingNumber {
                     let j = rng.random_range(0..=i);
                     nums.swap(i, j);
                 }
-                TestCase { data: Box::new(MissingNumTest { nums }) }
+                TestCase {
+                    data: Box::new(MissingNumTest { nums }),
+                }
             })
             .collect()
     }
@@ -405,10 +458,18 @@ struct CountingBitsTest {
 }
 
 impl Problem for BitsCountingBits {
-    fn id(&self) -> &str { "bits_counting_bits" }
-    fn name(&self) -> &str { "Counting Bits" }
-    fn topic(&self) -> &str { "bit_manipulation" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "bits_counting_bits"
+    }
+    fn name(&self) -> &str {
+        "Counting Bits"
+    }
+    fn topic(&self) -> &str {
+        "bit_manipulation"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "For each i in [0, n], return the number of 1-bits.\n\n\
          Input: i32 (n)\n\
@@ -420,7 +481,9 @@ impl Problem for BitsCountingBits {
         (0..10)
             .map(|_| {
                 let n = rng.random_range(0..=50);
-                TestCase { data: Box::new(CountingBitsTest { n }) }
+                TestCase {
+                    data: Box::new(CountingBitsTest { n }),
+                }
             })
             .collect()
     }
@@ -447,10 +510,18 @@ struct SubsetsTest {
 }
 
 impl Problem for BitsSubsetsBitmask {
-    fn id(&self) -> &str { "bits_subsets_bitmask" }
-    fn name(&self) -> &str { "Generate Subsets (Bitmask)" }
-    fn topic(&self) -> &str { "bit_manipulation" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "bits_subsets_bitmask"
+    }
+    fn name(&self) -> &str {
+        "Generate Subsets (Bitmask)"
+    }
+    fn topic(&self) -> &str {
+        "bit_manipulation"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Generate all subsets of the input array using bitmask enumeration.\n\
          Return subsets sorted lexicographically.\n\n\
@@ -464,7 +535,9 @@ impl Problem for BitsSubsetsBitmask {
             .map(|_| {
                 let n = rng.random_range(1..=6);
                 let nums: Vec<i32> = (0..n).map(|_| rng.random_range(1..=20)).collect();
-                TestCase { data: Box::new(SubsetsTest { nums }) }
+                TestCase {
+                    data: Box::new(SubsetsTest { nums }),
+                }
             })
             .collect()
     }
@@ -493,10 +566,18 @@ struct SumTest {
 }
 
 impl Problem for BitsSumWithoutArithmetic {
-    fn id(&self) -> &str { "bits_sum_without_arithmetic" }
-    fn name(&self) -> &str { "Add Without +/-" }
-    fn topic(&self) -> &str { "bit_manipulation" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "bits_sum_without_arithmetic"
+    }
+    fn name(&self) -> &str {
+        "Add Without +/-"
+    }
+    fn topic(&self) -> &str {
+        "bit_manipulation"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Add two integers without using + or - operators. Use bit manipulation.\n\n\
          Input: (i32, i32)\n\
@@ -509,7 +590,9 @@ impl Problem for BitsSumWithoutArithmetic {
             .map(|_| {
                 let a = rng.random_range(-1000..=1000);
                 let b = rng.random_range(-1000..=1000);
-                TestCase { data: Box::new(SumTest { a, b }) }
+                TestCase {
+                    data: Box::new(SumTest { a, b }),
+                }
             })
             .collect()
     }
@@ -536,10 +619,18 @@ struct HammingDistTest {
 }
 
 impl Problem for BitsTotalHammingDistance {
-    fn id(&self) -> &str { "bits_total_hamming_distance" }
-    fn name(&self) -> &str { "Total Hamming Distance" }
-    fn topic(&self) -> &str { "bit_manipulation" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "bits_total_hamming_distance"
+    }
+    fn name(&self) -> &str {
+        "Total Hamming Distance"
+    }
+    fn topic(&self) -> &str {
+        "bit_manipulation"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Return the total Hamming distance between all pairs of numbers.\n\n\
          Input: Vec<i32>\n\
@@ -552,7 +643,9 @@ impl Problem for BitsTotalHammingDistance {
             .map(|_| {
                 let n = rng.random_range(2..=15);
                 let nums: Vec<i32> = (0..n).map(|_| rng.random_range(0..=1000)).collect();
-                TestCase { data: Box::new(HammingDistTest { nums }) }
+                TestCase {
+                    data: Box::new(HammingDistTest { nums }),
+                }
             })
             .collect()
     }
@@ -579,10 +672,18 @@ struct MaxXorTest {
 }
 
 impl Problem for BitsMaximumXor {
-    fn id(&self) -> &str { "bits_maximum_xor" }
-    fn name(&self) -> &str { "Maximum XOR of Two Numbers" }
-    fn topic(&self) -> &str { "bit_manipulation" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "bits_maximum_xor"
+    }
+    fn name(&self) -> &str {
+        "Maximum XOR of Two Numbers"
+    }
+    fn topic(&self) -> &str {
+        "bit_manipulation"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Find the maximum XOR of any two numbers in the array.\n\
          Use a trie for O(n * 32) solution.\n\n\
@@ -596,7 +697,9 @@ impl Problem for BitsMaximumXor {
             .map(|_| {
                 let n = rng.random_range(2..=15);
                 let nums: Vec<i32> = (0..n).map(|_| rng.random_range(0..=10000)).collect();
-                TestCase { data: Box::new(MaxXorTest { nums }) }
+                TestCase {
+                    data: Box::new(MaxXorTest { nums }),
+                }
             })
             .collect()
     }
@@ -623,10 +726,18 @@ struct SingleNumIITest {
 }
 
 impl Problem for BitsSingleNumberII {
-    fn id(&self) -> &str { "bits_single_number_ii" }
-    fn name(&self) -> &str { "Single Number II (Others x3)" }
-    fn topic(&self) -> &str { "bit_manipulation" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "bits_single_number_ii"
+    }
+    fn name(&self) -> &str {
+        "Single Number II (Others x3)"
+    }
+    fn topic(&self) -> &str {
+        "bit_manipulation"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Every element appears three times except one. Find the element that appears once.\n\n\
          Input: Vec<i32>\n\
@@ -643,7 +754,9 @@ impl Problem for BitsSingleNumberII {
                 for _ in 0..triples {
                     let val = loop {
                         let v = rng.random_range(-100..=100);
-                        if v != single { break v; }
+                        if v != single {
+                            break v;
+                        }
                     };
                     nums.push(val);
                     nums.push(val);
@@ -654,7 +767,9 @@ impl Problem for BitsSingleNumberII {
                     let j = rng.random_range(0..=i);
                     nums.swap(i, j);
                 }
-                TestCase { data: Box::new(SingleNumIITest { nums }) }
+                TestCase {
+                    data: Box::new(SingleNumIITest { nums }),
+                }
             })
             .collect()
     }
@@ -681,10 +796,18 @@ struct SingleNumIIITest {
 }
 
 impl Problem for BitsSingleNumberIII {
-    fn id(&self) -> &str { "bits_single_number_iii" }
-    fn name(&self) -> &str { "Single Number III (Two Singles)" }
-    fn topic(&self) -> &str { "bit_manipulation" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "bits_single_number_iii"
+    }
+    fn name(&self) -> &str {
+        "Single Number III (Two Singles)"
+    }
+    fn topic(&self) -> &str {
+        "bit_manipulation"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Two elements appear once, all others appear twice.\n\
          Find the two unique elements and return them sorted.\n\n\
@@ -700,13 +823,17 @@ impl Problem for BitsSingleNumberIII {
                 let a = rng.random_range(-100..=100);
                 let b = loop {
                     let v = rng.random_range(-100..=100);
-                    if v != a { break v; }
+                    if v != a {
+                        break v;
+                    }
                 };
                 let mut nums: Vec<i32> = Vec::new();
                 for _ in 0..pairs {
                     let val = loop {
                         let v = rng.random_range(-100..=100);
-                        if v != a && v != b { break v; }
+                        if v != a && v != b {
+                            break v;
+                        }
                     };
                     nums.push(val);
                     nums.push(val);
@@ -717,7 +844,9 @@ impl Problem for BitsSingleNumberIII {
                     let j = rng.random_range(0..=i);
                     nums.swap(i, j);
                 }
-                TestCase { data: Box::new(SingleNumIIITest { nums }) }
+                TestCase {
+                    data: Box::new(SingleNumIIITest { nums }),
+                }
             })
             .collect()
     }
@@ -745,10 +874,18 @@ struct MaxAndTest {
 }
 
 impl Problem for BitsMaxAndPair {
-    fn id(&self) -> &str { "bits_max_and_pair" }
-    fn name(&self) -> &str { "Maximum AND of Any Pair" }
-    fn topic(&self) -> &str { "bit_manipulation" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "bits_max_and_pair"
+    }
+    fn name(&self) -> &str {
+        "Maximum AND of Any Pair"
+    }
+    fn topic(&self) -> &str {
+        "bit_manipulation"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Find the maximum bitwise AND of any pair of numbers in the array.\n\n\
          Input: Vec<i32>\n\
@@ -761,7 +898,9 @@ impl Problem for BitsMaxAndPair {
             .map(|_| {
                 let n = rng.random_range(2..=15);
                 let nums: Vec<i32> = (0..n).map(|_| rng.random_range(0..=100000)).collect();
-                TestCase { data: Box::new(MaxAndTest { nums }) }
+                TestCase {
+                    data: Box::new(MaxAndTest { nums }),
+                }
             })
             .collect()
     }
@@ -789,10 +928,18 @@ struct MinFlipsTest {
 }
 
 impl Problem for BitsMinFlips {
-    fn id(&self) -> &str { "bits_min_flips" }
-    fn name(&self) -> &str { "Minimum Bit Flips to Convert" }
-    fn topic(&self) -> &str { "bit_manipulation" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "bits_min_flips"
+    }
+    fn name(&self) -> &str {
+        "Minimum Bit Flips to Convert"
+    }
+    fn topic(&self) -> &str {
+        "bit_manipulation"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Find the minimum number of bit flips to convert integer a to integer b.\n\n\
          Input: (i32, i32)\n\
@@ -805,7 +952,9 @@ impl Problem for BitsMinFlips {
             .map(|_| {
                 let a = rng.random_range(0..=1_000_000);
                 let b = rng.random_range(0..=1_000_000);
-                TestCase { data: Box::new(MinFlipsTest { a, b }) }
+                TestCase {
+                    data: Box::new(MinFlipsTest { a, b }),
+                }
             })
             .collect()
     }
@@ -832,10 +981,18 @@ struct GrayCodeTest {
 }
 
 impl Problem for BitsGrayCode {
-    fn id(&self) -> &str { "bits_gray_code" }
-    fn name(&self) -> &str { "Gray Code Sequence" }
-    fn topic(&self) -> &str { "bit_manipulation" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "bits_gray_code"
+    }
+    fn name(&self) -> &str {
+        "Gray Code Sequence"
+    }
+    fn topic(&self) -> &str {
+        "bit_manipulation"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Generate the n-bit Gray code sequence. Each consecutive pair differs by one bit.\n\
          Start with 0.\n\n\
@@ -848,7 +1005,9 @@ impl Problem for BitsGrayCode {
         (0..10)
             .map(|_| {
                 let n = rng.random_range(1..=8);
-                TestCase { data: Box::new(GrayCodeTest { n }) }
+                TestCase {
+                    data: Box::new(GrayCodeTest { n }),
+                }
             })
             .collect()
     }
@@ -865,9 +1024,7 @@ impl Problem for BitsGrayCode {
             let mut s = std::collections::HashSet::new();
             actual.iter().all(|x| s.insert(*x)) && s.len() == total as usize
         };
-        let valid_gray = actual
-            .windows(2)
-            .all(|w| (w[0] ^ w[1]).count_ones() == 1);
+        let valid_gray = actual.windows(2).all(|w| (w[0] ^ w[1]).count_ones() == 1);
         let is_correct = valid_len && valid_start && valid_set && valid_gray;
         SolutionResult {
             is_correct,

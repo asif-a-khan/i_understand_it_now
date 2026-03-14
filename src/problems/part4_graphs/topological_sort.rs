@@ -64,10 +64,18 @@ struct TopoSortBasicTest {
 }
 
 impl Problem for TopoSortBasic {
-    fn id(&self) -> &str { "topo_sort_basic" }
-    fn name(&self) -> &str { "Topological Sort" }
-    fn topic(&self) -> &str { "topological_sort" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "topo_sort_basic"
+    }
+    fn name(&self) -> &str {
+        "Topological Sort"
+    }
+    fn topic(&self) -> &str {
+        "topological_sort"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given a DAG with `n` nodes (0..n-1) and a list of directed edges (u, v) meaning \
          u must come before v, return a valid topological ordering of all nodes.\n\n\
@@ -80,12 +88,16 @@ impl Problem for TopoSortBasic {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(2..=15);
-            let edge_count = rng.random_range(1..=(n * (n - 1) / 2).max(1));
-            let edges = gen_dag_edges(&mut rng, n, edge_count);
-            TestCase { data: Box::new(TopoSortBasicTest { n, edges }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(2..=15);
+                let edge_count = rng.random_range(1..=(n * (n - 1) / 2).max(1));
+                let edges = gen_dag_edges(&mut rng, n, edge_count);
+                TestCase {
+                    data: Box::new(TopoSortBasicTest { n, edges }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -132,10 +144,18 @@ struct CanFinishTest {
 }
 
 impl Problem for TopoSortCanFinish {
-    fn id(&self) -> &str { "topo_sort_can_finish" }
-    fn name(&self) -> &str { "Course Schedule (Can Finish)" }
-    fn topic(&self) -> &str { "topological_sort" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "topo_sort_can_finish"
+    }
+    fn name(&self) -> &str {
+        "Course Schedule (Can Finish)"
+    }
+    fn topic(&self) -> &str {
+        "topological_sort"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "There are `n` courses labeled 0 to n-1. Some courses have prerequisites given as \
          edges (a, b) meaning you must take course `a` before course `b`.\n\n\
@@ -147,23 +167,27 @@ impl Problem for TopoSortCanFinish {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(2..=12);
-            let edge_count = rng.random_range(1..=(n * 2).min(n * (n - 1) / 2).max(1));
-            let edges = if rng.random_range(0..3) == 0 {
-                // Possibly introduce a cycle
-                let mut e = gen_dag_edges(&mut rng, n, edge_count.saturating_sub(1));
-                if n >= 2 {
-                    let u = rng.random_range(1..n);
-                    let v = rng.random_range(0..u);
-                    e.push((u, v)); // back edge = cycle
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(2..=12);
+                let edge_count = rng.random_range(1..=(n * 2).min(n * (n - 1) / 2).max(1));
+                let edges = if rng.random_range(0..3) == 0 {
+                    // Possibly introduce a cycle
+                    let mut e = gen_dag_edges(&mut rng, n, edge_count.saturating_sub(1));
+                    if n >= 2 {
+                        let u = rng.random_range(1..n);
+                        let v = rng.random_range(0..u);
+                        e.push((u, v)); // back edge = cycle
+                    }
+                    e
+                } else {
+                    gen_dag_edges(&mut rng, n, edge_count)
+                };
+                TestCase {
+                    data: Box::new(CanFinishTest { n, edges }),
                 }
-                e
-            } else {
-                gen_dag_edges(&mut rng, n, edge_count)
-            };
-            TestCase { data: Box::new(CanFinishTest { n, edges }) }
-        }).collect()
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -187,8 +211,8 @@ fn ref_can_finish(n: usize, edges: &[(usize, usize)]) -> bool {
         indegree[v] += 1;
     }
     let mut queue = std::collections::VecDeque::new();
-    for i in 0..n {
-        if indegree[i] == 0 {
+    for (i, &deg) in indegree.iter().enumerate() {
+        if deg == 0 {
             queue.push_back(i);
         }
     }
@@ -215,10 +239,18 @@ struct FindOrderTest {
 }
 
 impl Problem for TopoSortFindOrder {
-    fn id(&self) -> &str { "topo_sort_find_order" }
-    fn name(&self) -> &str { "Course Schedule II (Find Order)" }
-    fn topic(&self) -> &str { "topological_sort" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "topo_sort_find_order"
+    }
+    fn name(&self) -> &str {
+        "Course Schedule II (Find Order)"
+    }
+    fn topic(&self) -> &str {
+        "topological_sort"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "There are `n` courses (0..n-1) with prerequisite edges (a, b) meaning course `a` \
          must be taken before course `b`. Return an ordering of courses to finish all of \
@@ -230,22 +262,26 @@ impl Problem for TopoSortFindOrder {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(2..=12);
-            let edge_count = rng.random_range(1..=(n * 2).min(n * (n - 1) / 2).max(1));
-            let edges = if rng.random_range(0..4) == 0 {
-                let mut e = gen_dag_edges(&mut rng, n, edge_count.saturating_sub(1));
-                if n >= 2 {
-                    let u = rng.random_range(1..n);
-                    let v = rng.random_range(0..u);
-                    e.push((u, v));
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(2..=12);
+                let edge_count = rng.random_range(1..=(n * 2).min(n * (n - 1) / 2).max(1));
+                let edges = if rng.random_range(0..4) == 0 {
+                    let mut e = gen_dag_edges(&mut rng, n, edge_count.saturating_sub(1));
+                    if n >= 2 {
+                        let u = rng.random_range(1..n);
+                        let v = rng.random_range(0..u);
+                        e.push((u, v));
+                    }
+                    e
+                } else {
+                    gen_dag_edges(&mut rng, n, edge_count)
+                };
+                TestCase {
+                    data: Box::new(FindOrderTest { n, edges }),
                 }
-                e
-            } else {
-                gen_dag_edges(&mut rng, n, edge_count)
-            };
-            TestCase { data: Box::new(FindOrderTest { n, edges }) }
-        }).collect()
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -260,7 +296,11 @@ impl Problem for TopoSortFindOrder {
         SolutionResult {
             is_correct,
             input_description: format!("n={}, edges={:?}", t.n, t.edges),
-            expected: if can { "any valid topological ordering".to_string() } else { "[] (cycle exists)".to_string() },
+            expected: if can {
+                "any valid topological ordering".to_string()
+            } else {
+                "[] (cycle exists)".to_string()
+            },
             actual: format!("{actual:?}"),
         }
     }
@@ -276,10 +316,18 @@ struct IsDagTest {
 }
 
 impl Problem for TopoSortIsDag {
-    fn id(&self) -> &str { "topo_sort_is_dag" }
-    fn name(&self) -> &str { "Check if Directed Graph is DAG" }
-    fn topic(&self) -> &str { "topological_sort" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "topo_sort_is_dag"
+    }
+    fn name(&self) -> &str {
+        "Check if Directed Graph is DAG"
+    }
+    fn topic(&self) -> &str {
+        "topological_sort"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given a directed graph with `n` nodes and edges (u, v), determine whether the \
          graph is a DAG (directed acyclic graph). Return true if there are no cycles.\n\n\
@@ -290,22 +338,26 @@ impl Problem for TopoSortIsDag {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(2..=12);
-            let edge_count = rng.random_range(1..=(n * 2).min(n * (n - 1) / 2).max(1));
-            let edges = if rng.random_range(0..2) == 0 {
-                let mut e = gen_dag_edges(&mut rng, n, edge_count.saturating_sub(1));
-                if n >= 2 {
-                    let u = rng.random_range(1..n);
-                    let v = rng.random_range(0..u);
-                    e.push((u, v));
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(2..=12);
+                let edge_count = rng.random_range(1..=(n * 2).min(n * (n - 1) / 2).max(1));
+                let edges = if rng.random_range(0..2) == 0 {
+                    let mut e = gen_dag_edges(&mut rng, n, edge_count.saturating_sub(1));
+                    if n >= 2 {
+                        let u = rng.random_range(1..n);
+                        let v = rng.random_range(0..u);
+                        e.push((u, v));
+                    }
+                    e
+                } else {
+                    gen_dag_edges(&mut rng, n, edge_count)
+                };
+                TestCase {
+                    data: Box::new(IsDagTest { n, edges }),
                 }
-                e
-            } else {
-                gen_dag_edges(&mut rng, n, edge_count)
-            };
-            TestCase { data: Box::new(IsDagTest { n, edges }) }
-        }).collect()
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -331,10 +383,18 @@ struct KahnBfsTest {
 }
 
 impl Problem for TopoSortKahnBfs {
-    fn id(&self) -> &str { "topo_sort_kahn_bfs" }
-    fn name(&self) -> &str { "Topological Sort (Kahn's BFS)" }
-    fn topic(&self) -> &str { "topological_sort" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "topo_sort_kahn_bfs"
+    }
+    fn name(&self) -> &str {
+        "Topological Sort (Kahn's BFS)"
+    }
+    fn topic(&self) -> &str {
+        "topological_sort"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Implement topological sort using Kahn's algorithm (BFS with in-degree counting). \
          Given a DAG with `n` nodes and edges (u, v), return a valid topological ordering.\n\n\
@@ -345,12 +405,16 @@ impl Problem for TopoSortKahnBfs {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(2..=15);
-            let edge_count = rng.random_range(1..=(n * (n - 1) / 2).max(1));
-            let edges = gen_dag_edges(&mut rng, n, edge_count);
-            TestCase { data: Box::new(KahnBfsTest { n, edges }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(2..=15);
+                let edge_count = rng.random_range(1..=(n * (n - 1) / 2).max(1));
+                let edges = gen_dag_edges(&mut rng, n, edge_count);
+                TestCase {
+                    data: Box::new(KahnBfsTest { n, edges }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -376,10 +440,18 @@ struct ParallelCoursesTest {
 }
 
 impl Problem for TopoSortParallelCourses {
-    fn id(&self) -> &str { "topo_sort_parallel_courses" }
-    fn name(&self) -> &str { "Parallel Courses" }
-    fn topic(&self) -> &str { "topological_sort" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "topo_sort_parallel_courses"
+    }
+    fn name(&self) -> &str {
+        "Parallel Courses"
+    }
+    fn topic(&self) -> &str {
+        "topological_sort"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "You are given `n` courses and prerequisite edges (a, b) meaning course `a` must \
          be completed before course `b`. In each semester you can take any number of courses \
@@ -393,22 +465,26 @@ impl Problem for TopoSortParallelCourses {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(2..=12);
-            let edge_count = rng.random_range(1..=(n * 2).min(n * (n - 1) / 2).max(1));
-            let edges = if rng.random_range(0..4) == 0 {
-                let mut e = gen_dag_edges(&mut rng, n, edge_count.saturating_sub(1));
-                if n >= 2 {
-                    let u = rng.random_range(1..n);
-                    let v = rng.random_range(0..u);
-                    e.push((u, v));
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(2..=12);
+                let edge_count = rng.random_range(1..=(n * 2).min(n * (n - 1) / 2).max(1));
+                let edges = if rng.random_range(0..4) == 0 {
+                    let mut e = gen_dag_edges(&mut rng, n, edge_count.saturating_sub(1));
+                    if n >= 2 {
+                        let u = rng.random_range(1..n);
+                        let v = rng.random_range(0..u);
+                        e.push((u, v));
+                    }
+                    e
+                } else {
+                    gen_dag_edges(&mut rng, n, edge_count)
+                };
+                TestCase {
+                    data: Box::new(ParallelCoursesTest { n, edges }),
                 }
-                e
-            } else {
-                gen_dag_edges(&mut rng, n, edge_count)
-            };
-            TestCase { data: Box::new(ParallelCoursesTest { n, edges }) }
-        }).collect()
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -433,8 +509,8 @@ fn ref_parallel_courses(n: usize, edges: &[(usize, usize)]) -> i32 {
         indegree[v] += 1;
     }
     let mut queue = VecDeque::new();
-    for i in 0..n {
-        if indegree[i] == 0 {
+    for (i, &deg) in indegree.iter().enumerate() {
+        if deg == 0 {
             queue.push_back(i);
         }
     }
@@ -454,7 +530,11 @@ fn ref_parallel_courses(n: usize, edges: &[(usize, usize)]) -> i32 {
             }
         }
     }
-    if processed == n { semesters } else { -1 }
+    if processed == n {
+        semesters
+    } else {
+        -1
+    }
 }
 
 // ── Medium 7: All Ancestors ────────────────────────────────────────────
@@ -467,10 +547,18 @@ struct AllAncestorsTest {
 }
 
 impl Problem for TopoSortAllAncestors {
-    fn id(&self) -> &str { "topo_sort_all_ancestors" }
-    fn name(&self) -> &str { "All Ancestors in DAG" }
-    fn topic(&self) -> &str { "topological_sort" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "topo_sort_all_ancestors"
+    }
+    fn name(&self) -> &str {
+        "All Ancestors in DAG"
+    }
+    fn topic(&self) -> &str {
+        "topological_sort"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given a DAG with `n` nodes and directed edges (u, v), for each node find all its \
          ancestors (nodes that can reach it). Return a vector of vectors where result[i] \
@@ -483,12 +571,16 @@ impl Problem for TopoSortAllAncestors {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(2..=10);
-            let edge_count = rng.random_range(1..=(n * (n - 1) / 2).max(1));
-            let edges = gen_dag_edges(&mut rng, n, edge_count);
-            TestCase { data: Box::new(AllAncestorsTest { n, edges }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(2..=10);
+                let edge_count = rng.random_range(1..=(n * (n - 1) / 2).max(1));
+                let edges = gen_dag_edges(&mut rng, n, edge_count);
+                TestCase {
+                    data: Box::new(AllAncestorsTest { n, edges }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -518,8 +610,8 @@ fn ref_all_ancestors(n: usize, edges: &[(usize, usize)]) -> Vec<Vec<usize>> {
         indegree[v] += 1;
     }
     let mut queue = std::collections::VecDeque::new();
-    for i in 0..n {
-        if indegree[i] == 0 {
+    for (i, &deg) in indegree.iter().enumerate() {
+        if deg == 0 {
             queue.push_back(i);
         }
     }
@@ -536,7 +628,10 @@ fn ref_all_ancestors(n: usize, edges: &[(usize, usize)]) -> Vec<Vec<usize>> {
             }
         }
     }
-    ancestors.into_iter().map(|s| s.into_iter().collect()).collect()
+    ancestors
+        .into_iter()
+        .map(|s| s.into_iter().collect())
+        .collect()
 }
 
 // ── Medium 8: Longest Path in DAG ──────────────────────────────────────
@@ -549,10 +644,18 @@ struct LongestPathDagTest {
 }
 
 impl Problem for TopoSortLongestPathDag {
-    fn id(&self) -> &str { "topo_sort_longest_path_dag" }
-    fn name(&self) -> &str { "Longest Path in DAG" }
-    fn topic(&self) -> &str { "topological_sort" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "topo_sort_longest_path_dag"
+    }
+    fn name(&self) -> &str {
+        "Longest Path in DAG"
+    }
+    fn topic(&self) -> &str {
+        "topological_sort"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given a weighted DAG with `n` nodes and edges (u, v, weight), find the length of \
          the longest path (by total weight) in the DAG. The path can start and end at any \
@@ -565,15 +668,20 @@ impl Problem for TopoSortLongestPathDag {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(2..=12);
-            let edge_count = rng.random_range(1..=(n * (n - 1) / 2).max(1));
-            let dag_edges = gen_dag_edges(&mut rng, n, edge_count);
-            let edges: Vec<(usize, usize, i32)> = dag_edges.into_iter()
-                .map(|(u, v)| (u, v, rng.random_range(1..=20)))
-                .collect();
-            TestCase { data: Box::new(LongestPathDagTest { n, edges }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(2..=12);
+                let edge_count = rng.random_range(1..=(n * (n - 1) / 2).max(1));
+                let dag_edges = gen_dag_edges(&mut rng, n, edge_count);
+                let edges: Vec<(usize, usize, i32)> = dag_edges
+                    .into_iter()
+                    .map(|(u, v)| (u, v, rng.random_range(1..=20)))
+                    .collect();
+                TestCase {
+                    data: Box::new(LongestPathDagTest { n, edges }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -599,8 +707,8 @@ fn ref_longest_path_dag(n: usize, edges: &[(usize, usize, i32)]) -> i32 {
 
     let mut queue = std::collections::VecDeque::new();
     let mut dist = vec![0i32; n];
-    for i in 0..n {
-        if indegree[i] == 0 {
+    for (i, &deg) in indegree.iter().enumerate() {
+        if deg == 0 {
             queue.push_back(i);
         }
     }
@@ -626,10 +734,18 @@ struct SequenceReconstructionTest {
 }
 
 impl Problem for TopoSortSequenceReconstruction {
-    fn id(&self) -> &str { "topo_sort_sequence_reconstruction" }
-    fn name(&self) -> &str { "Sequence Reconstruction" }
-    fn topic(&self) -> &str { "topological_sort" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "topo_sort_sequence_reconstruction"
+    }
+    fn name(&self) -> &str {
+        "Sequence Reconstruction"
+    }
+    fn topic(&self) -> &str {
+        "topological_sort"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Check whether the original sequence `org` can be uniquely reconstructed from the \
          subsequences in `seqs`. The original sequence is a permutation of integers 1..n.\n\n\
@@ -642,35 +758,44 @@ impl Problem for TopoSortSequenceReconstruction {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(2..=8);
-            let mut org: Vec<usize> = (1..=n).collect();
-            // Shuffle org
-            for i in (1..n).rev() {
-                let j = rng.random_range(0..=i);
-                org.swap(i, j);
-            }
-            // Generate subsequences from org
-            let num_seqs = rng.random_range(1..=(n * 2));
-            let seqs: Vec<Vec<usize>> = (0..num_seqs).map(|_| {
-                let len = rng.random_range(2..=n.min(4));
-                let mut indices: Vec<usize> = (0..n).collect();
-                // Pick random indices and keep them sorted
-                let mut picked: Vec<usize> = Vec::new();
-                for _ in 0..len.min(indices.len()) {
-                    let idx = rng.random_range(0..indices.len());
-                    picked.push(indices[idx]);
-                    indices.swap_remove(idx);
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(2..=8);
+                let mut org: Vec<usize> = (1..=n).collect();
+                // Shuffle org
+                for i in (1..n).rev() {
+                    let j = rng.random_range(0..=i);
+                    org.swap(i, j);
                 }
-                picked.sort();
-                picked.iter().map(|&i| org[i]).collect()
-            }).collect();
-            TestCase { data: Box::new(SequenceReconstructionTest { org, seqs }) }
-        }).collect()
+                // Generate subsequences from org
+                let num_seqs = rng.random_range(1..=(n * 2));
+                let seqs: Vec<Vec<usize>> = (0..num_seqs)
+                    .map(|_| {
+                        let len = rng.random_range(2..=n.min(4));
+                        let mut indices: Vec<usize> = (0..n).collect();
+                        // Pick random indices and keep them sorted
+                        let mut picked: Vec<usize> = Vec::new();
+                        for _ in 0..len.min(indices.len()) {
+                            let idx = rng.random_range(0..indices.len());
+                            picked.push(indices[idx]);
+                            indices.swap_remove(idx);
+                        }
+                        picked.sort();
+                        picked.iter().map(|&i| org[i]).collect()
+                    })
+                    .collect();
+                TestCase {
+                    data: Box::new(SequenceReconstructionTest { org, seqs }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
-        let t = test.data.downcast_ref::<SequenceReconstructionTest>().unwrap();
+        let t = test
+            .data
+            .downcast_ref::<SequenceReconstructionTest>()
+            .unwrap();
         let expected = ref_sequence_reconstruction(&t.org, &t.seqs);
         let actual = solutions::sequence_reconstruction(&t.org, &t.seqs);
         SolutionResult {
@@ -748,10 +873,18 @@ struct BuildOrderTest {
 }
 
 impl Problem for TopoSortBuildOrder {
-    fn id(&self) -> &str { "topo_sort_build_order" }
-    fn name(&self) -> &str { "Build Order" }
-    fn topic(&self) -> &str { "topological_sort" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "topo_sort_build_order"
+    }
+    fn name(&self) -> &str {
+        "Build Order"
+    }
+    fn topic(&self) -> &str {
+        "topological_sort"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Given a list of project names and a list of dependency pairs (a, b) meaning \
          project `a` must be built before project `b`, find a valid build order.\n\n\
@@ -763,16 +896,21 @@ impl Problem for TopoSortBuildOrder {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(2..=8);
-            let projects: Vec<String> = (0..n).map(|i| format!("p{i}")).collect();
-            let edge_count = rng.random_range(1..=(n * (n - 1) / 2).max(1));
-            let dag_edges = gen_dag_edges(&mut rng, n, edge_count);
-            let deps: Vec<(String, String)> = dag_edges.into_iter()
-                .map(|(u, v)| (projects[u].clone(), projects[v].clone()))
-                .collect();
-            TestCase { data: Box::new(BuildOrderTest { projects, deps }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(2..=8);
+                let projects: Vec<String> = (0..n).map(|i| format!("p{i}")).collect();
+                let edge_count = rng.random_range(1..=(n * (n - 1) / 2).max(1));
+                let dag_edges = gen_dag_edges(&mut rng, n, edge_count);
+                let deps: Vec<(String, String)> = dag_edges
+                    .into_iter()
+                    .map(|(u, v)| (projects[u].clone(), projects[v].clone()))
+                    .collect();
+                TestCase {
+                    data: Box::new(BuildOrderTest { projects, deps }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -789,7 +927,9 @@ impl Problem for TopoSortBuildOrder {
 }
 
 fn ref_validate_build_order(
-    projects: &[String], deps: &[(String, String)], order: &[String],
+    projects: &[String],
+    deps: &[(String, String)],
+    order: &[String],
 ) -> bool {
     use std::collections::HashMap;
     if order.len() != projects.len() {
@@ -823,10 +963,18 @@ struct AlienDictionaryTest {
 }
 
 impl Problem for TopoSortAlienDictionary {
-    fn id(&self) -> &str { "topo_sort_alien_dictionary" }
-    fn name(&self) -> &str { "Alien Dictionary" }
-    fn topic(&self) -> &str { "topological_sort" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "topo_sort_alien_dictionary"
+    }
+    fn name(&self) -> &str {
+        "Alien Dictionary"
+    }
+    fn topic(&self) -> &str {
+        "topological_sort"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given a sorted list of words in an alien language, derive the order of characters \
          in their alphabet. The words are sorted lexicographically by the alien language's \
@@ -841,38 +989,46 @@ impl Problem for TopoSortAlienDictionary {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let alpha_size = rng.random_range(3..=6);
-            let mut alpha: Vec<u8> = (b'a'..b'a' + alpha_size).collect();
-            // Shuffle to create alien ordering
-            for i in (1..alpha.len()).rev() {
-                let j = rng.random_range(0..=i);
-                alpha.swap(i, j);
-            }
-            // Generate words sorted by this alien ordering
-            let n_words = rng.random_range(2..=8);
-            let mut words: Vec<String> = (0..n_words).map(|_| {
-                let len = rng.random_range(1..=4);
-                (0..len).map(|_| alpha[rng.random_range(0..alpha_size as usize)] as char).collect()
-            }).collect();
-            // Sort by alien ordering
-            let mut order_map = std::collections::HashMap::new();
-            for (i, &ch) in alpha.iter().enumerate() {
-                order_map.insert(ch, i);
-            }
-            words.sort_by(|a, b| {
-                for (ca, cb) in a.bytes().zip(b.bytes()) {
-                    let oa = order_map[&ca];
-                    let ob = order_map[&cb];
-                    if oa != ob {
-                        return oa.cmp(&ob);
-                    }
+        (0..10)
+            .map(|_| {
+                let alpha_size = rng.random_range(3..=6);
+                let mut alpha: Vec<u8> = (b'a'..b'a' + alpha_size).collect();
+                // Shuffle to create alien ordering
+                for i in (1..alpha.len()).rev() {
+                    let j = rng.random_range(0..=i);
+                    alpha.swap(i, j);
                 }
-                a.len().cmp(&b.len())
-            });
-            words.dedup();
-            TestCase { data: Box::new(AlienDictionaryTest { words }) }
-        }).collect()
+                // Generate words sorted by this alien ordering
+                let n_words = rng.random_range(2..=8);
+                let mut words: Vec<String> = (0..n_words)
+                    .map(|_| {
+                        let len = rng.random_range(1..=4);
+                        (0..len)
+                            .map(|_| alpha[rng.random_range(0..alpha_size as usize)] as char)
+                            .collect()
+                    })
+                    .collect();
+                // Sort by alien ordering
+                let mut order_map = std::collections::HashMap::new();
+                for (i, &ch) in alpha.iter().enumerate() {
+                    order_map.insert(ch, i);
+                }
+                words.sort_by(|a, b| {
+                    for (ca, cb) in a.bytes().zip(b.bytes()) {
+                        let oa = order_map[&ca];
+                        let ob = order_map[&cb];
+                        if oa != ob {
+                            return oa.cmp(&ob);
+                        }
+                    }
+                    a.len().cmp(&b.len())
+                });
+                words.dedup();
+                TestCase {
+                    data: Box::new(AlienDictionaryTest { words }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -888,7 +1044,11 @@ impl Problem for TopoSortAlienDictionary {
         SolutionResult {
             is_correct: valid,
             input_description: format!("words={:?}", t.words),
-            expected: if expected.is_empty() { "\"\" (invalid)".to_string() } else { format!("{expected:?} (or any valid ordering)") },
+            expected: if expected.is_empty() {
+                "\"\" (invalid)".to_string()
+            } else {
+                format!("{expected:?} (or any valid ordering)")
+            },
             actual: format!("{actual:?}"),
         }
     }
@@ -998,10 +1158,18 @@ struct MinimumHeightTreesTest {
 }
 
 impl Problem for TopoSortMinimumHeightTrees {
-    fn id(&self) -> &str { "topo_sort_minimum_height_trees" }
-    fn name(&self) -> &str { "Minimum Height Trees" }
-    fn topic(&self) -> &str { "topological_sort" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "topo_sort_minimum_height_trees"
+    }
+    fn name(&self) -> &str {
+        "Minimum Height Trees"
+    }
+    fn topic(&self) -> &str {
+        "topological_sort"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given an undirected tree of `n` nodes labeled 0..n-1 and a list of edges, find \
          all root labels that minimize the height of the tree. Return them in any order.\n\n\
@@ -1015,11 +1183,19 @@ impl Problem for TopoSortMinimumHeightTrees {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=15);
-            let edges = if n > 1 { gen_tree_edges(&mut rng, n) } else { vec![] };
-            TestCase { data: Box::new(MinimumHeightTreesTest { n, edges }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=15);
+                let edges = if n > 1 {
+                    gen_tree_edges(&mut rng, n)
+                } else {
+                    vec![]
+                };
+                TestCase {
+                    data: Box::new(MinimumHeightTreesTest { n, edges }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -1049,8 +1225,8 @@ fn ref_minimum_height_trees(n: usize, edges: &[(usize, usize)]) -> Vec<usize> {
     }
 
     let mut leaves = VecDeque::new();
-    for i in 0..n {
-        if adj[i].len() == 1 {
+    for (i, neighbors) in adj.iter().enumerate() {
+        if neighbors.len() == 1 {
             leaves.push_back(i);
         }
     }
@@ -1081,10 +1257,18 @@ struct LongestIncreasingPathTopoTest {
 }
 
 impl Problem for TopoSortLongestIncreasingPath {
-    fn id(&self) -> &str { "topo_sort_longest_increasing_path" }
-    fn name(&self) -> &str { "Longest Increasing Path (Topo Sort)" }
-    fn topic(&self) -> &str { "topological_sort" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "topo_sort_longest_increasing_path"
+    }
+    fn name(&self) -> &str {
+        "Longest Increasing Path (Topo Sort)"
+    }
+    fn topic(&self) -> &str {
+        "topological_sort"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given an m x n matrix, find the length of the longest increasing path. From each \
          cell, you can move in four directions. Each cell in the path must be strictly \
@@ -1098,18 +1282,25 @@ impl Problem for TopoSortLongestIncreasingPath {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let rows = rng.random_range(2..=8);
-            let cols = rng.random_range(2..=8);
-            let matrix: Vec<Vec<i32>> = (0..rows)
-                .map(|_| (0..cols).map(|_| rng.random_range(0..=20)).collect())
-                .collect();
-            TestCase { data: Box::new(LongestIncreasingPathTopoTest { matrix }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let rows = rng.random_range(2..=8);
+                let cols = rng.random_range(2..=8);
+                let matrix: Vec<Vec<i32>> = (0..rows)
+                    .map(|_| (0..cols).map(|_| rng.random_range(0..=20)).collect())
+                    .collect();
+                TestCase {
+                    data: Box::new(LongestIncreasingPathTopoTest { matrix }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
-        let t = test.data.downcast_ref::<LongestIncreasingPathTopoTest>().unwrap();
+        let t = test
+            .data
+            .downcast_ref::<LongestIncreasingPathTopoTest>()
+            .unwrap();
         let expected = ref_longest_increasing_path_topo(&t.matrix);
         let actual = solutions::longest_increasing_path_topo(&t.matrix);
         SolutionResult {
@@ -1124,7 +1315,7 @@ impl Problem for TopoSortLongestIncreasingPath {
 fn ref_longest_increasing_path_topo(matrix: &[Vec<i32>]) -> i32 {
     let rows = matrix.len();
     let cols = matrix[0].len();
-    let dirs: [(i32, i32); 4] = [(-1,0),(1,0),(0,-1),(0,1)];
+    let dirs: [(i32, i32); 4] = [(-1, 0), (1, 0), (0, -1), (0, 1)];
 
     // Build indegree: for each cell, count how many smaller neighbors point to it
     let mut indegree = vec![vec![0usize; cols]; rows];
@@ -1145,9 +1336,9 @@ fn ref_longest_increasing_path_topo(matrix: &[Vec<i32>]) -> i32 {
     }
 
     let mut queue = std::collections::VecDeque::new();
-    for r in 0..rows {
-        for c in 0..cols {
-            if indegree[r][c] == 0 {
+    for (r, indegree_row) in indegree.iter().enumerate().take(rows) {
+        for (c, &deg) in indegree_row.iter().enumerate().take(cols) {
+            if deg == 0 {
                 queue.push_back((r, c));
             }
         }
@@ -1188,10 +1379,18 @@ struct CriticalConnectionsTest {
 }
 
 impl Problem for TopoSortCriticalConnections {
-    fn id(&self) -> &str { "topo_sort_critical_connections" }
-    fn name(&self) -> &str { "Critical Connections in a Network" }
-    fn topic(&self) -> &str { "topological_sort" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "topo_sort_critical_connections"
+    }
+    fn name(&self) -> &str {
+        "Critical Connections in a Network"
+    }
+    fn topic(&self) -> &str {
+        "topological_sort"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Given an undirected connected graph with `n` nodes and edges, find all critical \
          connections (bridges). A bridge is an edge whose removal disconnects the graph.\n\n\
@@ -1205,25 +1404,29 @@ impl Problem for TopoSortCriticalConnections {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(3..=12);
-            // Start with a tree (guaranteed connected, all edges are bridges)
-            let mut edges: Vec<(usize, usize)> = Vec::new();
-            for i in 1..n {
-                let parent = rng.random_range(0..i);
-                edges.push((parent, i));
-            }
-            // Add some extra edges (these create cycles and remove some bridges)
-            let extras = rng.random_range(0..=n / 2);
-            for _ in 0..extras {
-                let u = rng.random_range(0..n);
-                let v = rng.random_range(0..n);
-                if u != v {
-                    edges.push((u, v));
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(3..=12);
+                // Start with a tree (guaranteed connected, all edges are bridges)
+                let mut edges: Vec<(usize, usize)> = Vec::new();
+                for i in 1..n {
+                    let parent = rng.random_range(0..i);
+                    edges.push((parent, i));
                 }
-            }
-            TestCase { data: Box::new(CriticalConnectionsTest { n, edges }) }
-        }).collect()
+                // Add some extra edges (these create cycles and remove some bridges)
+                let extras = rng.random_range(0..=n / 2);
+                for _ in 0..extras {
+                    let u = rng.random_range(0..n);
+                    let v = rng.random_range(0..n);
+                    if u != v {
+                        edges.push((u, v));
+                    }
+                }
+                TestCase {
+                    data: Box::new(CriticalConnectionsTest { n, edges }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -1259,8 +1462,12 @@ fn ref_critical_connections(n: usize, edges: &[(usize, usize)]) -> Vec<(usize, u
     let mut timer = 0i32;
 
     fn dfs(
-        node: usize, parent: i32, adj: &[Vec<usize>],
-        disc: &mut [i32], low: &mut [i32], timer: &mut i32,
+        node: usize,
+        parent: i32,
+        adj: &[Vec<usize>],
+        disc: &mut [i32],
+        low: &mut [i32],
+        timer: &mut i32,
         bridges: &mut Vec<(usize, usize)>,
     ) {
         disc[node] = *timer;
@@ -1302,10 +1509,18 @@ struct SortItemsByGroupsTest {
 }
 
 impl Problem for TopoSortSortItemsByGroups {
-    fn id(&self) -> &str { "topo_sort_sort_items_by_groups" }
-    fn name(&self) -> &str { "Sort Items by Groups" }
-    fn topic(&self) -> &str { "topological_sort" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "topo_sort_sort_items_by_groups"
+    }
+    fn name(&self) -> &str {
+        "Sort Items by Groups"
+    }
+    fn topic(&self) -> &str {
+        "topological_sort"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "There are `n` items, each belonging to one of `m` groups (or no group, denoted -1). \
          Items in the same group must appear adjacent in the final ordering. Given a list \
@@ -1319,36 +1534,45 @@ impl Problem for TopoSortSortItemsByGroups {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(2..=10);
-            let m = rng.random_range(1..=n.max(2));
-            let group: Vec<i32> = (0..n)
-                .map(|_| {
-                    if rng.random_range(0..3) == 0 {
-                        -1
-                    } else {
-                        rng.random_range(0..m as i32)
-                    }
-                })
-                .collect();
-            // Generate some ordering constraints
-            let before_items: Vec<Vec<i32>> = (0..n)
-                .map(|i| {
-                    let count = rng.random_range(0..=(n / 3).max(1));
-                    let mut before = Vec::new();
-                    for _ in 0..count {
-                        let j = rng.random_range(0..n);
-                        if j != i && j < i {
-                            before.push(j as i32);
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(2..=10);
+                let m = rng.random_range(1..=n.max(2));
+                let group: Vec<i32> = (0..n)
+                    .map(|_| {
+                        if rng.random_range(0..3) == 0 {
+                            -1
+                        } else {
+                            rng.random_range(0..m as i32)
                         }
-                    }
-                    before.sort();
-                    before.dedup();
-                    before
-                })
-                .collect();
-            TestCase { data: Box::new(SortItemsByGroupsTest { n, m, group, before_items }) }
-        }).collect()
+                    })
+                    .collect();
+                // Generate some ordering constraints
+                let before_items: Vec<Vec<i32>> = (0..n)
+                    .map(|i| {
+                        let count = rng.random_range(0..=(n / 3).max(1));
+                        let mut before = Vec::new();
+                        for _ in 0..count {
+                            let j = rng.random_range(0..n);
+                            if j != i && j < i {
+                                before.push(j as i32);
+                            }
+                        }
+                        before.sort();
+                        before.dedup();
+                        before
+                    })
+                    .collect();
+                TestCase {
+                    data: Box::new(SortItemsByGroupsTest {
+                        n,
+                        m,
+                        group,
+                        before_items,
+                    }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -1363,7 +1587,8 @@ impl Problem for TopoSortSortItemsByGroups {
         SolutionResult {
             is_correct: valid,
             input_description: format!(
-                "n={}, m={}, group={:?}, before_items={:?}", t.n, t.m, t.group, t.before_items
+                "n={}, m={}, group={:?}, before_items={:?}",
+                t.n, t.m, t.group, t.before_items
             ),
             expected: if expected.is_empty() {
                 "[] (impossible)".to_string()
@@ -1376,7 +1601,10 @@ impl Problem for TopoSortSortItemsByGroups {
 }
 
 fn ref_sort_items_by_groups(
-    n: usize, m: usize, group: &[i32], before_items: &[Vec<i32>],
+    n: usize,
+    m: usize,
+    group: &[i32],
+    before_items: &[Vec<i32>],
 ) -> Vec<i32> {
     use std::collections::VecDeque;
     // Assign each ungrouped item its own unique group
@@ -1416,8 +1644,8 @@ fn ref_sort_items_by_groups(
     // Topo sort groups
     let group_order = {
         let mut queue = VecDeque::new();
-        for g in 0..total_groups {
-            if group_indegree[g] == 0 {
+        for (g, &deg) in group_indegree.iter().enumerate().take(total_groups) {
+            if deg == 0 {
                 queue.push_back(g);
             }
         }
@@ -1491,7 +1719,11 @@ fn ref_sort_items_by_groups(
 use std::collections::HashMap;
 
 fn ref_validate_sort_items(
-    n: usize, _m: usize, group: &[i32], before_items: &[Vec<i32>], order: &[i32],
+    n: usize,
+    _m: usize,
+    group: &[i32],
+    before_items: &[Vec<i32>],
+    order: &[i32],
 ) -> bool {
     if order.len() != n {
         return false;
@@ -1526,8 +1758,8 @@ fn ref_validate_sort_items(
         entry.1 = entry.1.max(idx);
     }
     for (&g, &(lo, hi)) in &group_ranges {
-        for idx in lo..=hi {
-            let item = order[idx] as usize;
+        for &item in order.iter().take(hi + 1).skip(lo) {
+            let item = item as usize;
             if group[item] != g && group[item] != -1 {
                 return false;
             }

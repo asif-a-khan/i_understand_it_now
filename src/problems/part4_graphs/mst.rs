@@ -1,6 +1,6 @@
 use rand::Rng;
-use std::collections::BinaryHeap;
 use std::cmp::Reverse;
+use std::collections::BinaryHeap;
 
 use crate::problems::{Difficulty, Problem, SolutionResult, TestCase};
 use crate::solutions::part4_graphs::mst as solutions;
@@ -112,7 +112,11 @@ fn ref_prim(n: usize, edges: &[(usize, usize, i32)]) -> i32 {
             }
         }
     }
-    if count < n { -1 } else { total }
+    if count < n {
+        -1
+    } else {
+        total
+    }
 }
 
 // ── Helper: generate random weighted edges for a connected graph ─────
@@ -142,11 +146,7 @@ fn random_connected_weighted_edges(
     edges
 }
 
-fn random_unweighted_edges(
-    rng: &mut impl Rng,
-    n: usize,
-    count: usize,
-) -> Vec<(usize, usize)> {
+fn random_unweighted_edges(rng: &mut impl Rng, n: usize, count: usize) -> Vec<(usize, usize)> {
     let mut edges = Vec::new();
     for _ in 0..count {
         let u = rng.random_range(0..n);
@@ -168,10 +168,18 @@ struct MstMinCostConnectTest {
 }
 
 impl Problem for MstMinCostConnect {
-    fn id(&self) -> &str { "mst_min_cost_connect" }
-    fn name(&self) -> &str { "Min Cost to Connect All Points" }
-    fn topic(&self) -> &str { "mst" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "mst_min_cost_connect"
+    }
+    fn name(&self) -> &str {
+        "Min Cost to Connect All Points"
+    }
+    fn topic(&self) -> &str {
+        "mst"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Given a list of 2D points, find the minimum cost to connect all points.\n\n\
          The cost of connecting two points (x1,y1) and (x2,y2) is |x1-x2| + |y1-y2| \
@@ -184,13 +192,17 @@ impl Problem for MstMinCostConnect {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(1..=30);
-            let points: Vec<(i32, i32)> = (0..n)
-                .map(|_| (rng.random_range(-100..=100), rng.random_range(-100..=100)))
-                .collect();
-            TestCase { data: Box::new(MstMinCostConnectTest { points }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(1..=30);
+                let points: Vec<(i32, i32)> = (0..n)
+                    .map(|_| (rng.random_range(-100..=100), rng.random_range(-100..=100)))
+                    .collect();
+                TestCase {
+                    data: Box::new(MstMinCostConnectTest { points }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -232,10 +244,18 @@ struct MstIsTreeTest {
 }
 
 impl Problem for MstIsTree {
-    fn id(&self) -> &str { "mst_is_tree" }
-    fn name(&self) -> &str { "Check if Graph is a Tree" }
-    fn topic(&self) -> &str { "mst" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "mst_is_tree"
+    }
+    fn name(&self) -> &str {
+        "Check if Graph is a Tree"
+    }
+    fn topic(&self) -> &str {
+        "mst"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Check if an undirected graph is a tree.\n\n\
          A graph is a tree if it is connected, has no cycles, and has exactly n-1 edges.\n\n\
@@ -248,23 +268,27 @@ impl Problem for MstIsTree {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|i| {
-            let n = rng.random_range(2..=20);
-            let edges = if i < 5 {
-                // Generate a tree (connected, n-1 edges)
-                let mut e = Vec::new();
-                for node in 1..n {
-                    let parent = rng.random_range(0..node);
-                    e.push((parent, node));
+        (0..10)
+            .map(|i| {
+                let n = rng.random_range(2..=20);
+                let edges = if i < 5 {
+                    // Generate a tree (connected, n-1 edges)
+                    let mut e = Vec::new();
+                    for node in 1..n {
+                        let parent = rng.random_range(0..node);
+                        e.push((parent, node));
+                    }
+                    e
+                } else {
+                    // Generate random edges (may or may not be a tree)
+                    let count = rng.random_range(0..=(n * 2));
+                    random_unweighted_edges(&mut rng, n, count)
+                };
+                TestCase {
+                    data: Box::new(MstIsTreeTest { n, edges }),
                 }
-                e
-            } else {
-                // Generate random edges (may or may not be a tree)
-                let count = rng.random_range(0..=(n * 2));
-                random_unweighted_edges(&mut rng, n, count)
-            };
-            TestCase { data: Box::new(MstIsTreeTest { n, edges }) }
-        }).collect()
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -303,10 +327,18 @@ struct MstConnectedComponentsTest {
 }
 
 impl Problem for MstConnectedComponents {
-    fn id(&self) -> &str { "mst_connected_components" }
-    fn name(&self) -> &str { "Count Connected Components" }
-    fn topic(&self) -> &str { "mst" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "mst_connected_components"
+    }
+    fn name(&self) -> &str {
+        "Count Connected Components"
+    }
+    fn topic(&self) -> &str {
+        "mst"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Count the number of connected components in an undirected graph.\n\n\
          Input: (n, edges) where n is the number of nodes (0-indexed).\n\n\
@@ -317,16 +349,23 @@ impl Problem for MstConnectedComponents {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(2..=30);
-            let edge_count = rng.random_range(0..=(n * 2));
-            let edges = random_unweighted_edges(&mut rng, n, edge_count);
-            TestCase { data: Box::new(MstConnectedComponentsTest { n, edges }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(2..=30);
+                let edge_count = rng.random_range(0..=(n * 2));
+                let edges = random_unweighted_edges(&mut rng, n, edge_count);
+                TestCase {
+                    data: Box::new(MstConnectedComponentsTest { n, edges }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
-        let t = test.data.downcast_ref::<MstConnectedComponentsTest>().unwrap();
+        let t = test
+            .data
+            .downcast_ref::<MstConnectedComponentsTest>()
+            .unwrap();
         let expected = ref_connected_components(t.n, &t.edges);
         let actual = solutions::connected_components(t.n, &t.edges);
         SolutionResult {
@@ -362,10 +401,18 @@ struct MstMinSpanningWeightTest {
 }
 
 impl Problem for MstMinSpanningWeight {
-    fn id(&self) -> &str { "mst_min_spanning_weight" }
-    fn name(&self) -> &str { "Total Weight of MST (Kruskal)" }
-    fn topic(&self) -> &str { "mst" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "mst_min_spanning_weight"
+    }
+    fn name(&self) -> &str {
+        "Total Weight of MST (Kruskal)"
+    }
+    fn topic(&self) -> &str {
+        "mst"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Find the total weight of the Minimum Spanning Tree using Kruskal's algorithm.\n\n\
          Input: (n, edges) where edges are (u, v, weight). The graph is connected.\n\n\
@@ -378,16 +425,23 @@ impl Problem for MstMinSpanningWeight {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(2..=25);
-            let extra = rng.random_range(0..=(n * 2));
-            let edges = random_connected_weighted_edges(&mut rng, n, extra);
-            TestCase { data: Box::new(MstMinSpanningWeightTest { n, edges }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(2..=25);
+                let extra = rng.random_range(0..=(n * 2));
+                let edges = random_connected_weighted_edges(&mut rng, n, extra);
+                TestCase {
+                    data: Box::new(MstMinSpanningWeightTest { n, edges }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
-        let t = test.data.downcast_ref::<MstMinSpanningWeightTest>().unwrap();
+        let t = test
+            .data
+            .downcast_ref::<MstMinSpanningWeightTest>()
+            .unwrap();
         let expected = ref_kruskal(t.n, &t.edges).0;
         let actual = solutions::min_spanning_weight(t.n, &t.edges);
         SolutionResult {
@@ -409,10 +463,18 @@ struct MstMaxEdgeInMstTest {
 }
 
 impl Problem for MstMaxEdgeInMst {
-    fn id(&self) -> &str { "mst_max_edge_in_mst" }
-    fn name(&self) -> &str { "Maximum Edge Weight in MST" }
-    fn topic(&self) -> &str { "mst" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "mst_max_edge_in_mst"
+    }
+    fn name(&self) -> &str {
+        "Maximum Edge Weight in MST"
+    }
+    fn topic(&self) -> &str {
+        "mst"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Find the maximum edge weight in the Minimum Spanning Tree.\n\n\
          Input: (n, edges) where edges are (u, v, weight). The graph is connected.\n\n\
@@ -425,12 +487,16 @@ impl Problem for MstMaxEdgeInMst {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(2..=25);
-            let extra = rng.random_range(0..=(n * 2));
-            let edges = random_connected_weighted_edges(&mut rng, n, extra);
-            TestCase { data: Box::new(MstMaxEdgeInMstTest { n, edges }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(2..=25);
+                let extra = rng.random_range(0..=(n * 2));
+                let edges = random_connected_weighted_edges(&mut rng, n, extra);
+                TestCase {
+                    data: Box::new(MstMaxEdgeInMstTest { n, edges }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -461,10 +527,18 @@ struct MstKruskalTest {
 }
 
 impl Problem for MstKruskal {
-    fn id(&self) -> &str { "mst_kruskal" }
-    fn name(&self) -> &str { "Kruskal's MST: Return Edges" }
-    fn topic(&self) -> &str { "mst" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "mst_kruskal"
+    }
+    fn name(&self) -> &str {
+        "Kruskal's MST: Return Edges"
+    }
+    fn topic(&self) -> &str {
+        "mst"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Implement Kruskal's algorithm and return the edges in the MST.\n\n\
          Return a Vec<(usize, usize, i32)> of edges in the MST, sorted by \
@@ -478,12 +552,16 @@ impl Problem for MstKruskal {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(2..=25);
-            let extra = rng.random_range(0..=(n * 2));
-            let edges = random_connected_weighted_edges(&mut rng, n, extra);
-            TestCase { data: Box::new(MstKruskalTest { n, edges }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(2..=25);
+                let extra = rng.random_range(0..=(n * 2));
+                let edges = random_connected_weighted_edges(&mut rng, n, extra);
+                TestCase {
+                    data: Box::new(MstKruskalTest { n, edges }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -519,10 +597,18 @@ struct MstPrimTest {
 }
 
 impl Problem for MstPrim {
-    fn id(&self) -> &str { "mst_prim" }
-    fn name(&self) -> &str { "Prim's MST: Total Weight" }
-    fn topic(&self) -> &str { "mst" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "mst_prim"
+    }
+    fn name(&self) -> &str {
+        "Prim's MST: Total Weight"
+    }
+    fn topic(&self) -> &str {
+        "mst"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Implement Prim's algorithm and return the total weight of the MST.\n\n\
          Start from node 0. Use a min-heap (priority queue).\n\n\
@@ -535,12 +621,16 @@ impl Problem for MstPrim {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(2..=25);
-            let extra = rng.random_range(0..=(n * 2));
-            let edges = random_connected_weighted_edges(&mut rng, n, extra);
-            TestCase { data: Box::new(MstPrimTest { n, edges }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(2..=25);
+                let extra = rng.random_range(0..=(n * 2));
+                let edges = random_connected_weighted_edges(&mut rng, n, extra);
+                TestCase {
+                    data: Box::new(MstPrimTest { n, edges }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -567,10 +657,18 @@ struct MstMinCostRepairRoadsTest {
 }
 
 impl Problem for MstMinCostRepairRoads {
-    fn id(&self) -> &str { "mst_min_cost_repair_roads" }
-    fn name(&self) -> &str { "Min Cost to Repair Roads" }
-    fn topic(&self) -> &str { "mst" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "mst_min_cost_repair_roads"
+    }
+    fn name(&self) -> &str {
+        "Min Cost to Repair Roads"
+    }
+    fn topic(&self) -> &str {
+        "mst"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "There are n cities. Some roads already exist (cost 0). Additional roads can be \
          built at given costs. Find the minimum cost to connect all cities.\n\n\
@@ -585,21 +683,30 @@ impl Problem for MstMinCostRepairRoads {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(2..=20);
-            let existing_count = rng.random_range(0..n);
-            let existing = random_unweighted_edges(&mut rng, n, existing_count);
-            // Make sure available edges can connect everything
-            let extra = rng.random_range(n..=(n * 3));
-            let available = random_connected_weighted_edges(&mut rng, n, extra);
-            TestCase {
-                data: Box::new(MstMinCostRepairRoadsTest { n, existing, available }),
-            }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(2..=20);
+                let existing_count = rng.random_range(0..n);
+                let existing = random_unweighted_edges(&mut rng, n, existing_count);
+                // Make sure available edges can connect everything
+                let extra = rng.random_range(n..=(n * 3));
+                let available = random_connected_weighted_edges(&mut rng, n, extra);
+                TestCase {
+                    data: Box::new(MstMinCostRepairRoadsTest {
+                        n,
+                        existing,
+                        available,
+                    }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
-        let t = test.data.downcast_ref::<MstMinCostRepairRoadsTest>().unwrap();
+        let t = test
+            .data
+            .downcast_ref::<MstMinCostRepairRoadsTest>()
+            .unwrap();
         let expected = ref_min_cost_repair(t.n, &t.existing, &t.available);
         let actual = solutions::min_cost_repair_roads(t.n, &t.existing, &t.available);
         SolutionResult {
@@ -651,10 +758,18 @@ struct MstSecondMstTest {
 }
 
 impl Problem for MstSecondMst {
-    fn id(&self) -> &str { "mst_second_mst" }
-    fn name(&self) -> &str { "Second-Best MST Weight" }
-    fn topic(&self) -> &str { "mst" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "mst_second_mst"
+    }
+    fn name(&self) -> &str {
+        "Second-Best MST Weight"
+    }
+    fn topic(&self) -> &str {
+        "mst"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Find the weight of the second-best MST.\n\n\
          The second-best MST is the spanning tree with the smallest total weight that is \
@@ -669,12 +784,16 @@ impl Problem for MstSecondMst {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(2..=12);
-            let extra = rng.random_range(1..=(n * 2));
-            let edges = random_connected_weighted_edges(&mut rng, n, extra);
-            TestCase { data: Box::new(MstSecondMstTest { n, edges }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(2..=12);
+                let extra = rng.random_range(1..=(n * 2));
+                let edges = random_connected_weighted_edges(&mut rng, n, extra);
+                TestCase {
+                    data: Box::new(MstSecondMstTest { n, edges }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -743,10 +862,18 @@ struct MstCriticalEdgesTest {
 }
 
 impl Problem for MstCriticalEdges {
-    fn id(&self) -> &str { "mst_critical_edges" }
-    fn name(&self) -> &str { "Critical Edges in MST" }
-    fn topic(&self) -> &str { "mst" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "mst_critical_edges"
+    }
+    fn name(&self) -> &str {
+        "Critical Edges in MST"
+    }
+    fn topic(&self) -> &str {
+        "mst"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Find all critical edges -- edges that MUST be in every MST.\n\n\
          An edge is critical if removing it increases the MST weight (or disconnects the graph).\n\n\
@@ -760,12 +887,16 @@ impl Problem for MstCriticalEdges {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(2..=12);
-            let extra = rng.random_range(0..=(n * 2));
-            let edges = random_connected_weighted_edges(&mut rng, n, extra);
-            TestCase { data: Box::new(MstCriticalEdgesTest { n, edges }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(2..=12);
+                let extra = rng.random_range(0..=(n * 2));
+                let edges = random_connected_weighted_edges(&mut rng, n, extra);
+                TestCase {
+                    data: Box::new(MstCriticalEdgesTest { n, edges }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -824,10 +955,18 @@ struct MstMaxSpanningTreeTest {
 }
 
 impl Problem for MstMaxSpanningTree {
-    fn id(&self) -> &str { "mst_max_spanning_tree" }
-    fn name(&self) -> &str { "Maximum Spanning Tree Weight" }
-    fn topic(&self) -> &str { "mst" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "mst_max_spanning_tree"
+    }
+    fn name(&self) -> &str {
+        "Maximum Spanning Tree Weight"
+    }
+    fn topic(&self) -> &str {
+        "mst"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Find the total weight of the Maximum Spanning Tree.\n\n\
          Like Kruskal's, but pick the heaviest edges first instead of lightest.\n\n\
@@ -840,12 +979,16 @@ impl Problem for MstMaxSpanningTree {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(2..=25);
-            let extra = rng.random_range(0..=(n * 2));
-            let edges = random_connected_weighted_edges(&mut rng, n, extra);
-            TestCase { data: Box::new(MstMaxSpanningTreeTest { n, edges }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(2..=25);
+                let extra = rng.random_range(0..=(n * 2));
+                let edges = random_connected_weighted_edges(&mut rng, n, extra);
+                TestCase {
+                    data: Box::new(MstMaxSpanningTreeTest { n, edges }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -886,10 +1029,18 @@ struct MstMinBottleneckPathTest {
 }
 
 impl Problem for MstMinBottleneckPath {
-    fn id(&self) -> &str { "mst_min_bottleneck_path" }
-    fn name(&self) -> &str { "Min Bottleneck Path" }
-    fn topic(&self) -> &str { "mst" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "mst_min_bottleneck_path"
+    }
+    fn name(&self) -> &str {
+        "Min Bottleneck Path"
+    }
+    fn topic(&self) -> &str {
+        "mst"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Find the min bottleneck path between src and dst.\n\n\
          The bottleneck of a path is the maximum edge weight along that path.\n\
@@ -905,23 +1056,28 @@ impl Problem for MstMinBottleneckPath {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(2..=25);
-            let extra = rng.random_range(0..=(n * 2));
-            let edges = random_connected_weighted_edges(&mut rng, n, extra);
-            let src = rng.random_range(0..n);
-            let mut dst = rng.random_range(0..n);
-            while dst == src {
-                dst = rng.random_range(0..n);
-            }
-            TestCase {
-                data: Box::new(MstMinBottleneckPathTest { n, edges, src, dst }),
-            }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(2..=25);
+                let extra = rng.random_range(0..=(n * 2));
+                let edges = random_connected_weighted_edges(&mut rng, n, extra);
+                let src = rng.random_range(0..n);
+                let mut dst = rng.random_range(0..n);
+                while dst == src {
+                    dst = rng.random_range(0..n);
+                }
+                TestCase {
+                    data: Box::new(MstMinBottleneckPathTest { n, edges, src, dst }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
-        let t = test.data.downcast_ref::<MstMinBottleneckPathTest>().unwrap();
+        let t = test
+            .data
+            .downcast_ref::<MstMinBottleneckPathTest>()
+            .unwrap();
         let expected = ref_min_bottleneck_path(t.n, &t.edges, t.src, t.dst);
         let actual = solutions::min_bottleneck_path(t.n, &t.edges, t.src, t.dst);
         SolutionResult {
@@ -961,10 +1117,8 @@ fn ref_min_bottleneck_path(n: usize, edges: &[(usize, usize, i32)], src: usize, 
         }
         visited[node] = true;
         for &(next, w) in &adj[node] {
-            if !visited[next] {
-                if dfs(next, target, max_so_far.max(w), adj, visited, result) {
-                    return true;
-                }
+            if !visited[next] && dfs(next, target, max_so_far.max(w), adj, visited, result) {
+                return true;
             }
         }
         false
@@ -983,10 +1137,18 @@ struct MstOptimizeNetworkTest {
 }
 
 impl Problem for MstOptimizeNetwork {
-    fn id(&self) -> &str { "mst_optimize_network" }
-    fn name(&self) -> &str { "Optimize Network (Remove Redundant Edges)" }
-    fn topic(&self) -> &str { "mst" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "mst_optimize_network"
+    }
+    fn name(&self) -> &str {
+        "Optimize Network (Remove Redundant Edges)"
+    }
+    fn topic(&self) -> &str {
+        "mst"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Remove redundant edges from a connected weighted graph while keeping it connected \
          and minimizing total weight.\n\n\
@@ -1001,12 +1163,16 @@ impl Problem for MstOptimizeNetwork {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(2..=25);
-            let extra = rng.random_range(2..=(n * 3));
-            let edges = random_connected_weighted_edges(&mut rng, n, extra);
-            TestCase { data: Box::new(MstOptimizeNetworkTest { n, edges }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(2..=25);
+                let extra = rng.random_range(2..=(n * 3));
+                let edges = random_connected_weighted_edges(&mut rng, n, extra);
+                TestCase {
+                    data: Box::new(MstOptimizeNetworkTest { n, edges }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -1033,10 +1199,18 @@ struct MstSteinerTreeTest {
 }
 
 impl Problem for MstSteinerTree {
-    fn id(&self) -> &str { "mst_steiner_tree" }
-    fn name(&self) -> &str { "Approximate Steiner Tree" }
-    fn topic(&self) -> &str { "mst" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "mst_steiner_tree"
+    }
+    fn name(&self) -> &str {
+        "Approximate Steiner Tree"
+    }
+    fn topic(&self) -> &str {
+        "mst"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Approximate the Steiner tree for a subset of terminal nodes.\n\n\
          A Steiner tree connects all terminal nodes with minimum total weight, possibly \
@@ -1054,23 +1228,29 @@ impl Problem for MstSteinerTree {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(4..=20);
-            let extra = rng.random_range(0..=(n * 2));
-            let edges = random_connected_weighted_edges(&mut rng, n, extra);
-            let t_count = rng.random_range(2..=n.min(8));
-            let mut terminals: Vec<usize> = (0..n).collect();
-            // Shuffle and take first t_count
-            for i in (1..terminals.len()).rev() {
-                let j = rng.random_range(0..=i);
-                terminals.swap(i, j);
-            }
-            terminals.truncate(t_count);
-            terminals.sort();
-            TestCase {
-                data: Box::new(MstSteinerTreeTest { n, edges, terminals }),
-            }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(4..=20);
+                let extra = rng.random_range(0..=(n * 2));
+                let edges = random_connected_weighted_edges(&mut rng, n, extra);
+                let t_count = rng.random_range(2..=n.min(8));
+                let mut terminals: Vec<usize> = (0..n).collect();
+                // Shuffle and take first t_count
+                for i in (1..terminals.len()).rev() {
+                    let j = rng.random_range(0..=i);
+                    terminals.swap(i, j);
+                }
+                terminals.truncate(t_count);
+                terminals.sort();
+                TestCase {
+                    data: Box::new(MstSteinerTreeTest {
+                        n,
+                        edges,
+                        terminals,
+                    }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -1121,9 +1301,9 @@ fn ref_steiner_tree(n: usize, edges: &[(usize, usize, i32)], terminals: &[usize]
     // Build complete graph on terminals
     let mut terminal_edges = Vec::new();
     let dists: Vec<Vec<i32>> = terminals.iter().map(|&t| dijkstra(t)).collect();
-    for i in 0..t_count {
-        for j in (i + 1)..t_count {
-            let d = dists[i][terminals[j]];
+    for (i, dist_row) in dists.iter().enumerate().take(t_count) {
+        for (j, &terminal) in terminals.iter().enumerate().take(t_count).skip(i + 1) {
+            let d = dist_row[terminal];
             terminal_edges.push((i, j, d));
         }
     }
@@ -1141,10 +1321,18 @@ struct MstMinDegreeSpanningTreeTest {
 }
 
 impl Problem for MstMinDegreeSpanningTree {
-    fn id(&self) -> &str { "mst_min_degree_spanning_tree" }
-    fn name(&self) -> &str { "Min-Degree Spanning Tree (Approximation)" }
-    fn topic(&self) -> &str { "mst" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "mst_min_degree_spanning_tree"
+    }
+    fn name(&self) -> &str {
+        "Min-Degree Spanning Tree (Approximation)"
+    }
+    fn topic(&self) -> &str {
+        "mst"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Find a spanning tree that minimizes the maximum degree of any node.\n\n\
          This is NP-hard in general, so use this approximation:\n\
@@ -1159,16 +1347,23 @@ impl Problem for MstMinDegreeSpanningTree {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(2..=25);
-            let extra = rng.random_range(0..=(n * 2));
-            let edges = random_connected_weighted_edges(&mut rng, n, extra);
-            TestCase { data: Box::new(MstMinDegreeSpanningTreeTest { n, edges }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(2..=25);
+                let extra = rng.random_range(0..=(n * 2));
+                let edges = random_connected_weighted_edges(&mut rng, n, extra);
+                TestCase {
+                    data: Box::new(MstMinDegreeSpanningTreeTest { n, edges }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
-        let t = test.data.downcast_ref::<MstMinDegreeSpanningTreeTest>().unwrap();
+        let t = test
+            .data
+            .downcast_ref::<MstMinDegreeSpanningTreeTest>()
+            .unwrap();
         let expected = ref_min_degree_spanning_tree(t.n, &t.edges);
         let actual = solutions::min_degree_spanning_tree(t.n, &t.edges);
         SolutionResult {

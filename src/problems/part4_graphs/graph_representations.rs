@@ -137,13 +137,24 @@ fn random_bipartite_edges(rng: &mut impl Rng, n: usize, edge_count: usize) -> Ve
 // ── Easy 1: Adjacency List ────────────────────────────────────────────
 
 struct AdjacencyList;
-struct AdjListTest { n: usize, edges: Vec<(usize, usize)> }
+struct AdjListTest {
+    n: usize,
+    edges: Vec<(usize, usize)>,
+}
 
 impl Problem for AdjacencyList {
-    fn id(&self) -> &str { "graph_repr_adjacency_list" }
-    fn name(&self) -> &str { "Edge List to Adjacency List" }
-    fn topic(&self) -> &str { "graph_representations" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "graph_repr_adjacency_list"
+    }
+    fn name(&self) -> &str {
+        "Edge List to Adjacency List"
+    }
+    fn topic(&self) -> &str {
+        "graph_representations"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Convert an undirected edge list to an adjacency list representation.\n\n\
          Input: (n: usize, edges: Vec<(usize, usize)>)\n\
@@ -157,12 +168,16 @@ impl Problem for AdjacencyList {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(2..=15);
-            let edge_count = rng.random_range(0..=n * 2);
-            let edges = random_undirected_edges(&mut rng, n, edge_count);
-            TestCase { data: Box::new(AdjListTest { n, edges }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(2..=15);
+                let edge_count = rng.random_range(0..=n * 2);
+                let edges = random_undirected_edges(&mut rng, n, edge_count);
+                TestCase {
+                    data: Box::new(AdjListTest { n, edges }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -193,13 +208,24 @@ fn ref_adjacency_list(n: usize, edges: &[(usize, usize)]) -> Vec<Vec<usize>> {
 // ── Easy 2: Adjacency Matrix ──────────────────────────────────────────
 
 struct AdjacencyMatrix;
-struct AdjMatTest { n: usize, edges: Vec<(usize, usize)> }
+struct AdjMatTest {
+    n: usize,
+    edges: Vec<(usize, usize)>,
+}
 
 impl Problem for AdjacencyMatrix {
-    fn id(&self) -> &str { "graph_repr_adjacency_matrix" }
-    fn name(&self) -> &str { "Edge List to Adjacency Matrix" }
-    fn topic(&self) -> &str { "graph_representations" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "graph_repr_adjacency_matrix"
+    }
+    fn name(&self) -> &str {
+        "Edge List to Adjacency Matrix"
+    }
+    fn topic(&self) -> &str {
+        "graph_representations"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Convert an undirected edge list to an adjacency matrix.\n\n\
          Input: (n: usize, edges: Vec<(usize, usize)>)\n\
@@ -211,12 +237,16 @@ impl Problem for AdjacencyMatrix {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(2..=12);
-            let edge_count = rng.random_range(0..=n * 2);
-            let edges = random_undirected_edges(&mut rng, n, edge_count);
-            TestCase { data: Box::new(AdjMatTest { n, edges }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(2..=12);
+                let edge_count = rng.random_range(0..=n * 2);
+                let edges = random_undirected_edges(&mut rng, n, edge_count);
+                TestCase {
+                    data: Box::new(AdjMatTest { n, edges }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -244,13 +274,24 @@ fn ref_adjacency_matrix(n: usize, edges: &[(usize, usize)]) -> Vec<Vec<bool>> {
 // ── Easy 3: Degree Count ──────────────────────────────────────────────
 
 struct DegreeCount;
-struct DegreeTest { n: usize, edges: Vec<(usize, usize)> }
+struct DegreeTest {
+    n: usize,
+    edges: Vec<(usize, usize)>,
+}
 
 impl Problem for DegreeCount {
-    fn id(&self) -> &str { "graph_repr_degree_count" }
-    fn name(&self) -> &str { "Degree Count" }
-    fn topic(&self) -> &str { "graph_representations" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "graph_repr_degree_count"
+    }
+    fn name(&self) -> &str {
+        "Degree Count"
+    }
+    fn topic(&self) -> &str {
+        "graph_representations"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Count the degree of each node in an undirected graph.\n\n\
          Input: (n: usize, edges: Vec<(usize, usize)>)\n\
@@ -262,12 +303,16 @@ impl Problem for DegreeCount {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(2..=15);
-            let edge_count = rng.random_range(0..=n * 2);
-            let edges = random_undirected_edges(&mut rng, n, edge_count);
-            TestCase { data: Box::new(DegreeTest { n, edges }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(2..=15);
+                let edge_count = rng.random_range(0..=n * 2);
+                let edges = random_undirected_edges(&mut rng, n, edge_count);
+                TestCase {
+                    data: Box::new(DegreeTest { n, edges }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -295,13 +340,26 @@ fn ref_degree_count(n: usize, edges: &[(usize, usize)]) -> Vec<usize> {
 // ── Easy 4: Has Edge ──────────────────────────────────────────────────
 
 struct HasEdge;
-struct HasEdgeTest { n: usize, edges: Vec<(usize, usize)>, u: usize, v: usize }
+struct HasEdgeTest {
+    n: usize,
+    edges: Vec<(usize, usize)>,
+    u: usize,
+    v: usize,
+}
 
 impl Problem for HasEdge {
-    fn id(&self) -> &str { "graph_repr_has_edge" }
-    fn name(&self) -> &str { "Has Edge" }
-    fn topic(&self) -> &str { "graph_representations" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "graph_repr_has_edge"
+    }
+    fn name(&self) -> &str {
+        "Has Edge"
+    }
+    fn topic(&self) -> &str {
+        "graph_representations"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Check if an edge exists between two nodes in an undirected graph.\n\n\
          Input: (n: usize, edges: Vec<(usize, usize)>, u: usize, v: usize)\n\
@@ -313,14 +371,18 @@ impl Problem for HasEdge {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(2..=15);
-            let edge_count = rng.random_range(1..=n * 2);
-            let edges = random_undirected_edges(&mut rng, n, edge_count);
-            let u = rng.random_range(0..n);
-            let v = rng.random_range(0..n);
-            TestCase { data: Box::new(HasEdgeTest { n, edges, u, v }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(2..=15);
+                let edge_count = rng.random_range(1..=n * 2);
+                let edges = random_undirected_edges(&mut rng, n, edge_count);
+                let u = rng.random_range(0..n);
+                let v = rng.random_range(0..n);
+                TestCase {
+                    data: Box::new(HasEdgeTest { n, edges, u, v }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -337,19 +399,32 @@ impl Problem for HasEdge {
 }
 
 fn ref_has_edge(edges: &[(usize, usize)], u: usize, v: usize) -> bool {
-    edges.iter().any(|&(a, b)| (a == u && b == v) || (a == v && b == u))
+    edges
+        .iter()
+        .any(|&(a, b)| (a == u && b == v) || (a == v && b == u))
 }
 
 // ── Easy 5: Count Edges ───────────────────────────────────────────────
 
 struct CountEdges;
-struct CountEdgesTest { n: usize, edges: Vec<(usize, usize)> }
+struct CountEdgesTest {
+    n: usize,
+    edges: Vec<(usize, usize)>,
+}
 
 impl Problem for CountEdges {
-    fn id(&self) -> &str { "graph_repr_count_edges" }
-    fn name(&self) -> &str { "Count Edges" }
-    fn topic(&self) -> &str { "graph_representations" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Easy }
+    fn id(&self) -> &str {
+        "graph_repr_count_edges"
+    }
+    fn name(&self) -> &str {
+        "Count Edges"
+    }
+    fn topic(&self) -> &str {
+        "graph_representations"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Easy
+    }
     fn description(&self) -> &str {
         "Count the total number of unique edges in an undirected graph.\n\n\
          Input: (n: usize, edges: Vec<(usize, usize)>)\n\
@@ -362,26 +437,30 @@ impl Problem for CountEdges {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(2..=15);
-            let base_count = rng.random_range(0..=n * 2);
-            let mut edges = random_undirected_edges(&mut rng, n, base_count);
-            // Add some duplicate edges
-            let dup_count = rng.random_range(0..=3);
-            for _ in 0..dup_count {
-                if !edges.is_empty() {
-                    let idx = rng.random_range(0..edges.len());
-                    let (a, b) = edges[idx];
-                    // Push reverse or same direction
-                    if rng.random_range(0..2) == 0 {
-                        edges.push((b, a));
-                    } else {
-                        edges.push((a, b));
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(2..=15);
+                let base_count = rng.random_range(0..=n * 2);
+                let mut edges = random_undirected_edges(&mut rng, n, base_count);
+                // Add some duplicate edges
+                let dup_count = rng.random_range(0..=3);
+                for _ in 0..dup_count {
+                    if !edges.is_empty() {
+                        let idx = rng.random_range(0..edges.len());
+                        let (a, b) = edges[idx];
+                        // Push reverse or same direction
+                        if rng.random_range(0..2) == 0 {
+                            edges.push((b, a));
+                        } else {
+                            edges.push((a, b));
+                        }
                     }
                 }
-            }
-            TestCase { data: Box::new(CountEdgesTest { n, edges }) }
-        }).collect()
+                TestCase {
+                    data: Box::new(CountEdgesTest { n, edges }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -408,13 +487,24 @@ fn ref_count_edges(edges: &[(usize, usize)]) -> usize {
 // ── Medium 6: Is Bipartite ────────────────────────────────────────────
 
 struct IsBipartite;
-struct BipartiteTest { n: usize, edges: Vec<(usize, usize)> }
+struct BipartiteTest {
+    n: usize,
+    edges: Vec<(usize, usize)>,
+}
 
 impl Problem for IsBipartite {
-    fn id(&self) -> &str { "graph_repr_is_bipartite" }
-    fn name(&self) -> &str { "Is Bipartite" }
-    fn topic(&self) -> &str { "graph_representations" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "graph_repr_is_bipartite"
+    }
+    fn name(&self) -> &str {
+        "Is Bipartite"
+    }
+    fn topic(&self) -> &str {
+        "graph_representations"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Check if an undirected graph is bipartite (2-colorable).\n\n\
          A graph is bipartite if its nodes can be divided into two disjoint sets such\n\
@@ -428,17 +518,21 @@ impl Problem for IsBipartite {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|i| {
-            let n = rng.random_range(2..=15);
-            // Mix bipartite and non-bipartite graphs
-            let edge_count = rng.random_range(1..=n * 2);
-            let edges = if i % 2 == 0 {
-                random_bipartite_edges(&mut rng, n, edge_count)
-            } else {
-                random_undirected_edges(&mut rng, n, edge_count)
-            };
-            TestCase { data: Box::new(BipartiteTest { n, edges }) }
-        }).collect()
+        (0..10)
+            .map(|i| {
+                let n = rng.random_range(2..=15);
+                // Mix bipartite and non-bipartite graphs
+                let edge_count = rng.random_range(1..=n * 2);
+                let edges = if i % 2 == 0 {
+                    random_bipartite_edges(&mut rng, n, edge_count)
+                } else {
+                    random_undirected_edges(&mut rng, n, edge_count)
+                };
+                TestCase {
+                    data: Box::new(BipartiteTest { n, edges }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -458,7 +552,9 @@ fn ref_is_bipartite(n: usize, edges: &[(usize, usize)]) -> bool {
     let adj = build_adj_undirected(n, edges);
     let mut color: Vec<i32> = vec![-1; n];
     for start in 0..n {
-        if color[start] != -1 { continue; }
+        if color[start] != -1 {
+            continue;
+        }
         color[start] = 0;
         let mut queue = VecDeque::new();
         queue.push_back(start);
@@ -479,13 +575,24 @@ fn ref_is_bipartite(n: usize, edges: &[(usize, usize)]) -> bool {
 // ── Medium 7: Connected Components ────────────────────────────────────
 
 struct ConnectedComponents;
-struct CCTest { n: usize, edges: Vec<(usize, usize)> }
+struct CCTest {
+    n: usize,
+    edges: Vec<(usize, usize)>,
+}
 
 impl Problem for ConnectedComponents {
-    fn id(&self) -> &str { "graph_repr_connected_components" }
-    fn name(&self) -> &str { "Connected Components" }
-    fn topic(&self) -> &str { "graph_representations" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "graph_repr_connected_components"
+    }
+    fn name(&self) -> &str {
+        "Connected Components"
+    }
+    fn topic(&self) -> &str {
+        "graph_representations"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Count the number of connected components in an undirected graph.\n\n\
          Input: (n: usize, edges: Vec<(usize, usize)>)\n\
@@ -497,12 +604,16 @@ impl Problem for ConnectedComponents {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(2..=20);
-            let edge_count = rng.random_range(0..=n);
-            let edges = random_undirected_edges(&mut rng, n, edge_count);
-            TestCase { data: Box::new(CCTest { n, edges }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(2..=20);
+                let edge_count = rng.random_range(0..=n);
+                let edges = random_undirected_edges(&mut rng, n, edge_count);
+                TestCase {
+                    data: Box::new(CCTest { n, edges }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -527,10 +638,14 @@ fn ref_connected_components(n: usize, edges: &[(usize, usize)]) -> usize {
             count += 1;
             let mut stack = vec![i];
             while let Some(u) = stack.pop() {
-                if visited[u] { continue; }
+                if visited[u] {
+                    continue;
+                }
                 visited[u] = true;
                 for &v in &adj[u] {
-                    if !visited[v] { stack.push(v); }
+                    if !visited[v] {
+                        stack.push(v);
+                    }
                 }
             }
         }
@@ -541,13 +656,24 @@ fn ref_connected_components(n: usize, edges: &[(usize, usize)]) -> usize {
 // ── Medium 8: Has Cycle Undirected ────────────────────────────────────
 
 struct HasCycleUndirected;
-struct CycleUndirectedTest { n: usize, edges: Vec<(usize, usize)> }
+struct CycleUndirectedTest {
+    n: usize,
+    edges: Vec<(usize, usize)>,
+}
 
 impl Problem for HasCycleUndirected {
-    fn id(&self) -> &str { "graph_repr_has_cycle_undirected" }
-    fn name(&self) -> &str { "Detect Cycle (Undirected)" }
-    fn topic(&self) -> &str { "graph_representations" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "graph_repr_has_cycle_undirected"
+    }
+    fn name(&self) -> &str {
+        "Detect Cycle (Undirected)"
+    }
+    fn topic(&self) -> &str {
+        "graph_representations"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Detect if an undirected graph contains a cycle.\n\n\
          Input: (n: usize, edges: Vec<(usize, usize)>)\n\
@@ -560,12 +686,16 @@ impl Problem for HasCycleUndirected {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(3..=15);
-            let edge_count = rng.random_range(1..=n * 2);
-            let edges = random_undirected_edges(&mut rng, n, edge_count);
-            TestCase { data: Box::new(CycleUndirectedTest { n, edges }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(3..=15);
+                let edge_count = rng.random_range(1..=n * 2);
+                let edges = random_undirected_edges(&mut rng, n, edge_count);
+                TestCase {
+                    data: Box::new(CycleUndirectedTest { n, edges }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -593,7 +723,9 @@ fn ref_has_cycle_undirected(n: usize, edges: &[(usize, usize)]) -> bool {
     for &(u, v) in edges {
         let pu = find(&mut parent, u);
         let pv = find(&mut parent, v);
-        if pu == pv { return true; }
+        if pu == pv {
+            return true;
+        }
         parent[pu] = pv;
     }
     false
@@ -602,13 +734,24 @@ fn ref_has_cycle_undirected(n: usize, edges: &[(usize, usize)]) -> bool {
 // ── Medium 9: Has Cycle Directed ──────────────────────────────────────
 
 struct HasCycleDirected;
-struct CycleDirectedTest { n: usize, edges: Vec<(usize, usize)> }
+struct CycleDirectedTest {
+    n: usize,
+    edges: Vec<(usize, usize)>,
+}
 
 impl Problem for HasCycleDirected {
-    fn id(&self) -> &str { "graph_repr_has_cycle_directed" }
-    fn name(&self) -> &str { "Detect Cycle (Directed)" }
-    fn topic(&self) -> &str { "graph_representations" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "graph_repr_has_cycle_directed"
+    }
+    fn name(&self) -> &str {
+        "Detect Cycle (Directed)"
+    }
+    fn topic(&self) -> &str {
+        "graph_representations"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Detect if a directed graph contains a cycle.\n\n\
          Input: (n: usize, edges: Vec<(usize, usize)>) where each edge is (from, to).\n\
@@ -621,17 +764,21 @@ impl Problem for HasCycleDirected {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|i| {
-            let n = rng.random_range(3..=12);
-            // Mix DAGs and graphs with cycles
-            let edge_count = rng.random_range(1..=n * 2);
-            let edges = if i % 2 == 0 {
-                random_dag_edges(&mut rng, n, edge_count)
-            } else {
-                random_directed_edges(&mut rng, n, edge_count)
-            };
-            TestCase { data: Box::new(CycleDirectedTest { n, edges }) }
-        }).collect()
+        (0..10)
+            .map(|i| {
+                let n = rng.random_range(3..=12);
+                // Mix DAGs and graphs with cycles
+                let edge_count = rng.random_range(1..=n * 2);
+                let edges = if i % 2 == 0 {
+                    random_dag_edges(&mut rng, n, edge_count)
+                } else {
+                    random_directed_edges(&mut rng, n, edge_count)
+                };
+                TestCase {
+                    data: Box::new(CycleDirectedTest { n, edges }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -654,8 +801,12 @@ fn ref_has_cycle_directed(n: usize, edges: &[(usize, usize)]) -> bool {
     fn dfs(u: usize, adj: &[Vec<usize>], state: &mut Vec<u8>) -> bool {
         state[u] = 1;
         for &v in &adj[u] {
-            if state[v] == 1 { return true; }
-            if state[v] == 0 && dfs(v, adj, state) { return true; }
+            if state[v] == 1 {
+                return true;
+            }
+            if state[v] == 0 && dfs(v, adj, state) {
+                return true;
+            }
         }
         state[u] = 2;
         false
@@ -671,13 +822,24 @@ fn ref_has_cycle_directed(n: usize, edges: &[(usize, usize)]) -> bool {
 // ── Medium 10: Transpose ──────────────────────────────────────────────
 
 struct Transpose;
-struct TransposeTest { n: usize, edges: Vec<(usize, usize)> }
+struct TransposeTest {
+    n: usize,
+    edges: Vec<(usize, usize)>,
+}
 
 impl Problem for Transpose {
-    fn id(&self) -> &str { "graph_repr_transpose" }
-    fn name(&self) -> &str { "Transpose Graph" }
-    fn topic(&self) -> &str { "graph_representations" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Medium }
+    fn id(&self) -> &str {
+        "graph_repr_transpose"
+    }
+    fn name(&self) -> &str {
+        "Transpose Graph"
+    }
+    fn topic(&self) -> &str {
+        "graph_representations"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Medium
+    }
     fn description(&self) -> &str {
         "Compute the transpose (reverse) of a directed graph.\n\n\
          The transpose reverses the direction of every edge: if (u, v) exists\n\
@@ -691,12 +853,16 @@ impl Problem for Transpose {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(2..=15);
-            let edge_count = rng.random_range(1..=n * 2);
-            let edges = random_directed_edges(&mut rng, n, edge_count);
-            TestCase { data: Box::new(TransposeTest { n, edges }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(2..=15);
+                let edge_count = rng.random_range(1..=n * 2);
+                let edges = random_directed_edges(&mut rng, n, edge_count);
+                TestCase {
+                    data: Box::new(TransposeTest { n, edges }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -726,13 +892,24 @@ fn ref_transpose(n: usize, edges: &[(usize, usize)]) -> Vec<Vec<usize>> {
 // ── Hard 11: Strongly Connected Components ────────────────────────────
 
 struct StronglyConnected;
-struct SCCTest { n: usize, edges: Vec<(usize, usize)> }
+struct SCCTest {
+    n: usize,
+    edges: Vec<(usize, usize)>,
+}
 
 impl Problem for StronglyConnected {
-    fn id(&self) -> &str { "graph_repr_strongly_connected" }
-    fn name(&self) -> &str { "Strongly Connected Components (Kosaraju)" }
-    fn topic(&self) -> &str { "graph_representations" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "graph_repr_strongly_connected"
+    }
+    fn name(&self) -> &str {
+        "Strongly Connected Components (Kosaraju)"
+    }
+    fn topic(&self) -> &str {
+        "graph_representations"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Count the number of strongly connected components in a directed graph.\n\n\
          A strongly connected component is a maximal set of nodes where every node\n\
@@ -746,12 +923,16 @@ impl Problem for StronglyConnected {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(3..=15);
-            let edge_count = rng.random_range(n..=n * 3);
-            let edges = random_directed_edges(&mut rng, n, edge_count);
-            TestCase { data: Box::new(SCCTest { n, edges }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(3..=15);
+                let edge_count = rng.random_range(n..=n * 3);
+                let edges = random_directed_edges(&mut rng, n, edge_count);
+                TestCase {
+                    data: Box::new(SCCTest { n, edges }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -775,12 +956,16 @@ fn ref_strongly_connected(n: usize, edges: &[(usize, usize)]) -> usize {
     fn dfs1(u: usize, adj: &[Vec<usize>], visited: &mut Vec<bool>, order: &mut Vec<usize>) {
         visited[u] = true;
         for &v in &adj[u] {
-            if !visited[v] { dfs1(v, adj, visited, order); }
+            if !visited[v] {
+                dfs1(v, adj, visited, order);
+            }
         }
         order.push(u);
     }
     for i in 0..n {
-        if !visited[i] { dfs1(i, &adj, &mut visited, &mut order); }
+        if !visited[i] {
+            dfs1(i, &adj, &mut visited, &mut order);
+        }
     }
     // Step 2: transpose
     let mut radj = vec![vec![]; n];
@@ -793,7 +978,9 @@ fn ref_strongly_connected(n: usize, edges: &[(usize, usize)]) -> usize {
     fn dfs2(u: usize, radj: &[Vec<usize>], visited: &mut Vec<bool>) {
         visited[u] = true;
         for &v in &radj[u] {
-            if !visited[v] { dfs2(v, radj, visited); }
+            if !visited[v] {
+                dfs2(v, radj, visited);
+            }
         }
     }
     for &u in order.iter().rev() {
@@ -808,13 +995,24 @@ fn ref_strongly_connected(n: usize, edges: &[(usize, usize)]) -> usize {
 // ── Hard 12: Bridges ──────────────────────────────────────────────────
 
 struct Bridges;
-struct BridgesTest { n: usize, edges: Vec<(usize, usize)> }
+struct BridgesTest {
+    n: usize,
+    edges: Vec<(usize, usize)>,
+}
 
 impl Problem for Bridges {
-    fn id(&self) -> &str { "graph_repr_bridges" }
-    fn name(&self) -> &str { "Find Bridges" }
-    fn topic(&self) -> &str { "graph_representations" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "graph_repr_bridges"
+    }
+    fn name(&self) -> &str {
+        "Find Bridges"
+    }
+    fn topic(&self) -> &str {
+        "graph_representations"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Find all bridges in an undirected graph.\n\n\
          A bridge is an edge whose removal disconnects the graph (or increases\n\
@@ -829,12 +1027,16 @@ impl Problem for Bridges {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(3..=15);
-            let extra = rng.random_range(0..=n);
-            let edges = random_connected_edges(&mut rng, n, extra);
-            TestCase { data: Box::new(BridgesTest { n, edges }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(3..=15);
+                let extra = rng.random_range(0..=n);
+                let edges = random_connected_edges(&mut rng, n, extra);
+                TestCase {
+                    data: Box::new(BridgesTest { n, edges }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -858,10 +1060,13 @@ fn ref_bridges(n: usize, edges: &[(usize, usize)]) -> Vec<(usize, usize)> {
     let mut timer = 1i32;
     let mut bridges = Vec::new();
 
+    #[allow(clippy::too_many_arguments)]
     fn dfs(
-        u: usize, parent: i32,
+        u: usize,
+        parent: i32,
         adj: &[Vec<usize>],
-        disc: &mut Vec<i32>, low: &mut Vec<i32>,
+        disc: &mut Vec<i32>,
+        low: &mut Vec<i32>,
         visited: &mut Vec<bool>,
         timer: &mut i32,
         bridges: &mut Vec<(usize, usize)>,
@@ -871,7 +1076,9 @@ fn ref_bridges(n: usize, edges: &[(usize, usize)]) -> Vec<(usize, usize)> {
         low[u] = *timer;
         *timer += 1;
         for &v in &adj[u] {
-            if v as i32 == parent { continue; }
+            if v as i32 == parent {
+                continue;
+            }
             if !visited[v] {
                 dfs(v, u as i32, adj, disc, low, visited, timer, bridges);
                 low[u] = low[u].min(low[v]);
@@ -886,7 +1093,16 @@ fn ref_bridges(n: usize, edges: &[(usize, usize)]) -> Vec<(usize, usize)> {
 
     for i in 0..n {
         if !visited[i] {
-            dfs(i, -1, &adj, &mut disc, &mut low, &mut visited, &mut timer, &mut bridges);
+            dfs(
+                i,
+                -1,
+                &adj,
+                &mut disc,
+                &mut low,
+                &mut visited,
+                &mut timer,
+                &mut bridges,
+            );
         }
     }
     bridges.sort();
@@ -896,13 +1112,24 @@ fn ref_bridges(n: usize, edges: &[(usize, usize)]) -> Vec<(usize, usize)> {
 // ── Hard 13: Articulation Points ──────────────────────────────────────
 
 struct ArticulationPoints;
-struct APTest { n: usize, edges: Vec<(usize, usize)> }
+struct APTest {
+    n: usize,
+    edges: Vec<(usize, usize)>,
+}
 
 impl Problem for ArticulationPoints {
-    fn id(&self) -> &str { "graph_repr_articulation_points" }
-    fn name(&self) -> &str { "Find Articulation Points" }
-    fn topic(&self) -> &str { "graph_representations" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "graph_repr_articulation_points"
+    }
+    fn name(&self) -> &str {
+        "Find Articulation Points"
+    }
+    fn topic(&self) -> &str {
+        "graph_representations"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Find all articulation points (cut vertices) in an undirected graph.\n\n\
          An articulation point is a vertex whose removal disconnects the graph\n\
@@ -916,12 +1143,16 @@ impl Problem for ArticulationPoints {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(3..=15);
-            let extra = rng.random_range(0..=n);
-            let edges = random_connected_edges(&mut rng, n, extra);
-            TestCase { data: Box::new(APTest { n, edges }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(3..=15);
+                let extra = rng.random_range(0..=n);
+                let edges = random_connected_edges(&mut rng, n, extra);
+                TestCase {
+                    data: Box::new(APTest { n, edges }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -945,10 +1176,13 @@ fn ref_articulation_points(n: usize, edges: &[(usize, usize)]) -> Vec<usize> {
     let mut is_ap = vec![false; n];
     let mut timer = 1i32;
 
+    #[allow(clippy::too_many_arguments)]
     fn dfs(
-        u: usize, parent: i32,
+        u: usize,
+        parent: i32,
         adj: &[Vec<usize>],
-        disc: &mut Vec<i32>, low: &mut Vec<i32>,
+        disc: &mut Vec<i32>,
+        low: &mut Vec<i32>,
         visited: &mut Vec<bool>,
         is_ap: &mut Vec<bool>,
         timer: &mut i32,
@@ -959,7 +1193,9 @@ fn ref_articulation_points(n: usize, edges: &[(usize, usize)]) -> Vec<usize> {
         *timer += 1;
         let mut children = 0;
         for &v in &adj[u] {
-            if v as i32 == parent { continue; }
+            if v as i32 == parent {
+                continue;
+            }
             if !visited[v] {
                 children += 1;
                 dfs(v, u as i32, adj, disc, low, visited, is_ap, timer);
@@ -980,7 +1216,16 @@ fn ref_articulation_points(n: usize, edges: &[(usize, usize)]) -> Vec<usize> {
 
     for i in 0..n {
         if !visited[i] {
-            dfs(i, -1, &adj, &mut disc, &mut low, &mut visited, &mut is_ap, &mut timer);
+            dfs(
+                i,
+                -1,
+                &adj,
+                &mut disc,
+                &mut low,
+                &mut visited,
+                &mut is_ap,
+                &mut timer,
+            );
         }
     }
     let mut result: Vec<usize> = (0..n).filter(|&i| is_ap[i]).collect();
@@ -991,13 +1236,24 @@ fn ref_articulation_points(n: usize, edges: &[(usize, usize)]) -> Vec<usize> {
 // ── Hard 14: Euler Path ───────────────────────────────────────────────
 
 struct EulerPath;
-struct EulerTest { n: usize, edges: Vec<(usize, usize)> }
+struct EulerTest {
+    n: usize,
+    edges: Vec<(usize, usize)>,
+}
 
 impl Problem for EulerPath {
-    fn id(&self) -> &str { "graph_repr_euler_path" }
-    fn name(&self) -> &str { "Eulerian Path Exists" }
-    fn topic(&self) -> &str { "graph_representations" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "graph_repr_euler_path"
+    }
+    fn name(&self) -> &str {
+        "Eulerian Path Exists"
+    }
+    fn topic(&self) -> &str {
+        "graph_representations"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Check if an Eulerian path exists in an undirected graph.\n\n\
          An Eulerian path visits every edge exactly once. It exists if and only if:\n\
@@ -1012,12 +1268,16 @@ impl Problem for EulerPath {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(3..=15);
-            let edge_count = rng.random_range(1..=n * 2);
-            let edges = random_connected_edges(&mut rng, n, edge_count);
-            TestCase { data: Box::new(EulerTest { n, edges }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(3..=15);
+                let edge_count = rng.random_range(1..=n * 2);
+                let edges = random_connected_edges(&mut rng, n, edge_count);
+                TestCase {
+                    data: Box::new(EulerTest { n, edges }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -1034,7 +1294,9 @@ impl Problem for EulerPath {
 }
 
 fn ref_euler_path(n: usize, edges: &[(usize, usize)]) -> bool {
-    if edges.is_empty() { return false; }
+    if edges.is_empty() {
+        return false;
+    }
     let adj = build_adj_undirected(n, edges);
 
     // Check connectivity among nodes with degree > 0
@@ -1042,32 +1304,49 @@ fn ref_euler_path(n: usize, edges: &[(usize, usize)]) -> bool {
     let mut visited = vec![false; n];
     let mut stack = vec![start];
     while let Some(u) = stack.pop() {
-        if visited[u] { continue; }
+        if visited[u] {
+            continue;
+        }
         visited[u] = true;
         for &v in &adj[u] {
-            if !visited[v] { stack.push(v); }
+            if !visited[v] {
+                stack.push(v);
+            }
         }
     }
     // All nodes with edges must be visited
     for i in 0..n {
-        if !adj[i].is_empty() && !visited[i] { return false; }
+        if !adj[i].is_empty() && !visited[i] {
+            return false;
+        }
     }
 
     // Count nodes with odd degree
-    let odd_count = (0..n).filter(|&i| adj[i].len() % 2 != 0).count();
+    let odd_count = (0..n).filter(|&i| !adj[i].len().is_multiple_of(2)).count();
     odd_count == 0 || odd_count == 2
 }
 
 // ── Hard 15: Graph Coloring ───────────────────────────────────────────
 
 struct GraphColoring;
-struct ColoringTest { n: usize, edges: Vec<(usize, usize)> }
+struct ColoringTest {
+    n: usize,
+    edges: Vec<(usize, usize)>,
+}
 
 impl Problem for GraphColoring {
-    fn id(&self) -> &str { "graph_repr_graph_coloring" }
-    fn name(&self) -> &str { "Graph Coloring (Greedy)" }
-    fn topic(&self) -> &str { "graph_representations" }
-    fn difficulty(&self) -> Difficulty { Difficulty::Hard }
+    fn id(&self) -> &str {
+        "graph_repr_graph_coloring"
+    }
+    fn name(&self) -> &str {
+        "Graph Coloring (Greedy)"
+    }
+    fn topic(&self) -> &str {
+        "graph_representations"
+    }
+    fn difficulty(&self) -> Difficulty {
+        Difficulty::Hard
+    }
     fn description(&self) -> &str {
         "Find the minimum number of colors needed to color a graph using a greedy\n\
          algorithm. Color nodes in order 0, 1, 2, ..., n-1, always assigning the\n\
@@ -1082,12 +1361,16 @@ impl Problem for GraphColoring {
 
     fn generate_tests(&self) -> Vec<TestCase> {
         let mut rng = rand::rng();
-        (0..10).map(|_| {
-            let n = rng.random_range(2..=15);
-            let edge_count = rng.random_range(0..=n * 2);
-            let edges = random_undirected_edges(&mut rng, n, edge_count);
-            TestCase { data: Box::new(ColoringTest { n, edges }) }
-        }).collect()
+        (0..10)
+            .map(|_| {
+                let n = rng.random_range(2..=15);
+                let edge_count = rng.random_range(0..=n * 2);
+                let edges = random_undirected_edges(&mut rng, n, edge_count);
+                TestCase {
+                    data: Box::new(ColoringTest { n, edges }),
+                }
+            })
+            .collect()
     }
 
     fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
@@ -1110,7 +1393,9 @@ fn ref_graph_coloring(n: usize, edges: &[(usize, usize)]) -> i32 {
     for u in 0..n {
         let neighbor_colors: HashSet<i32> = adj[u].iter().map(|&v| colors[v]).collect();
         let mut c = 1;
-        while neighbor_colors.contains(&c) { c += 1; }
+        while neighbor_colors.contains(&c) {
+            c += 1;
+        }
         colors[u] = c;
         max_color = max_color.max(c);
     }
