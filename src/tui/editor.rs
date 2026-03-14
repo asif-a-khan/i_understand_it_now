@@ -261,6 +261,17 @@ impl InTuiEditorState {
             return Action::None;
         }
 
+        // Ctrl+V: save, run tests, watch replay
+        if key.code == KeyCode::Char('v') && key.modifiers.contains(KeyModifiers::CONTROL) {
+            self.confirm_reset = false;
+            self.save();
+            if let Some(idx) = self.loaded_idx {
+                self.loaded_idx = None;
+                return Action::SaveRunReplay(idx);
+            }
+            return Action::None;
+        }
+
         // Ctrl+R: reset to original
         if key.code == KeyCode::Char('r') && key.modifiers.contains(KeyModifiers::CONTROL) {
             if self.confirm_reset {
@@ -581,7 +592,7 @@ impl InTuiEditorState {
         let status_text = if !self.status_msg.is_empty() {
             self.status_msg.as_str()
         } else {
-            "Ctrl+S save  |  Ctrl+R reset  |  Esc close"
+            "Ctrl+S save  |  Ctrl+V run+replay  |  Ctrl+R reset  |  Esc close"
         };
 
         let status = Line::from(vec![

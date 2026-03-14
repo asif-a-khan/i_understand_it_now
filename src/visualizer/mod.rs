@@ -1,5 +1,15 @@
 pub mod engine;
 pub mod instrumented;
+#[allow(
+    clippy::needless_range_loop,
+    clippy::int_plus_one,
+    clippy::collapsible_else_if,
+    clippy::unnecessary_cast,
+    clippy::manual_saturating_arithmetic,
+    unused_variables,
+    unused_mut
+)]
+pub mod problem_viz;
 pub mod reference;
 
 /// What kind of highlighting to apply to an element.
@@ -20,7 +30,7 @@ pub enum HighlightKind {
 }
 
 /// A single frame of a visualization.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct VizFrame {
     /// The array state at this point
     pub array: Vec<i32>,
@@ -28,6 +38,8 @@ pub struct VizFrame {
     pub highlights: Vec<(usize, HighlightKind)>,
     /// Text annotation for this step
     pub annotation: String,
+    /// Named pointers to show below the array (index, label)
+    pub pointers: Vec<(usize, String)>,
 }
 
 /// A reference visualization for a specific algorithm.

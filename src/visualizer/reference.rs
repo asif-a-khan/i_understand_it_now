@@ -26,6 +26,7 @@ impl ReferenceViz for BubbleSortViz {
             array: arr.clone(),
             highlights: vec![],
             annotation: "Initial array".to_string(),
+            ..Default::default()
         }];
 
         for i in 0..n {
@@ -43,6 +44,7 @@ impl ReferenceViz for BubbleSortViz {
                         j + 1,
                         arr[j + 1]
                     ),
+                    ..Default::default()
                 });
 
                 if arr[j] > arr[j + 1] {
@@ -54,6 +56,7 @@ impl ReferenceViz for BubbleSortViz {
                             (j + 1, HighlightKind::Swapping),
                         ],
                         annotation: format!("Swap! arr[{}] and arr[{}]", j, j + 1),
+                        ..Default::default()
                     });
                 }
             }
@@ -61,6 +64,7 @@ impl ReferenceViz for BubbleSortViz {
                 array: arr.clone(),
                 highlights: vec![(n - 1 - i, HighlightKind::Sorted)],
                 annotation: format!("Element {} is now in its final position", arr[n - 1 - i]),
+                ..Default::default()
             });
         }
 
@@ -68,6 +72,7 @@ impl ReferenceViz for BubbleSortViz {
             array: arr.clone(),
             highlights: (0..n).map(|i| (i, HighlightKind::Sorted)).collect(),
             annotation: "Array is sorted!".to_string(),
+            ..Default::default()
         });
         frames
     }
@@ -99,6 +104,7 @@ impl ReferenceViz for SelectionSortViz {
             array: arr.clone(),
             highlights: vec![],
             annotation: "Initial array".to_string(),
+            ..Default::default()
         }];
 
         for i in 0..n - 1 {
@@ -110,6 +116,7 @@ impl ReferenceViz for SelectionSortViz {
                     "Finding minimum in unsorted portion starting at index {}",
                     i
                 ),
+                ..Default::default()
             });
 
             for j in i + 1..n {
@@ -123,6 +130,7 @@ impl ReferenceViz for SelectionSortViz {
                         "Compare current min arr[{}]={} with arr[{}]={}",
                         min_idx, arr[min_idx], j, arr[j]
                     ),
+                    ..Default::default()
                 });
                 if arr[j] < arr[min_idx] {
                     min_idx = j;
@@ -138,6 +146,7 @@ impl ReferenceViz for SelectionSortViz {
                         (min_idx, HighlightKind::Swapping),
                     ],
                     annotation: format!("Swap arr[{}] and arr[{}]", i, min_idx),
+                    ..Default::default()
                 });
             }
 
@@ -145,6 +154,7 @@ impl ReferenceViz for SelectionSortViz {
                 array: arr.clone(),
                 highlights: vec![(i, HighlightKind::Sorted)],
                 annotation: format!("Position {} is finalized with value {}", i, arr[i]),
+                ..Default::default()
             });
         }
 
@@ -152,6 +162,7 @@ impl ReferenceViz for SelectionSortViz {
             array: arr.clone(),
             highlights: (0..n).map(|i| (i, HighlightKind::Sorted)).collect(),
             annotation: "Array is sorted!".to_string(),
+            ..Default::default()
         });
         frames
     }
@@ -183,6 +194,7 @@ impl ReferenceViz for InsertionSortViz {
             array: arr.clone(),
             highlights: vec![(0, HighlightKind::Sorted)],
             annotation: "First element is trivially sorted".to_string(),
+            ..Default::default()
         }];
 
         for i in 1..n {
@@ -191,6 +203,7 @@ impl ReferenceViz for InsertionSortViz {
                 array: arr.clone(),
                 highlights: vec![(i, HighlightKind::Active)],
                 annotation: format!("Insert arr[{}]={} into sorted portion", i, key),
+                ..Default::default()
             });
 
             let mut j = i;
@@ -202,6 +215,7 @@ impl ReferenceViz for InsertionSortViz {
                         (j - 1, HighlightKind::Comparing),
                     ],
                     annotation: format!("arr[{}]={} > {} — shift right", j - 1, arr[j - 1], key),
+                    ..Default::default()
                 });
                 arr[j] = arr[j - 1];
                 j -= 1;
@@ -213,6 +227,7 @@ impl ReferenceViz for InsertionSortViz {
                 array: arr.clone(),
                 highlights: sorted_highlights,
                 annotation: format!("Inserted {} at position {}", key, j),
+                ..Default::default()
             });
         }
 
@@ -220,6 +235,7 @@ impl ReferenceViz for InsertionSortViz {
             array: arr.clone(),
             highlights: (0..n).map(|i| (i, HighlightKind::Sorted)).collect(),
             annotation: "Array is sorted!".to_string(),
+            ..Default::default()
         });
         frames
     }
@@ -251,6 +267,7 @@ impl ReferenceViz for MergeSortViz {
             array: arr.clone(),
             highlights: vec![],
             annotation: "Initial array".to_string(),
+            ..Default::default()
         });
         let len = arr.len();
         merge_sort_frames(&mut arr, 0, len, &mut frames);
@@ -259,6 +276,7 @@ impl ReferenceViz for MergeSortViz {
             array: arr,
             highlights: (0..n).map(|i| (i, HighlightKind::Sorted)).collect(),
             annotation: "Array is sorted!".to_string(),
+            ..Default::default()
         });
         frames
     }
@@ -280,6 +298,7 @@ fn merge_sort_frames(arr: &mut Vec<i32>, lo: usize, hi: usize, frames: &mut Vec<
             "Split [{}, {}) into [{}, {}) and [{}, {})",
             lo, hi, lo, mid, mid, hi
         ),
+        ..Default::default()
     });
 
     merge_sort_frames(arr, lo, mid, frames);
@@ -316,6 +335,7 @@ fn merge_sort_frames(arr: &mut Vec<i32>, lo: usize, hi: usize, frames: &mut Vec<
         array: arr.clone(),
         highlights,
         annotation: format!("Merged [{}, {}): {:?}", lo, hi, &arr[lo..hi]),
+        ..Default::default()
     });
 }
 
@@ -346,6 +366,7 @@ impl ReferenceViz for QuickSortViz {
             array: arr.clone(),
             highlights: vec![],
             annotation: "Initial array".to_string(),
+            ..Default::default()
         });
         if n > 0 {
             quick_sort_frames(&mut arr, 0, n - 1, &mut frames);
@@ -354,6 +375,7 @@ impl ReferenceViz for QuickSortViz {
             array: arr,
             highlights: (0..n).map(|i| (i, HighlightKind::Sorted)).collect(),
             annotation: "Array is sorted!".to_string(),
+            ..Default::default()
         });
         frames
     }
@@ -368,6 +390,7 @@ fn quick_sort_frames(arr: &mut Vec<i32>, lo: usize, hi: usize, frames: &mut Vec<
         array: arr.clone(),
         highlights: vec![(hi, HighlightKind::Pivot)],
         annotation: format!("Pivot = arr[{}] = {}", hi, pivot_val),
+        ..Default::default()
     });
 
     let mut i = lo;
@@ -380,6 +403,7 @@ fn quick_sort_frames(arr: &mut Vec<i32>, lo: usize, hi: usize, frames: &mut Vec<
                 (i, HighlightKind::Active),
             ],
             annotation: format!("Compare arr[{}]={} with pivot {}", j, arr[j], pivot_val),
+            ..Default::default()
         });
         if arr[j] < pivot_val {
             if i != j {
@@ -392,6 +416,7 @@ fn quick_sort_frames(arr: &mut Vec<i32>, lo: usize, hi: usize, frames: &mut Vec<
                         (hi, HighlightKind::Pivot),
                     ],
                     annotation: format!("Swap arr[{}] and arr[{}]", i, j),
+                    ..Default::default()
                 });
             }
             i += 1;
@@ -402,6 +427,7 @@ fn quick_sort_frames(arr: &mut Vec<i32>, lo: usize, hi: usize, frames: &mut Vec<
         array: arr.clone(),
         highlights: vec![(i, HighlightKind::Sorted)],
         annotation: format!("Pivot {} placed at index {}", pivot_val, i),
+        ..Default::default()
     });
 
     if i > lo {
@@ -441,6 +467,7 @@ impl ReferenceViz for BinarySearchViz {
             array: arr.clone(),
             highlights: vec![],
             annotation: format!("Search for target = {}", target),
+            ..Default::default()
         });
 
         let mut lo = 0i32;
@@ -465,6 +492,7 @@ impl ReferenceViz for BinarySearchViz {
                     "lo={}, hi={}, mid={} | arr[mid]={} vs target={}",
                     lo, hi, mid, arr[mid_u], target
                 ),
+                ..Default::default()
             });
 
             if arr[mid_u] == target {
@@ -472,6 +500,7 @@ impl ReferenceViz for BinarySearchViz {
                     array: arr.clone(),
                     highlights: vec![(mid_u, HighlightKind::Found)],
                     annotation: format!("Found target {} at index {}!", target, mid_u),
+                    ..Default::default()
                 });
                 break;
             } else if arr[mid_u] < target {
@@ -482,6 +511,7 @@ impl ReferenceViz for BinarySearchViz {
                         "arr[{}]={} < {} — search right half",
                         mid, arr[mid_u], target
                     ),
+                    ..Default::default()
                 });
                 lo = mid + 1;
             } else {
@@ -492,6 +522,7 @@ impl ReferenceViz for BinarySearchViz {
                         "arr[{}]={} > {} — search left half",
                         mid, arr[mid_u], target
                     ),
+                    ..Default::default()
                 });
                 hi = mid - 1;
             }
@@ -527,6 +558,7 @@ impl ReferenceViz for HeapSortViz {
             array: arr.clone(),
             highlights: vec![],
             annotation: "Initial array — will build a max-heap first".to_string(),
+            ..Default::default()
         });
 
         // Build max-heap (bottom-up heapify)
@@ -538,6 +570,7 @@ impl ReferenceViz for HeapSortViz {
             array: arr.clone(),
             highlights: vec![],
             annotation: "Max-heap built — largest element is at root".to_string(),
+            ..Default::default()
         });
 
         // Extract elements one by one
@@ -547,12 +580,14 @@ impl ReferenceViz for HeapSortViz {
                 array: arr.clone(),
                 highlights: vec![(0, HighlightKind::Swapping), (end, HighlightKind::Swapping)],
                 annotation: format!("Swap root ({}) with position {}", arr[end], end),
+                ..Default::default()
             });
 
             frames.push(VizFrame {
                 array: arr.clone(),
                 highlights: (end..n).map(|i| (i, HighlightKind::Sorted)).collect(),
                 annotation: format!("{} is now in its final position", arr[end]),
+                ..Default::default()
             });
 
             heap_sift_down(&mut arr, 0, end, &mut frames);
@@ -562,6 +597,7 @@ impl ReferenceViz for HeapSortViz {
             array: arr.clone(),
             highlights: (0..n).map(|i| (i, HighlightKind::Sorted)).collect(),
             annotation: "Fully sorted!".to_string(),
+            ..Default::default()
         });
 
         frames
@@ -585,6 +621,7 @@ fn heap_sift_down(arr: &mut [i32], start: usize, end: usize, frames: &mut Vec<Vi
                 "Compare parent [{}]={} with left child [{}]={}",
                 root, arr[root], left, arr[left]
             ),
+            ..Default::default()
         });
 
         if arr[left] > arr[largest] {
@@ -599,6 +636,7 @@ fn heap_sift_down(arr: &mut [i32], start: usize, end: usize, frames: &mut Vec<Vi
                     (right, HighlightKind::Comparing),
                 ],
                 annotation: format!("Compare with right child [{}]={}", right, arr[right]),
+                ..Default::default()
             });
             if arr[right] > arr[largest] {
                 largest = right;
@@ -620,6 +658,7 @@ fn heap_sift_down(arr: &mut [i32], start: usize, end: usize, frames: &mut Vec<Vi
                 "Swap [{}] and [{}] to maintain heap property",
                 root, largest
             ),
+            ..Default::default()
         });
 
         root = largest;

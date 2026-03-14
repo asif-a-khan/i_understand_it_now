@@ -29,6 +29,7 @@ pub fn replay_from_ops(ops: &[Operation]) -> Vec<VizFrame> {
             array: vec![],
             highlights: vec![],
             annotation: "No array operations recorded".to_string(),
+            ..Default::default()
         }];
     };
 
@@ -38,6 +39,7 @@ pub fn replay_from_ops(ops: &[Operation]) -> Vec<VizFrame> {
             array: (1..=20i32).collect(),
             highlights: vec![],
             annotation: format!("Array too large to replay ({} elements)", n),
+            ..Default::default()
         }];
     }
 
@@ -65,6 +67,7 @@ pub fn replay_from_ops(ops: &[Operation]) -> Vec<VizFrame> {
         array: array.clone(),
         highlights: vec![],
         annotation: format!("Your solution — {} elements", n),
+        ..Default::default()
     });
 
     for op in ops {
@@ -90,6 +93,7 @@ pub fn replay_from_ops(ops: &[Operation]) -> Vec<VizFrame> {
                             cmp_count,
                             swap_count,
                         ),
+                        ..Default::default()
                     });
                 }
             }
@@ -110,6 +114,7 @@ pub fn replay_from_ops(ops: &[Operation]) -> Vec<VizFrame> {
                             "Swap [{}] <-> [{}] — cmp: {}, swap #{}",
                             left_idx, right_idx, cmp_count, swap_count,
                         ),
+                        ..Default::default()
                     });
                 }
             }
@@ -126,6 +131,7 @@ pub fn replay_from_ops(ops: &[Operation]) -> Vec<VizFrame> {
             swap_count,
             ops.len()
         ),
+        ..Default::default()
     });
 
     frames

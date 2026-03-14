@@ -5,69 +5,130 @@ use ratatui::text::{Line, Span};
 use ratatui::widgets::{Block, Borders, List, ListItem, ListState, Paragraph};
 use ratatui::Frame;
 
-use crate::visualizer::{self, HighlightKind, VizFrame};
+use crate::visualizer::{HighlightKind, VizFrame};
 
 use super::screens::{Action, Screen};
 use super::theme;
 
 // ─── Viz Picker ───────────────────────────────────────────
 
+use super::problem_runner::ProblemInfo;
+
+/// Entries in the viz picker list — either a topic header or a problem.
+enum VizEntry {
+    Header(String),
+    Problem(usize), // index into App's problems vec
+}
+
 pub struct VizPickerState {
     pub list_state: ListState,
-    viz_names: Vec<&'static str>,
+    entries: Vec<VizEntry>,
 }
 
 impl VizPickerState {
     pub fn new() -> Self {
-        let viz_names = visualizer::list_references();
         let mut list_state = ListState::default();
         list_state.select(Some(0));
         Self {
             list_state,
-            viz_names,
+            entries: Vec::new(),
+        }
+    }
+
+    /// Build the entry list from the problems. Called once on first render.
+    pub fn ensure_loaded(&mut self, problems: &[ProblemInfo]) {
+        if !self.entries.is_empty() {
+            return;
+        }
+        let mut current_topic = String::new();
+        for (idx, p) in problems.iter().enumerate() {
+            if p.topic != current_topic {
+                current_topic = p.topic.clone();
+                self.entries.push(VizEntry::Header(current_topic.clone()));
+            }
+            self.entries.push(VizEntry::Problem(idx));
+        }
+        // Select first problem (skip header)
+        if self.entries.len() > 1 {
+            self.list_state.select(Some(1));
         }
     }
 
     pub fn handle_key(&mut self, key: KeyEvent) -> Action {
-        let len = self.viz_names.len();
+        let len = self.entries.len();
+        if len == 0 {
+            if key.code == KeyCode::Esc {
+                return Action::Pop;
+            }
+            return Action::None;
+        }
 
         match key.code {
             KeyCode::Char('j') | KeyCode::Down => {
                 let i = self.list_state.selected().unwrap_or(0);
-                self.list_state.select(Some((i + 1).min(len - 1)));
+                let mut next = (i + 1).min(len - 1);
+                while next < len && matches!(self.entries.get(next), Some(VizEntry::Header(_))) {
+                    next += 1;
+                }
+                if next < len {
+                    self.list_state.select(Some(next));
+                }
                 Action::None
             }
             KeyCode::Char('k') | KeyCode::Up => {
                 let i = self.list_state.selected().unwrap_or(0);
-                self.list_state.select(Some(i.saturating_sub(1)));
+                let mut prev = i.saturating_sub(1);
+                while prev > 0 && matches!(self.entries.get(prev), Some(VizEntry::Header(_))) {
+                    prev = prev.saturating_sub(1);
+                }
+                if matches!(self.entries.get(prev), Some(VizEntry::Header(_))) {
+                    if let Some(pos) = self
+                        .entries
+                        .iter()
+                        .position(|e| matches!(e, VizEntry::Problem(_)))
+                    {
+                        prev = pos;
+                    }
+                }
+                self.list_state.select(Some(prev));
                 Action::None
             }
             KeyCode::Enter => {
-                let idx = self.list_state.selected().unwrap_or(0);
-                Action::Push(Screen::VizPlayer { viz_idx: idx })
+                if let Some(idx) = self.list_state.selected() {
+                    if let Some(VizEntry::Problem(pidx)) = self.entries.get(idx) {
+                        return Action::Push(Screen::ReplayPlayer { problem_idx: *pidx });
+                    }
+                }
+                Action::None
             }
             KeyCode::Esc => Action::Pop,
             _ => Action::None,
         }
     }
 
-    pub fn render(&mut self, f: &mut Frame, area: Rect) {
+    pub fn render(&mut self, f: &mut Frame, area: Rect, problems: &[ProblemInfo]) {
+        self.ensure_loaded(problems);
+
         let items: Vec<ListItem> = self
-            .viz_names
+            .entries
             .iter()
-            .map(|name| {
-                let viz = visualizer::get_reference(name);
-                let desc = viz
-                    .as_ref()
-                    .map(|v| v.description().to_string())
-                    .unwrap_or_default();
-                ListItem::new(Line::from(vec![
-                    Span::styled(
-                        format!("  {:20}", name),
-                        Style::new().fg(Color::Cyan).add_modifier(Modifier::BOLD),
-                    ),
-                    Span::styled(desc, Style::new().fg(Color::DarkGray)),
-                ]))
+            .map(|entry| match entry {
+                VizEntry::Header(topic) => ListItem::new(Line::from(Span::styled(
+                    format!("── {} ──", topic),
+                    Style::new().fg(Color::White).add_modifier(Modifier::BOLD),
+                ))),
+                VizEntry::Problem(idx) => {
+                    let p = &problems[*idx];
+                    ListItem::new(Line::from(vec![
+                        Span::raw("  "),
+                        Span::styled(
+                            format!("{:>6} ", p.difficulty),
+                            theme::difficulty_style(&p.difficulty),
+                        ),
+                        Span::styled(&p.id, Style::new().fg(Color::Cyan)),
+                        Span::styled(format!(" — {}", p.name), Style::new().fg(Color::DarkGray)),
+                    ]))
+                }
             })
             .collect();
 
@@ -75,7 +136,7 @@ impl VizPickerState {
             .block(
                 Block::default()
                     .borders(Borders::ALL)
-                    .title(" Visualizations ")
+                    .title(" Visualizations — all 570 problems ")
                     .title_style(theme::title_style()),
             )
             .highlight_style(theme::selected_style())
@@ -110,30 +171,12 @@ impl VizPlayerState {
         }
     }
 
-    pub fn load_viz(&mut self, viz_idx: usize) {
-        if self.loaded_idx == Some(viz_idx) {
-            return;
-        }
-        self.loaded_idx = Some(viz_idx);
-        self.current_frame = 0;
-        self.auto_play = false;
-
-        let names = visualizer::list_references();
-        if let Some(&name) = names.get(viz_idx) {
-            self.viz_name = name.to_string();
-            if let Some(viz) = visualizer::get_reference(name) {
-                let input = viz.default_input();
-                self.frames = viz.generate_frames(&input);
-            }
-        }
-    }
-
-    /// Load pre-built frames (for instrumented replay).
+    /// Load pre-built frames (for instrumented replay / problem viz).
     pub fn load_replay_frames(&mut self, frames: Vec<VizFrame>, name: String) {
         self.frames = frames;
         self.current_frame = 0;
-        self.auto_play = false;
-        self.delay_ms = 400;
+        self.auto_play = true;
+        self.delay_ms = 500;
         self.last_tick = std::time::Instant::now();
         self.viz_name = name;
         self.loaded_idx = None;
@@ -223,79 +266,101 @@ impl VizPlayerState {
         }
 
         let chunks = Layout::vertical([
-            Constraint::Length(2), // Header
-            Constraint::Min(6),    // Bar chart
-            Constraint::Length(3), // Annotation
+            Constraint::Length(3), // Header + progress
+            Constraint::Min(6),    // Bar chart + pointers
+            Constraint::Length(2), // Annotation
             Constraint::Length(1), // Metrics
-            Constraint::Length(2), // Legend
-            Constraint::Length(2), // Controls
+            Constraint::Length(1), // Legend
+            Constraint::Length(1), // Controls
         ])
         .split(area);
 
         let frame = &self.frames[self.current_frame];
         let total = self.frames.len();
-
-        // Header
-        let mode_str = if self.auto_play {
-            format!("Auto-play ({}ms)", self.delay_ms)
+        let progress_pct = if total > 1 {
+            self.current_frame as f64 / (total - 1) as f64
         } else {
-            "Step-by-step".to_string()
+            1.0
         };
-        let header = Paragraph::new(Line::from(vec![
-            Span::styled(format!("  {} ", self.viz_name), theme::title_style()),
-            Span::styled(
-                format!(
-                    "  Step {}/{}  |  {}",
-                    self.current_frame + 1,
-                    total,
-                    mode_str
+
+        // Header with progress bar
+        let mode_icon = if self.auto_play { "▶" } else { "⏸" };
+        let progress_width = chunks[0].width.saturating_sub(4) as usize;
+        let filled = (progress_pct * progress_width as f64) as usize;
+        let filled_bar = "━".repeat(filled);
+        let empty_bar = "─".repeat(progress_width.saturating_sub(filled));
+
+        let header = Paragraph::new(vec![
+            Line::from(vec![
+                Span::styled(format!("  {} ", self.viz_name), theme::title_style()),
+                Span::styled(
+                    format!(
+                        " {} Step {}/{}  {}ms",
+                        mode_icon,
+                        self.current_frame + 1,
+                        total,
+                        self.delay_ms
+                    ),
+                    theme::muted_style(),
                 ),
-                theme::muted_style(),
-            ),
-        ]));
+            ]),
+            Line::from(vec![
+                Span::raw("  "),
+                Span::styled(filled_bar, Style::new().fg(Color::Cyan)),
+                Span::styled(empty_bar, Style::new().fg(Color::DarkGray)),
+            ]),
+        ]);
         f.render_widget(header, chunks[0]);
 
-        // Bar chart
+        // Bar chart with pointer labels
         render_bar_chart(f, chunks[1], frame);
 
         // Annotation
-        let annotation = Paragraph::new(Line::from(Span::styled(
-            format!("  {}", frame.annotation),
-            Style::new().fg(Color::White).add_modifier(Modifier::BOLD),
-        )));
+        let annotation = Paragraph::new(vec![
+            Line::raw(""),
+            Line::from(Span::styled(
+                format!("  {}", frame.annotation),
+                Style::new().fg(Color::White).add_modifier(Modifier::BOLD),
+            )),
+        ]);
         f.render_widget(annotation, chunks[2]);
 
-        // Metrics (cumulative operation counts)
+        // Metrics
         let (cmp_count, swap_count) = self.cumulative_metrics();
         let metrics = Paragraph::new(Line::from(vec![
-            Span::styled("  Comparisons: ", Style::new().fg(Color::DarkGray)),
-            Span::styled(format!("{}", cmp_count), Style::new().fg(Color::Yellow)),
-            Span::styled("  Swaps: ", Style::new().fg(Color::DarkGray)),
-            Span::styled(format!("{}", swap_count), Style::new().fg(Color::Red)),
+            Span::styled("  cmp ", Style::new().fg(Color::DarkGray)),
+            Span::styled(
+                format!("{}", cmp_count),
+                Style::new().fg(Color::Yellow).add_modifier(Modifier::BOLD),
+            ),
+            Span::styled("  swp ", Style::new().fg(Color::DarkGray)),
+            Span::styled(
+                format!("{}", swap_count),
+                Style::new().fg(Color::Red).add_modifier(Modifier::BOLD),
+            ),
+            Span::styled("        ", Style::new()),
+            Span::styled("█", Style::new().fg(Color::Yellow)),
+            Span::styled(" cmp ", Style::new().fg(Color::DarkGray)),
+            Span::styled("█", Style::new().fg(Color::Red)),
+            Span::styled(" swp ", Style::new().fg(Color::DarkGray)),
+            Span::styled("█", Style::new().fg(Color::Green)),
+            Span::styled(" done ", Style::new().fg(Color::DarkGray)),
+            Span::styled("█", Style::new().fg(Color::Cyan)),
+            Span::styled(" ptr ", Style::new().fg(Color::DarkGray)),
+            Span::styled("█", Style::new().fg(Color::Magenta)),
+            Span::styled(" pivot", Style::new().fg(Color::DarkGray)),
         ]));
-        f.render_widget(metrics, chunks[3]);
-
-        // Legend
-        let legend = Paragraph::new(Line::from(vec![
-            Span::raw("  "),
-            Span::styled("██ Comparing ", Style::new().fg(Color::Yellow)),
-            Span::styled("██ Swapping ", Style::new().fg(Color::Red)),
-            Span::styled("██ Sorted ", Style::new().fg(Color::Green)),
-            Span::styled("██ Active ", Style::new().fg(Color::Cyan)),
-            Span::styled("██ Pivot ", Style::new().fg(Color::Magenta)),
-        ]));
-        f.render_widget(legend, chunks[4]);
+        f.render_widget(metrics, chunks[4]);
 
         // Controls
         let controls = Paragraph::new(Line::from(vec![
-            Span::raw("  "),
-            Span::styled("[Left/Right]", Style::new().fg(theme::ACCENT)),
-            Span::raw(" step  "),
-            Span::styled("[A]", Style::new().fg(theme::ACCENT)),
-            Span::raw(" auto-play  "),
-            Span::styled("[+/-]", Style::new().fg(theme::ACCENT)),
-            Span::raw(" speed  "),
-            Span::styled("[Esc]", Style::new().fg(theme::ACCENT)),
+            Span::styled("  [←/→]", Style::new().fg(Color::DarkGray)),
+            Span::raw(" step "),
+            Span::styled("[A]", Style::new().fg(Color::DarkGray)),
+            Span::raw(" play "),
+            Span::styled("[+/-]", Style::new().fg(Color::DarkGray)),
+            Span::raw(" speed "),
+            Span::styled("[Esc]", Style::new().fg(Color::DarkGray)),
             Span::raw(" back"),
         ]));
         f.render_widget(controls, chunks[5]);
@@ -327,64 +392,189 @@ impl VizPlayerState {
     }
 }
 
-/// Render a bar chart for a VizFrame using styled text blocks.
+/// Render array elements as rounded-corner boxes with pointer labels.
+///
+/// Layout:
+/// ```text
+///  ╭────╮ ╭────╮ ╭────╮ ╭────╮
+///  │  7 │ │  2 │ │ 11 │ │  4 │
+///  ╰────╯ ╰────╯ ╰────╯ ╰────╯
+///    ▲                ▲
+///   scan            match
+/// ```
 fn render_bar_chart(f: &mut Frame, area: Rect, frame: &VizFrame) {
-    let block = Block::default().borders(Borders::LEFT | Borders::BOTTOM);
-    let inner = block.inner(area);
-    f.render_widget(block, area);
-
-    if frame.array.is_empty() || inner.width == 0 || inner.height == 0 {
+    if frame.array.is_empty() || area.width < 4 || area.height < 4 {
         return;
     }
 
-    let max_val = frame.array.iter().copied().max().unwrap_or(1).max(1);
-    let bar_height = inner.height.saturating_sub(1) as usize; // leave 1 row for values
-    let num_bars = frame.array.len();
+    let num_cells = frame.array.len();
+    let has_pointers = !frame.pointers.is_empty();
 
-    // Calculate bar width based on available space
-    let available_width = inner.width as usize;
-    let bar_width = (available_width / num_bars).clamp(1, 4);
-    let gap = if bar_width >= 2 { 1 } else { 0 };
+    // Dynamic sizing: expand cells to fill available width
+    let available = area.width.saturating_sub(2) as usize; // 1 char pad each side
+    let gap = 1usize;
+    let min_val_width = frame
+        .array
+        .iter()
+        .map(|v| format!("{}", v).len())
+        .max()
+        .unwrap_or(1)
+        .max(1);
+
+    // Each cell = ╭ + inner + ╮ = inner_w + 2, plus gap between cells
+    // Total = num_cells * (inner_w + 2) + (num_cells - 1) * gap <= available
+    // Solve for inner_w: inner_w = (available - (num_cells-1)*gap) / num_cells - 2
+    let space_for_cells = available.saturating_sub(num_cells.saturating_sub(1) * gap);
+    let cell_w = (space_for_cells / num_cells).max(min_val_width + 2);
+    let inner_w = cell_w.saturating_sub(2).max(min_val_width);
 
     let highlight_map: std::collections::HashMap<usize, HighlightKind> =
         frame.highlights.iter().cloned().collect();
 
-    // Render bars top to bottom
-    let mut lines: Vec<Line> = Vec::new();
-
-    for row in (0..bar_height).rev() {
-        let mut spans = Vec::new();
-        for (col, &val) in frame.array.iter().enumerate() {
-            let normalized = (val as f64 / max_val as f64 * bar_height as f64) as usize;
-            let color = highlight_color(highlight_map.get(&col));
-
-            let cell = if normalized > row {
-                "█".repeat(bar_width)
-            } else {
-                " ".repeat(bar_width)
-            };
-            spans.push(Span::styled(cell, Style::new().fg(color)));
-            if gap > 0 {
-                spans.push(Span::raw(" "));
-            }
-        }
-        lines.push(Line::from(spans));
+    // Build pointer lookup
+    let pointer_colors = [
+        Color::Cyan,
+        Color::Yellow,
+        Color::Magenta,
+        Color::Red,
+        Color::Green,
+    ];
+    let mut pointer_map: std::collections::HashMap<usize, (&str, Color)> =
+        std::collections::HashMap::new();
+    let mut label_to_color: std::collections::HashMap<&str, Color> =
+        std::collections::HashMap::new();
+    let mut color_idx = 0;
+    for (idx, label) in &frame.pointers {
+        let color = *label_to_color.entry(label.as_str()).or_insert_with(|| {
+            let c = pointer_colors[color_idx % pointer_colors.len()];
+            color_idx += 1;
+            c
+        });
+        pointer_map.insert(*idx, (label.as_str(), color));
     }
 
-    // Value labels
-    let mut val_spans = Vec::new();
+    // Determine color for each cell
+    let cell_color = |col: usize| -> Color {
+        if let Some((_, c)) = pointer_map.get(&col) {
+            *c
+        } else {
+            highlight_color(highlight_map.get(&col))
+        }
+    };
+
+    let dim = Style::new().fg(Color::DarkGray);
+    let mut lines: Vec<Line> = Vec::new();
+
+    // Index row: [0] [1] [2] ...
+    let mut idx_spans = vec![Span::raw(" ")];
+    for col in 0..num_cells {
+        let label = format!("{:^width$}", col, width = cell_w);
+        idx_spans.push(Span::styled(label, dim));
+        if col + 1 < num_cells {
+            idx_spans.push(Span::raw(" ".repeat(gap)));
+        }
+    }
+    lines.push(Line::from(idx_spans));
+
+    // Top border: ╭────╮
+    let mut top_spans = vec![Span::raw(" ")];
+    for col in 0..num_cells {
+        let color = cell_color(col);
+        let border = format!("╭{}╮", "─".repeat(inner_w));
+        top_spans.push(Span::styled(border, Style::new().fg(color)));
+        if col + 1 < num_cells {
+            top_spans.push(Span::raw(" ".repeat(gap)));
+        }
+    }
+    lines.push(Line::from(top_spans));
+
+    // Value row: │  7 │
+    let mut val_spans = vec![Span::raw(" ")];
     for (col, &val) in frame.array.iter().enumerate() {
-        let color = highlight_color(highlight_map.get(&col));
-        let label = format!("{:>width$}", val, width = bar_width);
-        val_spans.push(Span::styled(label, Style::new().fg(color)));
-        if gap > 0 {
-            val_spans.push(Span::raw(" "));
+        let color = cell_color(col);
+        let val_str = format!("{:^width$}", val, width = inner_w);
+        let mut cell_spans = vec![
+            Span::styled("│", Style::new().fg(color)),
+            Span::styled(val_str, Style::new().fg(color).add_modifier(Modifier::BOLD)),
+            Span::styled("│", Style::new().fg(color)),
+        ];
+        val_spans.append(&mut cell_spans);
+        if col + 1 < num_cells {
+            val_spans.push(Span::raw(" ".repeat(gap)));
         }
     }
     lines.push(Line::from(val_spans));
 
-    let paragraph = Paragraph::new(lines);
-    f.render_widget(paragraph, inner);
+    // Bottom border: ╰────╯
+    let mut bot_spans = vec![Span::raw(" ")];
+    for col in 0..num_cells {
+        let color = cell_color(col);
+        let border = format!("╰{}╯", "─".repeat(inner_w));
+        bot_spans.push(Span::styled(border, Style::new().fg(color)));
+        if col + 1 < num_cells {
+            bot_spans.push(Span::raw(" ".repeat(gap)));
+        }
+    }
+    lines.push(Line::from(bot_spans));
+
+    // Arrow row
+    let mut arrow_spans = vec![Span::raw(" ")];
+    for col in 0..num_cells {
+        let content = if let Some((_, ptr_color)) = pointer_map.get(&col) {
+            Span::styled(
+                format!("{:^width$}", "▲", width = cell_w),
+                Style::new().fg(*ptr_color).add_modifier(Modifier::BOLD),
+            )
+        } else if let Some(kind) = highlight_map.get(&col) {
+            let sym = match kind {
+                HighlightKind::Sorted => "✓",
+                HighlightKind::Found => "★",
+                _ => " ",
+            };
+            Span::styled(
+                format!("{:^width$}", sym, width = cell_w),
+                Style::new().fg(highlight_color(Some(kind))),
+            )
+        } else {
+            Span::raw(" ".repeat(cell_w))
+        };
+        arrow_spans.push(content);
+        if col + 1 < num_cells {
+            arrow_spans.push(Span::raw(" ".repeat(gap)));
+        }
+    }
+    lines.push(Line::from(arrow_spans));
+
+    // Pointer label row
+    if has_pointers {
+        let mut label_spans = vec![Span::raw(" ")];
+        for col in 0..num_cells {
+            if let Some((label, ptr_color)) = pointer_map.get(&col) {
+                label_spans.push(Span::styled(
+                    format!("{:^width$}", label, width = cell_w),
+                    Style::new().fg(*ptr_color).add_modifier(Modifier::BOLD),
+                ));
+            } else {
+                label_spans.push(Span::raw(" ".repeat(cell_w)));
+            }
+            if col + 1 < num_cells {
+                label_spans.push(Span::raw(" ".repeat(gap)));
+            }
+        }
+        lines.push(Line::from(label_spans));
+    }
+
+    // Center vertically in the available area
+    let content_height = lines.len();
+    let top_pad = (area.height as usize).saturating_sub(content_height) / 2;
+    let mut padded: Vec<Line> = Vec::new();
+    for _ in 0..top_pad {
+        padded.push(Line::raw(""));
+    }
+    padded.append(&mut lines);
+
+    let paragraph = Paragraph::new(padded);
+    f.render_widget(paragraph, area);
 }
 
 fn highlight_color(kind: Option<&HighlightKind>) -> Color {

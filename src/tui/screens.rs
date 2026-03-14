@@ -12,7 +12,6 @@ pub enum Screen {
     ReplayPlayer { problem_idx: usize },
     InTuiEditor { problem_idx: usize },
     VizPicker,
-    VizPlayer { viz_idx: usize },
 }
 
 /// Actions returned from screen event handlers.
@@ -22,4 +21,8 @@ pub enum Action {
     Push(Screen),
     Pop,
     LaunchEditor(String),
+    /// Clear the screen stack and navigate directly to a screen.
+    GoTo(Screen),
+    /// From editor: save, run tests, then jump to replay.
+    SaveRunReplay(usize),
 }

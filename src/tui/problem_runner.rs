@@ -297,6 +297,7 @@ impl ProblemDetailState {
                 Action::LaunchEditor(path.to_string_lossy().to_string())
             }
             KeyCode::Char('i') => Action::Push(Screen::InTuiEditor { problem_idx }),
+            KeyCode::Char('v') => Action::Push(Screen::ReplayPlayer { problem_idx }),
             KeyCode::Esc => Action::Pop,
             _ => Action::None,
         }
@@ -399,6 +400,11 @@ impl ProblemDetailState {
                 Style::new().fg(theme::ACCENT).add_modifier(Modifier::BOLD),
             ),
             Span::raw(" Edit (in-TUI)  "),
+            Span::styled(
+                "[V]",
+                Style::new().fg(theme::ACCENT).add_modifier(Modifier::BOLD),
+            ),
+            Span::raw(" Visualize  "),
             Span::styled(
                 "[Esc]",
                 Style::new().fg(theme::ACCENT).add_modifier(Modifier::BOLD),
@@ -554,7 +560,9 @@ impl ProblemResultState {
                 Action::LaunchEditor(path.to_string_lossy().to_string())
             }
             KeyCode::Char('i') => Action::Push(Screen::InTuiEditor { problem_idx }),
-            KeyCode::Char('w') => Action::Push(Screen::ReplayPlayer { problem_idx }),
+            KeyCode::Char('v') | KeyCode::Char('w') => {
+                Action::Push(Screen::ReplayPlayer { problem_idx })
+            }
             KeyCode::Char('c') => Action::Push(Screen::ComplexityView { problem_idx }),
             KeyCode::Char('j') | KeyCode::Down => {
                 self.scroll_offset = (self.scroll_offset + 1).min(max_scroll);
@@ -679,10 +687,10 @@ impl ProblemResultState {
             ),
             Span::raw(" In-TUI edit  "),
             Span::styled(
-                "[W]",
+                "[V]",
                 Style::new().fg(theme::ACCENT).add_modifier(Modifier::BOLD),
             ),
-            Span::raw(" Watch replay  "),
+            Span::raw(" Visualize  "),
             Span::styled(
                 "[C]",
                 Style::new().fg(theme::ACCENT).add_modifier(Modifier::BOLD),

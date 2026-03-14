@@ -59,6 +59,8 @@ struct App {
 
     // Replay data from last test run
     replay_ops: Vec<Operation>,
+    /// After tests complete, go to replay instead of results
+    replay_after_tests: Option<usize>,
 }
 
 impl App {
@@ -89,6 +91,7 @@ impl App {
             complexity_receiver: None,
             check_receiver: None,
             replay_ops: Vec::new(),
+            replay_after_tests: None,
         }
     }
 
@@ -121,15 +124,17 @@ impl App {
                 if let Screen::LessonReader { lesson_idx } = &screen {
                     self.lesson_reader.load_lesson(*lesson_idx, &self.lessons);
                 }
-                // When pushing VizPlayer, load the viz
-                if let Screen::VizPlayer { viz_idx } = &screen {
-                    self.viz_player.load_viz(*viz_idx);
-                }
-                // When pushing ReplayPlayer, build replay frames from saved ops
+                // When pushing ReplayPlayer: try problem reference viz, then instrumented replay
                 if let Screen::ReplayPlayer { problem_idx } = &screen {
-                    let name = format!("Replay: {}", self.problems[*problem_idx].id);
-                    let frames = visualizer::instrumented::replay_from_ops(&self.replay_ops);
-                    self.viz_player.load_replay_frames(frames, name);
+                    let pid = &self.problems[*problem_idx].id;
+                    if let Some(frames) = visualizer::problem_viz::get_problem_viz(pid) {
+                        let name = format!("Viz: {}", pid);
+                        self.viz_player.load_replay_frames(frames, name);
+                    } else {
+                        let name = format!("Replay: {}", pid);
+                        let frames = visualizer::instrumented::replay_from_ops(&self.replay_ops);
+                        self.viz_player.load_replay_frames(frames, name);
+                    }
                 }
                 // When pushing ComplexityView, start measurement
                 if let Screen::ComplexityView { problem_idx } = &screen {
@@ -162,6 +167,29 @@ impl App {
                 if let Err(e) = editor::launch_external_editor(terminal, &path) {
                     let _ = e;
                 }
+                false
+            }
+            Action::GoTo(screen) => {
+                self.screen_stack.clear();
+                self.screen_stack.push(Screen::Dashboard);
+                if !matches!(screen, Screen::Dashboard) {
+                    // Trigger the Push logic for the target screen
+                    return self.handle_action(Action::Push(screen), terminal);
+                }
+                self.progress = Progress::load();
+                false
+            }
+            Action::SaveRunReplay(problem_idx) => {
+                // Pop editor, start test runner, flag to go to replay after
+                if matches!(self.current_screen(), Screen::InTuiEditor { .. }) {
+                    self.screen_stack.pop();
+                }
+                self.replay_after_tests = Some(problem_idx);
+                self.problem_running.reset();
+                let problem_id = self.problems[problem_idx].id.clone();
+                self.test_receiver = Some(problem_runner::spawn_test_runner(problem_id));
+                self.screen_stack
+                    .push(Screen::ProblemRunning { problem_idx });
                 false
             }
         }
@@ -203,10 +231,35 @@ impl App {
                         if let Some(Screen::ProblemRunning { problem_idx }) =
                             self.screen_stack.last().cloned()
                         {
-                            self.problem_result.scroll_offset = 0;
                             self.screen_stack.pop();
-                            self.screen_stack
-                                .push(Screen::ProblemResult { problem_idx });
+                            if let Some(target_idx) = self.replay_after_tests.take() {
+                                // Check if there are any useful ops to replay
+                                let has_ops = self.replay_ops.iter().any(|op| {
+                                    matches!(
+                                        op,
+                                        crate::tracker::Operation::Compare { .. }
+                                            | crate::tracker::Operation::Swap { .. }
+                                    )
+                                });
+                                if has_ops {
+                                    let name = format!("Replay: {}", self.problems[target_idx].id);
+                                    let frames =
+                                        visualizer::instrumented::replay_from_ops(&self.replay_ops);
+                                    self.viz_player.load_replay_frames(frames, name);
+                                    self.screen_stack.push(Screen::ReplayPlayer {
+                                        problem_idx: target_idx,
+                                    });
+                                } else {
+                                    // No ops (e.g. todo!() stubs) — show results instead
+                                    self.problem_result.scroll_offset = 0;
+                                    self.screen_stack
+                                        .push(Screen::ProblemResult { problem_idx });
+                                }
+                            } else {
+                                self.problem_result.scroll_offset = 0;
+                                self.screen_stack
+                                    .push(Screen::ProblemResult { problem_idx });
+                            }
                         }
                         break;
                     }
@@ -384,6 +437,22 @@ impl App {
                 return false;
             }
 
+            // Global navigation shortcuts (Ctrl+D/L/P) — work from any non-editor screen
+            let ctrl = key
+                .modifiers
+                .contains(crossterm::event::KeyModifiers::CONTROL);
+            if ctrl {
+                let nav = match key.code {
+                    KeyCode::Char('d') => Some(Action::GoTo(Screen::Dashboard)),
+                    KeyCode::Char('l') => Some(Action::GoTo(Screen::LessonList)),
+                    KeyCode::Char('p') => Some(Action::GoTo(Screen::ProblemList)),
+                    _ => None,
+                };
+                if let Some(action) = nav {
+                    return self.handle_action(action, terminal);
+                }
+            }
+
             let action = match self.current_screen().clone() {
                 Screen::Dashboard => self.dashboard.handle_key(key),
                 Screen::LessonList => self.lesson_list.handle_key(key, &self.lessons),
@@ -426,10 +495,20 @@ impl App {
                         .unwrap_or(20);
                     self.complexity_view.handle_key(key, visible_height)
                 }
-                Screen::ReplayPlayer { .. } => self.viz_player.handle_key(key),
+                Screen::ReplayPlayer { problem_idx } => {
+                    // Replay-specific keys: jump to editor for this problem
+                    match key.code {
+                        KeyCode::Char('e') => {
+                            let path =
+                                editor::solution_file_path(&self.problems[problem_idx].topic);
+                            Action::LaunchEditor(path.to_string_lossy().to_string())
+                        }
+                        KeyCode::Char('i') => Action::Push(Screen::InTuiEditor { problem_idx }),
+                        _ => self.viz_player.handle_key(key),
+                    }
+                }
                 Screen::InTuiEditor { .. } => unreachable!(), // handled above
                 Screen::VizPicker => self.viz_picker.handle_key(key),
-                Screen::VizPlayer { .. } => self.viz_player.handle_key(key),
             };
 
             return self.handle_action(action, terminal);
@@ -484,10 +563,7 @@ impl App {
                 self.in_tui_editor.render(f, area);
             }
             Screen::VizPicker => {
-                self.viz_picker.render(f, area);
-            }
-            Screen::VizPlayer { .. } => {
-                self.viz_player.render(f, area);
+                self.viz_picker.render(f, area, &self.problems);
             }
         }
 
@@ -502,9 +578,15 @@ impl App {
 pub fn run() -> io::Result<()> {
     let original_hook = std::panic::take_hook();
     std::panic::set_hook(Box::new(move |panic_info| {
-        let _ = terminal::disable_raw_mode();
-        let _ = crossterm::execute!(io::stdout(), terminal::LeaveAlternateScreen);
-        original_hook(panic_info);
+        // Only restore terminal + print for main thread panics.
+        // Background threads (test runners) use catch_unwind — suppress their output
+        // to avoid corrupting the TUI display.
+        let is_main = std::thread::current().name().is_some_and(|n| n == "main");
+        if is_main {
+            let _ = terminal::disable_raw_mode();
+            let _ = crossterm::execute!(io::stdout(), terminal::LeaveAlternateScreen);
+            original_hook(panic_info);
+        }
     }));
 
     terminal::enable_raw_mode()?;
