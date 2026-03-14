@@ -131,6 +131,17 @@ impl VizPlayerState {
         }
     }
 
+    /// Load pre-built frames (for instrumented replay).
+    pub fn load_replay_frames(&mut self, frames: Vec<VizFrame>, name: String) {
+        self.frames = frames;
+        self.current_frame = 0;
+        self.auto_play = false;
+        self.delay_ms = 400;
+        self.last_tick = std::time::Instant::now();
+        self.viz_name = name;
+        self.loaded_idx = None;
+    }
+
     pub fn tick(&mut self) {
         if self.auto_play && !self.frames.is_empty() {
             if self.last_tick.elapsed().as_millis() >= self.delay_ms as u128 {
@@ -220,6 +231,7 @@ impl VizPlayerState {
             Constraint::Length(2), // Header
             Constraint::Min(6),   // Bar chart
             Constraint::Length(3), // Annotation
+            Constraint::Length(1), // Metrics
             Constraint::Length(2), // Legend
             Constraint::Length(2), // Controls
         ])
@@ -263,6 +275,16 @@ impl VizPlayerState {
         )));
         f.render_widget(annotation, chunks[2]);
 
+        // Metrics (cumulative operation counts)
+        let (cmp_count, swap_count) = self.cumulative_metrics();
+        let metrics = Paragraph::new(Line::from(vec![
+            Span::styled("  Comparisons: ", Style::new().fg(Color::DarkGray)),
+            Span::styled(format!("{}", cmp_count), Style::new().fg(Color::Yellow)),
+            Span::styled("  Swaps: ", Style::new().fg(Color::DarkGray)),
+            Span::styled(format!("{}", swap_count), Style::new().fg(Color::Red)),
+        ]));
+        f.render_widget(metrics, chunks[3]);
+
         // Legend
         let legend = Paragraph::new(Line::from(vec![
             Span::raw("  "),
@@ -272,7 +294,7 @@ impl VizPlayerState {
             Span::styled("██ Active ", Style::new().fg(Color::Cyan)),
             Span::styled("██ Pivot ", Style::new().fg(Color::Magenta)),
         ]));
-        f.render_widget(legend, chunks[3]);
+        f.render_widget(legend, chunks[4]);
 
         // Controls
         let controls = Paragraph::new(Line::from(vec![
@@ -286,7 +308,32 @@ impl VizPlayerState {
             Span::styled("[Esc]", Style::new().fg(theme::ACCENT)),
             Span::raw(" back"),
         ]));
-        f.render_widget(controls, chunks[4]);
+        f.render_widget(controls, chunks[5]);
+    }
+
+    /// Count cumulative comparisons and swaps up to the current frame.
+    fn cumulative_metrics(&self) -> (usize, usize) {
+        let mut cmp = 0;
+        let mut swp = 0;
+        for i in 0..=self.current_frame {
+            if let Some(frame) = self.frames.get(i) {
+                let has_cmp = frame
+                    .highlights
+                    .iter()
+                    .any(|(_, k)| *k == HighlightKind::Comparing);
+                let has_swp = frame
+                    .highlights
+                    .iter()
+                    .any(|(_, k)| *k == HighlightKind::Swapping);
+                if has_cmp {
+                    cmp += 1;
+                }
+                if has_swp {
+                    swp += 1;
+                }
+            }
+        }
+        (cmp, swp)
     }
 }
 

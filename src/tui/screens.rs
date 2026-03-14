@@ -8,6 +8,9 @@ pub enum Screen {
     ProblemDetail { problem_idx: usize },
     ProblemRunning { problem_idx: usize },
     ProblemResult { problem_idx: usize },
+    ComplexityView { problem_idx: usize },
+    ReplayPlayer { problem_idx: usize },
+    InTuiEditor { problem_idx: usize },
     VizPicker,
     VizPlayer { viz_idx: usize },
 }

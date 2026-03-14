@@ -419,3 +419,134 @@ impl ReferenceViz for BinarySearchViz {
         frames
     }
 }
+
+// ─── Heap Sort ────────────────────────────────────────────
+
+pub struct HeapSortViz;
+
+impl ReferenceViz for HeapSortViz {
+    fn id(&self) -> &str {
+        "heap_sort"
+    }
+    fn name(&self) -> &str {
+        "Heap Sort"
+    }
+    fn description(&self) -> &str {
+        "Build a max-heap, then repeatedly extract the maximum. O(n log n) guaranteed."
+    }
+    fn default_input(&self) -> Vec<i32> {
+        vec![4, 10, 3, 5, 1, 8, 7]
+    }
+    fn generate_frames(&self, input: &[i32]) -> Vec<VizFrame> {
+        let mut arr = input.to_vec();
+        let mut frames = Vec::new();
+        let n = arr.len();
+
+        frames.push(VizFrame {
+            array: arr.clone(),
+            highlights: vec![],
+            annotation: "Initial array — will build a max-heap first".to_string(),
+        });
+
+        // Build max-heap (bottom-up heapify)
+        for i in (0..n / 2).rev() {
+            heap_sift_down(&mut arr, i, n, &mut frames);
+        }
+
+        frames.push(VizFrame {
+            array: arr.clone(),
+            highlights: vec![],
+            annotation: "Max-heap built — largest element is at root".to_string(),
+        });
+
+        // Extract elements one by one
+        for end in (1..n).rev() {
+            arr.swap(0, end);
+            frames.push(VizFrame {
+                array: arr.clone(),
+                highlights: vec![
+                    (0, HighlightKind::Swapping),
+                    (end, HighlightKind::Swapping),
+                ],
+                annotation: format!("Swap root ({}) with position {}", arr[end], end),
+            });
+
+            frames.push(VizFrame {
+                array: arr.clone(),
+                highlights: (end..n).map(|i| (i, HighlightKind::Sorted)).collect(),
+                annotation: format!("{} is now in its final position", arr[end]),
+            });
+
+            heap_sift_down(&mut arr, 0, end, &mut frames);
+        }
+
+        frames.push(VizFrame {
+            array: arr.clone(),
+            highlights: (0..n).map(|i| (i, HighlightKind::Sorted)).collect(),
+            annotation: "Fully sorted!".to_string(),
+        });
+
+        frames
+    }
+}
+
+fn heap_sift_down(arr: &mut [i32], start: usize, end: usize, frames: &mut Vec<VizFrame>) {
+    let mut root = start;
+    while 2 * root + 1 < end {
+        let left = 2 * root + 1;
+        let right = left + 1;
+        let mut largest = root;
+
+        frames.push(VizFrame {
+            array: arr.to_vec(),
+            highlights: vec![
+                (root, HighlightKind::Active),
+                (left, HighlightKind::Comparing),
+            ],
+            annotation: format!(
+                "Compare parent [{}]={} with left child [{}]={}",
+                root, arr[root], left, arr[left]
+            ),
+        });
+
+        if arr[left] > arr[largest] {
+            largest = left;
+        }
+
+        if right < end {
+            frames.push(VizFrame {
+                array: arr.to_vec(),
+                highlights: vec![
+                    (largest, HighlightKind::Active),
+                    (right, HighlightKind::Comparing),
+                ],
+                annotation: format!(
+                    "Compare with right child [{}]={}",
+                    right, arr[right]
+                ),
+            });
+            if arr[right] > arr[largest] {
+                largest = right;
+            }
+        }
+
+        if largest == root {
+            break;
+        }
+
+        arr.swap(root, largest);
+        frames.push(VizFrame {
+            array: arr.to_vec(),
+            highlights: vec![
+                (root, HighlightKind::Swapping),
+                (largest, HighlightKind::Swapping),
+            ],
+            annotation: format!(
+                "Swap [{}] and [{}] to maintain heap property",
+                root, largest
+            ),
+        });
+
+        root = largest;
+    }
+}

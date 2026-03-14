@@ -49,6 +49,7 @@ pub fn render_help(f: &mut Frame, screen: &Screen) {
         Screen::ProblemDetail { .. } => vec![
             ("r", "Run tests"),
             ("e", "Edit solution in $EDITOR"),
+            ("i", "Edit solution in-TUI"),
             ("Esc", "Back to problem list"),
             ("?", "Toggle this help"),
         ],
@@ -58,8 +59,32 @@ pub fn render_help(f: &mut Frame, screen: &Screen) {
         Screen::ProblemResult { .. } => vec![
             ("r", "Run tests again"),
             ("e", "Edit solution in $EDITOR"),
+            ("i", "Edit solution in-TUI"),
+            ("w", "Watch instrumented replay"),
+            ("c", "Measure complexity"),
             ("Esc", "Back to problem detail"),
             ("?", "Toggle this help"),
+        ],
+        Screen::ComplexityView { .. } => vec![
+            ("j / Down", "Scroll down"),
+            ("k / Up", "Scroll up"),
+            ("Esc", "Back"),
+            ("?", "Toggle this help"),
+        ],
+        Screen::ReplayPlayer { .. } => vec![
+            ("Right / Enter", "Next frame"),
+            ("Left", "Previous frame"),
+            ("a", "Toggle auto-play"),
+            ("+/-", "Adjust speed"),
+            ("Esc", "Back"),
+            ("?", "Toggle this help"),
+        ],
+        Screen::InTuiEditor { .. } => vec![
+            ("Arrow keys", "Move cursor"),
+            ("Home / End", "Start / end of line"),
+            ("PgUp / PgDn", "Page up / down"),
+            ("Ctrl+S", "Save file"),
+            ("Esc", "Close editor"),
         ],
         Screen::VizPicker => vec![
             ("j / Down", "Move down"),

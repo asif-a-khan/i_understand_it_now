@@ -7,9 +7,10 @@ use ratatui::text::{Line, Span};
 use ratatui::widgets::{Block, Borders, List, ListItem, ListState, Paragraph};
 use ratatui::Frame;
 
+use crate::complexity;
 use crate::problems::{self, Difficulty};
 use crate::progress::Progress;
-use crate::tracker::OperationLog;
+use crate::tracker::{Operation, OperationLog};
 
 use super::editor;
 use super::screens::{Action, Screen};
@@ -54,10 +55,21 @@ pub enum TestMessage {
         swaps: usize,
         ops: usize,
     },
-    /// All tests done.
-    Done,
+    /// All tests done. Includes operation log from first test for replay.
+    Done {
+        replay_ops: Vec<Operation>,
+    },
     /// A panic occurred (e.g., todo!()).
     Panicked(String),
+}
+
+/// Message from complexity measurement thread.
+pub enum ComplexityMessage {
+    Result {
+        estimated: String,
+        ascii_plot: String,
+    },
+    Error(String),
 }
 
 // ─── Problem List ─────────────────────────────────────────
@@ -290,6 +302,7 @@ impl ProblemDetailState {
                 let path = editor::solution_file_path(&problems[problem_idx].topic);
                 Action::LaunchEditor(path.to_string_lossy().to_string())
             }
+            KeyCode::Char('i') => Action::Push(Screen::InTuiEditor { problem_idx }),
             KeyCode::Esc => Action::Pop,
             _ => Action::None,
         }
@@ -382,7 +395,9 @@ impl ProblemDetailState {
             Span::styled("[R]", Style::new().fg(theme::ACCENT).add_modifier(Modifier::BOLD)),
             Span::raw(" Run tests  "),
             Span::styled("[E]", Style::new().fg(theme::ACCENT).add_modifier(Modifier::BOLD)),
-            Span::raw(" Edit solution  "),
+            Span::raw(" Edit ($EDITOR)  "),
+            Span::styled("[I]", Style::new().fg(theme::ACCENT).add_modifier(Modifier::BOLD)),
+            Span::raw(" Edit (in-TUI)  "),
             Span::styled("[Esc]", Style::new().fg(theme::ACCENT).add_modifier(Modifier::BOLD)),
             Span::raw(" Back"),
         ]));
@@ -539,6 +554,9 @@ impl ProblemResultState {
                 let path = editor::solution_file_path(&problems[problem_idx].topic);
                 Action::LaunchEditor(path.to_string_lossy().to_string())
             }
+            KeyCode::Char('i') => Action::Push(Screen::InTuiEditor { problem_idx }),
+            KeyCode::Char('w') => Action::Push(Screen::ReplayPlayer { problem_idx }),
+            KeyCode::Char('c') => Action::Push(Screen::ComplexityView { problem_idx }),
             KeyCode::Char('j') | KeyCode::Down => {
                 self.scroll_offset = (self.scroll_offset + 1).min(max_scroll);
                 Action::None
@@ -646,7 +664,13 @@ impl ProblemResultState {
             Span::styled("[R]", Style::new().fg(theme::ACCENT).add_modifier(Modifier::BOLD)),
             Span::raw(" Run again  "),
             Span::styled("[E]", Style::new().fg(theme::ACCENT).add_modifier(Modifier::BOLD)),
-            Span::raw(" Edit solution  "),
+            Span::raw(" Edit  "),
+            Span::styled("[I]", Style::new().fg(theme::ACCENT).add_modifier(Modifier::BOLD)),
+            Span::raw(" In-TUI edit  "),
+            Span::styled("[W]", Style::new().fg(theme::ACCENT).add_modifier(Modifier::BOLD)),
+            Span::raw(" Watch replay  "),
+            Span::styled("[C]", Style::new().fg(theme::ACCENT).add_modifier(Modifier::BOLD)),
+            Span::raw(" Complexity  "),
             Span::styled("[Esc]", Style::new().fg(theme::ACCENT).add_modifier(Modifier::BOLD)),
             Span::raw(" Back"),
         ]));
@@ -684,6 +708,7 @@ pub fn spawn_test_runner(problem_id: String) -> mpsc::Receiver<TestMessage> {
 
             let test_cases = problem.generate_tests();
             let total = test_cases.len();
+            let mut first_ops: Vec<Operation> = Vec::new();
 
             for (i, test) in test_cases.iter().enumerate() {
                 let mut log = OperationLog::new();
@@ -692,6 +717,11 @@ pub fn spawn_test_runner(problem_id: String) -> mpsc::Receiver<TestMessage> {
                 let case_result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
                     problem.run_solution(test, &mut log)
                 }));
+
+                // Capture ops from the first test for replay
+                if i == 0 {
+                    first_ops = log.operations().to_vec();
+                }
 
                 match case_result {
                     Ok(result) => {
@@ -729,7 +759,7 @@ pub fn spawn_test_runner(problem_id: String) -> mpsc::Receiver<TestMessage> {
                     }
                 }
             }
-            let _ = tx.send(TestMessage::Done);
+            let _ = tx.send(TestMessage::Done { replay_ops: first_ops });
         }));
 
         if let Err(panic_info) = result {
@@ -745,4 +775,156 @@ pub fn spawn_test_runner(problem_id: String) -> mpsc::Receiver<TestMessage> {
     });
 
     rx
+}
+
+/// Spawn a complexity measurement thread.
+pub fn spawn_complexity_runner(problem_id: String) -> mpsc::Receiver<ComplexityMessage> {
+    let (tx, rx) = mpsc::channel();
+
+    std::thread::spawn(move || {
+        let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+            let Some(problem) = problems::get_problem(&problem_id) else {
+                let _ = tx.send(ComplexityMessage::Error("Unknown problem".to_string()));
+                return;
+            };
+            let cr = complexity::measure_complexity(problem.as_ref());
+            let _ = tx.send(ComplexityMessage::Result {
+                estimated: cr.estimated_complexity,
+                ascii_plot: cr.ascii_plot,
+            });
+        }));
+
+        if result.is_err() {
+            let _ = tx.send(ComplexityMessage::Error(
+                "Panic during complexity measurement".to_string(),
+            ));
+        }
+    });
+
+    rx
+}
+
+// ─── Complexity View ──────────────────────────────────────
+
+pub struct ComplexityViewState {
+    pub loading: bool,
+    pub estimated: String,
+    pub ascii_plot: String,
+    pub error: Option<String>,
+    pub scroll_offset: u16,
+}
+
+impl ComplexityViewState {
+    pub fn new() -> Self {
+        Self {
+            loading: true,
+            estimated: String::new(),
+            ascii_plot: String::new(),
+            error: None,
+            scroll_offset: 0,
+        }
+    }
+
+    pub fn reset(&mut self) {
+        self.loading = true;
+        self.estimated.clear();
+        self.ascii_plot.clear();
+        self.error = None;
+        self.scroll_offset = 0;
+    }
+
+    pub fn handle_key(&mut self, key: KeyEvent, visible_height: u16) -> Action {
+        if self.loading {
+            if key.code == KeyCode::Esc {
+                return Action::Pop;
+            }
+            return Action::None;
+        }
+
+        let total_lines = self.ascii_plot.lines().count() + 10;
+        let max_scroll = total_lines.saturating_sub(visible_height as usize) as u16;
+
+        match key.code {
+            KeyCode::Char('j') | KeyCode::Down => {
+                self.scroll_offset = (self.scroll_offset + 1).min(max_scroll);
+                Action::None
+            }
+            KeyCode::Char('k') | KeyCode::Up => {
+                self.scroll_offset = self.scroll_offset.saturating_sub(1);
+                Action::None
+            }
+            KeyCode::Esc => Action::Pop,
+            _ => Action::None,
+        }
+    }
+
+    pub fn render(
+        &self,
+        f: &mut Frame,
+        area: Rect,
+        problem_idx: usize,
+        problems: &[ProblemInfo],
+    ) {
+        let p = &problems[problem_idx];
+        let mut lines = vec![
+            Line::raw(""),
+            Line::from(vec![
+                Span::styled("  Complexity: ", Style::new().fg(Color::DarkGray)),
+                Span::styled(&p.name, theme::heading_style()),
+            ]),
+            Line::raw(""),
+        ];
+
+        if self.loading {
+            lines.push(Line::from(Span::styled(
+                "  Measuring empirical complexity...",
+                Style::new()
+                    .fg(Color::Yellow)
+                    .add_modifier(Modifier::BOLD),
+            )));
+            lines.push(Line::from(Span::styled(
+                "  Running solution at multiple input sizes (this may take a few seconds)",
+                theme::muted_style(),
+            )));
+        } else if let Some(ref err) = self.error {
+            lines.push(Line::from(Span::styled(
+                format!("  Error: {}", err),
+                theme::error_style(),
+            )));
+        } else {
+            lines.push(Line::from(vec![
+                Span::styled("  Estimated: ", Style::new().fg(Color::DarkGray)),
+                Span::styled(
+                    &self.estimated,
+                    Style::new()
+                        .fg(Color::Cyan)
+                        .add_modifier(Modifier::BOLD),
+                ),
+            ]));
+            lines.push(Line::raw(""));
+
+            for plot_line in self.ascii_plot.lines() {
+                lines.push(Line::raw(format!("  {}", plot_line)));
+            }
+        }
+
+        lines.push(Line::raw(""));
+        lines.push(Line::from(vec![
+            Span::raw("  "),
+            Span::styled("[Esc]", Style::new().fg(theme::ACCENT).add_modifier(Modifier::BOLD)),
+            Span::raw(" Back"),
+        ]));
+
+        let block = Block::default()
+            .borders(Borders::ALL)
+            .title(format!(" Complexity: {} ", p.id))
+            .title_style(theme::title_style());
+
+        f.render_widget(
+            Paragraph::new(lines)
+                .block(block)
+                .scroll((self.scroll_offset, 0)),
+            area,
+        );
+    }
 }

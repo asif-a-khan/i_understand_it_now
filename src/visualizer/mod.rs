@@ -1,4 +1,5 @@
 pub mod engine;
+pub mod instrumented;
 pub mod reference;
 
 /// What kind of highlighting to apply to an element.
@@ -51,6 +52,7 @@ pub fn get_reference(name: &str) -> Option<Box<dyn ReferenceViz>> {
         "merge_sort" => Some(Box::new(reference::MergeSortViz)),
         "quick_sort" => Some(Box::new(reference::QuickSortViz)),
         "binary_search" => Some(Box::new(reference::BinarySearchViz)),
+        "heap_sort" => Some(Box::new(reference::HeapSortViz)),
         _ => None,
     }
 }
@@ -63,6 +65,7 @@ pub fn list_references() -> Vec<&'static str> {
         "insertion_sort",
         "merge_sort",
         "quick_sort",
+        "heap_sort",
         "binary_search",
     ]
 }
