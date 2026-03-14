@@ -80,6 +80,7 @@ impl RefTrie {
         true
     }
 
+    #[allow(dead_code)]
     fn count_prefix(&self, prefix: &str) -> i32 {
         let mut node = self;
         for c in prefix.chars() {
@@ -91,6 +92,7 @@ impl RefTrie {
         node.count as i32
     }
 
+    #[allow(dead_code)]
     fn collect_words(&self, prefix: &str) -> Vec<String> {
         let mut result = Vec::new();
         self.collect_helper(prefix, &mut result);

@@ -233,6 +233,7 @@ pub fn track_slice<T: Clone>(values: &[T], log: Rc<RefCell<OperationLog>>) -> Ve
 }
 
 /// Record a swap between two positions in a tracked slice.
+#[allow(dead_code)]
 pub fn tracked_swap<T>(slice: &mut [Tracked<T>], a: usize, b: usize) {
     if a < slice.len() && b < slice.len() {
         slice[a].log.borrow_mut().record(Operation::Swap {

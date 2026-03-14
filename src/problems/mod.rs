@@ -77,6 +77,7 @@ pub fn all_problems() -> Vec<Box<dyn Problem>> {
 }
 
 /// List problems filtered by topic.
+#[allow(dead_code)]
 pub fn problems_by_topic(topic: &str) -> Vec<Box<dyn Problem>> {
     all_problems()
         .into_iter()
@@ -85,6 +86,7 @@ pub fn problems_by_topic(topic: &str) -> Vec<Box<dyn Problem>> {
 }
 
 /// List problems filtered by difficulty.
+#[allow(dead_code)]
 pub fn problems_by_difficulty(difficulty: Difficulty) -> Vec<Box<dyn Problem>> {
     all_problems()
         .into_iter()

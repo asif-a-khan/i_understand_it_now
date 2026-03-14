@@ -27,6 +27,7 @@ pub fn problems() -> Vec<Box<dyn Problem>> {
 
 /// Shared test data for conceptual Big-O problems.
 /// Each problem has exactly one correct answer, so we store a simple identifier.
+#[allow(dead_code)]
 struct BigOTest {
     pattern_id: u32,
 }

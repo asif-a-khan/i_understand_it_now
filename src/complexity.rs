@@ -2,6 +2,7 @@ use crate::problems::Problem;
 use crate::tracker::OperationLog;
 
 /// Result of empirical complexity measurement.
+#[allow(dead_code)]
 pub struct ComplexityResult {
     /// (input_size, operations_count) pairs
     pub measurements: Vec<(usize, usize)>,

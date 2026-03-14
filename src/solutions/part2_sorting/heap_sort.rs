@@ -1,6 +1,7 @@
 // Heap Sort — Solution Templates
 // Edit these functions to solve each problem. Run with: cargo run -- solve <problem_id>
 
+#[allow(unused_imports)]
 use crate::tracker::{Tracked, tracked_swap};
 
 /// Heap Sort (Basic): Sort the array in ascending order using heap sort.

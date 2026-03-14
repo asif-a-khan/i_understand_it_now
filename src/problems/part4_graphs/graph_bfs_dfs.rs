@@ -43,6 +43,7 @@ fn build_adj_undirected(n: usize, edges: &[(usize, usize)]) -> Vec<Vec<usize>> {
 }
 
 /// Build directed adjacency list.
+#[allow(dead_code)]
 fn build_adj_directed(n: usize, edges: &[(usize, usize)]) -> Vec<Vec<usize>> {
     let mut adj = vec![vec![]; n];
     for &(u, v) in edges {

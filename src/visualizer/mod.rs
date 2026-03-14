@@ -32,6 +32,7 @@ pub struct VizFrame {
 
 /// A reference visualization for a specific algorithm.
 pub trait ReferenceViz {
+    #[allow(dead_code)]
     fn id(&self) -> &str;
     fn name(&self) -> &str;
     fn description(&self) -> &str;
