@@ -1,3 +1,4 @@
+use crate::tracker::Tracked;
 // Tries (Prefix Trees) -- Solution Templates
 // Edit these functions to solve each problem. Run with: cargo run -- solve <problem_id>
 
@@ -75,7 +76,7 @@ pub fn concatenated_words(_words: &[String]) -> Vec<String> {
 }
 
 /// Maximum XOR: return maximum XOR of any two elements in the array.
-pub fn maximum_xor(_nums: &[i32]) -> i32 {
+pub fn maximum_xor(_nums: &[Tracked<i32>]) -> i32 {
     todo!()
 }
 

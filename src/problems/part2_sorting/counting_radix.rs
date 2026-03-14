@@ -1,9 +1,12 @@
 use rand::Rng;
 use std::collections::HashMap;
 
+use std::cell::RefCell;
+use std::rc::Rc;
+
 use crate::problems::{Difficulty, Problem, SolutionResult, TestCase};
 use crate::solutions::part2_sorting::counting_radix as solutions;
-use crate::tracker::OperationLog;
+use crate::tracker::{track_slice, OperationLog};
 
 pub fn problems() -> Vec<Box<dyn Problem>> {
     vec![
@@ -68,11 +71,16 @@ impl Problem for CountingSortBasic {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<CountingSortBasicTest>().unwrap();
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
         let mut expected = t.nums.clone();
         expected.sort();
-        let actual = solutions::counting_sort(&t.nums);
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::counting_sort(&tracked_nums);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: actual == expected,
             input_description: format!("nums={:?}", t.nums),
@@ -126,11 +134,16 @@ impl Problem for SortColors {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<SortColorsTest>().unwrap();
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
         let mut expected = t.nums.clone();
         expected.sort();
-        let actual = solutions::sort_colors(&t.nums);
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::sort_colors(&tracked_nums);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: actual == expected,
             input_description: format!("nums={:?}", t.nums),
@@ -200,10 +213,16 @@ impl Problem for RelativeSort {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<RelativeSortTest>().unwrap();
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
         let expected = ref_relative_sort(&t.arr1, &t.arr2);
-        let actual = solutions::relative_sort(&t.arr1, &t.arr2);
+        let tracked_arr1 = track_slice(&t.arr1, shared_log.clone());
+        let tracked_arr2 = track_slice(&t.arr2, shared_log.clone());
+        let actual = solutions::relative_sort(&tracked_arr1, &tracked_arr2);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: actual == expected,
             input_description: format!("arr1={:?}, arr2={:?}", t.arr1, t.arr2),
@@ -269,8 +288,9 @@ impl Problem for HeightChecker {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<HeightCheckerTest>().unwrap();
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
         let mut sorted = t.heights.clone();
         sorted.sort();
         let expected: i32 = t
@@ -279,7 +299,11 @@ impl Problem for HeightChecker {
             .zip(sorted.iter())
             .filter(|(a, b)| a != b)
             .count() as i32;
-        let actual = solutions::height_checker(&t.heights);
+        let tracked_heights = track_slice(&t.heights, shared_log.clone());
+        let actual = solutions::height_checker(&tracked_heights);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("heights={:?}", t.heights),
@@ -401,11 +425,16 @@ impl Problem for RadixSortBasic {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<RadixSortBasicTest>().unwrap();
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
         let mut expected = t.nums.clone();
         expected.sort();
-        let actual = solutions::radix_sort(&t.nums);
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::radix_sort(&tracked_nums);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: actual == expected,
             input_description: format!("nums={:?}", t.nums),
@@ -460,10 +489,15 @@ impl Problem for MaximumGap {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<MaximumGapTest>().unwrap();
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
         let expected = ref_maximum_gap(&t.nums);
-        let actual = solutions::maximum_gap(&t.nums);
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::maximum_gap(&tracked_nums);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("nums={:?}", t.nums),
@@ -528,11 +562,16 @@ impl Problem for BucketSortBasic {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<BucketSortBasicTest>().unwrap();
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
         let mut expected = t.nums.clone();
         expected.sort_by(|a, b| a.partial_cmp(b).unwrap());
-        let actual = solutions::bucket_sort(&t.nums);
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::bucket_sort(&tracked_nums);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         let is_correct = expected.len() == actual.len()
             && expected
                 .iter()
@@ -766,10 +805,15 @@ impl Problem for RadixSortMaxGap {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<RadixSortMaxGapTest>().unwrap();
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
         let expected = ref_maximum_gap(&t.nums);
-        let actual = solutions::radix_sort_max_gap(&t.nums);
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::radix_sort_max_gap(&tracked_nums);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("nums={:?}", t.nums),
@@ -827,17 +871,22 @@ impl Problem for SmallestMissingPositive {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test
             .data
             .downcast_ref::<SmallestMissingPositiveTest>()
             .unwrap();
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
         let set: std::collections::HashSet<i32> = t.nums.iter().copied().collect();
         let mut expected = 1;
         while set.contains(&expected) {
             expected += 1;
         }
-        let actual = solutions::smallest_missing_positive(&t.nums);
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::smallest_missing_positive(&tracked_nums);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("nums={:?}", t.nums),
@@ -896,10 +945,16 @@ impl Problem for CreateMaximumNumber {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<CreateMaximumNumberTest>().unwrap();
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
         let expected = ref_create_max_number(&t.nums1, &t.nums2, t.k);
-        let actual = solutions::create_maximum_number(&t.nums1, &t.nums2, t.k);
+        let tracked_nums1 = track_slice(&t.nums1, shared_log.clone());
+        let tracked_nums2 = track_slice(&t.nums2, shared_log.clone());
+        let actual = solutions::create_maximum_number(&tracked_nums1, &tracked_nums2, t.k);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("nums1={:?}, nums2={:?}, k={}", t.nums1, t.nums2, t.k),
@@ -1082,10 +1137,15 @@ impl Problem for SortTransformed {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<SortTransformedTest>().unwrap();
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
         let expected = ref_sort_transformed(&t.nums, t.a, t.b, t.c);
-        let actual = solutions::sort_transformed(&t.nums, t.a, t.b, t.c);
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::sort_transformed(&tracked_nums, t.a, t.b, t.c);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("nums={:?}, a={}, b={}, c={}", t.nums, t.a, t.b, t.c),

@@ -18,7 +18,7 @@ pub fn heap_sort(_arr: &mut [Tracked<i32>]) {
 /// Kth Largest Element: Return the kth largest element (1-indexed).
 ///
 /// Hint: Use a min-heap of size k, or sort and pick.
-pub fn kth_largest(_nums: &[i32], _k: usize) -> i32 {
+pub fn kth_largest(_nums: &[Tracked<i32>], _k: usize) -> i32 {
     todo!()
 }
 
@@ -26,14 +26,14 @@ pub fn kth_largest(_nums: &[i32], _k: usize) -> i32 {
 ///
 /// If both equal, both destroyed. Otherwise the difference remains.
 /// Return weight of the last stone (or 0 if none remain).
-pub fn last_stone_weight(_stones: &[i32]) -> i32 {
+pub fn last_stone_weight(_stones: &[Tracked<i32>]) -> i32 {
     todo!()
 }
 
 /// K Weakest Rows: Return indices of the k rows with fewest 1s.
 ///
 /// A row is weaker if it has fewer 1s. Ties broken by row index.
-pub fn k_weakest_rows(_matrix: &[Vec<i32>], _k: usize) -> Vec<usize> {
+pub fn k_weakest_rows(_matrix: &[Vec<Tracked<i32>>], _k: usize) -> Vec<usize> {
     todo!()
 }
 
@@ -41,35 +41,35 @@ pub fn k_weakest_rows(_matrix: &[Vec<i32>], _k: usize) -> Vec<usize> {
 ///
 /// 1st -> "Gold Medal", 2nd -> "Silver Medal", 3rd -> "Bronze Medal",
 /// 4th -> "4", 5th -> "5", etc.
-pub fn relative_ranks(_scores: &[i32]) -> Vec<String> {
+pub fn relative_ranks(_scores: &[Tracked<i32>]) -> Vec<String> {
     todo!()
 }
 
 /// K Closest Points to Origin: Return k closest points sorted by distance.
 ///
 /// Distance = x*x + y*y. Ties broken by x then y.
-pub fn k_closest_points(_points: &[(i32, i32)], _k: usize) -> Vec<(i32, i32)> {
+pub fn k_closest_points(_points: &[(Tracked<i32>, Tracked<i32>)], _k: usize) -> Vec<(i32, i32)> {
     todo!()
 }
 
 /// Top K Frequent Elements: Return k most frequent elements.
 ///
 /// Sorted by frequency (descending). Ties broken by value (ascending).
-pub fn top_k_frequent(_nums: &[i32], _k: usize) -> Vec<i32> {
+pub fn top_k_frequent(_nums: &[Tracked<i32>], _k: usize) -> Vec<i32> {
     todo!()
 }
 
 /// Sort Nearly Sorted Array: Sort a k-sorted array using a min-heap.
 ///
 /// Each element is at most k positions from its sorted position.
-pub fn sort_nearly_sorted(_nums: &[i32], _k: usize) -> Vec<i32> {
+pub fn sort_nearly_sorted(_nums: &[Tracked<i32>], _k: usize) -> Vec<i32> {
     todo!()
 }
 
 /// Merge K Sorted Lists: Merge k sorted lists into one sorted list.
 ///
 /// Use a min-heap for efficient merging.
-pub fn merge_k_sorted(_lists: &[Vec<i32>]) -> Vec<i32> {
+pub fn merge_k_sorted(_lists: &[Vec<Tracked<i32>>]) -> Vec<i32> {
     todo!()
 }
 
@@ -84,28 +84,28 @@ pub fn task_scheduler(_tasks: &[char], _n: i32) -> i32 {
 ///
 /// result[i] = median of nums[0..=i].
 /// Hint: use two heaps — max-heap for lower half, min-heap for upper half.
-pub fn find_median_stream(_nums: &[i32]) -> Vec<f64> {
+pub fn find_median_stream(_nums: &[Tracked<i32>]) -> Vec<f64> {
     todo!()
 }
 
 /// Sliding Window Median: Return median for each window of size k.
 ///
 /// Return Vec<f64>.
-pub fn sliding_window_median(_nums: &[i32], _k: usize) -> Vec<f64> {
+pub fn sliding_window_median(_nums: &[Tracked<i32>], _k: usize) -> Vec<f64> {
     todo!()
 }
 
 /// Trapping Rain Water II: Compute water trapped in a 2D heightmap.
 ///
 /// Use a min-heap BFS from the borders inward.
-pub fn trapping_rain_water_ii(_heightmap: &[Vec<i32>]) -> i32 {
+pub fn trapping_rain_water_ii(_heightmap: &[Vec<Tracked<i32>>]) -> i32 {
     todo!()
 }
 
 /// Smallest Range: Find the smallest [a,b] covering at least one element from each list.
 ///
 /// If multiple same-size ranges, return the one with smallest a.
-pub fn smallest_range(_lists: &[Vec<i32>]) -> (i32, i32) {
+pub fn smallest_range(_lists: &[Vec<Tracked<i32>>]) -> (i32, i32) {
     todo!()
 }
 
@@ -113,6 +113,6 @@ pub fn smallest_range(_lists: &[Vec<i32>]) -> (i32, i32) {
 ///
 /// You start with capital w. Each project requires minimum capital and yields profit.
 /// Return maximized final capital.
-pub fn ipo(_k: usize, _w: i32, _profits: &[i32], _capital: &[i32]) -> i32 {
+pub fn ipo(_k: usize, _w: i32, _profits: &[Tracked<i32>], _capital: &[Tracked<i32>]) -> i32 {
     todo!()
 }

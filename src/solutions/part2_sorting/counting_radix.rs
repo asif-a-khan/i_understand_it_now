@@ -1,3 +1,4 @@
+use crate::tracker::Tracked;
 // Counting Sort & Radix Sort — Solution Templates
 // Edit these functions to solve each problem. Run with: cargo run -- solve <problem_id>
 
@@ -5,28 +6,28 @@
 ///
 /// Create a count array sized to the maximum value, tally occurrences,
 /// then reconstruct the sorted output.
-pub fn counting_sort(_nums: &[i32]) -> Vec<i32> {
+pub fn counting_sort(_nums: &[Tracked<i32>]) -> Vec<i32> {
     todo!()
 }
 
 /// Sort Colors: Sort an array of 0s, 1s, and 2s.
 ///
 /// Hint: counting sort with 3 buckets, or Dutch National Flag algorithm.
-pub fn sort_colors(_nums: &[i32]) -> Vec<i32> {
+pub fn sort_colors(_nums: &[Tracked<i32>]) -> Vec<i32> {
     todo!()
 }
 
 /// Relative Sort Array: Sort arr1 so elements match the order in arr2.
 ///
 /// Elements not in arr2 go at the end in ascending order.
-pub fn relative_sort(_arr1: &[i32], _arr2: &[i32]) -> Vec<i32> {
+pub fn relative_sort(_arr1: &[Tracked<i32>], _arr2: &[Tracked<i32>]) -> Vec<i32> {
     todo!()
 }
 
 /// Height Checker: Count students not in the correct height order.
 ///
 /// Compare against the counting-sorted version.
-pub fn height_checker(_heights: &[i32]) -> i32 {
+pub fn height_checker(_heights: &[Tracked<i32>]) -> i32 {
     todo!()
 }
 
@@ -41,7 +42,7 @@ pub fn sort_by_frequency(_s: &str) -> String {
 ///
 /// Process digits from least significant to most significant,
 /// using counting sort as a stable subroutine.
-pub fn radix_sort(_nums: &[i32]) -> Vec<i32> {
+pub fn radix_sort(_nums: &[Tracked<i32>]) -> Vec<i32> {
     todo!()
 }
 
@@ -49,14 +50,14 @@ pub fn radix_sort(_nums: &[i32]) -> Vec<i32> {
 ///
 /// Use a bucket/pigeonhole approach for O(n) time.
 /// Return 0 if fewer than 2 elements.
-pub fn maximum_gap(_nums: &[i32]) -> i32 {
+pub fn maximum_gap(_nums: &[Tracked<i32>]) -> i32 {
     todo!()
 }
 
 /// Bucket Sort: Sort floats in [0.0, 1.0) using bucket sort.
 ///
 /// Distribute into n buckets, sort each, concatenate.
-pub fn bucket_sort(_nums: &[f64]) -> Vec<f64> {
+pub fn bucket_sort(_nums: &[Tracked<f64>]) -> Vec<f64> {
     todo!()
 }
 
@@ -78,7 +79,7 @@ pub fn reorganize_string(_s: &str) -> String {
 ///
 /// The max gap must be >= ceil((max - min) / (n - 1)), so you only need
 /// to track bucket min/max values.
-pub fn radix_sort_max_gap(_nums: &[i32]) -> i32 {
+pub fn radix_sort_max_gap(_nums: &[Tracked<i32>]) -> i32 {
     todo!()
 }
 
@@ -86,7 +87,7 @@ pub fn radix_sort_max_gap(_nums: &[i32]) -> i32 {
 ///
 /// Use in-place counting sort: place value v at index v-1, then scan
 /// for the first i where nums[i] != i+1.
-pub fn smallest_missing_positive(_nums: &[i32]) -> i32 {
+pub fn smallest_missing_positive(_nums: &[Tracked<i32>]) -> i32 {
     todo!()
 }
 
@@ -94,7 +95,11 @@ pub fn smallest_missing_positive(_nums: &[i32]) -> i32 {
 ///
 /// Preserve relative order within each array. Try all splits of k
 /// between the two arrays, take the max subsequence from each, merge optimally.
-pub fn create_maximum_number(_nums1: &[i32], _nums2: &[i32], _k: usize) -> Vec<i32> {
+pub fn create_maximum_number(
+    _nums1: &[Tracked<i32>],
+    _nums2: &[Tracked<i32>],
+    _k: usize,
+) -> Vec<i32> {
     todo!()
 }
 
@@ -110,6 +115,6 @@ pub fn suffix_array(_s: &str) -> Vec<usize> {
 ///
 /// Return the transformed values in sorted order.
 /// Hint: use two pointers from the ends if a != 0.
-pub fn sort_transformed(_nums: &[i32], _a: i32, _b: i32, _c: i32) -> Vec<i32> {
+pub fn sort_transformed(_nums: &[Tracked<i32>], _a: i32, _b: i32, _c: i32) -> Vec<i32> {
     todo!()
 }

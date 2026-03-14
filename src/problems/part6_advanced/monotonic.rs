@@ -1,8 +1,11 @@
+use std::cell::RefCell;
+use std::rc::Rc;
+
 use rand::Rng;
 
 use crate::problems::{Difficulty, Problem, SolutionResult, TestCase};
 use crate::solutions::part6_advanced::monotonic as solutions;
-use crate::tracker::OperationLog;
+use crate::tracker::{track_slice, OperationLog, Tracked};
 
 pub fn problems() -> Vec<Box<dyn Problem>> {
     vec![
@@ -322,10 +325,15 @@ impl Problem for MonotonicNextGreater {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<NextGreaterTest>().unwrap();
         let expected = ref_next_greater(&t.nums);
-        let actual = solutions::next_greater(&t.nums);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::next_greater(&tracked_nums);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("nums={:?}", t.nums),
@@ -376,10 +384,15 @@ impl Problem for MonotonicNextSmaller {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<NextSmallerTest>().unwrap();
         let expected = ref_next_smaller(&t.nums);
-        let actual = solutions::next_smaller(&t.nums);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::next_smaller(&tracked_nums);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("nums={:?}", t.nums),
@@ -430,10 +443,15 @@ impl Problem for MonotonicDailyTemperatures {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<DailyTempsTest>().unwrap();
         let expected = ref_daily_temperatures(&t.temps);
-        let actual = solutions::daily_temperatures(&t.temps);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_temps = track_slice(&t.temps, shared_log.clone());
+        let actual = solutions::daily_temperatures(&tracked_temps);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("temps={:?}", t.temps),
@@ -484,10 +502,15 @@ impl Problem for MonotonicStockSpan {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<StockSpanTest>().unwrap();
         let expected = ref_stock_span(&t.prices);
-        let actual = solutions::stock_span(&t.prices);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_prices = track_slice(&t.prices, shared_log.clone());
+        let actual = solutions::stock_span(&tracked_prices);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("prices={:?}", t.prices),
@@ -539,10 +562,15 @@ impl Problem for MonotonicSlidingWindowMax {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<SlidingMaxTest>().unwrap();
         let expected = ref_sliding_window_max(&t.nums, t.k);
-        let actual = solutions::sliding_window_max(&t.nums, t.k);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::sliding_window_max(&tracked_nums, t.k);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("nums={:?}, k={}", t.nums, t.k),
@@ -592,10 +620,15 @@ impl Problem for MonotonicLargestRectangle {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<LargestRectTest>().unwrap();
         let expected = ref_largest_rectangle(&t.heights);
-        let actual = solutions::largest_rectangle(&t.heights);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_heights = track_slice(&t.heights, shared_log.clone());
+        let actual = solutions::largest_rectangle(&tracked_heights);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("heights={:?}", t.heights),
@@ -649,10 +682,25 @@ impl Problem for MonotonicMaximalRectangle {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<MaxRectTest>().unwrap();
         let expected = ref_maximal_rectangle(&t.matrix);
-        let actual = solutions::maximal_rectangle(&t.matrix);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked: Vec<Vec<Tracked<i32>>> = t
+            .matrix
+            .iter()
+            .enumerate()
+            .map(|(r, row)| {
+                row.iter()
+                    .enumerate()
+                    .map(|(c, &v)| Tracked::new(v, r * row.len().max(1) + c, shared_log.clone()))
+                    .collect()
+            })
+            .collect();
+        let actual = solutions::maximal_rectangle(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("matrix={:?}", t.matrix),
@@ -766,10 +814,15 @@ impl Problem for MonotonicSumOfSubarrayMinimums {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<SubMinTest>().unwrap();
         let expected = ref_sum_of_subarray_minimums(&t.arr);
-        let actual = solutions::sum_of_subarray_minimums(&t.arr);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_arr = track_slice(&t.arr, shared_log.clone());
+        let actual = solutions::sum_of_subarray_minimums(&tracked_arr);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("arr={:?}", t.arr),
@@ -821,10 +874,15 @@ impl Problem for MonotonicSlidingWindowMin {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<SlidingMinTest>().unwrap();
         let expected = ref_sliding_window_min(&t.nums, t.k);
-        let actual = solutions::sliding_window_min(&t.nums, t.k);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::sliding_window_min(&tracked_nums, t.k);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("nums={:?}, k={}", t.nums, t.k),
@@ -874,10 +932,15 @@ impl Problem for MonotonicTrappingRainWater {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<TrapTest>().unwrap();
         let expected = ref_trapping_rain_water(&t.height);
-        let actual = solutions::trapping_rain_water(&t.height);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_height = track_slice(&t.height, shared_log.clone());
+        let actual = solutions::trapping_rain_water(&tracked_height);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("height={:?}", t.height),
@@ -928,10 +991,15 @@ impl Problem for MonotonicMaxWidthRamp {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<MaxRampTest>().unwrap();
         let expected = ref_max_width_ramp(&t.nums);
-        let actual = solutions::max_width_ramp(&t.nums);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::max_width_ramp(&tracked_nums);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("nums={:?}", t.nums),
@@ -982,10 +1050,15 @@ impl Problem for MonotonicSumSubarrayRanges {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<SubRangesTest>().unwrap();
         let expected = ref_sum_subarray_ranges(&t.nums);
-        let actual = solutions::sum_subarray_ranges(&t.nums);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::sum_subarray_ranges(&tracked_nums);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("nums={:?}", t.nums),
@@ -1038,10 +1111,15 @@ impl Problem for MonotonicShortestSubarraySumK {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<ShortestSubSumTest>().unwrap();
         let expected = ref_shortest_subarray_sum_k(&t.nums, t.k);
-        let actual = solutions::shortest_subarray_sum_k(&t.nums, t.k);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::shortest_subarray_sum_k(&tracked_nums, t.k);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("nums={:?}, k={}", t.nums, t.k),

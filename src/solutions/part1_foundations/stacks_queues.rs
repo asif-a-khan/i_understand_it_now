@@ -1,3 +1,4 @@
+use crate::tracker::Tracked;
 // Stacks, Queues & Deques — Solution Templates
 // Edit these functions to solve each problem. Run with: cargo run -- solve <problem_id>
 
@@ -60,7 +61,7 @@ pub fn baseball_game(_ops: &[String]) -> i32 {
 /// Example: [1, 2, 1] -> [2, -1, 2]
 ///
 /// Hint: use a monotonic stack, iterate through the array twice (2*n).
-pub fn next_greater_element(_nums: &[i32]) -> Vec<i32> {
+pub fn next_greater_element(_nums: &[Tracked<i32>]) -> Vec<i32> {
     todo!()
 }
 
@@ -73,7 +74,7 @@ pub fn next_greater_element(_nums: &[i32]) -> Vec<i32> {
 /// Example: [73, 74, 75, 71, 69, 72, 76, 73] -> [1, 1, 4, 2, 1, 1, 0, 0]
 ///
 /// Hint: use a monotonic decreasing stack of indices.
-pub fn daily_temperatures(_temperatures: &[i32]) -> Vec<i32> {
+pub fn daily_temperatures(_temperatures: &[Tracked<i32>]) -> Vec<i32> {
     todo!()
 }
 
@@ -106,7 +107,7 @@ pub fn decode_string(_s: &str) -> String {
 /// Example: [5, 10, -5] -> [5, 10]  (10 destroys -5, 5 never meets -5)
 ///
 /// Hint: use a stack. Only collisions happen when stack top is positive and current is negative.
-pub fn asteroid_collision(_asteroids: &[i32]) -> Vec<i32> {
+pub fn asteroid_collision(_asteroids: &[Tracked<i32>]) -> Vec<i32> {
     todo!()
 }
 
@@ -118,7 +119,7 @@ pub fn asteroid_collision(_asteroids: &[i32]) -> Vec<i32> {
 /// Example: [100, 80, 60, 70, 60, 75, 85] -> [1, 1, 1, 2, 1, 4, 6]
 ///
 /// Hint: use a monotonic stack storing (price, accumulated_span) pairs.
-pub fn online_stock_span(_prices: &[i32]) -> Vec<i32> {
+pub fn online_stock_span(_prices: &[Tracked<i32>]) -> Vec<i32> {
     todo!()
 }
 
@@ -130,7 +131,7 @@ pub fn online_stock_span(_prices: &[i32]) -> Vec<i32> {
 ///
 /// Hint: use a monotonic deque (VecDeque) storing indices.
 /// Remove from front if out of window. Remove from back if smaller than current.
-pub fn sliding_window_max(_nums: &[i32], _k: usize) -> Vec<i32> {
+pub fn sliding_window_max(_nums: &[Tracked<i32>], _k: usize) -> Vec<i32> {
     todo!()
 }
 
@@ -140,7 +141,7 @@ pub fn sliding_window_max(_nums: &[i32], _k: usize) -> Vec<i32> {
 ///
 /// Hint: use a monotonic increasing stack. When a shorter bar is found,
 /// pop and calculate area using the popped height and width span.
-pub fn largest_rectangle_histogram(_heights: &[i32]) -> i32 {
+pub fn largest_rectangle_histogram(_heights: &[Tracked<i32>]) -> i32 {
     todo!()
 }
 
@@ -150,7 +151,7 @@ pub fn largest_rectangle_histogram(_heights: &[i32]) -> i32 {
 ///
 /// Hint: use a stack of indices. When current height > stack top,
 /// pop the top and calculate water bounded between current and new stack top.
-pub fn trapping_rain_water_stack(_height: &[i32]) -> i32 {
+pub fn trapping_rain_water_stack(_height: &[Tracked<i32>]) -> i32 {
     todo!()
 }
 

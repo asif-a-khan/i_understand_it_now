@@ -1,9 +1,12 @@
+use std::cell::RefCell;
+use std::rc::Rc;
+
 use rand::Rng;
 use std::collections::HashMap;
 
 use crate::problems::{Difficulty, Problem, SolutionResult, TestCase};
 use crate::solutions::part6_advanced::math_geometry as solutions;
-use crate::tracker::OperationLog;
+use crate::tracker::{track_slice, OperationLog, Tracked};
 
 pub fn problems() -> Vec<Box<dyn Problem>> {
     vec![
@@ -798,10 +801,25 @@ impl Problem for MathMaxPointsOnLine {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<MaxPointsTest>().unwrap();
         let expected = ref_max_points_on_line(&t.points);
-        let actual = solutions::max_points_on_line(&t.points);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked: Vec<(Tracked<i32>, Tracked<i32>)> = t
+            .points
+            .iter()
+            .enumerate()
+            .map(|(i, &(a, b))| {
+                (
+                    Tracked::new(a, i * 2, shared_log.clone()),
+                    Tracked::new(b, i * 2 + 1, shared_log.clone()),
+                )
+            })
+            .collect();
+        let actual = solutions::max_points_on_line(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("points={:?}", t.points),
@@ -905,10 +923,15 @@ impl Problem for MathNextPermutation {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<NextPermTest>().unwrap();
         let expected = ref_next_permutation(&t.nums);
-        let actual = solutions::next_permutation(&t.nums);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::next_permutation(&tracked_nums);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("nums={:?}", t.nums),
@@ -966,10 +989,25 @@ impl Problem for MathConvexHull {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<ConvexHullTest>().unwrap();
         let expected = ref_convex_hull(&t.points);
-        let mut actual = solutions::convex_hull(&t.points);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked: Vec<(Tracked<i64>, Tracked<i64>)> = t
+            .points
+            .iter()
+            .enumerate()
+            .map(|(i, &(a, b))| {
+                (
+                    Tracked::new(a, i * 2, shared_log.clone()),
+                    Tracked::new(b, i * 2 + 1, shared_log.clone()),
+                )
+            })
+            .collect();
+        let mut actual = solutions::convex_hull(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         actual.sort();
         actual.dedup();
         SolutionResult {
@@ -1088,10 +1126,25 @@ impl Problem for MathMatrixExponentiation {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<MatExpTest>().unwrap();
         let expected = ref_matrix_exp(&t.matrix, t.exp, t.m);
-        let actual = solutions::matrix_exponentiation(&t.matrix, t.exp, t.m);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked: Vec<Vec<Tracked<i64>>> = t
+            .matrix
+            .iter()
+            .enumerate()
+            .map(|(r, row)| {
+                row.iter()
+                    .enumerate()
+                    .map(|(c, &v)| Tracked::new(v, r * row.len().max(1) + c, shared_log.clone()))
+                    .collect()
+            })
+            .collect();
+        let actual = solutions::matrix_exponentiation(&tracked, t.exp, t.m);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("matrix={:?}, exp={}, m={}", t.matrix, t.exp, t.m),
@@ -1157,10 +1210,16 @@ impl Problem for MathChineseRemainder {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<CrtTest>().unwrap();
         let expected = ref_chinese_remainder(&t.remainders, &t.moduli);
-        let actual = solutions::chinese_remainder(&t.remainders, &t.moduli);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_remainders = track_slice(&t.remainders, shared_log.clone());
+        let tracked_moduli = track_slice(&t.moduli, shared_log.clone());
+        let actual = solutions::chinese_remainder(&tracked_remainders, &tracked_moduli);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         // Validate: actual satisfies all congruences
         let valid = if expected == -1 {
             actual == -1
@@ -1225,10 +1284,15 @@ impl Problem for MathTrapezoidalIntegral {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<TrapIntTest>().unwrap();
         let expected = ref_trapezoidal(&t.ys, t.dx);
-        let actual = solutions::trapezoidal_integral(&t.ys, t.dx);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_ys = track_slice(&t.ys, shared_log.clone());
+        let actual = solutions::trapezoidal_integral(&tracked_ys, t.dx);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: (expected - actual).abs() < 1e-6,
             input_description: format!("ys={:?}, dx={}", t.ys, t.dx),

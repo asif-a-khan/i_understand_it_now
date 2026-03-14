@@ -1,8 +1,9 @@
+use crate::tracker::Tracked;
 // Bit Manipulation — Solution Templates
 // Edit these functions to solve each problem. Run with: cargo run -- solve <problem_id>
 
 /// Single Number: find the element appearing once (others appear twice).
-pub fn single_number(_nums: &[i32]) -> i32 {
+pub fn single_number(_nums: &[Tracked<i32>]) -> i32 {
     todo!()
 }
 
@@ -22,7 +23,7 @@ pub fn reverse_bits(_n: u32) -> u32 {
 }
 
 /// Missing number in [0, n] given n distinct numbers.
-pub fn missing_number(_nums: &[i32]) -> i32 {
+pub fn missing_number(_nums: &[Tracked<i32>]) -> i32 {
     todo!()
 }
 
@@ -32,7 +33,7 @@ pub fn counting_bits(_n: i32) -> Vec<i32> {
 }
 
 /// Generate all subsets using bitmask. Return sorted.
-pub fn subsets_bitmask(_nums: &[i32]) -> Vec<Vec<i32>> {
+pub fn subsets_bitmask(_nums: &[Tracked<i32>]) -> Vec<Vec<i32>> {
     todo!()
 }
 
@@ -42,27 +43,27 @@ pub fn sum_without_arithmetic(_a: i32, _b: i32) -> i32 {
 }
 
 /// Total Hamming distance between all pairs.
-pub fn total_hamming_distance(_nums: &[i32]) -> i32 {
+pub fn total_hamming_distance(_nums: &[Tracked<i32>]) -> i32 {
     todo!()
 }
 
 /// Maximum XOR of any two numbers in the array.
-pub fn maximum_xor(_nums: &[i32]) -> i32 {
+pub fn maximum_xor(_nums: &[Tracked<i32>]) -> i32 {
     todo!()
 }
 
 /// Single Number II: element appearing once (others x3).
-pub fn single_number_ii(_nums: &[i32]) -> i32 {
+pub fn single_number_ii(_nums: &[Tracked<i32>]) -> i32 {
     todo!()
 }
 
 /// Single Number III: two elements appearing once (others x2). Return sorted.
-pub fn single_number_iii(_nums: &[i32]) -> Vec<i32> {
+pub fn single_number_iii(_nums: &[Tracked<i32>]) -> Vec<i32> {
     todo!()
 }
 
 /// Maximum AND of any pair.
-pub fn max_and_pair(_nums: &[i32]) -> i32 {
+pub fn max_and_pair(_nums: &[Tracked<i32>]) -> i32 {
     todo!()
 }
 

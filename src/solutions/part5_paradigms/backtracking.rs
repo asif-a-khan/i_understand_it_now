@@ -1,3 +1,4 @@
+use crate::tracker::Tracked;
 // Backtracking — Solution Templates
 // Edit these functions to solve each problem. Run with: cargo run -- solve <problem_id>
 
@@ -7,14 +8,14 @@
 /// list sorted lexicographically).
 ///
 /// Example: nums=[1,2,3] => [[], [1], [1,2], [1,2,3], [1,3], [2], [2,3], [3]]
-pub fn subsets(_nums: &[i32]) -> Vec<Vec<i32>> {
+pub fn subsets(_nums: &[Tracked<i32>]) -> Vec<Vec<i32>> {
     todo!()
 }
 
 /// Generate all permutations of the given array. Return sorted lexicographically.
 ///
 /// Example: nums=[1,2,3] => [[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]]
-pub fn permutations(_nums: &[i32]) -> Vec<Vec<i32>> {
+pub fn permutations(_nums: &[Tracked<i32>]) -> Vec<Vec<i32>> {
     todo!()
 }
 
@@ -49,7 +50,7 @@ pub fn binary_strings(_n: usize) -> Vec<String> {
 /// Each candidate can be used unlimited times. Return sorted.
 ///
 /// Example: candidates=[2,3,6,7], target=7 => [[2,2,3],[7]]
-pub fn combination_sum(_candidates: &[i32], _target: i32) -> Vec<Vec<i32>> {
+pub fn combination_sum(_candidates: &[Tracked<i32>], _target: i32) -> Vec<Vec<i32>> {
     todo!()
 }
 
@@ -57,7 +58,7 @@ pub fn combination_sum(_candidates: &[i32], _target: i32) -> Vec<Vec<i32>> {
 /// Return unique combinations that sum to target, sorted.
 ///
 /// Example: candidates=[10,1,2,7,6,1,5], target=8 => [[1,1,6],[1,2,5],[1,7],[2,6]]
-pub fn combination_sum_ii(_candidates: &[i32], _target: i32) -> Vec<Vec<i32>> {
+pub fn combination_sum_ii(_candidates: &[Tracked<i32>], _target: i32) -> Vec<Vec<i32>> {
     todo!()
 }
 

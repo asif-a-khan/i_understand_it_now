@@ -1,3 +1,4 @@
+use crate::tracker::Tracked;
 // Hash Maps & Sets — Solution Templates
 // Edit these functions to solve each problem. Run with: cargo run -- solve <problem_id>
 
@@ -6,7 +7,7 @@
 /// Contains Duplicate: return true if any value appears at least twice.
 ///
 /// Use a HashSet: insert each element and check if it was already present.
-pub fn contains_duplicate(_nums: &[i32]) -> bool {
+pub fn contains_duplicate(_nums: &[Tracked<i32>]) -> bool {
     todo!()
 }
 
@@ -14,7 +15,7 @@ pub fn contains_duplicate(_nums: &[i32]) -> bool {
 ///
 /// XOR all elements together — pairs cancel out, leaving the unique value.
 /// Alternatively, use a HashSet to track seen values.
-pub fn single_number(_nums: &[i32]) -> i32 {
+pub fn single_number(_nums: &[Tracked<i32>]) -> i32 {
     todo!()
 }
 
@@ -22,7 +23,7 @@ pub fn single_number(_nums: &[i32]) -> i32 {
 ///
 /// Build a HashSet from the first array, filter the second array through it,
 /// collect unique results and sort.
-pub fn intersection(_nums1: &[i32], _nums2: &[i32]) -> Vec<i32> {
+pub fn intersection(_nums1: &[Tracked<i32>], _nums2: &[Tracked<i32>]) -> Vec<i32> {
     todo!()
 }
 
@@ -56,7 +57,7 @@ pub fn group_anagrams(_strs: &[String]) -> Vec<Vec<String>> {
 ///
 /// Count frequencies with a HashMap, then sort by frequency descending.
 /// For ties in frequency, sort by value ascending.
-pub fn top_k_frequent(_nums: &[i32], _k: usize) -> Vec<i32> {
+pub fn top_k_frequent(_nums: &[Tracked<i32>], _k: usize) -> Vec<i32> {
     todo!()
 }
 
@@ -64,7 +65,7 @@ pub fn top_k_frequent(_nums: &[i32], _k: usize) -> Vec<i32> {
 ///
 /// Build a HashSet. For each number that starts a sequence (num-1 not in set),
 /// count how far the sequence extends. Track the maximum length.
-pub fn longest_consecutive(_nums: &[i32]) -> i32 {
+pub fn longest_consecutive(_nums: &[Tracked<i32>]) -> i32 {
     todo!()
 }
 
@@ -73,7 +74,7 @@ pub fn longest_consecutive(_nums: &[i32]) -> i32 {
 /// Use a prefix sum HashMap. For each running prefix_sum, the number of
 /// subarrays ending here with sum k equals the count of previous prefix sums
 /// equal to (prefix_sum - k).
-pub fn subarray_sum_k(_nums: &[i32], _k: i32) -> i32 {
+pub fn subarray_sum_k(_nums: &[Tracked<i32>], _k: i32) -> i32 {
     todo!()
 }
 
@@ -140,6 +141,6 @@ pub fn all_o1(_ops: &[(String, String)]) -> Vec<String> {
 /// For each point, compute slopes to all other points as normalized (dx, dy) pairs.
 /// Normalize by dividing both by their GCD and ensuring a canonical sign direction.
 /// Use a HashMap to count points sharing each slope.
-pub fn max_points_on_line(_points: &[(i32, i32)]) -> i32 {
+pub fn max_points_on_line(_points: &[(Tracked<i32>, Tracked<i32>)]) -> i32 {
     todo!()
 }

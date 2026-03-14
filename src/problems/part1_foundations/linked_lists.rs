@@ -1,9 +1,11 @@
 use rand::Rng;
+use std::cell::RefCell;
+use std::rc::Rc;
 
 use crate::problems::helpers::{random_sorted_vec, random_vec};
 use crate::problems::{Difficulty, Problem, SolutionResult, TestCase};
 use crate::solutions::part1_foundations::linked_lists as solutions;
-use crate::tracker::OperationLog;
+use crate::tracker::{track_slice, OperationLog};
 
 pub fn problems() -> Vec<Box<dyn Problem>> {
     vec![
@@ -74,10 +76,15 @@ impl Problem for ReverseList {
         tests
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<ReverseListTest>().unwrap();
         let expected: Vec<i32> = t.vals.iter().rev().cloned().collect();
-        let actual = solutions::reverse_list(&t.vals);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_vals = track_slice(&t.vals, shared_log.clone());
+        let actual = solutions::reverse_list(&tracked_vals);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("vals={:?}", t.vals),
@@ -145,12 +152,18 @@ impl Problem for MergeTwoSorted {
         tests
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<MergeTwoSortedTest>().unwrap();
         let mut expected = t.l1.clone();
         expected.extend_from_slice(&t.l2);
         expected.sort();
-        let actual = solutions::merge_two_sorted(&t.l1, &t.l2);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_l1 = track_slice(&t.l1, shared_log.clone());
+        let tracked_l2 = track_slice(&t.l2, shared_log.clone());
+        let actual = solutions::merge_two_sorted(&tracked_l1, &tracked_l2);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("l1={:?}, l2={:?}", t.l1, t.l2),
@@ -224,10 +237,15 @@ impl Problem for HasCycle {
         tests
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<HasCycleTest>().unwrap();
         let expected = t.cycle_pos.is_some();
-        let actual = solutions::has_cycle(&t.vals, t.cycle_pos);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_vals = track_slice(&t.vals, shared_log.clone());
+        let actual = solutions::has_cycle(&tracked_vals, t.cycle_pos);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("vals={:?}, cycle_pos={:?}", t.vals, t.cycle_pos),
@@ -296,12 +314,17 @@ impl Problem for RemoveNthFromEnd {
         tests
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<RemoveNthTest>().unwrap();
         let remove_idx = t.vals.len() - t.n;
         let mut expected = t.vals.clone();
         expected.remove(remove_idx);
-        let actual = solutions::remove_nth_from_end(&t.vals, t.n);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_vals = track_slice(&t.vals, shared_log.clone());
+        let actual = solutions::remove_nth_from_end(&tracked_vals, t.n);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("vals={:?}, n={}", t.vals, t.n),
@@ -380,11 +403,16 @@ impl Problem for IsPalindrome {
         tests
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<IsPalindromeTest>().unwrap();
         let reversed: Vec<i32> = t.vals.iter().rev().cloned().collect();
         let expected = t.vals == reversed;
-        let actual = solutions::is_palindrome(&t.vals);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_vals = track_slice(&t.vals, shared_log.clone());
+        let actual = solutions::is_palindrome(&tracked_vals);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("vals={:?}", t.vals),
@@ -456,10 +484,16 @@ impl Problem for AddTwoNumbers {
         tests
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<AddTwoNumbersTest>().unwrap();
         let expected = ref_add_two_numbers(&t.l1, &t.l2);
-        let actual = solutions::add_two_numbers(&t.l1, &t.l2);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_l1 = track_slice(&t.l1, shared_log.clone());
+        let tracked_l2 = track_slice(&t.l2, shared_log.clone());
+        let actual = solutions::add_two_numbers(&tracked_l1, &tracked_l2);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("l1={:?}, l2={:?}", t.l1, t.l2),
@@ -543,10 +577,15 @@ impl Problem for ReorderList {
         tests
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<ReorderListTest>().unwrap();
         let expected = ref_reorder_list(&t.vals);
-        let actual = solutions::reorder_list(&t.vals);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_vals = track_slice(&t.vals, shared_log.clone());
+        let actual = solutions::reorder_list(&tracked_vals);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("vals={:?}", t.vals),
@@ -621,11 +660,16 @@ impl Problem for SortList {
         tests
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<SortListTest>().unwrap();
         let mut expected = t.vals.clone();
         expected.sort();
-        let actual = solutions::sort_list(&t.vals);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_vals = track_slice(&t.vals, shared_log.clone());
+        let actual = solutions::sort_list(&tracked_vals);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("vals={:?}", t.vals),
@@ -693,10 +737,15 @@ impl Problem for RemoveDuplicatesII {
         tests
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<RemoveDuplicatesIITest>().unwrap();
         let expected = ref_remove_duplicates_ii(&t.vals);
-        let actual = solutions::remove_duplicates_ii(&t.vals);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_vals = track_slice(&t.vals, shared_log.clone());
+        let actual = solutions::remove_duplicates_ii(&tracked_vals);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("vals={:?}", t.vals),
@@ -782,10 +831,15 @@ impl Problem for RotateList {
         tests
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<RotateListTest>().unwrap();
         let expected = ref_rotate_list(&t.vals, t.k);
-        let actual = solutions::rotate_list(&t.vals, t.k);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_vals = track_slice(&t.vals, shared_log.clone());
+        let actual = solutions::rotate_list(&tracked_vals, t.k);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("vals={:?}, k={}", t.vals, t.k),
@@ -871,10 +925,15 @@ impl Problem for ReverseKGroup {
         tests
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<ReverseKGroupTest>().unwrap();
         let expected = ref_reverse_k_group(&t.vals, t.k);
-        let actual = solutions::reverse_k_group(&t.vals, t.k);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_vals = track_slice(&t.vals, shared_log.clone());
+        let actual = solutions::reverse_k_group(&tracked_vals, t.k);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("vals={:?}, k={}", t.vals, t.k),
@@ -957,11 +1016,20 @@ impl Problem for MergeKSorted {
         tests
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<MergeKSortedTest>().unwrap();
         let mut expected: Vec<i32> = t.lists.iter().flat_map(|l| l.iter().cloned()).collect();
         expected.sort();
-        let actual = solutions::merge_k_sorted(&t.lists);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_lists: Vec<Vec<_>> = t
+            .lists
+            .iter()
+            .map(|l| track_slice(l, shared_log.clone()))
+            .collect();
+        let actual = solutions::merge_k_sorted(&tracked_lists);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("lists={:?}", t.lists),
@@ -1017,10 +1085,15 @@ impl Problem for CopyRandomPointer {
         tests
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<CopyRandomPointerTest>().unwrap();
         let expected = t.vals.clone();
-        let actual = solutions::copy_random_pointer(&t.vals);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_vals = track_slice(&t.vals, shared_log.clone());
+        let actual = solutions::copy_random_pointer(&tracked_vals);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("vals={:?}", t.vals),
@@ -1224,10 +1297,15 @@ impl Problem for FlattenMultilevel {
         tests
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<FlattenMultilevelTest>().unwrap();
         let expected = t.vals.clone();
-        let actual = solutions::flatten_multilevel(&t.vals);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_vals = track_slice(&t.vals, shared_log.clone());
+        let actual = solutions::flatten_multilevel(&tracked_vals);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("vals={:?}", t.vals),

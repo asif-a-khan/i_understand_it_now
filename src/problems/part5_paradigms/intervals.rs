@@ -1,9 +1,12 @@
+use std::cell::RefCell;
+use std::rc::Rc;
+
 use rand::Rng;
 use std::collections::BTreeMap;
 
 use crate::problems::{Difficulty, Problem, SolutionResult, TestCase};
 use crate::solutions::part5_paradigms::intervals as solutions;
-use crate::tracker::OperationLog;
+use crate::tracker::{track_slice, OperationLog, Tracked};
 
 pub fn problems() -> Vec<Box<dyn Problem>> {
     vec![
@@ -78,10 +81,25 @@ impl Problem for MergeIntervals {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<MergeIntervalsTest>().unwrap();
         let expected = ref_merge_intervals(&t.intervals);
-        let actual = solutions::merge_intervals(&t.intervals);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked: Vec<(Tracked<i32>, Tracked<i32>)> = t
+            .intervals
+            .iter()
+            .enumerate()
+            .map(|(i, &(a, b))| {
+                (
+                    Tracked::new(a, i * 2, shared_log.clone()),
+                    Tracked::new(b, i * 2 + 1, shared_log.clone()),
+                )
+            })
+            .collect();
+        let actual = solutions::merge_intervals(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("intervals={:?}", t.intervals),
@@ -148,10 +166,25 @@ impl Problem for MeetingRooms {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<MeetingRoomsTest>().unwrap();
         let expected = ref_meeting_rooms(&t.intervals);
-        let actual = solutions::meeting_rooms(&t.intervals);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked: Vec<(Tracked<i32>, Tracked<i32>)> = t
+            .intervals
+            .iter()
+            .enumerate()
+            .map(|(i, &(a, b))| {
+                (
+                    Tracked::new(a, i * 2, shared_log.clone()),
+                    Tracked::new(b, i * 2 + 1, shared_log.clone()),
+                )
+            })
+            .collect();
+        let actual = solutions::meeting_rooms(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("intervals={:?}", t.intervals),
@@ -229,10 +262,25 @@ impl Problem for InsertInterval {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<InsertIntervalTest>().unwrap();
         let expected = ref_insert_interval(&t.intervals, t.new_interval);
-        let actual = solutions::insert_interval(&t.intervals, t.new_interval);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked: Vec<(Tracked<i32>, Tracked<i32>)> = t
+            .intervals
+            .iter()
+            .enumerate()
+            .map(|(i, &(a, b))| {
+                (
+                    Tracked::new(a, i * 2, shared_log.clone()),
+                    Tracked::new(b, i * 2 + 1, shared_log.clone()),
+                )
+            })
+            .collect();
+        let actual = solutions::insert_interval(&tracked, t.new_interval);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("intervals={:?}, new={:?}", t.intervals, t.new_interval),
@@ -311,10 +359,15 @@ impl Problem for SummaryRanges {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<SummaryRangesTest>().unwrap();
         let expected = ref_summary_ranges(&t.nums);
-        let actual = solutions::summary_ranges(&t.nums);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::summary_ranges(&tracked_nums);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("nums={:?}", t.nums),
@@ -387,10 +440,25 @@ impl Problem for CoveredLength {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<CoveredLengthTest>().unwrap();
         let expected = ref_covered_length(&t.intervals);
-        let actual = solutions::covered_length(&t.intervals);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked: Vec<(Tracked<i32>, Tracked<i32>)> = t
+            .intervals
+            .iter()
+            .enumerate()
+            .map(|(i, &(a, b))| {
+                (
+                    Tracked::new(a, i * 2, shared_log.clone()),
+                    Tracked::new(b, i * 2 + 1, shared_log.clone()),
+                )
+            })
+            .collect();
+        let actual = solutions::covered_length(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("intervals={:?}", t.intervals),
@@ -446,10 +514,25 @@ impl Problem for MeetingRoomsII {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<MeetingRoomsIITest>().unwrap();
         let expected = ref_meeting_rooms_ii(&t.intervals);
-        let actual = solutions::meeting_rooms_ii(&t.intervals);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked: Vec<(Tracked<i32>, Tracked<i32>)> = t
+            .intervals
+            .iter()
+            .enumerate()
+            .map(|(i, &(a, b))| {
+                (
+                    Tracked::new(a, i * 2, shared_log.clone()),
+                    Tracked::new(b, i * 2 + 1, shared_log.clone()),
+                )
+            })
+            .collect();
+        let actual = solutions::meeting_rooms_ii(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("intervals={:?}", t.intervals),
@@ -516,10 +599,25 @@ impl Problem for NonOverlapping {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<NonOverlappingTest>().unwrap();
         let expected = ref_non_overlapping(&t.intervals);
-        let actual = solutions::non_overlapping(&t.intervals);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked: Vec<(Tracked<i32>, Tracked<i32>)> = t
+            .intervals
+            .iter()
+            .enumerate()
+            .map(|(i, &(a, b))| {
+                (
+                    Tracked::new(a, i * 2, shared_log.clone()),
+                    Tracked::new(b, i * 2 + 1, shared_log.clone()),
+                )
+            })
+            .collect();
+        let actual = solutions::non_overlapping(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("intervals={:?}", t.intervals),
@@ -588,10 +686,25 @@ impl Problem for MinArrows {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<MinArrowsTest>().unwrap();
         let expected = ref_min_arrows(&t.balloons);
-        let actual = solutions::min_arrows(&t.balloons);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked: Vec<(Tracked<i32>, Tracked<i32>)> = t
+            .balloons
+            .iter()
+            .enumerate()
+            .map(|(i, &(a, b))| {
+                (
+                    Tracked::new(a, i * 2, shared_log.clone()),
+                    Tracked::new(b, i * 2 + 1, shared_log.clone()),
+                )
+            })
+            .collect();
+        let actual = solutions::min_arrows(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("balloons={:?}", t.balloons),
@@ -674,13 +787,40 @@ impl Problem for IntervalIntersection {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test
             .data
             .downcast_ref::<IntervalIntersectionTest>()
             .unwrap();
         let expected = ref_interval_intersection(&t.first, &t.second);
-        let actual = solutions::interval_intersection(&t.first, &t.second);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_first: Vec<(Tracked<i32>, Tracked<i32>)> = t
+            .first
+            .iter()
+            .enumerate()
+            .map(|(i, &(a, b))| {
+                (
+                    Tracked::new(a, i * 2, shared_log.clone()),
+                    Tracked::new(b, i * 2 + 1, shared_log.clone()),
+                )
+            })
+            .collect();
+        let offset = t.first.len() * 2;
+        let tracked_second: Vec<(Tracked<i32>, Tracked<i32>)> = t
+            .second
+            .iter()
+            .enumerate()
+            .map(|(i, &(a, b))| {
+                (
+                    Tracked::new(a, offset + i * 2, shared_log.clone()),
+                    Tracked::new(b, offset + i * 2 + 1, shared_log.clone()),
+                )
+            })
+            .collect();
+        let actual = solutions::interval_intersection(&tracked_first, &tracked_second);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("first={:?}, second={:?}", t.first, t.second),
@@ -756,10 +896,25 @@ impl Problem for MyCalendar {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<MyCalendarTest>().unwrap();
         let expected = ref_my_calendar(&t.bookings);
-        let actual = solutions::my_calendar(&t.bookings);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked: Vec<(Tracked<i32>, Tracked<i32>)> = t
+            .bookings
+            .iter()
+            .enumerate()
+            .map(|(i, &(a, b))| {
+                (
+                    Tracked::new(a, i * 2, shared_log.clone()),
+                    Tracked::new(b, i * 2 + 1, shared_log.clone()),
+                )
+            })
+            .collect();
+        let actual = solutions::my_calendar(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("bookings={:?}", t.bookings),
@@ -915,10 +1070,26 @@ impl Problem for Skyline {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<SkylineTest>().unwrap();
         let expected = ref_skyline_sweep(&t.buildings);
-        let actual = solutions::skyline(&t.buildings);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked: Vec<(Tracked<i32>, Tracked<i32>, Tracked<i32>)> = t
+            .buildings
+            .iter()
+            .enumerate()
+            .map(|(i, &(a, b, c))| {
+                (
+                    Tracked::new(a, i * 3, shared_log.clone()),
+                    Tracked::new(b, i * 3 + 1, shared_log.clone()),
+                    Tracked::new(c, i * 3 + 2, shared_log.clone()),
+                )
+            })
+            .collect();
+        let actual = solutions::skyline(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("buildings={:?}", t.buildings),
@@ -1003,10 +1174,15 @@ impl Problem for DataStreamDisjoint {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<DataStreamDisjointTest>().unwrap();
         let expected = ref_data_stream_disjoint(&t.nums);
-        let actual = solutions::data_stream_disjoint(&t.nums);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::data_stream_disjoint(&tracked_nums);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("nums={:?}", t.nums),
@@ -1083,10 +1259,25 @@ impl Problem for MaxEvents {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<MaxEventsTest>().unwrap();
         let expected = ref_max_events(&t.events);
-        let actual = solutions::max_events(&t.events);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked: Vec<(Tracked<i32>, Tracked<i32>)> = t
+            .events
+            .iter()
+            .enumerate()
+            .map(|(i, &(a, b))| {
+                (
+                    Tracked::new(a, i * 2, shared_log.clone()),
+                    Tracked::new(b, i * 2 + 1, shared_log.clone()),
+                )
+            })
+            .collect();
+        let actual = solutions::max_events(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("events={:?}", t.events),
@@ -1178,10 +1369,26 @@ impl Problem for MinIntervalQuery {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<MinIntervalQueryTest>().unwrap();
         let expected = ref_min_interval_query(&t.intervals, &t.queries);
-        let actual = solutions::min_interval_query(&t.intervals, &t.queries);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_intervals: Vec<(Tracked<i32>, Tracked<i32>)> = t
+            .intervals
+            .iter()
+            .enumerate()
+            .map(|(i, &(a, b))| {
+                (
+                    Tracked::new(a, i * 2, shared_log.clone()),
+                    Tracked::new(b, i * 2 + 1, shared_log.clone()),
+                )
+            })
+            .collect();
+        let tracked_queries = track_slice(&t.queries, shared_log.clone());
+        let actual = solutions::min_interval_query(&tracked_intervals, &tracked_queries);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("intervals={:?}, queries={:?}", t.intervals, t.queries),

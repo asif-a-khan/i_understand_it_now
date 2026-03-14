@@ -1,11 +1,13 @@
 use rand::Rng;
+use std::cell::RefCell;
+use std::rc::Rc;
 
 use crate::problems::helpers::{
     self, build_tree, inorder, random_bst, random_tree, tree_to_level_order, TreeNode,
 };
 use crate::problems::{Difficulty, Problem, SolutionResult, TestCase};
 use crate::solutions::part3_trees::balanced_bst as solutions;
-use crate::tracker::OperationLog;
+use crate::tracker::{track_slice, OperationLog};
 
 pub fn problems() -> Vec<Box<dyn Problem>> {
     vec![
@@ -161,11 +163,16 @@ impl Problem for IsBalanced {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<IsBalancedTest>().unwrap();
         let (arena, root) = build_tree(&t.tree);
         let expected = is_balanced_tree(&arena, root);
-        let actual = solutions::is_balanced(&t.tree);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_slice(&t.tree, shared_log.clone());
+        let actual = solutions::is_balanced(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("tree={:?}", t.tree),
@@ -218,9 +225,14 @@ impl Problem for SortedArrayToBST {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<SortedArrayToBSTTest>().unwrap();
-        let actual = solutions::sorted_array_to_bst(&t.nums);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::sorted_array_to_bst(&tracked_nums);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         let (arena, root) = build_tree(&actual);
         let in_order = inorder(&arena, root);
         let balanced = is_balanced_tree(&arena, root);
@@ -279,11 +291,16 @@ impl Problem for MinDepth {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<MinDepthTest>().unwrap();
         let (arena, root) = build_tree(&t.tree);
         let expected = ref_min_depth(&arena, root);
-        let actual = solutions::min_depth(&t.tree);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_slice(&t.tree, shared_log.clone());
+        let actual = solutions::min_depth(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("tree={:?}", t.tree),
@@ -354,11 +371,16 @@ impl Problem for TreeHeight {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<TreeHeightTest>().unwrap();
         let (arena, root) = build_tree(&t.tree);
         let expected = tree_height(&arena, root);
-        let actual = solutions::height(&t.tree);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_slice(&t.tree, shared_log.clone());
+        let actual = solutions::height(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("tree={:?}", t.tree),
@@ -412,11 +434,16 @@ impl Problem for CountNodes {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<CountNodesTest>().unwrap();
         let (arena, root) = build_tree(&t.tree);
         let expected = count_nodes(&arena, root);
-        let actual = solutions::count_nodes(&t.tree);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_slice(&t.tree, shared_log.clone());
+        let actual = solutions::count_nodes(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("tree={:?}", t.tree),
@@ -466,12 +493,17 @@ impl Problem for BalanceBST {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<BalanceBSTTest>().unwrap();
         let (orig_arena, orig_root) = build_tree(&t.tree);
         let orig_inorder = inorder(&orig_arena, orig_root);
 
-        let actual = solutions::balance_bst(&t.tree);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_slice(&t.tree, shared_log.clone());
+        let actual = solutions::balance_bst(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         let (act_arena, act_root) = build_tree(&actual);
         let act_inorder = inorder(&act_arena, act_root);
         let balanced = is_balanced_tree(&act_arena, act_root);
@@ -534,9 +566,14 @@ impl Problem for ConvertSortedList {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<ConvertSortedListTest>().unwrap();
-        let actual = solutions::sorted_list_to_bst(&t.nums);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::sorted_list_to_bst(&tracked_nums);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         let (arena, root) = build_tree(&actual);
         let in_order = inorder(&arena, root);
         let balanced = is_balanced_tree(&arena, root);
@@ -600,11 +637,16 @@ impl Problem for ClosestValue {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<ClosestValueTest>().unwrap();
         let (arena, root) = build_tree(&t.tree);
         let expected = ref_closest_value(&arena, root, t.target);
-        let actual = solutions::closest_value(&t.tree, t.target);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_slice(&t.tree, shared_log.clone());
+        let actual = solutions::closest_value(&tracked, t.target);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("tree={:?}, target={}", t.tree, t.target),
@@ -676,12 +718,17 @@ impl Problem for KthSmallest {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<KthSmallestTest>().unwrap();
         let (arena, root) = build_tree(&t.tree);
         let in_order = inorder(&arena, root);
         let expected = in_order[t.k - 1];
-        let actual = solutions::kth_smallest(&t.tree, t.k);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_slice(&t.tree, shared_log.clone());
+        let actual = solutions::kth_smallest(&tracked, t.k);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("tree={:?}, k={}", t.tree, t.k),
@@ -733,14 +780,20 @@ impl Problem for AllElementsTwoBST {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<AllElementsTest>().unwrap();
         let (a1, r1) = build_tree(&t.tree1);
         let (a2, r2) = build_tree(&t.tree2);
         let mut expected = inorder(&a1, r1);
         expected.extend(inorder(&a2, r2));
         expected.sort();
-        let actual = solutions::all_elements_two_bst(&t.tree1, &t.tree2);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked1 = track_slice(&t.tree1, shared_log.clone());
+        let tracked2 = track_slice(&t.tree2, shared_log.clone());
+        let actual = solutions::all_elements_two_bst(&tracked1, &tracked2);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("tree1={:?}, tree2={:?}", t.tree1, t.tree2),
@@ -791,11 +844,16 @@ impl Problem for LargestBSTSubtree {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<LargestBSTTest>().unwrap();
         let (arena, root) = build_tree(&t.tree);
         let expected = ref_largest_bst_subtree(&arena, root);
-        let actual = solutions::largest_bst_subtree(&t.tree);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_slice(&t.tree, shared_log.clone());
+        let actual = solutions::largest_bst_subtree(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("tree={:?}", t.tree),
@@ -876,10 +934,15 @@ impl Problem for VerifyPreorder {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<VerifyPreorderTest>().unwrap();
         let expected = ref_verify_preorder(&t.preorder);
-        let actual = solutions::verify_preorder(&t.preorder);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_preorder = track_slice(&t.preorder, shared_log.clone());
+        let actual = solutions::verify_preorder(&tracked_preorder);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("preorder={:?}", t.preorder),
@@ -967,12 +1030,17 @@ impl Problem for CountRange {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<CountRangeTest>().unwrap();
         let (arena, root) = build_tree(&t.tree);
         let in_order = inorder(&arena, root);
         let expected = in_order.iter().filter(|&&v| v >= t.lo && v <= t.hi).count() as i32;
-        let actual = solutions::count_range(&t.tree, t.lo, t.hi);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_slice(&t.tree, shared_log.clone());
+        let actual = solutions::count_range(&tracked, t.lo, t.hi);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("tree={:?}, lo={}, hi={}", t.tree, t.lo, t.hi),
@@ -1023,7 +1091,7 @@ impl Problem for MedianBST {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<MedianBSTTest>().unwrap();
         let (arena, root) = build_tree(&t.tree);
         let in_order = inorder(&arena, root);
@@ -1033,7 +1101,12 @@ impl Problem for MedianBST {
         } else {
             (in_order[n / 2 - 1] as f64 + in_order[n / 2] as f64) / 2.0
         };
-        let actual = solutions::median_bst(&t.tree);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_slice(&t.tree, shared_log.clone());
+        let actual = solutions::median_bst(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         let is_correct = (expected - actual).abs() < 1e-5;
         SolutionResult {
             is_correct,
@@ -1089,14 +1162,20 @@ impl Problem for RankFromStream {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<RankStreamTest>().unwrap();
         let expected: Vec<i32> = t
             .queries
             .iter()
             .map(|&q| t.stream.iter().filter(|&&v| v <= q).count() as i32)
             .collect();
-        let actual = solutions::rank_from_stream(&t.stream, &t.queries);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_stream = track_slice(&t.stream, shared_log.clone());
+        let tracked_queries = track_slice(&t.queries, shared_log.clone());
+        let actual = solutions::rank_from_stream(&tracked_stream, &tracked_queries);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("stream={:?}, queries={:?}", t.stream, t.queries),

@@ -508,7 +508,7 @@ impl App {
                     }
                 }
                 Screen::InTuiEditor { .. } => unreachable!(), // handled above
-                Screen::VizPicker => self.viz_picker.handle_key(key),
+                Screen::VizPicker => self.viz_picker.handle_key(key, &self.problems),
             };
 
             return self.handle_action(action, terminal);

@@ -1,9 +1,12 @@
 use rand::Rng;
 
+use std::cell::RefCell;
+use std::rc::Rc;
+
 use crate::problems::helpers;
 use crate::problems::{Difficulty, Problem, SolutionResult, TestCase};
 use crate::solutions::part1_foundations::recursion as solutions;
-use crate::tracker::OperationLog;
+use crate::tracker::{track_slice, OperationLog};
 
 pub fn problems() -> Vec<Box<dyn Problem>> {
     vec![
@@ -256,10 +259,15 @@ impl Problem for SumList {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<SumListTest>().unwrap();
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
         let expected: i32 = t.nums.iter().sum();
-        let actual = solutions::sum_list(&t.nums);
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::sum_list(&tracked_nums);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("nums={:?}", t.nums),
@@ -325,10 +333,15 @@ impl Problem for MaxDepthTree {
         tests
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<MaxDepthTreeTest>().unwrap();
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
         let expected = ref_max_depth(&t.level_order);
-        let actual = solutions::max_depth_tree(&t.level_order);
+        let tracked_level_order = track_slice(&t.level_order, shared_log.clone());
+        let actual = solutions::max_depth_tree(&tracked_level_order);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("tree={:?}", t.level_order),
@@ -394,10 +407,15 @@ impl Problem for Permutations {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<PermutationsTest>().unwrap();
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
         let expected = ref_permutations(&t.nums);
-        let actual = solutions::permutations(&t.nums);
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::permutations(&tracked_nums);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("nums={:?}", t.nums),
@@ -468,10 +486,15 @@ impl Problem for Subsets {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<SubsetsTest>().unwrap();
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
         let expected = ref_subsets(&t.nums);
-        let actual = solutions::subsets(&t.nums);
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::subsets(&tracked_nums);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("nums={:?}", t.nums),

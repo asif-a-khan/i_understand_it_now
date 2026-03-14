@@ -1,8 +1,10 @@
 use rand::Rng;
+use std::cell::RefCell;
+use std::rc::Rc;
 
 use crate::problems::{Difficulty, Problem, SolutionResult, TestCase};
 use crate::solutions::part4_graphs::matrix_grid as solutions;
-use crate::tracker::OperationLog;
+use crate::tracker::{OperationLog, Tracked};
 
 pub fn problems() -> Vec<Box<dyn Problem>> {
     vec![
@@ -84,10 +86,25 @@ impl Problem for MatrixGridFloodFill {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<FloodFillTest>().unwrap();
         let expected = ref_flood_fill(&t.image, t.sr, t.sc, t.new_color);
-        let actual = solutions::flood_fill(&t.image, t.sr, t.sc, t.new_color);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_image: Vec<Vec<Tracked<i32>>> = t
+            .image
+            .iter()
+            .enumerate()
+            .map(|(r, row)| {
+                row.iter()
+                    .enumerate()
+                    .map(|(c, &v)| Tracked::new(v, r * row.len() + c, shared_log.clone()))
+                    .collect()
+            })
+            .collect();
+        let actual = solutions::flood_fill(&tracked_image, t.sr, t.sc, t.new_color);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!(
@@ -203,10 +220,25 @@ impl Problem for MatrixGridIslandPerimeter {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<IslandPerimeterTest>().unwrap();
         let expected = ref_island_perimeter(&t.grid);
-        let actual = solutions::island_perimeter(&t.grid);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_grid: Vec<Vec<Tracked<i32>>> = t
+            .grid
+            .iter()
+            .enumerate()
+            .map(|(r, row)| {
+                row.iter()
+                    .enumerate()
+                    .map(|(c, &v)| Tracked::new(v, r * row.len() + c, shared_log.clone()))
+                    .collect()
+            })
+            .collect();
+        let actual = solutions::island_perimeter(&tracked_grid);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("grid={:?}", t.grid),
@@ -282,10 +314,25 @@ impl Problem for MatrixGridMaxAreaIsland {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<MaxAreaIslandTest>().unwrap();
         let expected = ref_max_area_island(&t.grid);
-        let actual = solutions::max_area_island(&t.grid);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_grid: Vec<Vec<Tracked<i32>>> = t
+            .grid
+            .iter()
+            .enumerate()
+            .map(|(r, row)| {
+                row.iter()
+                    .enumerate()
+                    .map(|(c, &v)| Tracked::new(v, r * row.len() + c, shared_log.clone()))
+                    .collect()
+            })
+            .collect();
+        let actual = solutions::max_area_island(&tracked_grid);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("grid={:?}", t.grid),
@@ -378,10 +425,25 @@ impl Problem for MatrixGridCountIslands {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<CountIslandsTest>().unwrap();
         let expected = ref_count_islands(&t.grid);
-        let actual = solutions::count_islands(&t.grid);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_grid: Vec<Vec<Tracked<i32>>> = t
+            .grid
+            .iter()
+            .enumerate()
+            .map(|(r, row)| {
+                row.iter()
+                    .enumerate()
+                    .map(|(c, &v)| Tracked::new(v, r * row.len() + c, shared_log.clone()))
+                    .collect()
+            })
+            .collect();
+        let actual = solutions::count_islands(&tracked_grid);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("grid={:?}", t.grid),
@@ -601,10 +663,25 @@ impl Problem for MatrixGridRottingOranges {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<RottingOrangesTest>().unwrap();
         let expected = ref_rotting_oranges(&t.grid);
-        let actual = solutions::rotting_oranges(&t.grid);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_grid: Vec<Vec<Tracked<i32>>> = t
+            .grid
+            .iter()
+            .enumerate()
+            .map(|(r, row)| {
+                row.iter()
+                    .enumerate()
+                    .map(|(c, &v)| Tracked::new(v, r * row.len() + c, shared_log.clone()))
+                    .collect()
+            })
+            .collect();
+        let actual = solutions::rotting_oranges(&tracked_grid);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("grid={:?}", t.grid),
@@ -733,10 +810,25 @@ impl Problem for MatrixGridWallsAndGates {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<WallsAndGatesTest>().unwrap();
         let expected = ref_walls_and_gates(&t.rooms);
-        let actual = solutions::walls_and_gates(&t.rooms);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_rooms: Vec<Vec<Tracked<i32>>> = t
+            .rooms
+            .iter()
+            .enumerate()
+            .map(|(r, row)| {
+                row.iter()
+                    .enumerate()
+                    .map(|(c, &v)| Tracked::new(v, r * row.len() + c, shared_log.clone()))
+                    .collect()
+            })
+            .collect();
+        let actual = solutions::walls_and_gates(&tracked_rooms);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("rooms={:?}", t.rooms),
@@ -829,10 +921,25 @@ impl Problem for MatrixGrid01Matrix {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<ZeroOneMatrixTest>().unwrap();
         let expected = ref_01_matrix(&t.mat);
-        let actual = solutions::zero_one_matrix(&t.mat);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_mat: Vec<Vec<Tracked<i32>>> = t
+            .mat
+            .iter()
+            .enumerate()
+            .map(|(r, row)| {
+                row.iter()
+                    .enumerate()
+                    .map(|(c, &v)| Tracked::new(v, r * row.len() + c, shared_log.clone()))
+                    .collect()
+            })
+            .collect();
+        let actual = solutions::zero_one_matrix(&tracked_mat);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("mat={:?}", t.mat),
@@ -1140,13 +1247,28 @@ impl Problem for MatrixGridShortestPathObstacles {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test
             .data
             .downcast_ref::<ShortestPathObstaclesTest>()
             .unwrap();
         let expected = ref_shortest_path_obstacles(&t.grid, t.k);
-        let actual = solutions::shortest_path_eliminating_obstacles(&t.grid, t.k);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_grid: Vec<Vec<Tracked<i32>>> = t
+            .grid
+            .iter()
+            .enumerate()
+            .map(|(r, row)| {
+                row.iter()
+                    .enumerate()
+                    .map(|(c, &v)| Tracked::new(v, r * row.len() + c, shared_log.clone()))
+                    .collect()
+            })
+            .collect();
+        let actual = solutions::shortest_path_eliminating_obstacles(&tracked_grid, t.k);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("grid={:?}, k={}", t.grid, t.k),
@@ -1245,10 +1367,25 @@ impl Problem for MatrixGridSwimInWater {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<SwimInWaterTest>().unwrap();
         let expected = ref_swim_in_water(&t.grid);
-        let actual = solutions::swim_in_water(&t.grid);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_grid: Vec<Vec<Tracked<i32>>> = t
+            .grid
+            .iter()
+            .enumerate()
+            .map(|(r, row)| {
+                row.iter()
+                    .enumerate()
+                    .map(|(c, &v)| Tracked::new(v, r * row.len() + c, shared_log.clone()))
+                    .collect()
+            })
+            .collect();
+        let actual = solutions::swim_in_water(&tracked_grid);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("grid={:?}", t.grid),
@@ -1336,10 +1473,25 @@ impl Problem for MatrixGridMakingLargeIsland {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<MakingLargeIslandTest>().unwrap();
         let expected = ref_making_large_island(&t.grid);
-        let actual = solutions::making_large_island(&t.grid);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_grid: Vec<Vec<Tracked<i32>>> = t
+            .grid
+            .iter()
+            .enumerate()
+            .map(|(r, row)| {
+                row.iter()
+                    .enumerate()
+                    .map(|(c, &v)| Tracked::new(v, r * row.len() + c, shared_log.clone()))
+                    .collect()
+            })
+            .collect();
+        let actual = solutions::making_large_island(&tracked_grid);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("grid={:?}", t.grid),
@@ -1469,13 +1621,28 @@ impl Problem for MatrixGridLongestIncreasingPath {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test
             .data
             .downcast_ref::<LongestIncreasingPathTest>()
             .unwrap();
         let expected = ref_longest_increasing_path(&t.matrix);
-        let actual = solutions::longest_increasing_path(&t.matrix);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_matrix: Vec<Vec<Tracked<i32>>> = t
+            .matrix
+            .iter()
+            .enumerate()
+            .map(|(r, row)| {
+                row.iter()
+                    .enumerate()
+                    .map(|(c, &v)| Tracked::new(v, r * row.len() + c, shared_log.clone()))
+                    .collect()
+            })
+            .collect();
+        let actual = solutions::longest_increasing_path(&tracked_matrix);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("matrix={:?}", t.matrix),

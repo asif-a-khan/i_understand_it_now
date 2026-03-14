@@ -1,9 +1,12 @@
 use rand::Rng;
 use std::collections::HashMap;
 
+use std::cell::RefCell;
+use std::rc::Rc;
+
 use crate::problems::{Difficulty, Problem, SolutionResult, TestCase};
 use crate::solutions::part2_sorting::prefix_sum as solutions;
-use crate::tracker::OperationLog;
+use crate::tracker::{track_slice, OperationLog};
 
 pub fn problems() -> Vec<Box<dyn Problem>> {
     vec![
@@ -73,14 +76,19 @@ impl Problem for RangeSum {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<RangeSumTest>().unwrap();
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
         let expected: Vec<i32> = t
             .queries
             .iter()
             .map(|&(l, r)| t.nums[l..=r].iter().sum())
             .collect();
-        let actual = solutions::range_sum(&t.nums, &t.queries);
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::range_sum(&tracked_nums, &t.queries);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("nums={:?}, queries={:?}", t.nums, t.queries),
@@ -127,15 +135,20 @@ impl Problem for RunningSum {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<RunningSumTest>().unwrap();
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
         let mut expected = Vec::with_capacity(t.nums.len());
         let mut acc = 0;
         for &v in &t.nums {
             acc += v;
             expected.push(acc);
         }
-        let actual = solutions::running_sum(&t.nums);
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::running_sum(&tracked_nums);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("nums={:?}", t.nums),
@@ -185,10 +198,15 @@ impl Problem for PivotIndex {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<PivotIndexTest>().unwrap();
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
         let expected = ref_pivot_index(&t.nums);
-        let actual = solutions::pivot_index(&t.nums);
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::pivot_index(&tracked_nums);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("nums={:?}", t.nums),
@@ -250,10 +268,15 @@ impl Problem for SumOfAbsoluteDifferences {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<SADTest>().unwrap();
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
         let expected = ref_sum_abs_diff(&t.nums);
-        let actual = solutions::sum_of_absolute_differences(&t.nums);
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::sum_of_absolute_differences(&tracked_nums);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("nums={:?}", t.nums),
@@ -329,15 +352,24 @@ impl Problem for CountNegatives {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<CountNegTest>().unwrap();
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
         let expected: i32 = t
             .matrix
             .iter()
             .flat_map(|row| row.iter())
             .filter(|&&v| v < 0)
             .count() as i32;
-        let actual = solutions::count_negatives(&t.matrix);
+        let tracked_matrix: Vec<Vec<_>> = t
+            .matrix
+            .iter()
+            .map(|v| track_slice(v, shared_log.clone()))
+            .collect();
+        let actual = solutions::count_negatives(&tracked_matrix);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("matrix={:?}", t.matrix),
@@ -388,10 +420,15 @@ impl Problem for SubarraySumK {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<SubSumKTest>().unwrap();
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
         let expected = ref_subarray_sum_k(&t.nums, t.k);
-        let actual = solutions::subarray_sum_k(&t.nums, t.k);
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::subarray_sum_k(&tracked_nums, t.k);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("nums={:?}, k={}", t.nums, t.k),
@@ -455,8 +492,9 @@ impl Problem for ProductExceptSelf {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<ProductTest>().unwrap();
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
         let n = t.nums.len();
         let mut expected = vec![1i32; n];
         for (i, expected_val) in expected.iter_mut().enumerate().take(n) {
@@ -466,7 +504,11 @@ impl Problem for ProductExceptSelf {
                 }
             }
         }
-        let actual = solutions::product_except_self(&t.nums);
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::product_except_self(&tracked_nums);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("nums={:?}", t.nums),
@@ -515,10 +557,15 @@ impl Problem for ContiguousArray {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<ContiguousArrayTest>().unwrap();
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
         let expected = ref_contiguous_array(&t.nums);
-        let actual = solutions::contiguous_array(&t.nums);
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::contiguous_array(&tracked_nums);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("nums={:?}", t.nums),
@@ -598,8 +645,9 @@ impl Problem for RangeSum2D {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<RangeSum2DTest>().unwrap();
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
         let expected: Vec<i32> = t
             .queries
             .iter()
@@ -613,7 +661,15 @@ impl Problem for RangeSum2D {
                 sum
             })
             .collect();
-        let actual = solutions::range_sum_2d(&t.matrix, &t.queries);
+        let tracked_matrix: Vec<Vec<_>> = t
+            .matrix
+            .iter()
+            .map(|v| track_slice(v, shared_log.clone()))
+            .collect();
+        let actual = solutions::range_sum_2d(&tracked_matrix, &t.queries);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("matrix={:?}, queries={:?}", t.matrix, t.queries),
@@ -664,10 +720,15 @@ impl Problem for MaxSubarrayLength {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<MaxSubLenTest>().unwrap();
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
         let expected = ref_max_subarray_length(&t.nums, t.k);
-        let actual = solutions::max_subarray_length(&t.nums, t.k);
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::max_subarray_length(&tracked_nums, t.k);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("nums={:?}, k={}", t.nums, t.k),
@@ -741,10 +802,15 @@ impl Problem for CountRangeSum {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<CountRangeSumTest>().unwrap();
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
         let expected = ref_count_range_sum(&t.nums, t.lower, t.upper);
-        let actual = solutions::count_range_sum(&t.nums, t.lower, t.upper);
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::count_range_sum(&tracked_nums, t.lower, t.upper);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("nums={:?}, lower={}, upper={}", t.nums, t.lower, t.upper),
@@ -813,10 +879,19 @@ impl Problem for MaxSumRectangle {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<MaxSumRectTest>().unwrap();
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
         let expected = ref_max_sum_rectangle(&t.matrix);
-        let actual = solutions::max_sum_rectangle(&t.matrix);
+        let tracked_matrix: Vec<Vec<_>> = t
+            .matrix
+            .iter()
+            .map(|v| track_slice(v, shared_log.clone()))
+            .collect();
+        let actual = solutions::max_sum_rectangle(&tracked_matrix);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("matrix={:?}", t.matrix),
@@ -894,10 +969,15 @@ impl Problem for ShortestSubarraySumK {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<ShortestSubKTest>().unwrap();
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
         let expected = ref_shortest_subarray_sum_k(&t.nums, t.k);
-        let actual = solutions::shortest_subarray_sum_k(&t.nums, t.k);
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::shortest_subarray_sum_k(&tracked_nums, t.k);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("nums={:?}, k={}", t.nums, t.k),
@@ -966,10 +1046,15 @@ impl Problem for NumberOfSubarraysOddSum {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<OddSumTest>().unwrap();
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
         let expected = ref_subarrays_odd_sum(&t.nums);
-        let actual = solutions::number_of_subarrays_odd_sum(&t.nums);
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::number_of_subarrays_odd_sum(&tracked_nums);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("nums={:?}", t.nums),
@@ -1050,14 +1135,19 @@ impl Problem for XorQueries {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<XorQueriesTest>().unwrap();
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
         let expected: Vec<i32> = t
             .queries
             .iter()
             .map(|&(l, r)| t.nums[l..=r].iter().fold(0, |acc, &x| acc ^ x))
             .collect();
-        let actual = solutions::xor_queries(&t.nums, &t.queries);
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::xor_queries(&tracked_nums, &t.queries);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("nums={:?}, queries={:?}", t.nums, t.queries),

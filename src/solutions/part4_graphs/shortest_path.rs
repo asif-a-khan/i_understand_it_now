@@ -1,3 +1,4 @@
+use crate::tracker::Tracked;
 // Shortest Path — Solution Templates
 // Edit these functions to solve each problem. Run with: cargo run -- solve <problem_id>
 
@@ -23,7 +24,7 @@ pub fn shortest_path_unweighted(
 ///
 /// Example: grid=[[0,1],[1,0]] => 2
 /// Example: grid=[[0,0,0],[1,1,0],[1,1,0]] => 4
-pub fn shortest_path_binary_grid(_grid: &[Vec<i32>]) -> i32 {
+pub fn shortest_path_binary_grid(_grid: &[Vec<Tracked<i32>>]) -> i32 {
     todo!()
 }
 
@@ -89,7 +90,7 @@ pub fn cheapest_flights(
 /// minimizing the maximum absolute height difference between consecutive cells.
 ///
 /// Example: heights=[[1,2,2],[3,8,2],[5,3,5]] => 2
-pub fn path_with_min_effort(_heights: &[Vec<i32>]) -> i32 {
+pub fn path_with_min_effort(_heights: &[Vec<Tracked<i32>>]) -> i32 {
     todo!()
 }
 
@@ -99,7 +100,7 @@ pub fn path_with_min_effort(_heights: &[Vec<i32>]) -> i32 {
 /// Example: maze=[[0,0,1,0,0],[0,0,0,0,0],[0,0,0,1,0],[1,1,0,1,1],[0,0,0,0,0]],
 ///          start=(0,4), dest=(4,4) => 12
 pub fn shortest_path_maze(
-    _maze: &[Vec<i32>],
+    _maze: &[Vec<Tracked<i32>>],
     _start: (usize, usize),
     _dest: (usize, usize),
 ) -> i32 {
@@ -134,7 +135,7 @@ pub fn k_shortest_paths(
 /// Cost between (x1,y1) and (x2,y2) is |x1-x2| + |y1-y2|.
 ///
 /// Example: points=[(0,0),(2,2),(3,10),(5,2),(7,0)] => 20
-pub fn min_cost_connect_all(_points: &[(i32, i32)]) -> i32 {
+pub fn min_cost_connect_all(_points: &[(Tracked<i32>, Tracked<i32>)]) -> i32 {
     todo!()
 }
 

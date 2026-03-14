@@ -1,9 +1,12 @@
+use std::cell::RefCell;
+use std::rc::Rc;
+
 use rand::Rng;
 use std::collections::HashMap;
 
 use crate::problems::{Difficulty, Problem, SolutionResult, TestCase};
 use crate::solutions::part6_advanced::sparse_tables as solutions;
-use crate::tracker::OperationLog;
+use crate::tracker::{track_slice, OperationLog, Tracked};
 
 pub fn problems() -> Vec<Box<dyn Problem>> {
     vec![
@@ -314,10 +317,15 @@ impl Problem for SparseTableRangeMin {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<RangeMinTest>().unwrap();
         let expected = ref_range_min(&t.arr, &t.queries);
-        let actual = solutions::range_min(&t.arr, &t.queries);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_arr = track_slice(&t.arr, shared_log.clone());
+        let actual = solutions::range_min(&tracked_arr, &t.queries);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("arr={:?}, queries={:?}", t.arr, t.queries),
@@ -377,10 +385,15 @@ impl Problem for SparseTableRangeMax {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<RangeMaxTest>().unwrap();
         let expected = ref_range_max(&t.arr, &t.queries);
-        let actual = solutions::range_max(&t.arr, &t.queries);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_arr = track_slice(&t.arr, shared_log.clone());
+        let actual = solutions::range_max(&tracked_arr, &t.queries);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("arr={:?}, queries={:?}", t.arr, t.queries),
@@ -440,10 +453,15 @@ impl Problem for SparseTableRangeGcd {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<RangeGcdTest>().unwrap();
         let expected = ref_range_gcd(&t.arr, &t.queries);
-        let actual = solutions::range_gcd(&t.arr, &t.queries);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_arr = track_slice(&t.arr, shared_log.clone());
+        let actual = solutions::range_gcd(&tracked_arr, &t.queries);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("arr={:?}, queries={:?}", t.arr, t.queries),
@@ -503,10 +521,15 @@ impl Problem for SparseTableBuild {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<BuildTest>().unwrap();
         let expected = ref_range_min(&t.arr, &t.queries);
-        let actual = solutions::build_and_query(&t.arr, &t.queries);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_arr = track_slice(&t.arr, shared_log.clone());
+        let actual = solutions::build_and_query(&tracked_arr, &t.queries);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("arr={:?}, queries={:?}", t.arr, t.queries),
@@ -566,10 +589,15 @@ impl Problem for SparseTableStaticRmq {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<StaticRmqTest>().unwrap();
         let expected = ref_range_min(&t.arr, &t.queries);
-        let actual = solutions::static_rmq(&t.arr, &t.queries);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_arr = track_slice(&t.arr, shared_log.clone());
+        let actual = solutions::static_rmq(&tracked_arr, &t.queries);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("arr={:?}, queries={:?}", t.arr, t.queries),
@@ -633,10 +661,31 @@ impl Problem for SparseTableLca {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<LcaTest>().unwrap();
         let expected = ref_lca(&t.tree, &t.queries);
-        let actual = solutions::lca_sparse_table(&t.tree, &t.queries);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_tree: Vec<Tracked<Option<i32>>> = t
+            .tree
+            .iter()
+            .enumerate()
+            .map(|(i, v)| Tracked::new(*v, i, shared_log.clone()))
+            .collect();
+        let tracked_queries: Vec<(Tracked<i32>, Tracked<i32>)> = t
+            .queries
+            .iter()
+            .enumerate()
+            .map(|(i, &(a, b))| {
+                (
+                    Tracked::new(a, t.tree.len() + i * 2, shared_log.clone()),
+                    Tracked::new(b, t.tree.len() + i * 2 + 1, shared_log.clone()),
+                )
+            })
+            .collect();
+        let actual = solutions::lca_sparse_table(&tracked_tree, &tracked_queries);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("tree={:?}, queries={:?}", t.tree, t.queries),
@@ -696,10 +745,15 @@ impl Problem for SparseTableRangeAnd {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<RangeAndTest>().unwrap();
         let expected = ref_range_and(&t.arr, &t.queries);
-        let actual = solutions::range_and(&t.arr, &t.queries);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_arr = track_slice(&t.arr, shared_log.clone());
+        let actual = solutions::range_and(&tracked_arr, &t.queries);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("arr={:?}, queries={:?}", t.arr, t.queries),
@@ -759,10 +813,15 @@ impl Problem for SparseTableRangeOr {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<RangeOrTest>().unwrap();
         let expected = ref_range_or(&t.arr, &t.queries);
-        let actual = solutions::range_or(&t.arr, &t.queries);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_arr = track_slice(&t.arr, shared_log.clone());
+        let actual = solutions::range_or(&tracked_arr, &t.queries);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("arr={:?}, queries={:?}", t.arr, t.queries),
@@ -823,10 +882,15 @@ impl Problem for SparseTableSecondMinimum {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<SecondMinTest>().unwrap();
         let expected = ref_second_minimum(&t.arr, &t.queries);
-        let actual = solutions::second_minimum(&t.arr, &t.queries);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_arr = track_slice(&t.arr, shared_log.clone());
+        let actual = solutions::second_minimum(&tracked_arr, &t.queries);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("arr={:?}, queries={:?}", t.arr, t.queries),
@@ -887,10 +951,15 @@ impl Problem for SparseTableIndexOfMin {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<IndexOfMinTest>().unwrap();
         let expected = ref_index_of_min(&t.arr, &t.queries);
-        let actual = solutions::index_of_min(&t.arr, &t.queries);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_arr = track_slice(&t.arr, shared_log.clone());
+        let actual = solutions::index_of_min(&tracked_arr, &t.queries);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("arr={:?}, queries={:?}", t.arr, t.queries),
@@ -955,10 +1024,25 @@ impl Problem for SparseTable2dRmq {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<Rmq2dTest>().unwrap();
         let expected = ref_2d_rmq(&t.matrix, &t.queries);
-        let actual = solutions::rmq_2d(&t.matrix, &t.queries);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked: Vec<Vec<Tracked<i32>>> = t
+            .matrix
+            .iter()
+            .enumerate()
+            .map(|(r, row)| {
+                row.iter()
+                    .enumerate()
+                    .map(|(c, &v)| Tracked::new(v, r * row.len().max(1) + c, shared_log.clone()))
+                    .collect()
+            })
+            .collect();
+        let actual = solutions::rmq_2d(&tracked, &t.queries);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("matrix={:?}, queries={:?}", t.matrix, t.queries),
@@ -1023,10 +1107,20 @@ impl Problem for SparseTableKthAncestor {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<KthAncestorTest>().unwrap();
         let expected = ref_kth_ancestor(&t.parents, &t.queries);
-        let actual = solutions::kth_ancestor(&t.parents, &t.queries);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_parents: Vec<Tracked<Option<usize>>> = t
+            .parents
+            .iter()
+            .enumerate()
+            .map(|(i, v)| Tracked::new(*v, i, shared_log.clone()))
+            .collect();
+        let actual = solutions::kth_ancestor(&tracked_parents, &t.queries);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("parents={:?}, queries={:?}", t.parents, t.queries),
@@ -1086,10 +1180,15 @@ impl Problem for SparseTableRangeFrequency {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<RangeFreqTest>().unwrap();
         let expected = ref_range_frequency(&t.arr, &t.queries);
-        let actual = solutions::range_frequency(&t.arr, &t.queries);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_arr = track_slice(&t.arr, shared_log.clone());
+        let actual = solutions::range_frequency(&tracked_arr, &t.queries);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("arr={:?}, queries={:?}", t.arr, t.queries),
@@ -1215,10 +1314,15 @@ impl Problem for SparseTableDistinctInRange {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<DistinctTest>().unwrap();
         let expected = ref_distinct_in_range(&t.arr, &t.queries);
-        let actual = solutions::distinct_in_range(&t.arr, &t.queries);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_arr = track_slice(&t.arr, shared_log.clone());
+        let actual = solutions::distinct_in_range(&tracked_arr, &t.queries);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("arr={:?}, queries={:?}", t.arr, t.queries),

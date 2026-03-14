@@ -1,9 +1,11 @@
 use rand::Rng;
+use std::cell::RefCell;
 use std::collections::{HashMap, HashSet, VecDeque};
+use std::rc::Rc;
 
 use crate::problems::{Difficulty, Problem, SolutionResult, TestCase};
 use crate::solutions::part4_graphs::graph_bfs_dfs as solutions;
-use crate::tracker::OperationLog;
+use crate::tracker::{OperationLog, Tracked};
 
 pub fn problems() -> Vec<Box<dyn Problem>> {
     vec![
@@ -837,10 +839,25 @@ impl Problem for NumberOfIslands {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<IslandTest>().unwrap();
         let expected = ref_num_islands(&t.grid);
-        let actual = solutions::num_islands(&t.grid);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_grid: Vec<Vec<Tracked<i32>>> = t
+            .grid
+            .iter()
+            .enumerate()
+            .map(|(r, row)| {
+                row.iter()
+                    .enumerate()
+                    .map(|(c, &v)| Tracked::new(v, r * row.len() + c, shared_log.clone()))
+                    .collect()
+            })
+            .collect();
+        let actual = solutions::num_islands(&tracked_grid);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("grid={:?}", t.grid),
@@ -1324,10 +1341,25 @@ impl Problem for PacificAtlantic {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<PacificAtlanticTest>().unwrap();
         let expected = ref_pacific_atlantic(&t.heights);
-        let actual = solutions::pacific_atlantic(&t.heights);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_heights: Vec<Vec<Tracked<i32>>> = t
+            .heights
+            .iter()
+            .enumerate()
+            .map(|(r, row)| {
+                row.iter()
+                    .enumerate()
+                    .map(|(c, &v)| Tracked::new(v, r * row.len() + c, shared_log.clone()))
+                    .collect()
+            })
+            .collect();
+        let actual = solutions::pacific_atlantic(&tracked_heights);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("heights={:?}", t.heights),
@@ -1574,10 +1606,25 @@ impl Problem for ShortestPathBinaryMatrix {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<BinaryMatrixTest>().unwrap();
         let expected = ref_shortest_path_binary_matrix(&t.grid);
-        let actual = solutions::shortest_path_binary_matrix(&t.grid);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_grid: Vec<Vec<Tracked<i32>>> = t
+            .grid
+            .iter()
+            .enumerate()
+            .map(|(r, row)| {
+                row.iter()
+                    .enumerate()
+                    .map(|(c, &v)| Tracked::new(v, r * row.len() + c, shared_log.clone()))
+                    .collect()
+            })
+            .collect();
+        let actual = solutions::shortest_path_binary_matrix(&tracked_grid);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("grid={:?}", t.grid),

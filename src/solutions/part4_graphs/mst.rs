@@ -1,10 +1,11 @@
+use crate::tracker::Tracked;
 // Minimum Spanning Tree -- Solution Templates
 // Edit these functions to solve each problem. Run with: cargo run -- solve <problem_id>
 
 /// Min Cost to Connect All Points: find the minimum cost to connect all points
 /// using Manhattan distance |x1-x2| + |y1-y2| as edge weights.
 /// This is equivalent to building a complete graph and finding the MST.
-pub fn min_cost_connect(_points: &[(i32, i32)]) -> i32 {
+pub fn min_cost_connect(_points: &[(Tracked<i32>, Tracked<i32>)]) -> i32 {
     todo!()
 }
 

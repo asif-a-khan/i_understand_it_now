@@ -1,3 +1,4 @@
+use crate::tracker::Tracked;
 // Recursion — Solution Templates
 // Edit these functions to solve each problem. Run with: cargo run -- solve <problem_id>
 //
@@ -29,7 +30,7 @@ pub fn reverse_string(_s: &str) -> String {
 /// Sum List: sum all elements recursively.
 /// Do NOT use .iter().sum() or loops.
 /// Hint: sum(slice) = slice[0] + sum(slice[1..])
-pub fn sum_list(_nums: &[i32]) -> i32 {
+pub fn sum_list(_nums: &[Tracked<i32>]) -> i32 {
     todo!()
 }
 
@@ -42,7 +43,7 @@ pub fn sum_list(_nums: &[i32]) -> i32 {
 /// let (arena, root) = helpers::build_tree(level_order);
 /// // recurse on arena[idx].left and arena[idx].right
 /// ```
-pub fn max_depth_tree(_level_order: &[Option<i32>]) -> i32 {
+pub fn max_depth_tree(_level_order: &[Tracked<Option<i32>>]) -> i32 {
     todo!()
 }
 
@@ -51,14 +52,14 @@ pub fn max_depth_tree(_level_order: &[Option<i32>]) -> i32 {
 /// Permutations: return all permutations of nums (all elements distinct).
 /// Return them sorted lexicographically.
 /// Hint: use backtracking — for each position, try swapping in each remaining element.
-pub fn permutations(_nums: &[i32]) -> Vec<Vec<i32>> {
+pub fn permutations(_nums: &[Tracked<i32>]) -> Vec<Vec<i32>> {
     todo!()
 }
 
 /// Subsets: return all subsets (power set) of nums.
 /// Each subset sorted internally, all subsets sorted lexicographically.
 /// Hint: for each element, choose to include or exclude it.
-pub fn subsets(_nums: &[i32]) -> Vec<Vec<i32>> {
+pub fn subsets(_nums: &[Tracked<i32>]) -> Vec<Vec<i32>> {
     todo!()
 }
 

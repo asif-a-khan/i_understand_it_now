@@ -1,3 +1,4 @@
+use crate::tracker::Tracked;
 // Math & Geometry — Solution Templates
 // Edit these functions to solve each problem. Run with: cargo run -- solve <problem_id>
 
@@ -37,7 +38,7 @@ pub fn multiply_strings(_num1: &str, _num2: &str) -> String {
 }
 
 /// Max number of points on the same line.
-pub fn max_points_on_line(_points: &[(i32, i32)]) -> i32 {
+pub fn max_points_on_line(_points: &[(Tracked<i32>, Tracked<i32>)]) -> i32 {
     todo!()
 }
 
@@ -47,12 +48,12 @@ pub fn ugly_number(_n: i32) -> i32 {
 }
 
 /// Next lexicographic permutation. If largest, return sorted.
-pub fn next_permutation(_nums: &[i32]) -> Vec<i32> {
+pub fn next_permutation(_nums: &[Tracked<i32>]) -> Vec<i32> {
     todo!()
 }
 
 /// Convex hull of points. Return hull vertices sorted.
-pub fn convex_hull(_points: &[(i64, i64)]) -> Vec<(i64, i64)> {
+pub fn convex_hull(_points: &[(Tracked<i64>, Tracked<i64>)]) -> Vec<(i64, i64)> {
     todo!()
 }
 
@@ -62,16 +63,16 @@ pub fn modular_inverse(_a: i64, _m: i64) -> i64 {
 }
 
 /// Matrix exponentiation: matrix^exp mod m. Matrix is 2x2.
-pub fn matrix_exponentiation(_matrix: &[Vec<i64>], _exp: i64, _m: i64) -> Vec<Vec<i64>> {
+pub fn matrix_exponentiation(_matrix: &[Vec<Tracked<i64>>], _exp: i64, _m: i64) -> Vec<Vec<i64>> {
     todo!()
 }
 
 /// Chinese Remainder Theorem: smallest non-negative x satisfying all congruences.
-pub fn chinese_remainder(_remainders: &[i64], _moduli: &[i64]) -> i64 {
+pub fn chinese_remainder(_remainders: &[Tracked<i64>], _moduli: &[Tracked<i64>]) -> i64 {
     todo!()
 }
 
 /// Trapezoidal integration. ys are y-values at equally spaced x-points with spacing dx.
-pub fn trapezoidal_integral(_ys: &[f64], _dx: f64) -> f64 {
+pub fn trapezoidal_integral(_ys: &[Tracked<f64>], _dx: f64) -> f64 {
     todo!()
 }

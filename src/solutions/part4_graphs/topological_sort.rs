@@ -1,3 +1,4 @@
+use crate::tracker::Tracked;
 // Topological Sort — Solution Templates
 // Edit these functions to solve each problem. Run with: cargo run -- solve <problem_id>
 
@@ -110,7 +111,7 @@ pub fn minimum_height_trees(_n: usize, _edges: &[(usize, usize)]) -> Vec<usize> 
 /// strictly increasing path in the matrix (4-directional moves).
 ///
 /// Example: matrix=[[9,9,4],[6,6,8],[2,1,1]] => 4
-pub fn longest_increasing_path_topo(_matrix: &[Vec<i32>]) -> i32 {
+pub fn longest_increasing_path_topo(_matrix: &[Vec<Tracked<i32>>]) -> i32 {
     todo!()
 }
 
@@ -132,8 +133,8 @@ pub fn critical_connections(_n: usize, _edges: &[(usize, usize)]) -> Vec<(usize,
 pub fn sort_items_by_groups(
     _n: usize,
     _m: usize,
-    _group: &[i32],
-    _before_items: &[Vec<i32>],
+    _group: &[Tracked<i32>],
+    _before_items: &[Vec<Tracked<i32>>],
 ) -> Vec<i32> {
     todo!()
 }

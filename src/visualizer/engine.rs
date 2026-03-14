@@ -7,7 +7,7 @@ use crossterm::{
 };
 use std::io::{self, Write};
 
-use super::{HighlightKind, VizFrame};
+use super::{HighlightKind, VizData, VizFrame};
 
 /// Playback mode for the visualizer.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -197,56 +197,70 @@ fn render_frame(
     let highlight_map: std::collections::HashMap<usize, HighlightKind> =
         frame.highlights.iter().cloned().collect();
 
-    // Render bar chart
-    let max_val = frame.array.iter().copied().max().unwrap_or(1).max(1);
-    let bar_height = 12usize;
-
-    for row in (0..bar_height).rev() {
-        queue!(stdout, style::Print("  "))?;
-        for (col, &val) in frame.array.iter().enumerate() {
-            let normalized = (val as f64 / max_val as f64 * bar_height as f64) as usize;
-            let cell = if normalized > row { "██" } else { "  " };
-
-            let color = match highlight_map.get(&col) {
-                Some(HighlightKind::Comparing) => Color::Yellow,
-                Some(HighlightKind::Swapping) => Color::Red,
-                Some(HighlightKind::Sorted) => Color::Green,
-                Some(HighlightKind::Active) => Color::Cyan,
-                Some(HighlightKind::Pivot) => Color::Magenta,
-                Some(HighlightKind::Found) => Color::Green,
-                None => Color::White,
-            };
-
-            queue!(stdout, style::PrintStyledContent(cell.with(color)))?;
-            queue!(stdout, style::Print(" "))?;
-        }
-        queue!(stdout, style::Print("\n"))?;
-    }
-
-    // Render values below bars
-    queue!(stdout, style::Print("  "))?;
-    for (col, &val) in frame.array.iter().enumerate() {
-        let color = match highlight_map.get(&col) {
+    let highlight_to_color = |kind: Option<&HighlightKind>| -> Color {
+        match kind {
             Some(HighlightKind::Comparing) => Color::Yellow,
             Some(HighlightKind::Swapping) => Color::Red,
             Some(HighlightKind::Sorted) => Color::Green,
             Some(HighlightKind::Active) => Color::Cyan,
             Some(HighlightKind::Pivot) => Color::Magenta,
             Some(HighlightKind::Found) => Color::Green,
+            Some(HighlightKind::Reading) => Color::Cyan,
+            Some(HighlightKind::Writing) => Color::Magenta,
+            Some(HighlightKind::Target) => Color::Red,
             None => Color::White,
-        };
-        let s = format!("{:>2} ", val);
-        queue!(stdout, style::PrintStyledContent(s.with(color)))?;
-    }
-    queue!(stdout, style::Print("\n\n"))?;
+        }
+    };
 
-    // Render indices
-    queue!(stdout, style::Print("  "))?;
-    for (col, _) in frame.array.iter().enumerate() {
-        let s = format!("{:>2} ", col);
-        queue!(stdout, style::PrintStyledContent(s.with(Color::DarkGrey)))?;
+    // Get array values (from viz_data or legacy array field)
+    let values: Vec<String> = match frame.viz_data() {
+        VizData::Array { values } => values,
+        VizData::None { message } => {
+            queue!(
+                stdout,
+                style::Print("  "),
+                style::PrintStyledContent(message.with(Color::DarkGrey)),
+                style::Print("\n\n"),
+            )?;
+            vec![]
+        }
+        _ => frame.array.iter().map(|v| v.to_string()).collect(),
+    };
+
+    if !values.is_empty() {
+        // Render bar chart
+        let max_val = frame.array.iter().copied().max().unwrap_or(1).max(1);
+        let bar_height = 12usize;
+
+        for row in (0..bar_height).rev() {
+            queue!(stdout, style::Print("  "))?;
+            for (col, val) in frame.array.iter().enumerate() {
+                let normalized = (*val as f64 / max_val as f64 * bar_height as f64) as usize;
+                let cell = if normalized > row { "██" } else { "  " };
+                let color = highlight_to_color(highlight_map.get(&col));
+                queue!(stdout, style::PrintStyledContent(cell.with(color)))?;
+                queue!(stdout, style::Print(" "))?;
+            }
+            queue!(stdout, style::Print("\n"))?;
+        }
+
+        // Render values below bars
+        queue!(stdout, style::Print("  "))?;
+        for (col, val) in values.iter().enumerate() {
+            let color = highlight_to_color(highlight_map.get(&col));
+            let s = format!("{:>3} ", val);
+            queue!(stdout, style::PrintStyledContent(s.with(color)))?;
+        }
+        queue!(stdout, style::Print("\n\n"))?;
+
+        // Render indices
+        queue!(stdout, style::Print("  "))?;
+        for col in 0..values.len() {
+            let s = format!("{:>3} ", col);
+            queue!(stdout, style::PrintStyledContent(s.with(Color::DarkGrey)))?;
+        }
+        queue!(stdout, style::Print("\n\n"))?;
     }
-    queue!(stdout, style::Print("\n\n"))?;
 
     // Annotation
     queue!(

@@ -1,3 +1,4 @@
+use crate::tracker::Tracked;
 // Union-Find / Disjoint Set Union -- Solution Templates
 // Edit these functions to solve each problem. Run with: cargo run -- solve <problem_id>
 
@@ -16,7 +17,7 @@ pub fn is_connected(_n: usize, _edges: &[(usize, usize)], _u: usize, _v: usize) 
 /// Number of Friend Circles: given an adjacency matrix, find the number of
 /// friend circles (connected components) using Union-Find.
 /// matrix[i][j] = 1 means i and j are friends.
-pub fn friend_circles(_matrix: &[Vec<i32>]) -> i32 {
+pub fn friend_circles(_matrix: &[Vec<Tracked<i32>>]) -> i32 {
     todo!()
 }
 
@@ -64,7 +65,7 @@ pub fn regions_by_slashes(_grid: &[String]) -> i32 {
 
 /// Longest Consecutive Sequence using Union-Find.
 /// For each number n, if n+1 exists, union them. Return largest component size.
-pub fn longest_consecutive(_nums: &[i32]) -> i32 {
+pub fn longest_consecutive(_nums: &[Tracked<i32>]) -> i32 {
     todo!()
 }
 
@@ -79,7 +80,7 @@ pub fn number_of_islands_removal(_n: usize, _edges: &[(usize, usize)]) -> Vec<us
 /// At time t, you can traverse cells with elevation <= t.
 /// Sort cells by elevation, union adjacent processed cells, return t when
 /// (0,0) and (n-1,n-1) are connected.
-pub fn swim_in_water(_grid: &[Vec<i32>]) -> i32 {
+pub fn swim_in_water(_grid: &[Vec<Tracked<i32>>]) -> i32 {
     todo!()
 }
 
@@ -93,7 +94,7 @@ pub fn min_cost_connect_cities(_n: usize, _edges: &[(usize, usize, i32)]) -> i32
 /// A stone can be removed if it shares row or col with another remaining stone.
 /// Answer = total stones - number of connected components (where stones sharing
 /// row or col are connected).
-pub fn remove_stones(_stones: &[(i32, i32)]) -> i32 {
+pub fn remove_stones(_stones: &[(Tracked<i32>, Tracked<i32>)]) -> i32 {
     todo!()
 }
 

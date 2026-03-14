@@ -1,9 +1,12 @@
 use rand::Rng;
 use std::collections::HashMap;
 
+use std::cell::RefCell;
+use std::rc::Rc;
+
 use crate::problems::{Difficulty, Problem, SolutionResult, TestCase};
 use crate::solutions::part2_sorting::two_pointers as solutions;
-use crate::tracker::OperationLog;
+use crate::tracker::{track_slice, OperationLog};
 
 pub fn problems() -> Vec<Box<dyn Problem>> {
     vec![
@@ -75,10 +78,15 @@ impl Problem for TwoSumSorted {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<TwoSumSortedTest>().unwrap();
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
         let expected = ref_two_sum_sorted(&t.nums, t.target);
-        let actual = solutions::two_sum_sorted(&t.nums, t.target);
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::two_sum_sorted(&tracked_nums, t.target);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("nums={:?}, target={}", t.nums, t.target),
@@ -143,18 +151,22 @@ impl Problem for RemoveDuplicates {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<RemoveDuplicatesTest>().unwrap();
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
         let mut expected = t.nums.clone();
         expected.dedup();
         let expected_k = expected.len();
 
-        let mut input = t.nums.clone();
-        let actual_k = solutions::remove_duplicates(&mut input);
-        let actual_slice = &input[..actual_k];
+        let mut tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual_k = solutions::remove_duplicates(&mut tracked_nums);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
+        let actual_slice: Vec<i32> = tracked_nums[..actual_k].iter().map(|t| t.value).collect();
 
         SolutionResult {
-            is_correct: actual_k == expected_k && actual_slice == &expected[..],
+            is_correct: actual_k == expected_k && actual_slice == expected[..],
             input_description: format!("nums={:?}", t.nums),
             expected: format!("k={expected_k}, vals={expected:?}"),
             actual: format!("k={actual_k}, vals={actual_slice:?}"),
@@ -209,10 +221,15 @@ impl Problem for MoveZeroes {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<MoveZeroesTest>().unwrap();
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
         let expected = ref_move_zeroes(&t.nums);
-        let actual = solutions::move_zeroes(&t.nums);
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::move_zeroes(&tracked_nums);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("nums={:?}", t.nums),
@@ -359,11 +376,16 @@ impl Problem for SquaresSorted {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<SquaresSortedTest>().unwrap();
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
         let mut expected: Vec<i32> = t.nums.iter().map(|x| x * x).collect();
         expected.sort();
-        let actual = solutions::squares_sorted(&t.nums);
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::squares_sorted(&tracked_nums);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("nums={:?}", t.nums),
@@ -413,10 +435,15 @@ impl Problem for ThreeSum {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<ThreeSumTest>().unwrap();
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
         let expected = ref_three_sum(&t.nums);
-        let actual = solutions::three_sum(&t.nums);
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::three_sum(&tracked_nums);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("nums={:?}", t.nums),
@@ -498,10 +525,15 @@ impl Problem for ContainerWater {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<ContainerWaterTest>().unwrap();
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
         let expected = ref_container_water(&t.height);
-        let actual = solutions::container_water(&t.height);
+        let tracked_height = track_slice(&t.height, shared_log.clone());
+        let actual = solutions::container_water(&tracked_height);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("height={:?}", t.height),
@@ -651,10 +683,15 @@ impl Problem for FruitIntoBaskets {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<FruitTest>().unwrap();
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
         let expected = ref_fruit_into_baskets(&t.fruits);
-        let actual = solutions::fruit_into_baskets(&t.fruits);
+        let tracked_fruits = track_slice(&t.fruits, shared_log.clone());
+        let actual = solutions::fruit_into_baskets(&tracked_fruits);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("fruits={:?}", t.fruits),
@@ -726,10 +763,15 @@ impl Problem for MinSizeSubarraySum {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<MinSizeTest>().unwrap();
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
         let expected = ref_min_size_subarray_sum(&t.nums, t.target);
-        let actual = solutions::min_size_subarray_sum(&t.nums, t.target);
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::min_size_subarray_sum(&tracked_nums, t.target);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("nums={:?}, target={}", t.nums, t.target),
@@ -797,10 +839,15 @@ impl Problem for TrappingRainWater {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<TrapTest>().unwrap();
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
         let expected = ref_trap(&t.height);
-        let actual = solutions::trapping_rain_water(&t.height);
+        let tracked_height = track_slice(&t.height, shared_log.clone());
+        let actual = solutions::trapping_rain_water(&tracked_height);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("height={:?}", t.height),
@@ -1122,10 +1169,15 @@ impl Problem for SlidingWindowMax {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<SWMaxTest>().unwrap();
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
         let expected = ref_sliding_window_max(&t.nums, t.k);
-        let actual = solutions::sliding_window_max(&t.nums, t.k);
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::sliding_window_max(&tracked_nums, t.k);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("nums={:?}, k={}", t.nums, t.k),
@@ -1196,10 +1248,15 @@ impl Problem for FourSum {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<FourSumTest>().unwrap();
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
         let expected = ref_four_sum(&t.nums, t.target);
-        let actual = solutions::four_sum(&t.nums, t.target);
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::four_sum(&tracked_nums, t.target);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("nums={:?}, target={}", t.nums, t.target),

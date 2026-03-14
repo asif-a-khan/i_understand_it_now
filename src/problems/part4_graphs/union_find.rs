@@ -1,9 +1,11 @@
 use rand::Rng;
+use std::cell::RefCell;
 use std::collections::{HashMap, HashSet};
+use std::rc::Rc;
 
 use crate::problems::{Difficulty, Problem, SolutionResult, TestCase};
 use crate::solutions::part4_graphs::union_find as solutions;
-use crate::tracker::OperationLog;
+use crate::tracker::{track_slice, OperationLog, Tracked};
 
 pub fn problems() -> Vec<Box<dyn Problem>> {
     vec![
@@ -285,10 +287,25 @@ impl Problem for UfFriendCircles {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<UfFriendCirclesTest>().unwrap();
         let expected = ref_friend_circles(&t.matrix);
-        let actual = solutions::friend_circles(&t.matrix);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_matrix: Vec<Vec<Tracked<i32>>> = t
+            .matrix
+            .iter()
+            .enumerate()
+            .map(|(r, row)| {
+                row.iter()
+                    .enumerate()
+                    .map(|(c, &v)| Tracked::new(v, r * row.len() + c, shared_log.clone()))
+                    .collect()
+            })
+            .collect();
+        let actual = solutions::friend_circles(&tracked_matrix);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: actual == expected,
             input_description: format!("matrix={:?}", t.matrix),
@@ -1005,13 +1022,18 @@ impl Problem for UfLongestConsecutive {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test
             .data
             .downcast_ref::<UfLongestConsecutiveTest>()
             .unwrap();
         let expected = ref_longest_consecutive(&t.nums);
-        let actual = solutions::longest_consecutive(&t.nums);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::longest_consecutive(&tracked_nums);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: actual == expected,
             input_description: format!("nums={:?}", t.nums),
@@ -1192,10 +1214,25 @@ impl Problem for UfSwimInWater {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<UfSwimInWaterTest>().unwrap();
         let expected = ref_swim_in_water(&t.grid);
-        let actual = solutions::swim_in_water(&t.grid);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_grid: Vec<Vec<Tracked<i32>>> = t
+            .grid
+            .iter()
+            .enumerate()
+            .map(|(r, row)| {
+                row.iter()
+                    .enumerate()
+                    .map(|(c, &v)| Tracked::new(v, r * row.len() + c, shared_log.clone()))
+                    .collect()
+            })
+            .collect();
+        let actual = solutions::swim_in_water(&tracked_grid);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: actual == expected,
             input_description: format!("grid={:?}", t.grid),
@@ -1400,10 +1437,25 @@ impl Problem for UfRemoveStones {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<UfRemoveStonesTest>().unwrap();
         let expected = ref_remove_stones(&t.stones);
-        let actual = solutions::remove_stones(&t.stones);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_stones: Vec<(Tracked<i32>, Tracked<i32>)> = t
+            .stones
+            .iter()
+            .enumerate()
+            .map(|(i, &(a, b))| {
+                (
+                    Tracked::new(a, i * 2, shared_log.clone()),
+                    Tracked::new(b, i * 2 + 1, shared_log.clone()),
+                )
+            })
+            .collect();
+        let actual = solutions::remove_stones(&tracked_stones);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: actual == expected,
             input_description: format!("stones={:?}", t.stones),

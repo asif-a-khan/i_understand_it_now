@@ -1,10 +1,12 @@
 use rand::Rng;
+use std::cell::RefCell;
 use std::cmp::Reverse;
 use std::collections::BinaryHeap;
+use std::rc::Rc;
 
 use crate::problems::{Difficulty, Problem, SolutionResult, TestCase};
 use crate::solutions::part4_graphs::mst as solutions;
-use crate::tracker::OperationLog;
+use crate::tracker::{OperationLog, Tracked};
 
 pub fn problems() -> Vec<Box<dyn Problem>> {
     vec![
@@ -205,10 +207,25 @@ impl Problem for MstMinCostConnect {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<MstMinCostConnectTest>().unwrap();
         let expected = ref_min_cost_connect(&t.points);
-        let actual = solutions::min_cost_connect(&t.points);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_points: Vec<(Tracked<i32>, Tracked<i32>)> = t
+            .points
+            .iter()
+            .enumerate()
+            .map(|(i, &(a, b))| {
+                (
+                    Tracked::new(a, i * 2, shared_log.clone()),
+                    Tracked::new(b, i * 2 + 1, shared_log.clone()),
+                )
+            })
+            .collect();
+        let actual = solutions::min_cost_connect(&tracked_points);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: actual == expected,
             input_description: format!("points={:?}", t.points),

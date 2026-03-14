@@ -1,9 +1,12 @@
 use rand::Rng;
 use std::collections::{HashMap, VecDeque};
 
+use std::cell::RefCell;
+use std::rc::Rc;
+
 use crate::problems::{Difficulty, Problem, SolutionResult, TestCase};
 use crate::solutions::part1_foundations::stacks_queues as solutions;
-use crate::tracker::OperationLog;
+use crate::tracker::{track_slice, OperationLog};
 
 pub fn problems() -> Vec<Box<dyn Problem>> {
     vec![
@@ -516,10 +519,15 @@ impl Problem for NextGreaterElement {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<NextGreaterElementTest>().unwrap();
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
         let expected = ref_next_greater_element(&t.nums);
-        let actual = solutions::next_greater_element(&t.nums);
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::next_greater_element(&tracked_nums);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("nums={:?}", t.nums),
@@ -594,10 +602,15 @@ impl Problem for DailyTemperatures {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<DailyTemperaturesTest>().unwrap();
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
         let expected = ref_daily_temperatures(&t.temperatures);
-        let actual = solutions::daily_temperatures(&t.temperatures);
+        let tracked_temperatures = track_slice(&t.temperatures, shared_log.clone());
+        let actual = solutions::daily_temperatures(&tracked_temperatures);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("temps={:?}", t.temperatures),
@@ -896,10 +909,15 @@ impl Problem for AsteroidCollision {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<AsteroidCollisionTest>().unwrap();
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
         let expected = ref_asteroid_collision(&t.asteroids);
-        let actual = solutions::asteroid_collision(&t.asteroids);
+        let tracked_asteroids = track_slice(&t.asteroids, shared_log.clone());
+        let actual = solutions::asteroid_collision(&tracked_asteroids);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("asteroids={:?}", t.asteroids),
@@ -978,10 +996,15 @@ impl Problem for OnlineStockSpan {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<OnlineStockSpanTest>().unwrap();
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
         let expected = ref_online_stock_span(&t.prices);
-        let actual = solutions::online_stock_span(&t.prices);
+        let tracked_prices = track_slice(&t.prices, shared_log.clone());
+        let actual = solutions::online_stock_span(&tracked_prices);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("prices={:?}", t.prices),
@@ -1057,10 +1080,15 @@ impl Problem for SlidingWindowMax {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<SlidingWindowMaxTest>().unwrap();
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
         let expected = ref_sliding_window_max(&t.nums, t.k);
-        let actual = solutions::sliding_window_max(&t.nums, t.k);
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::sliding_window_max(&tracked_nums, t.k);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("nums={:?}, k={}", t.nums, t.k),
@@ -1143,13 +1171,18 @@ impl Problem for LargestRectangleHistogram {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test
             .data
             .downcast_ref::<LargestRectangleHistogramTest>()
             .unwrap();
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
         let expected = ref_largest_rectangle_histogram(&t.heights);
-        let actual = solutions::largest_rectangle_histogram(&t.heights);
+        let tracked_heights = track_slice(&t.heights, shared_log.clone());
+        let actual = solutions::largest_rectangle_histogram(&tracked_heights);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("heights={:?}", t.heights),
@@ -1228,13 +1261,18 @@ impl Problem for TrappingRainWaterStack {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test
             .data
             .downcast_ref::<TrappingRainWaterStackTest>()
             .unwrap();
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
         let expected = ref_trapping_rain_water_stack(&t.height);
-        let actual = solutions::trapping_rain_water_stack(&t.height);
+        let tracked_height = track_slice(&t.height, shared_log.clone());
+        let actual = solutions::trapping_rain_water_stack(&tracked_height);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("height={:?}", t.height),

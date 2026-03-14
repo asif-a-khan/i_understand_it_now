@@ -42,6 +42,7 @@ impl VizLog {
     ) {
         self.frames.push(VizFrame {
             array: self.array.clone(),
+            data: None,
             highlights: highlights.to_vec(),
             pointers: pointers.iter().map(|(i, s)| (*i, s.to_string())).collect(),
             annotation: annotation.into(),
@@ -87,6 +88,61 @@ impl VizLog {
 
     pub fn into_frames(self) -> Vec<VizFrame> {
         self.frames
+    }
+
+    /// Convert all frames to use VizData::Tree (level-order array → tree nodes).
+    pub fn into_tree_frames(self) -> Vec<VizFrame> {
+        self.frames
+            .into_iter()
+            .map(|mut f| {
+                f.data = Some(super::VizData::Tree {
+                    nodes: f.array.iter().map(|v| Some(v.to_string())).collect(),
+                });
+                f
+            })
+            .collect()
+    }
+
+    /// Convert all frames to use VizData::Graph.
+    pub fn into_graph_frames(self, edges: &[(usize, usize)], directed: bool) -> Vec<VizFrame> {
+        self.frames
+            .into_iter()
+            .map(|mut f| {
+                let n = f.array.len();
+                f.data = Some(super::VizData::Graph {
+                    n,
+                    labels: (0..n).map(|i| i.to_string()).collect(),
+                    edges: edges.to_vec(),
+                    weighted_edges: vec![],
+                    directed,
+                });
+                f
+            })
+            .collect()
+    }
+
+    /// Convert all frames to use VizData::Grid with given dimensions.
+    pub fn into_grid_frames(self, rows: usize, cols: usize) -> Vec<VizFrame> {
+        self.frames
+            .into_iter()
+            .map(|mut f| {
+                let mut cells: Vec<Vec<String>> = Vec::new();
+                for r in 0..rows {
+                    let mut row = Vec::new();
+                    for c in 0..cols {
+                        let idx = r * cols + c;
+                        if idx < f.array.len() {
+                            row.push(f.array[idx].to_string());
+                        } else {
+                            row.push(" ".to_string());
+                        }
+                    }
+                    cells.push(row);
+                }
+                f.data = Some(super::VizData::Grid { cells });
+                f
+            })
+            .collect()
     }
 }
 
@@ -818,7 +874,7 @@ fn viz_two_sum() -> Vec<VizFrame> {
 
     let mut v = VizLog::new(nums.clone());
     v.ptrs(
-        &[],
+        &[(ai, HighlightKind::Target), (bi, HighlightKind::Target)],
         &[],
         format!(
             "Goal: find two numbers that add up to {}. Strategy: use a hash map.",
@@ -833,7 +889,11 @@ fn viz_two_sum() -> Vec<VizFrame> {
 
         // Show what we're looking for
         v.ptrs(
-            &[(i, HighlightKind::Active)],
+            &[
+                (i, HighlightKind::Active),
+                (ai, HighlightKind::Target),
+                (bi, HighlightKind::Target),
+            ],
             &[(i, "i")],
             format!(
                 "Look at nums[{}]={}. We need {} - {} = {} to make the target.",
@@ -869,7 +929,11 @@ fn viz_two_sum() -> Vec<VizFrame> {
         }
         seen_str.push_str(&format!("{}", num));
         v.ptrs(
-            &[(i, HighlightKind::Sorted)],
+            &[
+                (i, HighlightKind::Sorted),
+                (ai, HighlightKind::Target),
+                (bi, HighlightKind::Target),
+            ],
             &[(i, "i")],
             format!(
                 "No match. Store {} in map. Seen so far: {{{}}}",
@@ -3803,7 +3867,7 @@ fn viz_binary_search_basic() -> Vec<VizFrame> {
 
     let mut v = VizLog::new(nums.clone());
     v.ptrs(
-        &[],
+        &[(target_idx, HighlightKind::Target)],
         &[],
         format!(
             "Goal: find {} in a sorted array. Strategy: check the middle element. \
@@ -3822,6 +3886,7 @@ fn viz_binary_search_basic() -> Vec<VizFrame> {
                 (lo, HighlightKind::Active),
                 (mid, HighlightKind::Comparing),
                 (hi, HighlightKind::Active),
+                (target_idx, HighlightKind::Target),
             ],
             &[(lo, "lo"), (mid, "mid"), (hi, "hi")],
             format!("Check mid=[{}]={}, target={}", mid, nums[mid], target),
@@ -3835,7 +3900,10 @@ fn viz_binary_search_basic() -> Vec<VizFrame> {
             return v.into_frames();
         } else if nums[mid] < target {
             v.ptrs(
-                &[(mid, HighlightKind::Comparing)],
+                &[
+                    (mid, HighlightKind::Comparing),
+                    (target_idx, HighlightKind::Target),
+                ],
                 &[(mid, "mid")],
                 format!(
                     "{} < {}, so target is in the right half. Eliminate left.",
@@ -3845,7 +3913,10 @@ fn viz_binary_search_basic() -> Vec<VizFrame> {
             lo = mid + 1;
         } else {
             v.ptrs(
-                &[(mid, HighlightKind::Comparing)],
+                &[
+                    (mid, HighlightKind::Comparing),
+                    (target_idx, HighlightKind::Target),
+                ],
                 &[(mid, "mid")],
                 format!(
                     "{} > {}, so target is in the left half. Eliminate right.",
@@ -6899,6 +6970,7 @@ fn viz_linked_lists_lru_cache() -> Vec<VizFrame> {
                 let idx = cache.len() - 1;
                 all_frames.push(VizFrame {
                     array: display.clone(),
+                    data: None,
                     highlights: vec![(idx.min(display_len - 1), HighlightKind::Found)],
                     pointers: vec![(idx.min(display_len - 1), "hit".to_string())],
                     annotation: format!("GET key={} -> val={}, move to front", key, val),
@@ -6906,6 +6978,7 @@ fn viz_linked_lists_lru_cache() -> Vec<VizFrame> {
             } else {
                 all_frames.push(VizFrame {
                     array: display.clone(),
+                    data: None,
                     highlights: vec![],
                     pointers: vec![],
                     annotation: format!("GET key={} -> miss", key),
@@ -6920,6 +6993,7 @@ fn viz_linked_lists_lru_cache() -> Vec<VizFrame> {
                 let evicted = cache.pop_front().unwrap();
                 all_frames.push(VizFrame {
                     array: display.clone(),
+                    data: None,
                     highlights: vec![(0, HighlightKind::Swapping)],
                     pointers: vec![(0, "evict".to_string())],
                     annotation: format!("Evict LRU: key={}", evicted.0),
@@ -6937,6 +7011,7 @@ fn viz_linked_lists_lru_cache() -> Vec<VizFrame> {
             let idx = cache.len() - 1;
             all_frames.push(VizFrame {
                 array: display.clone(),
+                data: None,
                 highlights: vec![(idx.min(display_len - 1), HighlightKind::Active)],
                 pointers: vec![(idx.min(display_len - 1), "put".to_string())],
                 annotation: format!("PUT key={}, val={}", key, val),
@@ -6948,6 +7023,7 @@ fn viz_linked_lists_lru_cache() -> Vec<VizFrame> {
     let all: Vec<(usize, HighlightKind)> = (0..used).map(|i| (i, HighlightKind::Sorted)).collect();
     all_frames.push(VizFrame {
         array: display,
+        data: None,
         highlights: all,
         pointers: vec![],
         annotation: format!(
@@ -15038,7 +15114,7 @@ fn viz_binary_trees_max_depth() -> Vec<VizFrame> {
         &[(0, "root")],
         format!("Result: max depth = {}. Time complexity: O(n).", max_d + 1),
     );
-    v.into_frames()
+    v.into_tree_frames()
 }
 
 fn viz_binary_trees_inorder_traversal() -> Vec<VizFrame> {
@@ -15073,7 +15149,7 @@ fn viz_binary_trees_inorder_traversal() -> Vec<VizFrame> {
         &[],
         format!("Result: {:?}. Time complexity: O(n).", result),
     );
-    v.into_frames()
+    v.into_tree_frames()
 }
 
 fn viz_binary_trees_is_symmetric() -> Vec<VizFrame> {
@@ -15124,7 +15200,7 @@ fn viz_binary_trees_is_symmetric() -> Vec<VizFrame> {
         &[],
         format!("Result: symmetric = {}. Time complexity: O(n).", sym),
     );
-    v.into_frames()
+    v.into_tree_frames()
 }
 
 fn viz_binary_trees_is_same_tree() -> Vec<VizFrame> {
@@ -15156,7 +15232,7 @@ fn viz_binary_trees_is_same_tree() -> Vec<VizFrame> {
         &[],
         "Result: trees are identical. Time complexity: O(n).",
     );
-    v.into_frames()
+    v.into_tree_frames()
 }
 
 fn viz_binary_trees_invert() -> Vec<VizFrame> {
@@ -15187,7 +15263,7 @@ fn viz_binary_trees_invert() -> Vec<VizFrame> {
             tree.swap(l, r);
             v = VizLog {
                 array: tree.clone(),
-                frames: v.into_frames(),
+                frames: v.into_tree_frames(),
             };
         }
     }
@@ -15197,7 +15273,7 @@ fn viz_binary_trees_invert() -> Vec<VizFrame> {
         &[(0, "root")],
         "Result: tree inverted. Time complexity: O(n).",
     );
-    v.into_frames()
+    v.into_tree_frames()
 }
 
 fn viz_binary_trees_level_order() -> Vec<VizFrame> {
@@ -15236,7 +15312,7 @@ fn viz_binary_trees_level_order() -> Vec<VizFrame> {
         &[],
         "Result: all levels traversed. Time complexity: O(n).",
     );
-    v.into_frames()
+    v.into_tree_frames()
 }
 
 fn viz_binary_trees_zigzag_level_order() -> Vec<VizFrame> {
@@ -15284,7 +15360,7 @@ fn viz_binary_trees_zigzag_level_order() -> Vec<VizFrame> {
         &[],
         "Result: zigzag traversal complete. Time complexity: O(n).",
     );
-    v.into_frames()
+    v.into_tree_frames()
 }
 
 fn viz_binary_trees_right_side_view() -> Vec<VizFrame> {
@@ -15330,7 +15406,7 @@ fn viz_binary_trees_right_side_view() -> Vec<VizFrame> {
         &[],
         format!("Result: {:?}. Time complexity: O(n).", result),
     );
-    v.into_frames()
+    v.into_tree_frames()
 }
 
 fn viz_binary_trees_flatten_to_linked_list() -> Vec<VizFrame> {
@@ -15366,7 +15442,7 @@ fn viz_binary_trees_flatten_to_linked_list() -> Vec<VizFrame> {
         &[],
         format!("Result: {:?}. Time complexity: O(n).", flat),
     );
-    v.into_frames()
+    v.into_tree_frames()
 }
 
 fn viz_binary_trees_construct_from_preorder_inorder() -> Vec<VizFrame> {
@@ -15410,7 +15486,7 @@ fn viz_binary_trees_construct_from_preorder_inorder() -> Vec<VizFrame> {
         &[(0, "root")],
         "Result: tree reconstructed. Time complexity: O(n).",
     );
-    v.into_frames()
+    v.into_tree_frames()
 }
 
 fn viz_binary_trees_max_path_sum() -> Vec<VizFrame> {
@@ -15446,7 +15522,7 @@ fn viz_binary_trees_max_path_sum() -> Vec<VizFrame> {
         &[],
         format!("Result: max path sum = {}. Time complexity: O(n).", best),
     );
-    v.into_frames()
+    v.into_tree_frames()
 }
 
 fn viz_binary_trees_serialize_deserialize() -> Vec<VizFrame> {
@@ -15483,7 +15559,7 @@ fn viz_binary_trees_serialize_deserialize() -> Vec<VizFrame> {
         &[],
         "Result: serialize + deserialize round-trip. Time complexity: O(n).",
     );
-    v.into_frames()
+    v.into_tree_frames()
 }
 
 fn viz_binary_trees_lowest_common_ancestor() -> Vec<VizFrame> {
@@ -15561,7 +15637,7 @@ fn viz_binary_trees_lowest_common_ancestor() -> Vec<VizFrame> {
             lca, tree[lca]
         ),
     );
-    v.into_frames()
+    v.into_tree_frames()
 }
 
 fn viz_binary_trees_diameter() -> Vec<VizFrame> {
@@ -15600,7 +15676,7 @@ fn viz_binary_trees_diameter() -> Vec<VizFrame> {
         &[],
         format!("Result: diameter = {}. Time complexity: O(n).", best),
     );
-    v.into_frames()
+    v.into_tree_frames()
 }
 
 fn viz_binary_trees_count_complete_tree_nodes() -> Vec<VizFrame> {
@@ -15654,7 +15730,7 @@ fn viz_binary_trees_count_complete_tree_nodes() -> Vec<VizFrame> {
         &[],
         format!("Result: {} nodes. Time complexity: O(log^2 n).", count),
     );
-    v.into_frames()
+    v.into_tree_frames()
 }
 
 // ─── Part 5: Dynamic Programming Visualizations ────────────────
@@ -16397,7 +16473,7 @@ fn viz_bst_search() -> Vec<VizFrame> {
     let target_idx = rng.random_range(0..n);
     let target = tree[target_idx];
     let mut v = VizLog::new(tree.clone());
-    v.ptrs(&[], &[(0, "root")], format!("Goal: Find value {} in the BST. Strategy: Compare with current node — go left if smaller, right if larger. O(log n) on balanced trees.", target));
+    v.ptrs(&[(target_idx, HighlightKind::Target)], &[(0, "root")], format!("Goal: Find value {} in the BST. Strategy: Compare with current node — go left if smaller, right if larger. O(log n) on balanced trees.", target));
 
     let mut i = 0;
     while i < n {
@@ -16413,21 +16489,21 @@ fn viz_bst_search() -> Vec<VizFrame> {
             break;
         } else if target < tree[i] {
             v.ptrs(
-                &[(i, HighlightKind::Comparing)],
+                &[(i, HighlightKind::Comparing), (target_idx, HighlightKind::Target)],
                 &[(i, "node")],
                 format!("{} < node [{}]={}, so target must be in left subtree. BST guarantees all left descendants are smaller.", target, i, tree[i]),
             );
             i = left_child(i);
         } else {
             v.ptrs(
-                &[(i, HighlightKind::Comparing)],
+                &[(i, HighlightKind::Comparing), (target_idx, HighlightKind::Target)],
                 &[(i, "node")],
                 format!("{} > node [{}]={}, so target must be in right subtree. BST guarantees all right descendants are larger.", target, i, tree[i]),
             );
             i = right_child(i);
         }
     }
-    v.into_frames()
+    v.into_tree_frames()
 }
 
 fn viz_bst_minimum() -> Vec<VizFrame> {
@@ -16451,7 +16527,7 @@ fn viz_bst_minimum() -> Vec<VizFrame> {
         &[(i, "node")],
         format!("Result: minimum = {} at [{}]. No more left children, so this is the smallest. Time O(h).", tree[i], i),
     );
-    v.into_frames()
+    v.into_tree_frames()
 }
 
 fn viz_bst_is_valid() -> Vec<VizFrame> {
@@ -16505,7 +16581,7 @@ fn viz_bst_is_valid() -> Vec<VizFrame> {
             }
         ),
     );
-    v.into_frames()
+    v.into_tree_frames()
 }
 
 fn viz_bst_range_sum() -> Vec<VizFrame> {
@@ -16560,7 +16636,7 @@ fn viz_bst_range_sum() -> Vec<VizFrame> {
             sum
         ),
     );
-    v.into_frames()
+    v.into_tree_frames()
 }
 
 fn viz_bst_sorted_array_to_bst() -> Vec<VizFrame> {
@@ -16595,7 +16671,7 @@ fn viz_bst_sorted_array_to_bst() -> Vec<VizFrame> {
     build(&arr, &mut tree, 0, &mut v);
     let all: Vec<_> = (0..n).map(|i| (i, HighlightKind::Sorted)).collect();
     v.ptrs(&all, &[(0, "root")], format!("Result: balanced BST = {:?}. Height is O(log n) because we always split in half. Time O(n).", tree));
-    v.into_frames()
+    v.into_tree_frames()
 }
 
 fn viz_bst_insert() -> Vec<VizFrame> {
@@ -16650,7 +16726,7 @@ fn viz_bst_insert() -> Vec<VizFrame> {
             i = right_child(i);
         }
     }
-    v.into_frames()
+    v.into_tree_frames()
 }
 
 fn viz_bst_delete() -> Vec<VizFrame> {
@@ -16723,7 +16799,7 @@ fn viz_bst_delete() -> Vec<VizFrame> {
             del_val
         ),
     );
-    v.into_frames()
+    v.into_tree_frames()
 }
 
 fn viz_bst_kth_smallest() -> Vec<VizFrame> {
@@ -16770,7 +16846,7 @@ fn viz_bst_kth_smallest() -> Vec<VizFrame> {
             tree[order[k - 1]]
         ),
     );
-    v.into_frames()
+    v.into_tree_frames()
 }
 
 fn viz_bst_inorder_successor() -> Vec<VizFrame> {
@@ -16831,7 +16907,7 @@ fn viz_bst_inorder_successor() -> Vec<VizFrame> {
             tree[target_idx], tree[succ_idx]
         ),
     );
-    v.into_frames()
+    v.into_tree_frames()
 }
 
 fn viz_bst_lca() -> Vec<VizFrame> {
@@ -16883,7 +16959,7 @@ fn viz_bst_lca() -> Vec<VizFrame> {
             break;
         }
     }
-    v.into_frames()
+    v.into_tree_frames()
 }
 
 fn viz_bst_recover() -> Vec<VizFrame> {
@@ -16958,7 +17034,7 @@ fn viz_bst_recover() -> Vec<VizFrame> {
             ),
         );
     }
-    v.into_frames()
+    v.into_tree_frames()
 }
 
 fn viz_bst_count_nodes_in_range() -> Vec<VizFrame> {
@@ -17008,7 +17084,7 @@ fn viz_bst_count_nodes_in_range() -> Vec<VizFrame> {
             count, lo, hi
         ),
     );
-    v.into_frames()
+    v.into_tree_frames()
 }
 
 fn viz_bst_from_preorder() -> Vec<VizFrame> {
@@ -17039,7 +17115,7 @@ fn viz_bst_from_preorder() -> Vec<VizFrame> {
         &[(0, "root")],
         "Result: BST reconstructed from preorder. Time O(n).".to_string(),
     );
-    v.into_frames()
+    v.into_tree_frames()
 }
 
 fn viz_bst_iterator() -> Vec<VizFrame> {
@@ -17073,7 +17149,7 @@ fn viz_bst_iterator() -> Vec<VizFrame> {
             vals
         ),
     );
-    v.into_frames()
+    v.into_tree_frames()
 }
 
 fn viz_bst_merge_two() -> Vec<VizFrame> {
@@ -17141,7 +17217,7 @@ fn viz_bst_merge_two() -> Vec<VizFrame> {
             merged
         ),
     );
-    v.into_frames()
+    v.into_tree_frames()
 }
 
 // ─── Graph Helper Functions ──────────────────────────────────
@@ -17240,7 +17316,7 @@ fn uf_union(parent: &mut [usize], rank: &mut [usize], a: usize, b: usize) -> boo
 
 fn viz_graph_repr_adjacency_list() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
+    let n = rng.random_range(10..=14);
     let adj = rand_graph_undirected(&mut rng, n);
     let vals: Vec<i32> = (0..n).map(|i| adj[i].len() as i32).collect();
 
@@ -17266,12 +17342,20 @@ fn viz_graph_repr_adjacency_list() -> Vec<VizFrame> {
         &[(0, "start"), (n - 1, "end")],
         format!("Result: adjacency list built for {} nodes. O(V+E) space, O(1) to add edge, O(degree) to check neighbors.", n),
     );
-    v.into_frames()
+    let mut edges: Vec<(usize, usize)> = Vec::new();
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &w in neighbors {
+            if u < w {
+                edges.push((u, w));
+            }
+        }
+    }
+    v.into_graph_frames(&edges, false)
 }
 
 fn viz_graph_repr_adjacency_matrix() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
+    let n = rng.random_range(10..=14);
     let adj = rand_graph_undirected(&mut rng, n);
     let vals: Vec<i32> = (0..n).map(|i| adj[i].len() as i32).collect();
 
@@ -17305,12 +17389,20 @@ fn viz_graph_repr_adjacency_matrix() -> Vec<VizFrame> {
         &[(0, "start"), (n - 1, "end")],
         format!("Result: {}x{} adjacency matrix built. O(1) edge lookup, but O(V^2) space even for sparse graphs.", n, n),
     );
-    v.into_frames()
+    let mut edges: Vec<(usize, usize)> = Vec::new();
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &w in neighbors {
+            if u < w {
+                edges.push((u, w));
+            }
+        }
+    }
+    v.into_graph_frames(&edges, false)
 }
 
 fn viz_graph_repr_degree_count() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
+    let n = rng.random_range(10..=14);
     let adj = rand_graph_undirected(&mut rng, n);
     let degrees: Vec<i32> = (0..n).map(|i| adj[i].len() as i32).collect();
 
@@ -17343,12 +17435,20 @@ fn viz_graph_repr_degree_count() -> Vec<VizFrame> {
             max_deg, max_node
         ),
     );
-    v.into_frames()
+    let mut edges: Vec<(usize, usize)> = Vec::new();
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &w in neighbors {
+            if u < w {
+                edges.push((u, w));
+            }
+        }
+    }
+    v.into_graph_frames(&edges, false)
 }
 
 fn viz_graph_repr_has_edge() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
+    let n = rng.random_range(10..=14);
     let adj = rand_graph_undirected(&mut rng, n);
     let vals: Vec<i32> = (0..n).map(|i| adj[i].len() as i32).collect();
 
@@ -17410,12 +17510,20 @@ fn viz_graph_repr_has_edge() -> Vec<VizFrame> {
             if has { "does" } else { "does not" }
         ),
     );
-    v.into_frames()
+    let mut edges: Vec<(usize, usize)> = Vec::new();
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &w in neighbors {
+            if u < w {
+                edges.push((u, w));
+            }
+        }
+    }
+    v.into_graph_frames(&edges, false)
 }
 
 fn viz_graph_repr_count_edges() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
+    let n = rng.random_range(10..=14);
     let adj = rand_graph_undirected(&mut rng, n);
     let degrees: Vec<i32> = (0..n).map(|i| adj[i].len() as i32).collect();
 
@@ -17443,7 +17551,15 @@ fn viz_graph_repr_count_edges() -> Vec<VizFrame> {
         &[(0, "start"), (n - 1, "end")],
         format!("Result: {} edges (sum_deg={}/2)", edges, total),
     );
-    v.into_frames()
+    let mut graph_edges: Vec<(usize, usize)> = Vec::new();
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &w in neighbors {
+            if u < w {
+                graph_edges.push((u, w));
+            }
+        }
+    }
+    v.into_graph_frames(&graph_edges, false)
 }
 
 fn viz_graph_repr_is_bipartite() -> Vec<VizFrame> {
@@ -17499,7 +17615,15 @@ fn viz_graph_repr_is_bipartite() -> Vec<VizFrame> {
         &[(0, "grp0"), (1.min(n - 1), "grp1")],
         "Result: graph is bipartite".to_string(),
     );
-    v.into_frames()
+    let mut edges: Vec<(usize, usize)> = Vec::new();
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &w in neighbors {
+            if u < w {
+                edges.push((u, w));
+            }
+        }
+    }
+    v.into_graph_frames(&edges, false)
 }
 
 fn viz_graph_repr_connected_components() -> Vec<VizFrame> {
@@ -17569,12 +17693,20 @@ fn viz_graph_repr_connected_components() -> Vec<VizFrame> {
         &[(0, "start"), (n - 1, "end")],
         format!("Result: {} connected components", comp_id),
     );
-    v.into_frames()
+    let mut edges: Vec<(usize, usize)> = Vec::new();
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &w in neighbors {
+            if u < w {
+                edges.push((u, w));
+            }
+        }
+    }
+    v.into_graph_frames(&edges, false)
 }
 
 fn viz_graph_repr_has_cycle_undirected() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
+    let n = rng.random_range(10..=14);
     let adj = rand_graph_undirected(&mut rng, n);
     let vals: Vec<i32> = (0..n).map(|i| adj[i].len() as i32).collect();
 
@@ -17631,12 +17763,20 @@ fn viz_graph_repr_has_cycle_undirected() -> Vec<VizFrame> {
             if found_cycle { "detected" } else { "not found" }
         ),
     );
-    v.into_frames()
+    let mut edges: Vec<(usize, usize)> = Vec::new();
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &w in neighbors {
+            if u < w {
+                edges.push((u, w));
+            }
+        }
+    }
+    v.into_graph_frames(&edges, false)
 }
 
 fn viz_graph_repr_has_cycle_directed() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
+    let n = rng.random_range(10..=14);
     let mut adj = rand_dag(&mut rng, n);
     // Add a back edge to create cycle
     if n > 2 {
@@ -17723,12 +17863,18 @@ fn viz_graph_repr_has_cycle_directed() -> Vec<VizFrame> {
             if found_cycle { "detected" } else { "not found" }
         ),
     );
-    v.into_frames()
+    let mut edges: Vec<(usize, usize)> = Vec::new();
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &w in neighbors {
+            edges.push((u, w));
+        }
+    }
+    v.into_graph_frames(&edges, true)
 }
 
 fn viz_graph_repr_transpose() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
+    let n = rng.random_range(10..=14);
     let adj = rand_dag(&mut rng, n);
     let vals: Vec<i32> = (0..n).map(|i| adj[i].len() as i32).collect();
 
@@ -17765,8 +17911,15 @@ fn viz_graph_repr_transpose() -> Vec<VizFrame> {
         format!("Result: transpose complete for {} nodes", n),
     );
 
-    let mut frames = v.into_frames();
-    frames.extend(v2.into_frames());
+    let mut edges: Vec<(usize, usize)> = Vec::new();
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &w in neighbors {
+            edges.push((u, w));
+        }
+    }
+    let trans_edges: Vec<(usize, usize)> = edges.iter().map(|&(u, w)| (w, u)).collect();
+    let mut frames = v.into_graph_frames(&edges, true);
+    frames.extend(v2.into_graph_frames(&trans_edges, true));
     frames
 }
 
@@ -17865,12 +18018,18 @@ fn viz_graph_repr_strongly_connected() -> Vec<VizFrame> {
         &[(0, "start")],
         format!("Result: {} strongly connected components", scc_count),
     );
-    v.into_frames()
+    let mut edges: Vec<(usize, usize)> = Vec::new();
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &w in neighbors {
+            edges.push((u, w));
+        }
+    }
+    v.into_graph_frames(&edges, true)
 }
 
 fn viz_graph_repr_bridges() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
+    let n = rng.random_range(10..=14);
     let adj = rand_graph_undirected(&mut rng, n);
     let vals: Vec<i32> = (0..n).map(|i| adj[i].len() as i32).collect();
 
@@ -17944,12 +18103,20 @@ fn viz_graph_repr_bridges() -> Vec<VizFrame> {
         &[(0, "start")],
         format!("Result: {} bridge(s) found", bridges.len()),
     );
-    v.into_frames()
+    let mut edges: Vec<(usize, usize)> = Vec::new();
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &w in neighbors {
+            if u < w {
+                edges.push((u, w));
+            }
+        }
+    }
+    v.into_graph_frames(&edges, false)
 }
 
 fn viz_graph_repr_articulation_points() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
+    let n = rng.random_range(10..=14);
     let adj = rand_graph_undirected(&mut rng, n);
     let vals: Vec<i32> = (0..n).map(|i| adj[i].len() as i32).collect();
 
@@ -18031,7 +18198,15 @@ fn viz_graph_repr_articulation_points() -> Vec<VizFrame> {
         &[(0, "start")],
         format!("Result: {} articulation point(s)", ap_set.len()),
     );
-    v.into_frames()
+    let mut edges: Vec<(usize, usize)> = Vec::new();
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &w in neighbors {
+            if u < w {
+                edges.push((u, w));
+            }
+        }
+    }
+    v.into_graph_frames(&edges, false)
 }
 
 fn viz_graph_repr_euler_path() -> Vec<VizFrame> {
@@ -18084,12 +18259,20 @@ fn viz_graph_repr_euler_path() -> Vec<VizFrame> {
             if has_path { "exists" } else { "does not exist" }
         ),
     );
-    v.into_frames()
+    let mut edges: Vec<(usize, usize)> = Vec::new();
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &w in neighbors {
+            if u < w {
+                edges.push((u, w));
+            }
+        }
+    }
+    v.into_graph_frames(&edges, false)
 }
 
 fn viz_graph_repr_graph_coloring() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
+    let n = rng.random_range(10..=14);
     let adj = rand_graph_undirected(&mut rng, n);
     let vals: Vec<i32> = vec![0; n];
 
@@ -18138,7 +18321,15 @@ fn viz_graph_repr_graph_coloring() -> Vec<VizFrame> {
         &[(0, "start"), (n - 1, "end")],
         format!("Result: {} colors used", max_color + 1),
     );
-    v.into_frames()
+    let mut edges: Vec<(usize, usize)> = Vec::new();
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &w in neighbors {
+            if u < w {
+                edges.push((u, w));
+            }
+        }
+    }
+    v.into_graph_frames(&edges, false)
 }
 
 // ─── Part 5: Divide & Conquer Visualizations ───────────────────
@@ -19064,7 +19255,7 @@ fn viz_heaps_kth_largest_element() -> Vec<VizFrame> {
             k, heap[0]
         ),
     );
-    v.into_frames()
+    v.into_tree_frames()
 }
 
 fn viz_heaps_last_stone_weight() -> Vec<VizFrame> {
@@ -19101,7 +19292,7 @@ fn viz_heaps_last_stone_weight() -> Vec<VizFrame> {
         }
         v = VizLog {
             array: arr.clone(),
-            frames: v.into_frames(),
+            frames: v.into_tree_frames(),
         };
         v.ptrs(
             &[(0, HighlightKind::Active)],
@@ -19118,7 +19309,7 @@ fn viz_heaps_last_stone_weight() -> Vec<VizFrame> {
         &[(0, "node")],
         format!("Result: last stone weight = {}. Max-heap gives O(n log n) total. Greedy: always smash biggest.", result),
     );
-    v.into_frames()
+    v.into_tree_frames()
 }
 
 fn viz_heaps_k_closest_points() -> Vec<VizFrame> {
@@ -19189,7 +19380,7 @@ fn viz_heaps_k_closest_points() -> Vec<VizFrame> {
             k
         ),
     );
-    v.into_frames()
+    v.into_tree_frames()
 }
 
 fn viz_heaps_sort_array_by_increasing_frequency() -> Vec<VizFrame> {
@@ -19226,13 +19417,13 @@ fn viz_heaps_sort_array_by_increasing_frequency() -> Vec<VizFrame> {
     result_arr.truncate(n);
     v = VizLog {
         array: result_arr.clone(),
-        frames: v.into_frames(),
+        frames: v.into_tree_frames(),
     };
     let all: Vec<_> = (0..result_arr.len())
         .map(|i| (i, HighlightKind::Sorted))
         .collect();
     v.ptrs(&all, &[], format!("Result: {:?}", sorted));
-    v.into_frames()
+    v.into_tree_frames()
 }
 
 fn viz_heaps_is_min_heap() -> Vec<VizFrame> {
@@ -19323,7 +19514,7 @@ fn viz_heaps_is_min_heap() -> Vec<VizFrame> {
             valid
         ),
     );
-    v.into_frames()
+    v.into_tree_frames()
 }
 
 fn viz_heaps_top_k_frequent() -> Vec<VizFrame> {
@@ -19361,7 +19552,7 @@ fn viz_heaps_top_k_frequent() -> Vec<VizFrame> {
             k, top_k
         ),
     );
-    v.into_frames()
+    v.into_tree_frames()
 }
 
 fn viz_heaps_k_closest_to_value() -> Vec<VizFrame> {
@@ -19404,7 +19595,7 @@ fn viz_heaps_k_closest_to_value() -> Vec<VizFrame> {
         &[],
         format!("Result: {} closest to {} = {:?}. Sort by distance is O(n log n); heap approach is O(n log k).", k, target, vals),
     );
-    v.into_frames()
+    v.into_tree_frames()
 }
 
 fn viz_heaps_reorganize_string() -> Vec<VizFrame> {
@@ -19451,13 +19642,13 @@ fn viz_heaps_reorganize_string() -> Vec<VizFrame> {
     res_arr.truncate(chars.len());
     v = VizLog {
         array: res_arr.clone(),
-        frames: v.into_frames(),
+        frames: v.into_tree_frames(),
     };
     let all: Vec<_> = (0..res_arr.len())
         .map(|i| (i, HighlightKind::Sorted))
         .collect();
     v.ptrs(&all, &[], format!("Result: {:?}", result));
-    v.into_frames()
+    v.into_tree_frames()
 }
 
 fn viz_heaps_merge_k_sorted_lists() -> Vec<VizFrame> {
@@ -19513,7 +19704,7 @@ fn viz_heaps_merge_k_sorted_lists() -> Vec<VizFrame> {
             merged
         ),
     );
-    v.into_frames()
+    v.into_tree_frames()
 }
 
 fn viz_heaps_task_scheduler() -> Vec<VizFrame> {
@@ -19552,7 +19743,7 @@ fn viz_heaps_task_scheduler() -> Vec<VizFrame> {
             intervals
         ),
     );
-    v.into_frames()
+    v.into_tree_frames()
 }
 
 fn viz_heaps_find_median_stream() -> Vec<VizFrame> {
@@ -19584,7 +19775,7 @@ fn viz_heaps_find_median_stream() -> Vec<VizFrame> {
         "Result: median stream complete. Two-heap approach: O(log n) insert, O(1) median query."
             .to_string(),
     );
-    v.into_frames()
+    v.into_tree_frames()
 }
 
 fn viz_heaps_sliding_window_median() -> Vec<VizFrame> {
@@ -19623,7 +19814,7 @@ fn viz_heaps_sliding_window_median() -> Vec<VizFrame> {
             medians
         ),
     );
-    v.into_frames()
+    v.into_tree_frames()
 }
 
 fn viz_heaps_smallest_range() -> Vec<VizFrame> {
@@ -19680,7 +19871,7 @@ fn viz_heaps_smallest_range() -> Vec<VizFrame> {
             best_lo, best_hi
         ),
     );
-    v.into_frames()
+    v.into_tree_frames()
 }
 
 fn viz_heaps_ipo() -> Vec<VizFrame> {
@@ -19733,7 +19924,7 @@ fn viz_heaps_ipo() -> Vec<VizFrame> {
             cur_capital
         ),
     );
-    v.into_frames()
+    v.into_tree_frames()
 }
 
 fn viz_heaps_skyline() -> Vec<VizFrame> {
@@ -19789,16 +19980,26 @@ fn viz_heaps_skyline() -> Vec<VizFrame> {
             key_points.len()
         ),
     );
-    v.into_frames()
+    v.into_tree_frames()
 }
 
 // ─── Graph BFS/DFS ───────────────────────────────────────────
 
 fn viz_graph_bfs_dfs_bfs_order() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
+    let n = rng.random_range(10..=14);
     let adj = rand_graph_undirected(&mut rng, n);
     let vals: Vec<i32> = (0..n as i32).collect();
+
+    // Collect edges for graph renderer
+    let mut edges: Vec<(usize, usize)> = Vec::new();
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &v in neighbors {
+            if u < v {
+                edges.push((u, v));
+            }
+        }
+    }
 
     let mut v = VizLog::new(vals);
     v.ptrs(
@@ -19848,12 +20049,12 @@ fn viz_graph_bfs_dfs_bfs_order() -> Vec<VizFrame> {
             order
         ),
     );
-    v.into_frames()
+    v.into_graph_frames(&edges, false)
 }
 
 fn viz_graph_bfs_dfs_dfs_order() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
+    let n = rng.random_range(10..=14);
     let adj = rand_graph_undirected(&mut rng, n);
     let vals: Vec<i32> = (0..n as i32).collect();
 
@@ -19899,12 +20100,20 @@ fn viz_graph_bfs_dfs_dfs_order() -> Vec<VizFrame> {
             order
         ),
     );
-    v.into_frames()
+    let mut edges: Vec<(usize, usize)> = Vec::new();
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &w in neighbors {
+            if u < w {
+                edges.push((u, w));
+            }
+        }
+    }
+    v.into_graph_frames(&edges, false)
 }
 
 fn viz_graph_bfs_dfs_is_connected() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
+    let n = rng.random_range(10..=14);
     let adj = rand_graph_undirected(&mut rng, n);
     let vals: Vec<i32> = (0..n as i32).collect();
 
@@ -19955,12 +20164,20 @@ fn viz_graph_bfs_dfs_is_connected() -> Vec<VizFrame> {
             n
         ),
     );
-    v.into_frames()
+    let mut edges: Vec<(usize, usize)> = Vec::new();
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &w in neighbors {
+            if u < w {
+                edges.push((u, w));
+            }
+        }
+    }
+    v.into_graph_frames(&edges, false)
 }
 
 fn viz_graph_bfs_dfs_shortest_path_unweighted() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
+    let n = rng.random_range(10..=14);
     let adj = rand_graph_undirected(&mut rng, n);
     let src = 0;
     let dst = n - 1;
@@ -19968,7 +20185,7 @@ fn viz_graph_bfs_dfs_shortest_path_unweighted() -> Vec<VizFrame> {
 
     let mut v = VizLog::new(vals);
     v.ptrs(
-        &[],
+        &[(dst, HighlightKind::Target)],
         &[],
         format!("Goal: Find shortest path from {} to {} in unweighted graph. Strategy: BFS — first time we reach a node is via shortest path. O(V+E) time.", src, dst),
     );
@@ -19980,7 +20197,7 @@ fn viz_graph_bfs_dfs_shortest_path_unweighted() -> Vec<VizFrame> {
 
     while let Some(u) = queue.pop_front() {
         v.ptrs(
-            &[(u, HighlightKind::Active)],
+            &[(u, HighlightKind::Active), (dst, HighlightKind::Target)],
             &[(u, "node")],
             format!("Visit node {} at distance {}. BFS guarantees this is the shortest distance from source.", u, dist[u]),
         );
@@ -19997,7 +20214,7 @@ fn viz_graph_bfs_dfs_shortest_path_unweighted() -> Vec<VizFrame> {
                 dist[nb] = dist[u] + 1;
                 queue.push_back(nb);
                 v.ptrs(
-                    &[(u, HighlightKind::Active), (nb, HighlightKind::Comparing)],
+                    &[(u, HighlightKind::Active), (nb, HighlightKind::Comparing), (dst, HighlightKind::Target)],
                     &[(u, "node"), (nb, "enq")],
                     format!("Set dist[{}]={} (parent dist + 1). First visit = shortest path in unweighted graph.", nb, dist[nb]),
                 );
@@ -20011,12 +20228,20 @@ fn viz_graph_bfs_dfs_shortest_path_unweighted() -> Vec<VizFrame> {
         &[(src, "src"), (dst, "dst")],
         format!("Result: shortest path {} -> {} = {} edges. BFS is optimal for unweighted graphs. O(V+E).", src, dst, dist[dst]),
     );
-    v.into_frames()
+    let mut edges: Vec<(usize, usize)> = Vec::new();
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &w in neighbors {
+            if u < w {
+                edges.push((u, w));
+            }
+        }
+    }
+    v.into_graph_frames(&edges, false)
 }
 
 fn viz_graph_bfs_dfs_find_path() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
+    let n = rng.random_range(10..=14);
     let adj = rand_graph_undirected(&mut rng, n);
     let src = 0;
     let dst = n - 1;
@@ -20080,12 +20305,20 @@ fn viz_graph_bfs_dfs_find_path() -> Vec<VizFrame> {
             format!("Result: no path from {} to {}. DFS explored all reachable nodes without finding destination.", src, dst),
         );
     }
-    v.into_frames()
+    let mut edges: Vec<(usize, usize)> = Vec::new();
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &w in neighbors {
+            if u < w {
+                edges.push((u, w));
+            }
+        }
+    }
+    v.into_graph_frames(&edges, false)
 }
 
 fn viz_graph_bfs_dfs_clone_graph() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
+    let n = rng.random_range(10..=14);
     let adj = rand_graph_undirected(&mut rng, n);
     let vals: Vec<i32> = (0..n as i32).collect();
 
@@ -20122,12 +20355,20 @@ fn viz_graph_bfs_dfs_clone_graph() -> Vec<VizFrame> {
             cloned
         ),
     );
-    v.into_frames()
+    let mut edges: Vec<(usize, usize)> = Vec::new();
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &w in neighbors {
+            if u < w {
+                edges.push((u, w));
+            }
+        }
+    }
+    v.into_graph_frames(&edges, false)
 }
 
 fn viz_graph_bfs_dfs_course_schedule() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
+    let n = rng.random_range(10..=14);
     let adj = rand_dag(&mut rng, n);
     let in_deg: Vec<i32> = {
         let mut d = vec![0i32; n];
@@ -20193,12 +20434,18 @@ fn viz_graph_bfs_dfs_course_schedule() -> Vec<VizFrame> {
             n
         ),
     );
-    v.into_frames()
+    let mut edges: Vec<(usize, usize)> = Vec::new();
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &w in neighbors {
+            edges.push((u, w));
+        }
+    }
+    v.into_graph_frames(&edges, true)
 }
 
 fn viz_graph_bfs_dfs_course_schedule_ii() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
+    let n = rng.random_range(10..=14);
     let adj = rand_dag(&mut rng, n);
     let in_deg: Vec<i32> = {
         let mut d = vec![0i32; n];
@@ -20250,7 +20497,13 @@ fn viz_graph_bfs_dfs_course_schedule_ii() -> Vec<VizFrame> {
             order
         ),
     );
-    v.into_frames()
+    let mut edges: Vec<(usize, usize)> = Vec::new();
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &w in neighbors {
+            edges.push((u, w));
+        }
+    }
+    v.into_graph_frames(&edges, true)
 }
 
 fn viz_graph_bfs_dfs_number_of_islands() -> Vec<VizFrame> {
@@ -20570,7 +20823,7 @@ fn viz_graph_bfs_dfs_pacific_atlantic() -> Vec<VizFrame> {
 
 fn viz_graph_bfs_dfs_all_paths() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
+    let n = rng.random_range(10..=14);
     let adj = rand_dag(&mut rng, n);
     let vals: Vec<i32> = (0..n as i32).collect();
     let dst = n - 1;
@@ -20627,7 +20880,13 @@ fn viz_graph_bfs_dfs_all_paths() -> Vec<VizFrame> {
         &[(0, "src"), (dst, "dst")],
         format!("Result: {} paths from 0 to {}. DFS backtracking explores all possibilities. O(2^V * V) worst case.", all_paths.len(), dst),
     );
-    v.into_frames()
+    let mut edges: Vec<(usize, usize)> = Vec::new();
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &w in neighbors {
+            edges.push((u, w));
+        }
+    }
+    v.into_graph_frames(&edges, true)
 }
 
 fn viz_graph_bfs_dfs_shortest_path_binary_matrix() -> Vec<VizFrame> {
@@ -21508,7 +21767,7 @@ fn viz_balanced_bst_is_balanced() -> Vec<VizFrame> {
             result >= 0
         ),
     );
-    v.into_frames()
+    v.into_tree_frames()
 }
 
 fn viz_balanced_bst_sorted_array_to_bst() -> Vec<VizFrame> {
@@ -21546,7 +21805,7 @@ fn viz_balanced_bst_sorted_array_to_bst() -> Vec<VizFrame> {
             tree
         ),
     );
-    v.into_frames()
+    v.into_tree_frames()
 }
 
 fn viz_balanced_bst_min_depth() -> Vec<VizFrame> {
@@ -21590,7 +21849,7 @@ fn viz_balanced_bst_min_depth() -> Vec<VizFrame> {
     }
     let all: Vec<_> = (0..n).map(|i| (i, HighlightKind::Sorted)).collect();
     v.ptrs(&all, &[], format!("Result: min depth = {}. BFS finds the answer in O(n) worst case, but stops early at first leaf.", min_d));
-    v.into_frames()
+    v.into_tree_frames()
 }
 
 fn viz_balanced_bst_height() -> Vec<VizFrame> {
@@ -21621,7 +21880,7 @@ fn viz_balanced_bst_height() -> Vec<VizFrame> {
         &[],
         format!("Result: tree height = {}. Post-order DFS in O(n) time.", h),
     );
-    v.into_frames()
+    v.into_tree_frames()
 }
 
 fn viz_balanced_bst_count_nodes() -> Vec<VizFrame> {
@@ -21654,7 +21913,7 @@ fn viz_balanced_bst_count_nodes() -> Vec<VizFrame> {
             count
         ),
     );
-    v.into_frames()
+    v.into_tree_frames()
 }
 
 fn viz_balanced_bst_balance() -> Vec<VizFrame> {
@@ -21708,7 +21967,7 @@ fn viz_balanced_bst_balance() -> Vec<VizFrame> {
             new_tree
         ),
     );
-    v.into_frames()
+    v.into_tree_frames()
 }
 
 fn viz_balanced_bst_convert_sorted_list() -> Vec<VizFrame> {
@@ -21742,7 +22001,7 @@ fn viz_balanced_bst_convert_sorted_list() -> Vec<VizFrame> {
     build(&arr, &mut tree, 0, &mut v);
     let all: Vec<_> = (0..n).map(|i| (i, HighlightKind::Sorted)).collect();
     v.ptrs(&all, &[(0, "root")], format!("Result: {:?}", tree));
-    v.into_frames()
+    v.into_tree_frames()
 }
 
 fn viz_balanced_bst_closest_value() -> Vec<VizFrame> {
@@ -21791,7 +22050,7 @@ fn viz_balanced_bst_closest_value() -> Vec<VizFrame> {
             target, closest
         ),
     );
-    v.into_frames()
+    v.into_tree_frames()
 }
 
 fn viz_balanced_bst_kth_smallest() -> Vec<VizFrame> {
@@ -21835,7 +22094,7 @@ fn viz_balanced_bst_kth_smallest() -> Vec<VizFrame> {
             tree[order[k - 1]]
         ),
     );
-    v.into_frames()
+    v.into_tree_frames()
 }
 
 fn viz_balanced_bst_all_elements_two_bst() -> Vec<VizFrame> {
@@ -21888,7 +22147,7 @@ fn viz_balanced_bst_all_elements_two_bst() -> Vec<VizFrame> {
         .map(|i| (i, HighlightKind::Sorted))
         .collect();
     v.ptrs(&all, &[], format!("Result: {:?}", merged));
-    v.into_frames()
+    v.into_tree_frames()
 }
 
 fn viz_balanced_bst_largest_bst_subtree() -> Vec<VizFrame> {
@@ -21943,7 +22202,7 @@ fn viz_balanced_bst_largest_bst_subtree() -> Vec<VizFrame> {
             best
         ),
     );
-    v.into_frames()
+    v.into_tree_frames()
 }
 
 fn viz_balanced_bst_verify_preorder() -> Vec<VizFrame> {
@@ -21994,7 +22253,7 @@ fn viz_balanced_bst_verify_preorder() -> Vec<VizFrame> {
             valid
         ),
     );
-    v.into_frames()
+    v.into_tree_frames()
 }
 
 fn viz_balanced_bst_count_range() -> Vec<VizFrame> {
@@ -22046,7 +22305,7 @@ fn viz_balanced_bst_count_range() -> Vec<VizFrame> {
             count, lo, hi
         ),
     );
-    v.into_frames()
+    v.into_tree_frames()
 }
 
 fn viz_balanced_bst_median_bst() -> Vec<VizFrame> {
@@ -22084,7 +22343,7 @@ fn viz_balanced_bst_median_bst() -> Vec<VizFrame> {
             median, sorted
         ),
     );
-    v.into_frames()
+    v.into_tree_frames()
 }
 
 fn viz_balanced_bst_rank_from_stream() -> Vec<VizFrame> {
@@ -22114,7 +22373,7 @@ fn viz_balanced_bst_rank_from_stream() -> Vec<VizFrame> {
             query, rank
         ),
     );
-    v.into_frames()
+    v.into_tree_frames()
 }
 
 // ─── Matrix / Grid ───────────────────────────────────────────
@@ -22187,7 +22446,7 @@ fn viz_matrix_grid_flood_fill() -> Vec<VizFrame> {
             filled.len()
         ),
     );
-    v.into_frames()
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_matrix_grid_island_perimeter() -> Vec<VizFrame> {
@@ -22241,7 +22500,7 @@ fn viz_matrix_grid_island_perimeter() -> Vec<VizFrame> {
         &[(0, "start")],
         format!("Result: island perimeter = {}. Each cell contributes 4 minus shared edges. O(rows*cols).", perimeter),
     );
-    v.into_frames()
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_matrix_grid_max_area_island() -> Vec<VizFrame> {
@@ -22320,7 +22579,7 @@ fn viz_matrix_grid_max_area_island() -> Vec<VizFrame> {
             max_area
         ),
     );
-    v.into_frames()
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_matrix_grid_count_islands() -> Vec<VizFrame> {
@@ -22372,7 +22631,7 @@ fn viz_matrix_grid_count_islands() -> Vec<VizFrame> {
 
     let all: Vec<(usize, HighlightKind)> = (0..n).map(|i| (i, HighlightKind::Sorted)).collect();
     v.ptrs(&all, &[(0, "start")], format!("Result: {} islands found. Each DFS from unvisited land starts a new island. O(rows*cols).", count));
-    v.into_frames()
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_matrix_grid_surrounded_regions() -> Vec<VizFrame> {
@@ -22443,7 +22702,7 @@ fn viz_matrix_grid_surrounded_regions() -> Vec<VizFrame> {
             captured
         ),
     );
-    v.into_frames()
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_matrix_grid_rotting_oranges() -> Vec<VizFrame> {
@@ -22509,7 +22768,7 @@ fn viz_matrix_grid_rotting_oranges() -> Vec<VizFrame> {
             fresh_left
         ),
     );
-    v.into_frames()
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_matrix_grid_walls_and_gates() -> Vec<VizFrame> {
@@ -22580,7 +22839,7 @@ fn viz_matrix_grid_walls_and_gates() -> Vec<VizFrame> {
         "Result: all distances to nearest gate computed. Multi-source BFS in O(rows*cols) time."
             .to_string(),
     );
-    v.into_frames()
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_matrix_grid_01_matrix() -> Vec<VizFrame> {
@@ -22640,7 +22899,7 @@ fn viz_matrix_grid_01_matrix() -> Vec<VizFrame> {
         "Result: all nearest-0 distances computed. Multi-source BFS in O(rows*cols) time."
             .to_string(),
     );
-    v.into_frames()
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_matrix_grid_word_search() -> Vec<VizFrame> {
@@ -22701,7 +22960,7 @@ fn viz_matrix_grid_word_search() -> Vec<VizFrame> {
         &[(path[0], "start"), (*path.last().unwrap(), "end")],
         format!("Result: found path of length {}. Backtracking DFS explores all possibilities. O(m*n*4^L).", path.len()),
     );
-    v.into_frames()
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_matrix_grid_unique_paths() -> Vec<VizFrame> {
@@ -22743,7 +23002,7 @@ fn viz_matrix_grid_unique_paths() -> Vec<VizFrame> {
             dp[n - 1]
         ),
     );
-    v.into_frames()
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_matrix_grid_shortest_path_obstacles() -> Vec<VizFrame> {
@@ -22754,9 +23013,10 @@ fn viz_matrix_grid_shortest_path_obstacles() -> Vec<VizFrame> {
     grid[0] = 0;
     grid[n - 1] = 0;
 
+    let dst = n - 1;
     let mut v = VizLog::new(grid.clone());
     v.ptrs(
-        &[],
+        &[(dst, HighlightKind::Target)],
         &[],
         format!(
             "Goal: Shortest path in {}x{} grid allowing obstacle elimination. Strategy: BFS with state (position, obstacles_remaining). O(rows*cols*k).",
@@ -22773,11 +23033,19 @@ fn viz_matrix_grid_shortest_path_obstacles() -> Vec<VizFrame> {
         let r = pos / side;
         let c = pos % side;
         v.ptrs(
-            &[(pos, HighlightKind::Active)],
+            &[(pos, HighlightKind::Active), (dst, HighlightKind::Target)],
             &[(pos, "node")],
             format!("Visit ({},{}) dist={}", r, c, dist[pos]),
         );
-        if pos == n - 1 {
+        if pos == dst {
+            v.ptrs(
+                &[(pos, HighlightKind::Found)],
+                &[(pos, "end")],
+                format!(
+                    "Reached destination ({},{})! Shortest path = {}",
+                    r, c, dist[pos]
+                ),
+            );
             break;
         }
         for (dr, dc) in [(-1i32, 0), (1, 0), (0, -1), (0, 1)] {
@@ -22796,10 +23064,10 @@ fn viz_matrix_grid_shortest_path_obstacles() -> Vec<VizFrame> {
     let all: Vec<(usize, HighlightKind)> = (0..n).map(|i| (i, HighlightKind::Sorted)).collect();
     v.ptrs(
         &all,
-        &[(0, "start"), (n - 1, "end")],
-        format!("Result: shortest path = {}", dist[n - 1]),
+        &[(0, "start"), (dst, "end")],
+        format!("Result: shortest path = {}", dist[dst]),
     );
-    v.into_frames()
+    v.into_grid_frames(side, side)
 }
 
 fn viz_matrix_grid_swim_in_water() -> Vec<VizFrame> {
@@ -22808,9 +23076,10 @@ fn viz_matrix_grid_swim_in_water() -> Vec<VizFrame> {
     let n = side * side;
     let grid = rand_unique(&mut rng, n, 0, (n as i32) - 1);
 
+    let dst = n - 1;
     let mut v = VizLog::new(grid.clone());
     v.ptrs(
-        &[],
+        &[(dst, HighlightKind::Target)],
         &[],
         format!(
             "Goal: Find min time to swim from top-left to bottom-right in {}x{} grid. Strategy: Binary search + BFS, or Dijkstra on elevation. O(n^2 log n).",
@@ -22828,7 +23097,7 @@ fn viz_matrix_grid_swim_in_water() -> Vec<VizFrame> {
         let r = idx / side;
         let c = idx % side;
         v.ptrs(
-            &[(idx, HighlightKind::Active)],
+            &[(idx, HighlightKind::Active), (dst, HighlightKind::Target)],
             &[(idx, "cell")],
             format!(
                 "Time {}: cell ({},{}) h={} becomes accessible. Process cells in elevation order.",
@@ -22837,17 +23106,17 @@ fn viz_matrix_grid_swim_in_water() -> Vec<VizFrame> {
         );
     }
 
-    let time = grid[0].max(grid[n - 1]);
+    let time = grid[0].max(grid[dst]);
     let all: Vec<(usize, HighlightKind)> = (0..n).map(|i| (i, HighlightKind::Sorted)).collect();
     v.ptrs(
         &all,
-        &[(0, "start"), (n - 1, "end")],
+        &[(0, "start"), (dst, "end")],
         format!(
             "Result: min time = {}. Binary search + BFS or Dijkstra in O(n^2 log n).",
             time
         ),
     );
-    v.into_frames()
+    v.into_grid_frames(side, side)
 }
 
 fn viz_matrix_grid_making_large_island() -> Vec<VizFrame> {
@@ -22957,7 +23226,7 @@ fn viz_matrix_grid_making_large_island() -> Vec<VizFrame> {
             best.max(1)
         ),
     );
-    v.into_frames()
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_matrix_grid_longest_increasing_path() -> Vec<VizFrame> {
@@ -23014,7 +23283,7 @@ fn viz_matrix_grid_longest_increasing_path() -> Vec<VizFrame> {
             best
         ),
     );
-    v.into_frames()
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_matrix_grid_treasure_island() -> Vec<VizFrame> {
@@ -23027,9 +23296,10 @@ fn viz_matrix_grid_treasure_island() -> Vec<VizFrame> {
     grid[0] = 0;
     grid[n - 1] = 2; // treasure
 
+    let treasure = n - 1;
     let mut v = VizLog::new(grid.clone());
     v.ptrs(
-        &[],
+        &[(treasure, HighlightKind::Target)],
         &[],
         format!("Goal: Find shortest path from (0,0) to treasure in {}x{} grid. Strategy: BFS from start — first time we reach treasure is shortest path. O(rows*cols).", rows, cols),
     );
@@ -23043,7 +23313,10 @@ fn viz_matrix_grid_treasure_island() -> Vec<VizFrame> {
         let r = pos / cols;
         let c = pos % cols;
         v.ptrs(
-            &[(pos, HighlightKind::Active)],
+            &[
+                (pos, HighlightKind::Active),
+                (treasure, HighlightKind::Target),
+            ],
             &[(pos, "node")],
             format!("Visit ({},{}) dist={}", r, c, dist[pos]),
         );
@@ -23074,13 +23347,13 @@ fn viz_matrix_grid_treasure_island() -> Vec<VizFrame> {
     let all: Vec<(usize, HighlightKind)> = (0..n).map(|i| (i, HighlightKind::Sorted)).collect();
     v.ptrs(
         &all,
-        &[(0, "start"), (n - 1, "treas")],
+        &[(0, "start"), (treasure, "treas")],
         format!(
             "Result: min steps to treasure = {}. BFS on grid in O(rows*cols) time.",
-            dist[n - 1]
+            dist[treasure]
         ),
     );
-    v.into_frames()
+    v.into_grid_frames(rows, cols)
 }
 
 // ─── Tries Visualizations ───────────────────────────────────
@@ -24268,7 +24541,7 @@ fn viz_segment_dynamic() -> Vec<VizFrame> {
 
 fn viz_topo_sort_basic() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
+    let n = rng.random_range(10..=14);
     let adj = rand_dag(&mut rng, n);
     let in_deg: Vec<i32> = {
         let mut d = vec![0i32; n];
@@ -24317,12 +24590,18 @@ fn viz_topo_sort_basic() -> Vec<VizFrame> {
         &[(0, "start")],
         format!("Answer: topological order = {:?}. Time: O(V + E).", order),
     );
-    v.into_frames()
+    let mut edges: Vec<(usize, usize)> = Vec::new();
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &w in neighbors {
+            edges.push((u, w));
+        }
+    }
+    v.into_graph_frames(&edges, true)
 }
 
 fn viz_topo_sort_can_finish() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
+    let n = rng.random_range(10..=14);
     let adj = rand_dag(&mut rng, n);
     let in_deg: Vec<i32> = {
         let mut d = vec![0i32; n];
@@ -24376,12 +24655,18 @@ fn viz_topo_sort_can_finish() -> Vec<VizFrame> {
             n
         ),
     );
-    v.into_frames()
+    let mut edges: Vec<(usize, usize)> = Vec::new();
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &w in neighbors {
+            edges.push((u, w));
+        }
+    }
+    v.into_graph_frames(&edges, true)
 }
 
 fn viz_topo_sort_find_order() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
+    let n = rng.random_range(10..=14);
     let adj = rand_dag(&mut rng, n);
     let in_deg: Vec<i32> = {
         let mut d = vec![0i32; n];
@@ -24429,12 +24714,18 @@ fn viz_topo_sort_find_order() -> Vec<VizFrame> {
         &[(0, "start")],
         format!("Answer: valid course order = {:?}. Time: O(V + E).", order),
     );
-    v.into_frames()
+    let mut edges: Vec<(usize, usize)> = Vec::new();
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &w in neighbors {
+            edges.push((u, w));
+        }
+    }
+    v.into_graph_frames(&edges, true)
 }
 
 fn viz_topo_sort_is_dag() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
+    let n = rng.random_range(10..=14);
     let adj = rand_dag(&mut rng, n);
     let vals: Vec<i32> = (0..n as i32).collect();
 
@@ -24510,12 +24801,18 @@ fn viz_topo_sort_is_dag() -> Vec<VizFrame> {
             }
         ),
     );
-    v.into_frames()
+    let mut edges: Vec<(usize, usize)> = Vec::new();
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &w in neighbors {
+            edges.push((u, w));
+        }
+    }
+    v.into_graph_frames(&edges, true)
 }
 
 fn viz_topo_sort_kahn_bfs() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
+    let n = rng.random_range(10..=14);
     let adj = rand_dag(&mut rng, n);
     let in_deg: Vec<i32> = {
         let mut d = vec![0i32; n];
@@ -24570,12 +24867,18 @@ fn viz_topo_sort_kahn_bfs() -> Vec<VizFrame> {
         &[(0, "start")],
         format!("Answer: topological order = {:?}. Time: O(V + E).", order),
     );
-    v.into_frames()
+    let mut edges: Vec<(usize, usize)> = Vec::new();
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &w in neighbors {
+            edges.push((u, w));
+        }
+    }
+    v.into_graph_frames(&edges, true)
 }
 
 fn viz_topo_sort_parallel_courses() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
+    let n = rng.random_range(10..=14);
     let adj = rand_dag(&mut rng, n);
     let in_deg: Vec<i32> = {
         let mut d = vec![0i32; n];
@@ -24636,12 +24939,18 @@ fn viz_topo_sort_parallel_courses() -> Vec<VizFrame> {
         &[(0, "start")],
         format!("Answer: {} semesters needed for {} courses. This equals the longest dependency chain. Time: O(V + E).", semesters, taken),
     );
-    v.into_frames()
+    let mut edges: Vec<(usize, usize)> = Vec::new();
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &w in neighbors {
+            edges.push((u, w));
+        }
+    }
+    v.into_graph_frames(&edges, true)
 }
 
 fn viz_topo_sort_all_ancestors() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
+    let n = rng.random_range(10..=14);
     let adj = rand_dag(&mut rng, n);
     let vals: Vec<i32> = (0..n as i32).collect();
 
@@ -24697,12 +25006,18 @@ fn viz_topo_sort_all_ancestors() -> Vec<VizFrame> {
         &[(0, "start")],
         format!("Answer: all ancestors computed for {} nodes. Time: O(V^2) in the worst case due to ancestor set sizes.", n),
     );
-    v.into_frames()
+    let mut edges: Vec<(usize, usize)> = Vec::new();
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &w in neighbors {
+            edges.push((u, w));
+        }
+    }
+    v.into_graph_frames(&edges, true)
 }
 
 fn viz_topo_sort_longest_path_dag() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
+    let n = rng.random_range(10..=14);
     let adj = rand_dag(&mut rng, n);
     let vals: Vec<i32> = (0..n as i32).collect();
 
@@ -24758,12 +25073,18 @@ fn viz_topo_sort_longest_path_dag() -> Vec<VizFrame> {
             best
         ),
     );
-    v.into_frames()
+    let mut edges: Vec<(usize, usize)> = Vec::new();
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &w in neighbors {
+            edges.push((u, w));
+        }
+    }
+    v.into_graph_frames(&edges, true)
 }
 
 fn viz_topo_sort_sequence_reconstruction() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
+    let n = rng.random_range(10..=14);
     let adj = rand_dag(&mut rng, n);
     let in_deg: Vec<i32> = {
         let mut d = vec![0i32; n];
@@ -24826,12 +25147,18 @@ fn viz_topo_sort_sequence_reconstruction() -> Vec<VizFrame> {
             if unique { "IS" } else { "is NOT" }
         ),
     );
-    v.into_frames()
+    let mut edges: Vec<(usize, usize)> = Vec::new();
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &w in neighbors {
+            edges.push((u, w));
+        }
+    }
+    v.into_graph_frames(&edges, true)
 }
 
 fn viz_topo_sort_build_order() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
+    let n = rng.random_range(10..=14);
     let adj = rand_dag(&mut rng, n);
     let in_deg: Vec<i32> = {
         let mut d = vec![0i32; n];
@@ -24879,12 +25206,18 @@ fn viz_topo_sort_build_order() -> Vec<VizFrame> {
         &[(0, "start")],
         format!("Answer: build order = {:?}. Time: O(V + E).", order),
     );
-    v.into_frames()
+    let mut edges: Vec<(usize, usize)> = Vec::new();
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &w in neighbors {
+            edges.push((u, w));
+        }
+    }
+    v.into_graph_frames(&edges, true)
 }
 
 fn viz_topo_sort_alien_dictionary() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
+    let n = rng.random_range(10..=14);
     let adj = rand_dag(&mut rng, n);
     let in_deg: Vec<i32> = {
         let mut d = vec![0i32; n];
@@ -24935,12 +25268,18 @@ fn viz_topo_sort_alien_dictionary() -> Vec<VizFrame> {
         &[(0, "start")],
         format!("Result: alien order \"{}\"", result),
     );
-    v.into_frames()
+    let mut edges: Vec<(usize, usize)> = Vec::new();
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &w in neighbors {
+            edges.push((u, w));
+        }
+    }
+    v.into_graph_frames(&edges, true)
 }
 
 fn viz_topo_sort_minimum_height_trees() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
+    let n = rng.random_range(10..=14);
     let adj = rand_graph_undirected(&mut rng, n);
     let degrees: Vec<i32> = (0..n).map(|i| adj[i].len() as i32).collect();
 
@@ -24992,7 +25331,15 @@ fn viz_topo_sort_minimum_height_trees() -> Vec<VizFrame> {
             roots
         ),
     );
-    v.into_frames()
+    let mut edges: Vec<(usize, usize)> = Vec::new();
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &w in neighbors {
+            if u < w {
+                edges.push((u, w));
+            }
+        }
+    }
+    v.into_graph_frames(&edges, false)
 }
 
 fn viz_topo_sort_longest_increasing_path() -> Vec<VizFrame> {
@@ -25034,7 +25381,7 @@ fn viz_topo_sort_longest_increasing_path() -> Vec<VizFrame> {
 
 fn viz_topo_sort_critical_connections() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
+    let n = rng.random_range(10..=14);
     let adj = rand_graph_undirected(&mut rng, n);
     let vals: Vec<i32> = (0..n as i32).collect();
 
@@ -25111,7 +25458,15 @@ fn viz_topo_sort_critical_connections() -> Vec<VizFrame> {
             bridges.len()
         ),
     );
-    v.into_frames()
+    let mut edges: Vec<(usize, usize)> = Vec::new();
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &w in neighbors {
+            if u < w {
+                edges.push((u, w));
+            }
+        }
+    }
+    v.into_graph_frames(&edges, false)
 }
 
 fn viz_topo_sort_sort_items_by_groups() -> Vec<VizFrame> {
@@ -25755,15 +26110,16 @@ fn viz_sparse_table_distinct_in_range() -> Vec<VizFrame> {
 
 fn viz_shortest_path_unweighted() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
+    let n = rng.random_range(10..=14);
     let adj = rand_graph_undirected(&mut rng, n);
     let vals: Vec<i32> = vec![-1; n];
 
+    let dst = n - 1;
     let mut v = VizLog::new(vals);
     v.ptrs(
+        &[(dst, HighlightKind::Target)],
         &[],
-        &[],
-        format!("Shortest Path (Unweighted) — BFS 0 to {}", n - 1),
+        format!("Shortest Path (Unweighted) — BFS 0 to {}", dst),
     );
 
     let mut dist = vec![-1i32; n];
@@ -25773,7 +26129,7 @@ fn viz_shortest_path_unweighted() -> Vec<VizFrame> {
 
     while let Some(u) = queue.pop_front() {
         v.ptrs(
-            &[(u, HighlightKind::Active)],
+            &[(u, HighlightKind::Active), (dst, HighlightKind::Target)],
             &[(u, "node")],
             format!("Visit node {}, dist={}", u, dist[u]),
         );
@@ -25788,10 +26144,18 @@ fn viz_shortest_path_unweighted() -> Vec<VizFrame> {
     let all: Vec<(usize, HighlightKind)> = (0..n).map(|i| (i, HighlightKind::Sorted)).collect();
     v.ptrs(
         &all,
-        &[(0, "src"), (n - 1, "dst")],
-        format!("Result: dist[{}] = {}", n - 1, dist[n - 1]),
+        &[(0, "src"), (dst, "dst")],
+        format!("Result: dist[{}] = {}", dst, dist[dst]),
     );
-    v.into_frames()
+    let mut edges: Vec<(usize, usize)> = Vec::new();
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &w in neighbors {
+            if u < w {
+                edges.push((u, w));
+            }
+        }
+    }
+    v.into_graph_frames(&edges, false)
 }
 
 fn viz_shortest_path_binary_grid() -> Vec<VizFrame> {
@@ -25959,7 +26323,15 @@ fn viz_shortest_path_network_delay() -> Vec<VizFrame> {
         &[(0, "src")],
         format!("Result: network delay = {}", max_dist),
     );
-    v.into_frames()
+    let mut edges: Vec<(usize, usize)> = Vec::new();
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &(w, _weight) in neighbors {
+            if u < w {
+                edges.push((u, w));
+            }
+        }
+    }
+    v.into_graph_frames(&edges, false)
 }
 
 fn viz_shortest_path_city_fewest_neighbors() -> Vec<VizFrame> {
@@ -26024,7 +26396,15 @@ fn viz_shortest_path_city_fewest_neighbors() -> Vec<VizFrame> {
         &[(best_city, "best")],
         format!("Result: city {} has fewest reachable neighbors", best_city),
     );
-    v.into_frames()
+    let mut edges: Vec<(usize, usize)> = Vec::new();
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &(w, _weight) in neighbors {
+            if u < w {
+                edges.push((u, w));
+            }
+        }
+    }
+    v.into_graph_frames(&edges, false)
 }
 
 fn viz_shortest_path_dijkstra() -> Vec<VizFrame> {
@@ -26032,9 +26412,10 @@ fn viz_shortest_path_dijkstra() -> Vec<VizFrame> {
     let n = rng.random_range(6..=8);
     let (adj, weights) = rand_weighted_graph(&mut rng, n);
 
+    let dst = n - 1;
     let mut v = VizLog::new(weights);
     v.ptrs(
-        &[],
+        &[(dst, HighlightKind::Target)],
         &[],
         format!("Dijkstra — {} nodes, find shortest paths from 0", n),
     );
@@ -26057,7 +26438,7 @@ fn viz_shortest_path_dijkstra() -> Vec<VizFrame> {
         }
         visited[u] = true;
         v.ptrs(
-            &[(u, HighlightKind::Sorted)],
+            &[(u, HighlightKind::Sorted), (dst, HighlightKind::Target)],
             &[(u, "node")],
             format!("Finalize node {}, dist={}", u, dist[u]),
         );
@@ -26065,7 +26446,11 @@ fn viz_shortest_path_dijkstra() -> Vec<VizFrame> {
             if dist[u] + w < dist[nb] {
                 dist[nb] = dist[u] + w;
                 v.ptrs(
-                    &[(u, HighlightKind::Active), (nb, HighlightKind::Comparing)],
+                    &[
+                        (u, HighlightKind::Active),
+                        (nb, HighlightKind::Comparing),
+                        (dst, HighlightKind::Target),
+                    ],
                     &[(u, "from"), (nb, "relax")],
                     format!("Relax {}->{}: dist[{}] = {}", u, nb, nb, dist[nb]),
                 );
@@ -26086,10 +26471,18 @@ fn viz_shortest_path_dijkstra() -> Vec<VizFrame> {
         .collect();
     v.ptrs(
         &all,
-        &[(0, "src")],
+        &[(0, "src"), (dst, "dst")],
         format!("Result: dists [{}]", dists.join(",")),
     );
-    v.into_frames()
+    let mut edges: Vec<(usize, usize)> = Vec::new();
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &(w, _weight) in neighbors {
+            if u < w {
+                edges.push((u, w));
+            }
+        }
+    }
+    v.into_graph_frames(&edges, false)
 }
 
 fn viz_shortest_path_bellman_ford() -> Vec<VizFrame> {
@@ -26097,9 +26490,10 @@ fn viz_shortest_path_bellman_ford() -> Vec<VizFrame> {
     let n = rng.random_range(6..=8);
     let (adj, weights) = rand_weighted_graph(&mut rng, n);
 
+    let dst = n - 1;
     let mut v = VizLog::new(weights);
     v.ptrs(
-        &[],
+        &[(dst, HighlightKind::Target)],
         &[],
         format!("Bellman-Ford — {} nodes, relax all edges n-1 times", n),
     );
@@ -26124,7 +26518,7 @@ fn viz_shortest_path_bellman_ford() -> Vec<VizFrame> {
             }
         }
         v.ptrs(
-            &[(round, HighlightKind::Active)],
+            &[(round, HighlightKind::Active), (dst, HighlightKind::Target)],
             &[(round, "rnd")],
             format!("Round {}: relaxed edges, updated={}", round + 1, updated),
         );
@@ -26136,18 +26530,22 @@ fn viz_shortest_path_bellman_ford() -> Vec<VizFrame> {
     let all: Vec<(usize, HighlightKind)> = (0..n).map(|i| (i, HighlightKind::Sorted)).collect();
     v.ptrs(
         &all,
-        &[(0, "src")],
+        &[(0, "src"), (dst, "dst")],
         format!(
             "Result: Bellman-Ford complete, dist[{}]={}",
-            n - 1,
-            if dist[n - 1] == i32::MAX {
-                -1
-            } else {
-                dist[n - 1]
-            }
+            dst,
+            if dist[dst] == i32::MAX { -1 } else { dist[dst] }
         ),
     );
-    v.into_frames()
+    let mut graph_edges: Vec<(usize, usize)> = Vec::new();
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &(w, _weight) in neighbors {
+            if u < w {
+                graph_edges.push((u, w));
+            }
+        }
+    }
+    v.into_graph_frames(&graph_edges, false)
 }
 
 fn viz_shortest_path_cheapest_flights() -> Vec<VizFrame> {
@@ -26207,7 +26605,15 @@ fn viz_shortest_path_cheapest_flights() -> Vec<VizFrame> {
             }
         ),
     );
-    v.into_frames()
+    let mut edges: Vec<(usize, usize)> = Vec::new();
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &(w, _weight) in neighbors {
+            if u < w {
+                edges.push((u, w));
+            }
+        }
+    }
+    v.into_graph_frames(&edges, false)
 }
 
 fn viz_shortest_path_path_with_min_effort() -> Vec<VizFrame> {
@@ -26374,7 +26780,15 @@ fn viz_shortest_path_floyd_warshall() -> Vec<VizFrame> {
         &[(0, "start")],
         format!("Result: all-pairs shortest paths computed for {} nodes", n),
     );
-    v.into_frames()
+    let mut edges: Vec<(usize, usize)> = Vec::new();
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &(w, _weight) in neighbors {
+            if u < w {
+                edges.push((u, w));
+            }
+        }
+    }
+    v.into_graph_frames(&edges, false)
 }
 
 fn viz_shortest_path_k_shortest() -> Vec<VizFrame> {
@@ -26434,7 +26848,15 @@ fn viz_shortest_path_k_shortest() -> Vec<VizFrame> {
             }
         ),
     );
-    v.into_frames()
+    let mut edges: Vec<(usize, usize)> = Vec::new();
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &(w, _weight) in neighbors {
+            if u < w {
+                edges.push((u, w));
+            }
+        }
+    }
+    v.into_graph_frames(&edges, false)
 }
 
 fn viz_shortest_path_minimum_cost_connect_all() -> Vec<VizFrame> {
@@ -26495,7 +26917,7 @@ fn viz_shortest_path_minimum_cost_connect_all() -> Vec<VizFrame> {
 
 fn viz_shortest_path_reconstruct() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
+    let n = rng.random_range(10..=14);
     let adj = rand_graph_undirected(&mut rng, n);
     let vals: Vec<i32> = (0..n as i32).collect();
 
@@ -26541,12 +26963,20 @@ fn viz_shortest_path_reconstruct() -> Vec<VizFrame> {
         &[(0, "src"), (n - 1, "dst")],
         format!("Result: path {:?}", path),
     );
-    v.into_frames()
+    let mut edges: Vec<(usize, usize)> = Vec::new();
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &w in neighbors {
+            if u < w {
+                edges.push((u, w));
+            }
+        }
+    }
+    v.into_graph_frames(&edges, false)
 }
 
 fn viz_shortest_path_with_alternating_colors() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
+    let n = rng.random_range(10..=14);
     let adj = rand_graph_undirected(&mut rng, n);
     let vals: Vec<i32> = (0..n as i32).collect();
 
@@ -26597,7 +27027,15 @@ fn viz_shortest_path_with_alternating_colors() -> Vec<VizFrame> {
         .collect();
     let all: Vec<(usize, HighlightKind)> = (0..n).map(|i| (i, HighlightKind::Sorted)).collect();
     v.ptrs(&all, &[(0, "src")], format!("Result: {:?}", result));
-    v.into_frames()
+    let mut edges: Vec<(usize, usize)> = Vec::new();
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &w in neighbors {
+            if u < w {
+                edges.push((u, w));
+            }
+        }
+    }
+    v.into_graph_frames(&edges, false)
 }
 
 // ─── Part 6: Monotonic Stacks/Queues Visualizations ────────────
@@ -27345,12 +27783,20 @@ fn viz_mst_min_cost_connect() -> Vec<VizFrame> {
         &[(0, "start")],
         format!("Result: MST cost = {}", total),
     );
-    v.into_frames()
+    let mut edges: Vec<(usize, usize)> = Vec::new();
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &(w, _weight) in neighbors {
+            if u < w {
+                edges.push((u, w));
+            }
+        }
+    }
+    v.into_graph_frames(&edges, false)
 }
 
 fn viz_mst_is_tree() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
+    let n = rng.random_range(10..=14);
     let adj = rand_graph_undirected(&mut rng, n);
     let vals: Vec<i32> = (0..n).map(|i| adj[i].len() as i32).collect();
 
@@ -27399,7 +27845,15 @@ fn viz_mst_is_tree() -> Vec<VizFrame> {
             edge_count
         ),
     );
-    v.into_frames()
+    let mut edges: Vec<(usize, usize)> = Vec::new();
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &w in neighbors {
+            if u < w {
+                edges.push((u, w));
+            }
+        }
+    }
+    v.into_graph_frames(&edges, false)
 }
 
 fn viz_mst_connected_components() -> Vec<VizFrame> {
@@ -27505,7 +27959,8 @@ fn viz_mst_min_spanning_weight() -> Vec<VizFrame> {
         &[(0, "start")],
         format!("Result: MST weight = {}", total),
     );
-    v.into_frames()
+    let graph_edges: Vec<(usize, usize)> = edges.iter().map(|&(_w, u, vv)| (u, vv)).collect();
+    v.into_graph_frames(&graph_edges, false)
 }
 
 fn viz_mst_max_edge_in_mst() -> Vec<VizFrame> {
@@ -27547,7 +28002,8 @@ fn viz_mst_max_edge_in_mst() -> Vec<VizFrame> {
         &[(0, "start")],
         format!("Result: max MST edge = {}", max_edge),
     );
-    v.into_frames()
+    let graph_edges: Vec<(usize, usize)> = edges.iter().map(|&(_w, u, vv)| (u, vv)).collect();
+    v.into_graph_frames(&graph_edges, false)
 }
 
 fn viz_mst_kruskal() -> Vec<VizFrame> {
@@ -27596,7 +28052,8 @@ fn viz_mst_kruskal() -> Vec<VizFrame> {
         &[(0, "start")],
         format!("Result: Kruskal MST = {}", total),
     );
-    v.into_frames()
+    let graph_edges: Vec<(usize, usize)> = edges.iter().map(|&(_w, u, vv)| (u, vv)).collect();
+    v.into_graph_frames(&graph_edges, false)
 }
 
 fn viz_mst_prim() -> Vec<VizFrame> {
@@ -27644,7 +28101,15 @@ fn viz_mst_prim() -> Vec<VizFrame> {
         &[(0, "start")],
         format!("Answer: Prim's MST total weight = {}. Time: O(V^2) naive, O(E log V) with priority queue.", total),
     );
-    v.into_frames()
+    let mut edges: Vec<(usize, usize)> = Vec::new();
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &(w, _weight) in neighbors {
+            if u < w {
+                edges.push((u, w));
+            }
+        }
+    }
+    v.into_graph_frames(&edges, false)
 }
 
 fn viz_mst_min_cost_repair_roads() -> Vec<VizFrame> {
@@ -27696,7 +28161,8 @@ fn viz_mst_min_cost_repair_roads() -> Vec<VizFrame> {
         &[(0, "start")],
         format!("Result: repair cost = {}", total),
     );
-    v.into_frames()
+    let graph_edges: Vec<(usize, usize)> = edges.iter().map(|&(_w, u, vv)| (u, vv)).collect();
+    v.into_graph_frames(&graph_edges, false)
 }
 
 fn viz_mst_second_mst() -> Vec<VizFrame> {
@@ -27750,7 +28216,8 @@ fn viz_mst_second_mst() -> Vec<VizFrame> {
         &[(0, "start")],
         format!("Result: MST={}, second MST computed", total),
     );
-    v.into_frames()
+    let graph_edges: Vec<(usize, usize)> = edges.iter().map(|&(_w, u, vv)| (u, vv)).collect();
+    v.into_graph_frames(&graph_edges, false)
 }
 
 fn viz_mst_critical_edges() -> Vec<VizFrame> {
@@ -27802,7 +28269,8 @@ fn viz_mst_critical_edges() -> Vec<VizFrame> {
         &[(0, "start")],
         format!("Result: {} critical edges", critical),
     );
-    v.into_frames()
+    let graph_edges: Vec<(usize, usize)> = edges.iter().map(|&(_w, u, vv)| (u, vv)).collect();
+    v.into_graph_frames(&graph_edges, false)
 }
 
 fn viz_mst_max_spanning_tree() -> Vec<VizFrame> {
@@ -27851,7 +28319,8 @@ fn viz_mst_max_spanning_tree() -> Vec<VizFrame> {
         &[(0, "start")],
         format!("Result: max spanning tree = {}", total),
     );
-    v.into_frames()
+    let graph_edges: Vec<(usize, usize)> = edges.iter().map(|&(_w, u, vv)| (u, vv)).collect();
+    v.into_graph_frames(&graph_edges, false)
 }
 
 fn viz_mst_min_bottleneck_path() -> Vec<VizFrame> {
@@ -27901,7 +28370,8 @@ fn viz_mst_min_bottleneck_path() -> Vec<VizFrame> {
         &[(0, "src"), (n - 1, "dst")],
         format!("Result: min bottleneck = {}", bottleneck),
     );
-    v.into_frames()
+    let graph_edges: Vec<(usize, usize)> = edges.iter().map(|&(_w, u, vv)| (u, vv)).collect();
+    v.into_graph_frames(&graph_edges, false)
 }
 
 fn viz_mst_optimize_network() -> Vec<VizFrame> {
@@ -27963,7 +28433,15 @@ fn viz_mst_optimize_network() -> Vec<VizFrame> {
         &[(0, "start")],
         format!("Result: MST={}, removed {} redundant edges", total, removed),
     );
-    v.into_frames()
+    let mut edges: Vec<(usize, usize)> = Vec::new();
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &(w, _weight) in neighbors {
+            if u < w {
+                edges.push((u, w));
+            }
+        }
+    }
+    v.into_graph_frames(&edges, false)
 }
 
 fn viz_mst_steiner_tree() -> Vec<VizFrame> {
@@ -28018,7 +28496,15 @@ fn viz_mst_steiner_tree() -> Vec<VizFrame> {
         &[(terminals[0], "root")],
         format!("Result: Steiner tree cost ~ {}", total),
     );
-    v.into_frames()
+    let mut edges: Vec<(usize, usize)> = Vec::new();
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &(w, _weight) in neighbors {
+            if u < w {
+                edges.push((u, w));
+            }
+        }
+    }
+    v.into_graph_frames(&edges, false)
 }
 
 fn viz_mst_min_degree_spanning_tree() -> Vec<VizFrame> {
@@ -28068,7 +28554,15 @@ fn viz_mst_min_degree_spanning_tree() -> Vec<VizFrame> {
         &[(0, "start")],
         format!("Result: MST built, max degree = {}", max_deg),
     );
-    v.into_frames()
+    let mut edges: Vec<(usize, usize)> = Vec::new();
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &(w, _weight) in neighbors {
+            if u < w {
+                edges.push((u, w));
+            }
+        }
+    }
+    v.into_graph_frames(&edges, false)
 }
 
 // ─── Part 6: Bit Manipulation Visualizations ───────────────────
@@ -28806,7 +29300,8 @@ fn viz_union_find_redundant_connection() -> Vec<VizFrame> {
         &[(0, "start")],
         format!("Result: redundant edge ({},{})", redundant.0, redundant.1),
     );
-    v.into_frames()
+    let graph_edges: Vec<(usize, usize)> = edges.clone();
+    v.into_graph_frames(&graph_edges, false)
 }
 
 fn viz_union_find_earliest_connection() -> Vec<VizFrame> {
@@ -29358,7 +29853,8 @@ fn viz_union_find_min_cost_connect_cities() -> Vec<VizFrame> {
         &[(0, "start")],
         format!("Result: min cost = {}", total),
     );
-    v.into_frames()
+    let graph_edges: Vec<(usize, usize)> = edges.iter().map(|&(_w, u, vv)| (u, vv)).collect();
+    v.into_graph_frames(&graph_edges, false)
 }
 
 fn viz_union_find_remove_stones() -> Vec<VizFrame> {
@@ -29480,7 +29976,8 @@ fn viz_union_find_checking_existence_edge_length() -> Vec<VizFrame> {
         &[(0, "start")],
         format!("Result: {} queries answered", queries),
     );
-    v.into_frames()
+    let graph_edges: Vec<(usize, usize)> = edges.iter().map(|&(_w, u, vv)| (u, vv)).collect();
+    v.into_graph_frames(&graph_edges, false)
 }
 
 // ─── Part 6: String Algorithm Visualizations ───────────────────

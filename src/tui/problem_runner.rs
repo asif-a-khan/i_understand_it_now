@@ -1,7 +1,7 @@
 use std::sync::mpsc;
 
 use crossterm::event::{KeyCode, KeyEvent};
-use ratatui::layout::Rect;
+use ratatui::layout::{Constraint, Layout, Rect};
 use ratatui::style::{Color, Modifier, Style};
 use ratatui::text::{Line, Span};
 use ratatui::widgets::{Block, Borders, List, ListItem, ListState, Paragraph};
@@ -76,6 +76,8 @@ pub struct ProblemListState {
     pub list_state: ListState,
     pub topic_filter: Option<usize>, // index into unique topics list
     pub difficulty_filter: Option<Difficulty>,
+    pub search_active: bool,
+    pub search_query: String,
     topics: Vec<String>,
 }
 
@@ -92,6 +94,8 @@ impl ProblemListState {
             list_state,
             topic_filter: None,
             difficulty_filter: None,
+            search_active: false,
+            search_query: String::new(),
             topics,
         }
     }
@@ -100,6 +104,7 @@ impl ProblemListState {
     fn filtered_indices(&self, problems: &[ProblemInfo]) -> Vec<FilteredEntry> {
         let mut entries = Vec::new();
         let mut current_topic = String::new();
+        let query = self.search_query.to_lowercase();
 
         for (idx, p) in problems.iter().enumerate() {
             if let Some(ti) = self.topic_filter {
@@ -113,6 +118,15 @@ impl ProblemListState {
                 }
             }
 
+            // Text search filter
+            if !query.is_empty()
+                && !p.id.to_lowercase().contains(&query)
+                && !p.name.to_lowercase().contains(&query)
+                && !p.topic.to_lowercase().contains(&query)
+            {
+                continue;
+            }
+
             if p.topic != current_topic {
                 current_topic = p.topic.clone();
                 entries.push(FilteredEntry::Header(current_topic.clone()));
@@ -122,14 +136,100 @@ impl ProblemListState {
         entries
     }
 
+    /// Reset selection to the first problem entry in the current filtered list.
+    fn select_first_problem(&mut self, problems: &[ProblemInfo]) {
+        self.list_state.select(Some(0));
+        let entries = self.filtered_indices(problems);
+        if let Some(pos) = entries
+            .iter()
+            .position(|e| matches!(e, FilteredEntry::Problem(_)))
+        {
+            self.list_state.select(Some(pos));
+        }
+    }
+
     pub fn handle_key(&mut self, key: KeyEvent, problems: &[ProblemInfo]) -> Action {
+        // Search-mode input handling
+        if self.search_active {
+            match key.code {
+                KeyCode::Char(c) => {
+                    self.search_query.push(c);
+                    self.select_first_problem(problems);
+                    return Action::None;
+                }
+                KeyCode::Backspace => {
+                    self.search_query.pop();
+                    self.select_first_problem(problems);
+                    return Action::None;
+                }
+                KeyCode::Esc => {
+                    self.search_active = false;
+                    self.search_query.clear();
+                    self.select_first_problem(problems);
+                    return Action::None;
+                }
+                KeyCode::Enter => {
+                    self.search_active = false;
+                    // Keep the query and current selection
+                    return Action::None;
+                }
+                KeyCode::Down => {
+                    let entries = self.filtered_indices(problems);
+                    let len = entries.len();
+                    let i = self.list_state.selected().unwrap_or(0);
+                    let mut next = (i + 1).min(len.saturating_sub(1));
+                    while next < len && matches!(entries.get(next), Some(FilteredEntry::Header(_)))
+                    {
+                        next += 1;
+                    }
+                    if next < len {
+                        self.list_state.select(Some(next));
+                    }
+                    return Action::None;
+                }
+                KeyCode::Up => {
+                    let entries = self.filtered_indices(problems);
+                    let i = self.list_state.selected().unwrap_or(0);
+                    let mut prev = i.saturating_sub(1);
+                    while prev > 0 && matches!(entries.get(prev), Some(FilteredEntry::Header(_))) {
+                        prev = prev.saturating_sub(1);
+                    }
+                    if matches!(entries.get(prev), Some(FilteredEntry::Header(_))) {
+                        if let Some(pos) = entries
+                            .iter()
+                            .position(|e| matches!(e, FilteredEntry::Problem(_)))
+                        {
+                            prev = pos;
+                        }
+                    }
+                    self.list_state.select(Some(prev));
+                    return Action::None;
+                }
+                _ => return Action::None,
+            }
+        }
+
+        // Normal mode
         let entries = self.filtered_indices(problems);
         let len = entries.len();
-        if len == 0 && key.code == KeyCode::Esc {
-            return Action::Pop;
+        if len == 0 {
+            if key.code == KeyCode::Esc {
+                if !self.search_query.is_empty() {
+                    self.search_query.clear();
+                    self.select_first_problem(problems);
+                    return Action::None;
+                }
+                return Action::Pop;
+            }
+            return Action::None;
         }
 
         match key.code {
+            KeyCode::Char('/') => {
+                self.search_active = true;
+                self.search_query.clear();
+                Action::None
+            }
             KeyCode::Char('j') | KeyCode::Down => {
                 let i = self.list_state.selected().unwrap_or(0);
                 let mut next = (i + 1).min(len.saturating_sub(1));
@@ -174,15 +274,7 @@ impl ProblemListState {
                     Some(i) if i + 1 < self.topics.len() => Some(i + 1),
                     Some(_) => None,
                 };
-                self.list_state.select(Some(0));
-                // Skip to first problem entry
-                let entries = self.filtered_indices(problems);
-                if let Some(pos) = entries
-                    .iter()
-                    .position(|e| matches!(e, FilteredEntry::Problem(_)))
-                {
-                    self.list_state.select(Some(pos));
-                }
+                self.select_first_problem(problems);
                 Action::None
             }
             KeyCode::Char('d') => {
@@ -192,17 +284,18 @@ impl ProblemListState {
                     Some(Difficulty::Medium) => Some(Difficulty::Hard),
                     Some(Difficulty::Hard) => None,
                 };
-                self.list_state.select(Some(0));
-                let entries = self.filtered_indices(problems);
-                if let Some(pos) = entries
-                    .iter()
-                    .position(|e| matches!(e, FilteredEntry::Problem(_)))
-                {
-                    self.list_state.select(Some(pos));
-                }
+                self.select_first_problem(problems);
                 Action::None
             }
-            KeyCode::Esc => Action::Pop,
+            KeyCode::Esc => {
+                if !self.search_query.is_empty() {
+                    self.search_query.clear();
+                    self.select_first_problem(problems);
+                    Action::None
+                } else {
+                    Action::Pop
+                }
+            }
             _ => Action::None,
         }
     }
@@ -214,7 +307,17 @@ impl ProblemListState {
         problems: &[ProblemInfo],
         progress: &Progress,
     ) {
+        // Always show search bar at bottom
+        let chunks = Layout::vertical([Constraint::Fill(1), Constraint::Length(1)]).split(area);
+        let list_area = chunks[0];
+        let search_bar_area = chunks[1];
+
         let entries = self.filtered_indices(problems);
+
+        let problem_count = entries
+            .iter()
+            .filter(|e| matches!(e, FilteredEntry::Problem(_)))
+            .count();
 
         let items: Vec<ListItem> = entries
             .iter()
@@ -270,7 +373,44 @@ impl ProblemListState {
             .highlight_style(theme::selected_style())
             .highlight_symbol("> ");
 
-        f.render_stateful_widget(list, area, &mut self.list_state);
+        f.render_stateful_widget(list, list_area, &mut self.list_state);
+
+        // Persistent search bar
+        let search_line = if self.search_active {
+            let mut spans = vec![
+                Span::styled(
+                    " / ",
+                    Style::new().fg(Color::Yellow).add_modifier(Modifier::BOLD),
+                ),
+                Span::styled(&self.search_query, Style::new().fg(Color::White)),
+                Span::styled("\u{2588}", Style::new().fg(Color::White)),
+            ];
+            if !self.search_query.is_empty() {
+                spans.push(Span::styled(
+                    format!("  ({} results)  ", problem_count),
+                    Style::new().fg(Color::DarkGray),
+                ));
+                spans.push(Span::styled("[t]", Style::new().fg(Color::DarkGray)));
+                spans.push(Span::styled(" topic ", Style::new().fg(Color::DarkGray)));
+                spans.push(Span::styled("[d]", Style::new().fg(Color::DarkGray)));
+                spans.push(Span::styled(" diff", Style::new().fg(Color::DarkGray)));
+            }
+            Line::from(spans)
+        } else {
+            Line::from(vec![
+                Span::styled(
+                    " / Press / to search...  ",
+                    Style::new()
+                        .fg(Color::DarkGray)
+                        .add_modifier(Modifier::ITALIC),
+                ),
+                Span::styled("[t]", Style::new().fg(Color::DarkGray)),
+                Span::styled(" topic ", Style::new().fg(Color::DarkGray)),
+                Span::styled("[d]", Style::new().fg(Color::DarkGray)),
+                Span::styled(" diff", Style::new().fg(Color::DarkGray)),
+            ])
+        };
+        f.render_widget(Paragraph::new(search_line), search_bar_area);
     }
 }
 

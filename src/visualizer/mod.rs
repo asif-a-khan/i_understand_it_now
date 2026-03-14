@@ -14,6 +14,7 @@ pub mod reference;
 
 /// What kind of highlighting to apply to an element.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[allow(dead_code)]
 pub enum HighlightKind {
     /// Currently being compared
     Comparing,
@@ -27,19 +28,66 @@ pub enum HighlightKind {
     Pivot,
     /// Found / target element
     Found,
+    /// Element being read
+    Reading,
+    /// Element being written
+    Writing,
+    /// Search target — what the algorithm is looking for
+    Target,
+}
+
+/// Typed visualization data — determines which renderer is used.
+#[derive(Debug, Clone)]
+#[allow(dead_code)]
+pub enum VizData {
+    /// Flat array/string — rendered as horizontal boxes.
+    Array { values: Vec<String> },
+    /// Binary tree — rendered with spatial node layout (level-order).
+    Tree { nodes: Vec<Option<String>> },
+    /// Graph — 2D spatial layout with edges.
+    Graph {
+        n: usize,
+        labels: Vec<String>,
+        edges: Vec<(usize, usize)>,
+        weighted_edges: Vec<(usize, usize, String)>,
+        directed: bool,
+    },
+    /// 2D grid — colored cell matrix.
+    Grid { cells: Vec<Vec<String>> },
+    /// No visual data (theory/scalar problems).
+    None { message: String },
 }
 
 /// A single frame of a visualization.
 #[derive(Debug, Clone, Default)]
 pub struct VizFrame {
-    /// The array state at this point
+    /// Legacy array data — used when `data` is None.
     pub array: Vec<i32>,
+    /// Typed visualization data. When Some, the renderer uses this instead of `array`.
+    pub data: Option<VizData>,
     /// Which indices are highlighted and how
     pub highlights: Vec<(usize, HighlightKind)>,
     /// Text annotation for this step
     pub annotation: String,
     /// Named pointers to show below the array (index, label)
     pub pointers: Vec<(usize, String)>,
+}
+
+impl VizFrame {
+    /// Get the effective VizData for rendering. Falls back to converting `array` to strings.
+    pub fn viz_data(&self) -> VizData {
+        if let Some(ref data) = self.data {
+            data.clone()
+        } else if self.array.is_empty() && self.annotation.is_empty() {
+            VizData::None {
+                message: "No visualization data".to_string(),
+            }
+        } else {
+            VizData::Array {
+                values: self.array.iter().map(|v| v.to_string()).collect(),
+            }
+        }
+    }
 }
 
 /// A reference visualization for a specific algorithm.

@@ -1,9 +1,11 @@
 use rand::Rng;
+use std::cell::RefCell;
 use std::collections::{BinaryHeap, HashMap};
+use std::rc::Rc;
 
 use crate::problems::{Difficulty, Problem, SolutionResult, TestCase};
 use crate::solutions::part3_trees::heaps_priority_queues as solutions;
-use crate::tracker::OperationLog;
+use crate::tracker::{track_slice, OperationLog, Tracked};
 
 pub fn problems() -> Vec<Box<dyn Problem>> {
     vec![
@@ -67,10 +69,15 @@ impl Problem for KthLargestElement {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<KthLargestTest>().unwrap();
         let expected = ref_kth_largest(&t.nums, t.k);
-        let actual = solutions::kth_largest(&t.nums, t.k);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::kth_largest(&tracked_nums, t.k);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("nums={:?}, k={}", t.nums, t.k),
@@ -129,10 +136,15 @@ impl Problem for LastStoneWeight {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<LastStoneWeightTest>().unwrap();
         let expected = ref_last_stone_weight(&t.stones);
-        let actual = solutions::last_stone_weight(&t.stones);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_stones = track_slice(&t.stones, shared_log.clone());
+        let actual = solutions::last_stone_weight(&tracked_stones);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("stones={:?}", t.stones),
@@ -200,10 +212,25 @@ impl Problem for KClosestPoints {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<KClosestTest>().unwrap();
         let expected = ref_k_closest(&t.points, t.k);
-        let actual = solutions::k_closest_points(&t.points, t.k);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_points: Vec<(Tracked<i32>, Tracked<i32>)> = t
+            .points
+            .iter()
+            .enumerate()
+            .map(|(i, &(a, b))| {
+                (
+                    Tracked::new(a, i * 2, shared_log.clone()),
+                    Tracked::new(b, i * 2 + 1, shared_log.clone()),
+                )
+            })
+            .collect();
+        let actual = solutions::k_closest_points(&tracked_points, t.k);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("points={:?}, k={}", t.points, t.k),
@@ -265,10 +292,15 @@ impl Problem for SortByIncreasingFrequency {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<FreqSortTest>().unwrap();
         let expected = ref_sort_by_freq(&t.nums);
-        let actual = solutions::sort_by_increasing_frequency(&t.nums);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::sort_by_increasing_frequency(&tracked_nums);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("nums={:?}", t.nums),
@@ -338,10 +370,15 @@ impl Problem for IsMinHeap {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<IsMinHeapTest>().unwrap();
         let expected = ref_is_min_heap(&t.arr);
-        let actual = solutions::is_min_heap(&t.arr);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_arr = track_slice(&t.arr, shared_log.clone());
+        let actual = solutions::is_min_heap(&tracked_arr);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("arr={:?}", t.arr),
@@ -426,10 +463,15 @@ impl Problem for TopKFrequent {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<TopKFreqTest>().unwrap();
         let expected = ref_top_k_frequent(&t.nums, t.k);
-        let actual = solutions::top_k_frequent(&t.nums, t.k);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::top_k_frequent(&tracked_nums, t.k);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("nums={:?}, k={}", t.nums, t.k),
@@ -496,10 +538,15 @@ impl Problem for KClosestToValue {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<KClosestValTest>().unwrap();
         let expected = ref_k_closest_to_value(&t.arr, t.k, t.target);
-        let actual = solutions::k_closest_to_value(&t.arr, t.k, t.target);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_arr = track_slice(&t.arr, shared_log.clone());
+        let actual = solutions::k_closest_to_value(&tracked_arr, t.k, t.target);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("arr={:?}, k={}, target={}", t.arr, t.k, t.target),
@@ -670,11 +717,26 @@ impl Problem for MergeKSortedLists {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<MergeKTest>().unwrap();
         let mut expected: Vec<i32> = t.lists.iter().flatten().copied().collect();
         expected.sort();
-        let actual = solutions::merge_k_sorted_lists(&t.lists);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_lists: Vec<Vec<Tracked<i32>>> = t
+            .lists
+            .iter()
+            .enumerate()
+            .map(|(r, row)| {
+                row.iter()
+                    .enumerate()
+                    .map(|(c, &v)| Tracked::new(v, r * 1000 + c, shared_log.clone()))
+                    .collect()
+            })
+            .collect();
+        let actual = solutions::merge_k_sorted_lists(&tracked_lists);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("lists={:?}", t.lists),
@@ -799,10 +861,15 @@ impl Problem for FindMedianStream {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<MedianStreamTest>().unwrap();
         let expected = ref_median_stream(&t.nums);
-        let actual = solutions::find_median_stream(&t.nums);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::find_median_stream(&tracked_nums);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         let is_correct = expected.len() == actual.len()
             && expected
                 .iter()
@@ -876,10 +943,15 @@ impl Problem for SlidingWindowMedian {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<SlidingMedianTest>().unwrap();
         let expected = ref_sliding_window_median(&t.nums, t.k);
-        let actual = solutions::sliding_window_median(&t.nums, t.k);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::sliding_window_median(&tracked_nums, t.k);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         let is_correct = expected.len() == actual.len()
             && expected
                 .iter()
@@ -963,10 +1035,25 @@ impl Problem for SmallestRange {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<SmallestRangeTest>().unwrap();
         let expected = ref_smallest_range(&t.lists);
-        let actual = solutions::smallest_range(&t.lists);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_lists: Vec<Vec<Tracked<i32>>> = t
+            .lists
+            .iter()
+            .enumerate()
+            .map(|(r, row)| {
+                row.iter()
+                    .enumerate()
+                    .map(|(c, &v)| Tracked::new(v, r * 1000 + c, shared_log.clone()))
+                    .collect()
+            })
+            .collect();
+        let actual = solutions::smallest_range(&tracked_lists);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("lists={:?}", t.lists),
@@ -1072,10 +1159,17 @@ impl Problem for Ipo {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<IpoTest>().unwrap();
         let expected = ref_ipo(t.k, t.w, &t.profits, &t.capital);
-        let actual = solutions::find_maximized_capital(t.k, t.w, &t.profits, &t.capital);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_profits = track_slice(&t.profits, shared_log.clone());
+        let tracked_capital = track_slice(&t.capital, shared_log.clone());
+        let actual =
+            solutions::find_maximized_capital(t.k, t.w, &tracked_profits, &tracked_capital);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!(
@@ -1168,10 +1262,26 @@ impl Problem for Skyline {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<SkylineTest>().unwrap();
         let expected = ref_skyline(&t.buildings);
-        let actual = solutions::get_skyline(&t.buildings);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_buildings: Vec<(Tracked<i32>, Tracked<i32>, Tracked<i32>)> = t
+            .buildings
+            .iter()
+            .enumerate()
+            .map(|(i, &(l, r, h))| {
+                (
+                    Tracked::new(l, i * 3, shared_log.clone()),
+                    Tracked::new(r, i * 3 + 1, shared_log.clone()),
+                    Tracked::new(h, i * 3 + 2, shared_log.clone()),
+                )
+            })
+            .collect();
+        let actual = solutions::get_skyline(&tracked_buildings);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("buildings={:?}", t.buildings),

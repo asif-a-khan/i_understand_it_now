@@ -1,8 +1,10 @@
 use rand::Rng;
+use std::cell::RefCell;
+use std::rc::Rc;
 
 use crate::problems::{Difficulty, Problem, SolutionResult, TestCase};
 use crate::solutions::part4_graphs::shortest_path as solutions;
-use crate::tracker::OperationLog;
+use crate::tracker::{OperationLog, Tracked};
 
 pub fn problems() -> Vec<Box<dyn Problem>> {
     vec![
@@ -241,10 +243,25 @@ impl Problem for ShortestPathBinaryGrid {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<BinaryGridTest>().unwrap();
         let expected = ref_shortest_binary_grid(&t.grid);
-        let actual = solutions::shortest_path_binary_grid(&t.grid);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_grid: Vec<Vec<Tracked<i32>>> = t
+            .grid
+            .iter()
+            .enumerate()
+            .map(|(r, row)| {
+                row.iter()
+                    .enumerate()
+                    .map(|(c, &v)| Tracked::new(v, r * row.len() + c, shared_log.clone()))
+                    .collect()
+            })
+            .collect();
+        let actual = solutions::shortest_path_binary_grid(&tracked_grid);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("grid={:?}", t.grid),
@@ -841,10 +858,25 @@ impl Problem for ShortestPathMinEffort {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<MinEffortTest>().unwrap();
         let expected = ref_min_effort(&t.heights);
-        let actual = solutions::path_with_min_effort(&t.heights);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_heights: Vec<Vec<Tracked<i32>>> = t
+            .heights
+            .iter()
+            .enumerate()
+            .map(|(r, row)| {
+                row.iter()
+                    .enumerate()
+                    .map(|(c, &v)| Tracked::new(v, r * row.len() + c, shared_log.clone()))
+                    .collect()
+            })
+            .collect();
+        let actual = solutions::path_with_min_effort(&tracked_heights);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("heights={:?}", t.heights),
@@ -951,10 +983,25 @@ impl Problem for ShortestPathMaze {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<MazeTest>().unwrap();
         let expected = ref_maze_shortest(&t.maze, t.start, t.dest);
-        let actual = solutions::shortest_path_maze(&t.maze, t.start, t.dest);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_maze: Vec<Vec<Tracked<i32>>> = t
+            .maze
+            .iter()
+            .enumerate()
+            .map(|(r, row)| {
+                row.iter()
+                    .enumerate()
+                    .map(|(c, &v)| Tracked::new(v, r * row.len() + c, shared_log.clone()))
+                    .collect()
+            })
+            .collect();
+        let actual = solutions::shortest_path_maze(&tracked_maze, t.start, t.dest);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("maze={:?}, start={:?}, dest={:?}", t.maze, t.start, t.dest),
@@ -1272,10 +1319,25 @@ impl Problem for ShortestPathMinCostConnectAll {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<MinCostConnectTest>().unwrap();
         let expected = ref_min_cost_connect(&t.points);
-        let actual = solutions::min_cost_connect_all(&t.points);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_points: Vec<(Tracked<i32>, Tracked<i32>)> = t
+            .points
+            .iter()
+            .enumerate()
+            .map(|(i, &(a, b))| {
+                (
+                    Tracked::new(a, i * 2, shared_log.clone()),
+                    Tracked::new(b, i * 2 + 1, shared_log.clone()),
+                )
+            })
+            .collect();
+        let actual = solutions::min_cost_connect_all(&tracked_points);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("points={:?}", t.points),

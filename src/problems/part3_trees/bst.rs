@@ -1,11 +1,13 @@
 use rand::Rng;
+use std::cell::RefCell;
+use std::rc::Rc;
 
 use crate::problems::helpers::{
     build_tree, inorder, random_bst, random_unique_vec, tree_to_level_order, TreeNode,
 };
 use crate::problems::{Difficulty, Problem, SolutionResult, TestCase};
 use crate::solutions::part3_trees::bst as solutions;
-use crate::tracker::OperationLog;
+use crate::tracker::{track_slice, OperationLog};
 
 pub fn problems() -> Vec<Box<dyn Problem>> {
     vec![
@@ -92,10 +94,15 @@ impl Problem for BstSearch {
         tests
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<BstSearchTest>().unwrap();
         let expected = ref_bst_search(&t.tree, t.target);
-        let actual = solutions::bst_search(&t.tree, t.target);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_slice(&t.tree, shared_log.clone());
+        let actual = solutions::bst_search(&tracked, t.target);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("tree={:?}, target={}", t.tree, t.target),
@@ -163,12 +170,17 @@ impl Problem for BstMinimum {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<BstMinimumTest>().unwrap();
         let (arena, root) = build_tree(&t.tree);
         let vals = inorder(&arena, root);
         let expected = vals[0];
-        let actual = solutions::bst_minimum(&t.tree);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_slice(&t.tree, shared_log.clone());
+        let actual = solutions::bst_minimum(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("tree={:?}", t.tree),
@@ -244,10 +256,15 @@ impl Problem for BstIsValid {
         tests
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<BstIsValidTest>().unwrap();
         let expected = ref_is_valid_bst(&t.tree);
-        let actual = solutions::bst_is_valid(&t.tree);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_slice(&t.tree, shared_log.clone());
+        let actual = solutions::bst_is_valid(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("tree={:?}", t.tree),
@@ -318,10 +335,15 @@ impl Problem for BstRangeSum {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<BstRangeSumTest>().unwrap();
         let expected = ref_range_sum(&t.tree, t.low, t.high);
-        let actual = solutions::bst_range_sum(&t.tree, t.low, t.high);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_slice(&t.tree, shared_log.clone());
+        let actual = solutions::bst_range_sum(&tracked, t.low, t.high);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("tree={:?}, low={}, high={}", t.tree, t.low, t.high),
@@ -400,9 +422,14 @@ impl Problem for BstSortedArrayToBst {
         tests
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<BstSortedArrayToBstTest>().unwrap();
-        let actual = solutions::bst_sorted_array_to_bst(&t.nums);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::bst_sorted_array_to_bst(&tracked_nums);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         // Validate: (1) inorder matches sorted input, (2) is valid BST, (3) is balanced
         let (arena, root) = build_tree(&actual);
         let in_vals = inorder(&arena, root);
@@ -485,9 +512,14 @@ impl Problem for BstInsert {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<BstInsertTest>().unwrap();
-        let actual = solutions::bst_insert(&t.tree, t.val);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_slice(&t.tree, shared_log.clone());
+        let actual = solutions::bst_insert(&tracked, t.val);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         // Validate: (1) inorder contains all original values + new value, (2) is valid BST
         let (arena_orig, root_orig) = build_tree(&t.tree);
         let mut expected_inorder = inorder(&arena_orig, root_orig);
@@ -570,9 +602,14 @@ impl Problem for BstDelete {
         tests
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<BstDeleteTest>().unwrap();
-        let actual = solutions::bst_delete(&t.tree, t.val);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_slice(&t.tree, shared_log.clone());
+        let actual = solutions::bst_delete(&tracked, t.val);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         // Validate: (1) inorder is original minus deleted val, (2) valid BST
         let (arena_orig, root_orig) = build_tree(&t.tree);
         let orig_inorder = inorder(&arena_orig, root_orig);
@@ -636,12 +673,17 @@ impl Problem for BstKthSmallest {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<BstKthSmallestTest>().unwrap();
         let (arena, root) = build_tree(&t.tree);
         let vals = inorder(&arena, root);
         let expected = vals[t.k - 1];
-        let actual = solutions::bst_kth_smallest(&t.tree, t.k);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_slice(&t.tree, shared_log.clone());
+        let actual = solutions::bst_kth_smallest(&tracked, t.k);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("tree={:?}, k={}", t.tree, t.k),
@@ -700,10 +742,15 @@ impl Problem for BstInorderSuccessor {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<BstInorderSuccessorTest>().unwrap();
         let expected = ref_inorder_successor(&t.tree, t.val);
-        let actual = solutions::bst_inorder_successor(&t.tree, t.val);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_slice(&t.tree, shared_log.clone());
+        let actual = solutions::bst_inorder_successor(&tracked, t.val);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("tree={:?}, val={}", t.tree, t.val),
@@ -780,10 +827,15 @@ impl Problem for BstLca {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<BstLcaTest>().unwrap();
         let expected = ref_bst_lca(&t.tree, t.p, t.q);
-        let actual = solutions::bst_lca(&t.tree, t.p, t.q);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_slice(&t.tree, shared_log.clone());
+        let actual = solutions::bst_lca(&tracked, t.p, t.q);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("tree={:?}, p={}, q={}", t.tree, t.p, t.q),
@@ -882,9 +934,14 @@ impl Problem for BstRecover {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<BstRecoverTest>().unwrap();
-        let actual = solutions::bst_recover(&t.tree);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_slice(&t.tree, shared_log.clone());
+        let actual = solutions::bst_recover(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         // Validate: result must be a valid BST with the same structure
         let is_valid = ref_is_valid_bst(&actual);
         // Same structure: both trees should have same shape
@@ -957,7 +1014,7 @@ impl Problem for BstCountNodesInRange {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test
             .data
             .downcast_ref::<BstCountNodesInRangeTest>()
@@ -965,7 +1022,12 @@ impl Problem for BstCountNodesInRange {
         let (arena, root) = build_tree(&t.tree);
         let vals = inorder(&arena, root);
         let expected = vals.iter().filter(|&&v| v >= t.lo && v <= t.hi).count() as i32;
-        let actual = solutions::bst_count_nodes_in_range(&t.tree, t.lo, t.hi);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_slice(&t.tree, shared_log.clone());
+        let actual = solutions::bst_count_nodes_in_range(&tracked, t.lo, t.hi);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("tree={:?}, lo={}, hi={}", t.tree, t.lo, t.hi),
@@ -1018,10 +1080,15 @@ impl Problem for BstFromPreorder {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<BstFromPreorderTest>().unwrap();
         let expected = ref_bst_from_preorder(&t.preorder);
-        let actual = solutions::bst_from_preorder(&t.preorder);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_preorder = track_slice(&t.preorder, shared_log.clone());
+        let actual = solutions::bst_from_preorder(&tracked_preorder);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         // Validate: same preorder and valid BST
         let e_pre = ref_preorder_traversal(&expected);
         let a_pre = ref_preorder_traversal(&actual);
@@ -1132,11 +1199,16 @@ impl Problem for BstIterator {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<BstIteratorTest>().unwrap();
         let (arena, root) = build_tree(&t.tree);
         let expected = inorder(&arena, root);
-        let actual = solutions::bst_iterator(&t.tree);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_slice(&t.tree, shared_log.clone());
+        let actual = solutions::bst_iterator(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("tree={:?}", t.tree),
@@ -1216,14 +1288,20 @@ impl Problem for BstMergeTwo {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<BstMergeTwoTest>().unwrap();
         let (a1, r1) = build_tree(&t.tree1);
         let (a2, r2) = build_tree(&t.tree2);
         let mut expected = inorder(&a1, r1);
         expected.extend(inorder(&a2, r2));
         expected.sort();
-        let actual = solutions::bst_merge_two(&t.tree1, &t.tree2);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked1 = track_slice(&t.tree1, shared_log.clone());
+        let tracked2 = track_slice(&t.tree2, shared_log.clone());
+        let actual = solutions::bst_merge_two(&tracked1, &tracked2);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("tree1={:?}, tree2={:?}", t.tree1, t.tree2),

@@ -1,8 +1,11 @@
+use std::cell::RefCell;
+use std::rc::Rc;
+
 use rand::Rng;
 
 use crate::problems::{Difficulty, Problem, SolutionResult, TestCase};
 use crate::solutions::part5_paradigms::divide_conquer as solutions;
-use crate::tracker::OperationLog;
+use crate::tracker::{track_slice, OperationLog, Tracked};
 
 pub fn problems() -> Vec<Box<dyn Problem>> {
     vec![
@@ -66,10 +69,15 @@ impl Problem for DcMaxSubarray {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<DcMaxSubarrayTest>().unwrap();
         let expected = ref_max_subarray_dc(&t.nums);
-        let actual = solutions::max_subarray(&t.nums);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::max_subarray(&tracked_nums);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("nums={:?}", t.nums),
@@ -227,10 +235,15 @@ impl Problem for DcCountInversions {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<DcCountInversionsTest>().unwrap();
         let expected = ref_count_inversions(&t.nums);
-        let actual = solutions::count_inversions(&t.nums);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::count_inversions(&tracked_nums);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("nums={:?}", t.nums),
@@ -329,9 +342,14 @@ impl Problem for DcBinarySearch {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<DcBinarySearchTest>().unwrap();
-        let actual = solutions::binary_search(&t.nums, t.target);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::binary_search(&tracked_nums, t.target);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         let is_correct = if actual == -1 {
             !t.nums.contains(&t.target)
         } else {
@@ -404,9 +422,14 @@ impl Problem for DcFindPeak {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<DcFindPeakTest>().unwrap();
-        let actual = solutions::find_peak(&t.nums);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::find_peak(&tracked_nums);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         let n = t.nums.len();
         let is_peak = actual < n
             && (actual == 0 || t.nums[actual] > t.nums[actual - 1])
@@ -459,11 +482,16 @@ impl Problem for DcMergeSort {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<DcMergeSortTest>().unwrap();
         let mut expected = t.nums.clone();
         expected.sort();
-        let actual = solutions::merge_sort(&t.nums);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::merge_sort(&tracked_nums);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("nums={:?}", t.nums),
@@ -515,13 +543,18 @@ impl Problem for DcKthLargest {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<DcKthLargestTest>().unwrap();
         let mut sorted = t.nums.clone();
         sorted.sort_unstable();
         sorted.reverse();
         let expected = sorted[t.k - 1];
-        let actual = solutions::kth_largest(&t.nums, t.k);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::kth_largest(&tracked_nums, t.k);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("nums={:?}, k={}", t.nums, t.k),
@@ -579,10 +612,25 @@ impl Problem for DcClosestPair {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<DcClosestPairTest>().unwrap();
         let expected = ref_closest_pair(&t.points);
-        let actual = solutions::closest_pair(&t.points);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked: Vec<(Tracked<i64>, Tracked<i64>)> = t
+            .points
+            .iter()
+            .enumerate()
+            .map(|(i, &(a, b))| {
+                (
+                    Tracked::new(a, i * 2, shared_log.clone()),
+                    Tracked::new(b, i * 2 + 1, shared_log.clone()),
+                )
+            })
+            .collect();
+        let actual = solutions::closest_pair(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         let is_correct = (expected - actual).abs() < 1e-6;
         SolutionResult {
             is_correct,
@@ -659,10 +707,15 @@ impl Problem for DcMajorityElement {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<DcMajorityTest>().unwrap();
         let expected = ref_majority(&t.nums);
-        let actual = solutions::majority_element(&t.nums);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::majority_element(&tracked_nums);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("nums={:?}", t.nums),
@@ -824,7 +877,7 @@ impl Problem for DcMedianTwoSorted {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<DcMedianTest>().unwrap();
         let mut merged = t.nums1.clone();
         merged.extend_from_slice(&t.nums2);
@@ -835,7 +888,13 @@ impl Problem for DcMedianTwoSorted {
         } else {
             (merged[n / 2 - 1] as f64 + merged[n / 2] as f64) / 2.0
         };
-        let actual = solutions::median_two_sorted(&t.nums1, &t.nums2);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_nums1 = track_slice(&t.nums1, shared_log.clone());
+        let tracked_nums2 = track_slice(&t.nums2, shared_log.clone());
+        let actual = solutions::median_two_sorted(&tracked_nums1, &tracked_nums2);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: (expected - actual).abs() < 1e-5,
             input_description: format!("nums1={:?}, nums2={:?}", t.nums1, t.nums2),
@@ -896,10 +955,26 @@ impl Problem for DcSkyline {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<DcSkylineTest>().unwrap();
         let expected = ref_skyline(&t.buildings);
-        let actual = solutions::skyline(&t.buildings);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked: Vec<(Tracked<i32>, Tracked<i32>, Tracked<i32>)> = t
+            .buildings
+            .iter()
+            .enumerate()
+            .map(|(i, &(a, b, c))| {
+                (
+                    Tracked::new(a, i * 3, shared_log.clone()),
+                    Tracked::new(b, i * 3 + 1, shared_log.clone()),
+                    Tracked::new(c, i * 3 + 2, shared_log.clone()),
+                )
+            })
+            .collect();
+        let actual = solutions::skyline(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("buildings={:?}", t.buildings),
@@ -1017,10 +1092,15 @@ impl Problem for DcCountRangeSum {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<DcCountRangeSumTest>().unwrap();
         let expected = ref_count_range_sum(&t.nums, t.lower, t.upper);
-        let actual = solutions::count_range_sum(&t.nums, t.lower, t.upper);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::count_range_sum(&tracked_nums, t.lower, t.upper);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("nums={:?}, lower={}, upper={}", t.nums, t.lower, t.upper),
@@ -1085,10 +1165,15 @@ impl Problem for DcReversePairs {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<DcReversePairsTest>().unwrap();
         let expected = ref_reverse_pairs(&t.nums);
-        let actual = solutions::reverse_pairs(&t.nums);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::reverse_pairs(&tracked_nums);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("nums={:?}", t.nums),
@@ -1166,12 +1251,27 @@ impl Problem for DcKthSmallestSortedMatrix {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<DcKthSmallestMatrixTest>().unwrap();
         let mut all: Vec<i32> = t.matrix.iter().flat_map(|r| r.iter().copied()).collect();
         all.sort();
         let expected = all[t.k - 1];
-        let actual = solutions::kth_smallest_sorted_matrix(&t.matrix, t.k);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked: Vec<Vec<Tracked<i32>>> = t
+            .matrix
+            .iter()
+            .enumerate()
+            .map(|(r, row)| {
+                row.iter()
+                    .enumerate()
+                    .map(|(c, &v)| Tracked::new(v, r * row.len().max(1) + c, shared_log.clone()))
+                    .collect()
+            })
+            .collect();
+        let actual = solutions::kth_smallest_sorted_matrix(&tracked, t.k);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("matrix={:?}, k={}", t.matrix, t.k),

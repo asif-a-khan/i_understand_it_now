@@ -1,3 +1,4 @@
+use crate::tracker::Tracked;
 // Graph BFS & DFS — Solution Templates
 // Edit these functions to solve each problem. Run with: cargo run -- solve <problem_id>
 
@@ -54,7 +55,7 @@ pub fn course_order(_n: usize, _prerequisites: &[(usize, usize)]) -> Vec<usize> 
 
 /// Number of Islands: count islands in a binary grid (1=land, 0=water).
 /// Connected horizontally/vertically.
-pub fn num_islands(_grid: &[Vec<i32>]) -> i32 {
+pub fn num_islands(_grid: &[Vec<Tracked<i32>>]) -> i32 {
     todo!()
 }
 
@@ -77,7 +78,7 @@ pub fn solve_surrounded(_board: &[Vec<char>]) -> Vec<Vec<char>> {
 
 /// Pacific Atlantic Water Flow: return cells that can flow to both oceans.
 /// Sorted by (row, col).
-pub fn pacific_atlantic(_heights: &[Vec<i32>]) -> Vec<(usize, usize)> {
+pub fn pacific_atlantic(_heights: &[Vec<Tracked<i32>>]) -> Vec<(usize, usize)> {
     todo!()
 }
 
@@ -89,6 +90,6 @@ pub fn all_paths(_graph: &[Vec<usize>]) -> Vec<Vec<usize>> {
 
 /// Shortest Path in Binary Matrix: find shortest 8-directional path in binary grid.
 /// 0=open, 1=blocked. Return path length (number of cells), or -1 if impossible.
-pub fn shortest_path_binary_matrix(_grid: &[Vec<i32>]) -> i32 {
+pub fn shortest_path_binary_matrix(_grid: &[Vec<Tracked<i32>>]) -> i32 {
     todo!()
 }

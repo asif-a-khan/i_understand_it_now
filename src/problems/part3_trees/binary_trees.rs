@@ -1,10 +1,12 @@
 use rand::Rng;
+use std::cell::RefCell;
 use std::collections::VecDeque;
+use std::rc::Rc;
 
 use crate::problems::helpers::{build_tree, inorder, random_tree, tree_to_level_order, TreeNode};
 use crate::problems::{Difficulty, Problem, SolutionResult, TestCase};
 use crate::solutions::part3_trees::binary_trees as solutions;
-use crate::tracker::OperationLog;
+use crate::tracker::{track_slice, OperationLog};
 
 pub fn problems() -> Vec<Box<dyn Problem>> {
     vec![
@@ -83,10 +85,15 @@ impl Problem for MaxDepth {
         tests
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<MaxDepthTest>().unwrap();
         let expected = ref_max_depth(&t.tree);
-        let actual = solutions::max_depth(&t.tree);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_slice(&t.tree, shared_log.clone());
+        let actual = solutions::max_depth(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("tree={:?}", t.tree),
@@ -163,11 +170,16 @@ impl Problem for InorderTraversal {
         tests
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<InorderTraversalTest>().unwrap();
         let (arena, root) = build_tree(&t.tree);
         let expected = inorder(&arena, root);
-        let actual = solutions::inorder_traversal(&t.tree);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_slice(&t.tree, shared_log.clone());
+        let actual = solutions::inorder_traversal(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("tree={:?}", t.tree),
@@ -237,10 +249,15 @@ impl Problem for IsSymmetric {
         tests
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<IsSymmetricTest>().unwrap();
         let expected = ref_is_symmetric(&t.tree);
-        let actual = solutions::is_symmetric(&t.tree);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_slice(&t.tree, shared_log.clone());
+        let actual = solutions::is_symmetric(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("tree={:?}", t.tree),
@@ -381,10 +398,16 @@ impl Problem for IsSameTree {
         tests
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<IsSameTreeTest>().unwrap();
         let expected = ref_is_same_tree(&t.tree1, &t.tree2);
-        let actual = solutions::is_same_tree(&t.tree1, &t.tree2);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked1 = track_slice(&t.tree1, shared_log.clone());
+        let tracked2 = track_slice(&t.tree2, shared_log.clone());
+        let actual = solutions::is_same_tree(&tracked1, &tracked2);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("p={:?}, q={:?}", t.tree1, t.tree2),
@@ -462,10 +485,15 @@ impl Problem for InvertTree {
         tests
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<InvertTreeTest>().unwrap();
         let expected = ref_invert(&t.tree);
-        let actual = solutions::invert_tree(&t.tree);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_slice(&t.tree, shared_log.clone());
+        let actual = solutions::invert_tree(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("tree={:?}", t.tree),
@@ -542,10 +570,15 @@ impl Problem for LevelOrder {
         tests
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<LevelOrderTest>().unwrap();
         let expected = ref_level_order(&t.tree);
-        let actual = solutions::level_order(&t.tree);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_slice(&t.tree, shared_log.clone());
+        let actual = solutions::level_order(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("tree={:?}", t.tree),
@@ -631,10 +664,15 @@ impl Problem for ZigzagLevelOrder {
         tests
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<ZigzagLevelOrderTest>().unwrap();
         let expected = ref_zigzag_level_order(&t.tree);
-        let actual = solutions::zigzag_level_order(&t.tree);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_slice(&t.tree, shared_log.clone());
+        let actual = solutions::zigzag_level_order(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("tree={:?}", t.tree),
@@ -705,10 +743,15 @@ impl Problem for RightSideView {
         tests
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<RightSideViewTest>().unwrap();
         let expected = ref_right_side_view(&t.tree);
-        let actual = solutions::right_side_view(&t.tree);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_slice(&t.tree, shared_log.clone());
+        let actual = solutions::right_side_view(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("tree={:?}", t.tree),
@@ -777,10 +820,15 @@ impl Problem for FlattenToLinkedList {
         tests
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<FlattenToLinkedListTest>().unwrap();
         let expected = ref_preorder(&t.tree);
-        let actual = solutions::flatten_to_linked_list(&t.tree);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_slice(&t.tree, shared_log.clone());
+        let actual = solutions::flatten_to_linked_list(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("tree={:?}", t.tree),
@@ -897,13 +945,19 @@ impl Problem for ConstructFromPreorderInorder {
         tests
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test
             .data
             .downcast_ref::<ConstructFromPreorderInorderTest>()
             .unwrap();
         let expected = ref_build_from_preorder_inorder(&t.preorder, &t.inorder_vals);
-        let actual = solutions::construct_from_preorder_inorder(&t.preorder, &t.inorder_vals);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_pre = track_slice(&t.preorder, shared_log.clone());
+        let tracked_in = track_slice(&t.inorder_vals, shared_log.clone());
+        let actual = solutions::construct_from_preorder_inorder(&tracked_pre, &tracked_in);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         // Compare by rebuilding and checking inorder traversal (structure match)
         let (ea, er) = build_tree(&expected);
         let (aa, ar) = build_tree(&actual);
@@ -1036,10 +1090,15 @@ impl Problem for MaxPathSum {
         tests
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<MaxPathSumTest>().unwrap();
         let expected = ref_max_path_sum(&t.tree);
-        let actual = solutions::max_path_sum(&t.tree);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_slice(&t.tree, shared_log.clone());
+        let actual = solutions::max_path_sum(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("tree={:?}", t.tree),
@@ -1118,7 +1177,7 @@ impl Problem for SerializeDeserialize {
         tests
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test
             .data
             .downcast_ref::<SerializeDeserializeTest>()
@@ -1126,7 +1185,12 @@ impl Problem for SerializeDeserialize {
         // The expected output is the canonical level-order form of the input tree.
         let (arena, root) = build_tree(&t.tree);
         let expected = tree_to_level_order(&arena, root);
-        let actual = solutions::serialize_deserialize(&t.tree);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_slice(&t.tree, shared_log.clone());
+        let actual = solutions::serialize_deserialize(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         // Compare by rebuilding both and checking structural equality
         let (ea, er) = build_tree(&expected);
         let (aa, ar) = build_tree(&actual);
@@ -1224,13 +1288,18 @@ impl Problem for LowestCommonAncestor {
         tests
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test
             .data
             .downcast_ref::<LowestCommonAncestorTest>()
             .unwrap();
         let expected = ref_lca(&t.tree, t.p, t.q);
-        let actual = solutions::lowest_common_ancestor(&t.tree, t.p, t.q);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_slice(&t.tree, shared_log.clone());
+        let actual = solutions::lowest_common_ancestor(&tracked, t.p, t.q);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("tree={:?}, p={}, q={}", t.tree, t.p, t.q),
@@ -1314,10 +1383,15 @@ impl Problem for Diameter {
         tests
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<DiameterTest>().unwrap();
         let expected = ref_diameter(&t.tree);
-        let actual = solutions::diameter(&t.tree);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_slice(&t.tree, shared_log.clone());
+        let actual = solutions::diameter(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("tree={:?}", t.tree),
@@ -1395,14 +1469,19 @@ impl Problem for CountCompleteTreeNodes {
         tests
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test
             .data
             .downcast_ref::<CountCompleteTreeNodesTest>()
             .unwrap();
         let (arena, root) = build_tree(&t.tree);
         let expected = ref_count_nodes(&arena, root);
-        let actual = solutions::count_complete_tree_nodes(&t.tree);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_slice(&t.tree, shared_log.clone());
+        let actual = solutions::count_complete_tree_nodes(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("tree={:?}", t.tree),

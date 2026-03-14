@@ -1,6 +1,6 @@
 use crossterm::event::{KeyCode, KeyEvent};
 use ratatui::layout::{Constraint, Layout, Rect};
-use ratatui::style::{Color, Style};
+use ratatui::style::{Color, Modifier, Style};
 use ratatui::text::{Line, Span};
 use ratatui::widgets::{Block, Borders, List, ListItem, ListState, Paragraph};
 use ratatui::Frame;
@@ -65,25 +65,102 @@ impl LessonInfo {
 
 pub struct LessonListState {
     pub list_state: ListState,
+    pub search_active: bool,
+    pub search_query: String,
 }
 
 impl LessonListState {
     pub fn new() -> Self {
         let mut list_state = ListState::default();
         list_state.select(Some(0));
-        Self { list_state }
+        Self {
+            list_state,
+            search_active: false,
+            search_query: String::new(),
+        }
+    }
+
+    /// Return indices of lessons matching the current search query.
+    fn filtered_indices(&self, lessons: &[LessonInfo]) -> Vec<usize> {
+        if self.search_query.is_empty() {
+            return (0..lessons.len()).collect();
+        }
+        let query = self.search_query.to_lowercase();
+        lessons
+            .iter()
+            .enumerate()
+            .filter(|(_, l)| {
+                l.title.to_lowercase().contains(&query)
+                    || l.lesson_id.to_lowercase().contains(&query)
+            })
+            .map(|(i, _)| i)
+            .collect()
     }
 
     pub fn handle_key(&mut self, key: KeyEvent, lessons: &[LessonInfo]) -> Action {
-        let len = lessons.len();
+        let filtered = self.filtered_indices(lessons);
+        let len = filtered.len();
+
+        // Search-mode input handling
+        if self.search_active {
+            match key.code {
+                KeyCode::Char(c) => {
+                    self.search_query.push(c);
+                    // Reset selection to first filtered result
+                    self.list_state.select(Some(0));
+                    return Action::None;
+                }
+                KeyCode::Backspace => {
+                    self.search_query.pop();
+                    self.list_state.select(Some(0));
+                    return Action::None;
+                }
+                KeyCode::Esc => {
+                    self.search_active = false;
+                    self.search_query.clear();
+                    self.list_state.select(Some(0));
+                    return Action::None;
+                }
+                KeyCode::Enter => {
+                    self.search_active = false;
+                    // Keep the query and current selection
+                    return Action::None;
+                }
+                KeyCode::Down => {
+                    if len > 0 {
+                        let i = self.list_state.selected().unwrap_or(0);
+                        self.list_state.select(Some((i + 1).min(len - 1)));
+                    }
+                    return Action::None;
+                }
+                KeyCode::Up => {
+                    let i = self.list_state.selected().unwrap_or(0);
+                    self.list_state.select(Some(i.saturating_sub(1)));
+                    return Action::None;
+                }
+                _ => return Action::None,
+            }
+        }
+
+        // Normal mode
         if len == 0 {
             if key.code == KeyCode::Esc {
+                if !self.search_query.is_empty() {
+                    self.search_query.clear();
+                    self.list_state.select(Some(0));
+                    return Action::None;
+                }
                 return Action::Pop;
             }
             return Action::None;
         }
 
         match key.code {
+            KeyCode::Char('/') => {
+                self.search_active = true;
+                self.search_query.clear();
+                Action::None
+            }
             KeyCode::Char('j') | KeyCode::Down => {
                 let i = self.list_state.selected().unwrap_or(0);
                 self.list_state.select(Some((i + 1).min(len - 1)));
@@ -96,9 +173,24 @@ impl LessonListState {
             }
             KeyCode::Enter => {
                 let idx = self.list_state.selected().unwrap_or(0);
-                Action::Push(Screen::LessonReader { lesson_idx: idx })
+                // Map filtered index back to the original lesson index
+                if let Some(&original_idx) = filtered.get(idx) {
+                    Action::Push(Screen::LessonReader {
+                        lesson_idx: original_idx,
+                    })
+                } else {
+                    Action::None
+                }
             }
-            KeyCode::Esc => Action::Pop,
+            KeyCode::Esc => {
+                if !self.search_query.is_empty() {
+                    self.search_query.clear();
+                    self.list_state.select(Some(0));
+                    Action::None
+                } else {
+                    Action::Pop
+                }
+            }
             _ => Action::None,
         }
     }
@@ -110,9 +202,16 @@ impl LessonListState {
         lessons: &[LessonInfo],
         progress: &Progress,
     ) {
-        let items: Vec<ListItem> = lessons
+        // Always show search bar at bottom
+        let chunks = Layout::vertical([Constraint::Fill(1), Constraint::Length(1)]).split(area);
+        let list_area = chunks[0];
+        let search_bar_area = chunks[1];
+
+        let filtered = self.filtered_indices(lessons);
+        let items: Vec<ListItem> = filtered
             .iter()
-            .map(|lesson| {
+            .map(|&idx| {
+                let lesson = &lessons[idx];
                 let read = progress
                     .lessons_read
                     .get(&lesson.lesson_id)
@@ -133,17 +232,49 @@ impl LessonListState {
             .collect();
 
         let read_count = progress.lessons_read.values().filter(|&&v| v).count();
+        let title = if !self.search_query.is_empty() {
+            format!(" Lessons — {} matching ", filtered.len())
+        } else {
+            format!(" Lessons ({read_count}/{}) ", lessons.len())
+        };
         let list = List::new(items)
             .block(
                 Block::default()
                     .borders(Borders::ALL)
-                    .title(format!(" Lessons ({read_count}/{}) ", lessons.len()))
+                    .title(title)
                     .title_style(theme::title_style()),
             )
             .highlight_style(theme::selected_style())
             .highlight_symbol("> ");
 
-        f.render_stateful_widget(list, area, &mut self.list_state);
+        f.render_stateful_widget(list, list_area, &mut self.list_state);
+
+        // Persistent search bar
+        let search_line = if self.search_active {
+            let mut spans = vec![
+                Span::styled(
+                    " / ",
+                    Style::new().fg(Color::Yellow).add_modifier(Modifier::BOLD),
+                ),
+                Span::styled(&self.search_query, Style::new().fg(Color::White)),
+                Span::styled("\u{2588}", Style::new().fg(Color::White)),
+            ];
+            if !self.search_query.is_empty() {
+                spans.push(Span::styled(
+                    format!("  ({} results)", filtered.len()),
+                    Style::new().fg(Color::DarkGray),
+                ));
+            }
+            Line::from(spans)
+        } else {
+            Line::from(Span::styled(
+                " / Press / to search...",
+                Style::new()
+                    .fg(Color::DarkGray)
+                    .add_modifier(Modifier::ITALIC),
+            ))
+        };
+        f.render_widget(Paragraph::new(search_line), search_bar_area);
     }
 }
 

@@ -1,8 +1,11 @@
+use std::cell::RefCell;
+use std::rc::Rc;
+
 use rand::Rng;
 
 use crate::problems::{Difficulty, Problem, SolutionResult, TestCase};
 use crate::solutions::part5_paradigms::backtracking as solutions;
-use crate::tracker::OperationLog;
+use crate::tracker::{track_slice, OperationLog};
 
 pub fn problems() -> Vec<Box<dyn Problem>> {
     vec![
@@ -68,10 +71,15 @@ impl Problem for Subsets {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<SubsetsTest>().unwrap();
         let expected = ref_subsets(&t.nums);
-        let actual = solutions::subsets(&t.nums);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::subsets(&tracked_nums);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("nums={:?}", t.nums),
@@ -142,10 +150,15 @@ impl Problem for Permutations {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<PermutationsTest>().unwrap();
         let expected = ref_permutations(&t.nums);
-        let actual = solutions::permutations(&t.nums);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::permutations(&tracked_nums);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("nums={:?}", t.nums),
@@ -477,10 +490,15 @@ impl Problem for CombinationSum {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<CombinationSumTest>().unwrap();
         let expected = ref_combination_sum(&t.candidates, t.target);
-        let actual = solutions::combination_sum(&t.candidates, t.target);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_candidates = track_slice(&t.candidates, shared_log.clone());
+        let actual = solutions::combination_sum(&tracked_candidates, t.target);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("candidates={:?}, target={}", t.candidates, t.target),
@@ -568,10 +586,15 @@ impl Problem for CombinationSumII {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<CombinationSumIITest>().unwrap();
         let expected = ref_combination_sum_ii(&t.candidates, t.target);
-        let actual = solutions::combination_sum_ii(&t.candidates, t.target);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_candidates = track_slice(&t.candidates, shared_log.clone());
+        let actual = solutions::combination_sum_ii(&tracked_candidates, t.target);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("candidates={:?}, target={}", t.candidates, t.target),

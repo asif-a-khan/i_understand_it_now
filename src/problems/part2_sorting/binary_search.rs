@@ -1,8 +1,11 @@
 use rand::Rng;
 
+use std::cell::RefCell;
+use std::rc::Rc;
+
 use crate::problems::{Difficulty, Problem, SolutionResult, TestCase};
 use crate::solutions::part2_sorting::binary_search as solutions;
-use crate::tracker::OperationLog;
+use crate::tracker::{track_slice, OperationLog};
 
 pub fn problems() -> Vec<Box<dyn Problem>> {
     vec![
@@ -76,10 +79,15 @@ impl Problem for BinarySearchBasic {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<BinarySearchBasicTest>().unwrap();
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
         let expected = ref_binary_search(&t.nums, t.target);
-        let actual = solutions::binary_search_basic(&t.nums, t.target);
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::binary_search_basic(&tracked_nums, t.target);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("nums={:?}, target={}", t.nums, t.target),
@@ -156,10 +164,15 @@ impl Problem for BinarySearchInsertPosition {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<InsertPositionTest>().unwrap();
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
         let expected = ref_search_insert(&t.nums, t.target);
-        let actual = solutions::search_insert_position(&t.nums, t.target);
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::search_insert_position(&tracked_nums, t.target);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("nums={:?}, target={}", t.nums, t.target),
@@ -233,10 +246,15 @@ impl Problem for BinarySearchFirstLast {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<FirstLastTest>().unwrap();
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
         let expected = ref_first_last(&t.nums, t.target);
-        let actual = solutions::search_first_last(&t.nums, t.target);
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::search_first_last(&tracked_nums, t.target);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("nums={:?}, target={}", t.nums, t.target),
@@ -474,10 +492,15 @@ impl Problem for BinarySearchRotatedArray {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<RotatedArrayTest>().unwrap();
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
         let expected = ref_search_rotated(&t.nums, t.target);
-        let actual = solutions::search_rotated_array(&t.nums, t.target);
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::search_rotated_array(&tracked_nums, t.target);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("nums={:?}, target={}", t.nums, t.target),
@@ -567,9 +590,14 @@ impl Problem for BinarySearchPeakElement {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<PeakElementTest>().unwrap();
-        let actual = solutions::find_peak_element(&t.nums);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::find_peak_element(&tracked_nums);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         // Validate that the returned index is indeed a peak
         let is_peak = ref_is_peak(&t.nums, actual);
         SolutionResult {
@@ -646,10 +674,15 @@ impl Problem for BinarySearchFindMinRotated {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<FindMinRotatedTest>().unwrap();
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
         let expected = *t.nums.iter().min().unwrap();
-        let actual = solutions::find_min_rotated(&t.nums);
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::find_min_rotated(&tracked_nums);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("nums={:?}", t.nums),
@@ -715,10 +748,19 @@ impl Problem for BinarySearch2dMatrix {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<Matrix2dTest>().unwrap();
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
         let expected = ref_search_matrix(&t.matrix, t.target);
-        let actual = solutions::search_2d_matrix(&t.matrix, t.target);
+        let tracked_matrix: Vec<Vec<_>> = t
+            .matrix
+            .iter()
+            .map(|v| track_slice(v, shared_log.clone()))
+            .collect();
+        let actual = solutions::search_2d_matrix(&tracked_matrix, t.target);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("matrix={:?}, target={}", t.matrix, t.target),
@@ -799,10 +841,15 @@ impl Problem for BinarySearchKokoBananas {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<KokoTest>().unwrap();
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
         let expected = ref_min_eating_speed(&t.piles, t.h);
-        let actual = solutions::min_eating_speed(&t.piles, t.h);
+        let tracked_piles = track_slice(&t.piles, shared_log.clone());
+        let actual = solutions::min_eating_speed(&tracked_piles, t.h);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("piles={:?}, h={}", t.piles, t.h),
@@ -876,10 +923,16 @@ impl Problem for BinarySearchMedianSortedArrays {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<MedianSortedTest>().unwrap();
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
         let expected = ref_median_sorted(&t.nums1, &t.nums2);
-        let actual = solutions::find_median_sorted_arrays(&t.nums1, &t.nums2);
+        let tracked_nums1 = track_slice(&t.nums1, shared_log.clone());
+        let tracked_nums2 = track_slice(&t.nums2, shared_log.clone());
+        let actual = solutions::find_median_sorted_arrays(&tracked_nums1, &tracked_nums2);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: (expected - actual).abs() < 1e-5,
             input_description: format!("nums1={:?}, nums2={:?}", t.nums1, t.nums2),
@@ -947,10 +1000,15 @@ impl Problem for BinarySearchSplitArrayLargest {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<SplitArrayTest>().unwrap();
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
         let expected = ref_split_array(&t.nums, t.m);
-        let actual = solutions::split_array_largest_sum(&t.nums, t.m);
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::split_array_largest_sum(&tracked_nums, t.m);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("nums={:?}, m={}", t.nums, t.m),
@@ -1037,10 +1095,15 @@ impl Problem for BinarySearchFindKthSmallestPair {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<KthPairTest>().unwrap();
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
         let expected = ref_kth_smallest_pair(&t.nums, t.k);
-        let actual = solutions::kth_smallest_pair_distance(&t.nums, t.k);
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::kth_smallest_pair_distance(&tracked_nums, t.k);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("nums={:?}, k={}", t.nums, t.k),
@@ -1123,10 +1186,15 @@ impl Problem for BinarySearchCountSmallerAfter {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<CountSmallerTest>().unwrap();
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
         let expected = ref_count_smaller(&t.nums);
-        let actual = solutions::count_smaller_after_self(&t.nums);
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::count_smaller_after_self(&tracked_nums);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("nums={:?}", t.nums),
@@ -1199,10 +1267,25 @@ impl Problem for BinarySearchRussianDollEnvelopes {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<EnvelopesTest>().unwrap();
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
         let expected = ref_max_envelopes(&t.envelopes);
-        let actual = solutions::max_envelopes(&t.envelopes);
+        let tracked_envelopes: Vec<(crate::tracker::Tracked<i32>, crate::tracker::Tracked<i32>)> =
+            t.envelopes
+                .iter()
+                .enumerate()
+                .map(|(i, &(a, b))| {
+                    (
+                        crate::tracker::Tracked::new(a, i * 2, shared_log.clone()),
+                        crate::tracker::Tracked::new(b, i * 2 + 1, shared_log.clone()),
+                    )
+                })
+                .collect();
+        let actual = solutions::max_envelopes(&tracked_envelopes);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("envelopes={:?}", t.envelopes),

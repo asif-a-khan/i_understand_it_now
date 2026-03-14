@@ -1,8 +1,11 @@
+use std::cell::RefCell;
+use std::rc::Rc;
+
 use rand::Rng;
 
 use crate::problems::{Difficulty, Problem, SolutionResult, TestCase};
 use crate::solutions::part5_paradigms::greedy as solutions;
-use crate::tracker::OperationLog;
+use crate::tracker::{track_slice, OperationLog, Tracked};
 
 pub fn problems() -> Vec<Box<dyn Problem>> {
     vec![
@@ -74,10 +77,16 @@ impl Problem for AssignCookies {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<AssignCookiesTest>().unwrap();
         let expected = ref_assign_cookies(&t.children, &t.cookies);
-        let actual = solutions::assign_cookies(&t.children, &t.cookies);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_children = track_slice(&t.children, shared_log.clone());
+        let tracked_cookies = track_slice(&t.cookies, shared_log.clone());
+        let actual = solutions::assign_cookies(&tracked_children, &tracked_cookies);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("children={:?}, cookies={:?}", t.children, t.cookies),
@@ -148,10 +157,15 @@ impl Problem for BestTimeStockII {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<BestTimeStockIITest>().unwrap();
         let expected = ref_max_profit_ii(&t.prices);
-        let actual = solutions::best_time_stock_ii(&t.prices);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_prices = track_slice(&t.prices, shared_log.clone());
+        let actual = solutions::best_time_stock_ii(&tracked_prices);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("prices={:?}", t.prices),
@@ -226,10 +240,15 @@ impl Problem for LemonadeChange {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<LemonadeChangeTest>().unwrap();
         let expected = ref_lemonade_change(&t.bills);
-        let actual = solutions::lemonade_change(&t.bills);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_bills = track_slice(&t.bills, shared_log.clone());
+        let actual = solutions::lemonade_change(&tracked_bills);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("bills={:?}", t.bills),
@@ -322,10 +341,25 @@ impl Problem for MaximumUnits {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<MaximumUnitsTest>().unwrap();
         let expected = ref_maximum_units(&t.box_types, t.truck_size);
-        let actual = solutions::maximum_units(&t.box_types, t.truck_size);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked: Vec<(Tracked<i32>, Tracked<i32>)> = t
+            .box_types
+            .iter()
+            .enumerate()
+            .map(|(i, &(a, b))| {
+                (
+                    Tracked::new(a, i * 2, shared_log.clone()),
+                    Tracked::new(b, i * 2 + 1, shared_log.clone()),
+                )
+            })
+            .collect();
+        let actual = solutions::maximum_units(&tracked, t.truck_size);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("box_types={:?}, truck_size={}", t.box_types, t.truck_size),
@@ -410,10 +444,15 @@ impl Problem for CanPlaceFlowers {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<CanPlaceFlowersTest>().unwrap();
         let expected = ref_can_place_flowers(&t.flowerbed, t.n);
-        let actual = solutions::can_place_flowers(&t.flowerbed, t.n);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_flowerbed = track_slice(&t.flowerbed, shared_log.clone());
+        let actual = solutions::can_place_flowers(&tracked_flowerbed, t.n);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("flowerbed={:?}, n={}", t.flowerbed, t.n),
@@ -484,10 +523,15 @@ impl Problem for JumpGame {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<JumpGameTest>().unwrap();
         let expected = ref_jump_game(&t.nums);
-        let actual = solutions::jump_game(&t.nums);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::jump_game(&tracked_nums);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("nums={:?}", t.nums),
@@ -560,10 +604,15 @@ impl Problem for JumpGameII {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<JumpGameIITest>().unwrap();
         let expected = ref_jump_game_ii(&t.nums);
-        let actual = solutions::jump_game_ii(&t.nums);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::jump_game_ii(&tracked_nums);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("nums={:?}", t.nums),
@@ -640,10 +689,16 @@ impl Problem for GasStation {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<GasStationTest>().unwrap();
         let expected = ref_gas_station(&t.gas, &t.cost);
-        let actual = solutions::gas_station(&t.gas, &t.cost);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_gas = track_slice(&t.gas, shared_log.clone());
+        let tracked_cost = track_slice(&t.cost, shared_log.clone());
+        let actual = solutions::gas_station(&tracked_gas, &tracked_cost);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("gas={:?}, cost={:?}", t.gas, t.cost),
@@ -868,10 +923,15 @@ impl Problem for Candy {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<CandyTest>().unwrap();
         let expected = ref_candy(&t.ratings);
-        let actual = solutions::candy(&t.ratings);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_ratings = track_slice(&t.ratings, shared_log.clone());
+        let actual = solutions::candy(&tracked_ratings);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("ratings={:?}", t.ratings),
@@ -952,10 +1012,25 @@ impl Problem for MinArrowsBurstBalloons {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<MinArrowsTest>().unwrap();
         let expected = ref_min_arrows(&t.points);
-        let actual = solutions::min_number_arrows(&t.points);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked: Vec<(Tracked<i32>, Tracked<i32>)> = t
+            .points
+            .iter()
+            .enumerate()
+            .map(|(i, &(a, b))| {
+                (
+                    Tracked::new(a, i * 2, shared_log.clone()),
+                    Tracked::new(b, i * 2 + 1, shared_log.clone()),
+                )
+            })
+            .collect();
+        let actual = solutions::min_number_arrows(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("points={:?}", t.points),
@@ -1031,10 +1106,25 @@ impl Problem for NonOverlappingIntervals {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<NonOverlappingTest>().unwrap();
         let expected = ref_erase_overlap(&t.intervals);
-        let actual = solutions::non_overlapping_intervals(&t.intervals);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked: Vec<(Tracked<i32>, Tracked<i32>)> = t
+            .intervals
+            .iter()
+            .enumerate()
+            .map(|(i, &(a, b))| {
+                (
+                    Tracked::new(a, i * 2, shared_log.clone()),
+                    Tracked::new(b, i * 2 + 1, shared_log.clone()),
+                )
+            })
+            .collect();
+        let actual = solutions::non_overlapping_intervals(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("intervals={:?}", t.intervals),
@@ -1145,10 +1235,25 @@ impl Problem for QueueReconstruction {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<QueueReconstructionTest>().unwrap();
         let expected = ref_queue_reconstruction(&t.people);
-        let actual = solutions::queue_reconstruction(&t.people);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked: Vec<(Tracked<i32>, Tracked<i32>)> = t
+            .people
+            .iter()
+            .enumerate()
+            .map(|(i, &(a, b))| {
+                (
+                    Tracked::new(a, i * 2, shared_log.clone()),
+                    Tracked::new(b, i * 2 + 1, shared_log.clone()),
+                )
+            })
+            .collect();
+        let actual = solutions::queue_reconstruction(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("people={:?}", t.people),
@@ -1234,10 +1339,16 @@ impl Problem for Ipo {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<IpoTest>().unwrap();
         let expected = ref_ipo(t.k, t.w, &t.profits, &t.capital);
-        let actual = solutions::ipo(t.k, t.w, &t.profits, &t.capital);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_profits = track_slice(&t.profits, shared_log.clone());
+        let tracked_capital = track_slice(&t.capital, shared_log.clone());
+        let actual = solutions::ipo(t.k, t.w, &tracked_profits, &tracked_capital);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!(

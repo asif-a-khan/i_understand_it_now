@@ -56,7 +56,7 @@ pub fn insertion_sort(_arr: &mut [Tracked<i32>]) {
 ///
 /// Return `true` if every element is <= the next element.
 /// An empty array or single-element array is considered sorted.
-pub fn is_sorted(_nums: &[i32]) -> bool {
+pub fn is_sorted(_nums: &[Tracked<i32>]) -> bool {
     todo!()
 }
 
@@ -68,7 +68,7 @@ pub fn is_sorted(_nums: &[i32]) -> bool {
 ///
 /// Challenge: Can you solve it in a single pass with O(1) extra space?
 /// (Use three pointers: lo, mid, hi.)
-pub fn sort_colors(_nums: &[i32]) -> Vec<i32> {
+pub fn sort_colors(_nums: &[Tracked<i32>]) -> Vec<i32> {
     todo!()
 }
 
@@ -78,7 +78,7 @@ pub fn sort_colors(_nums: &[i32]) -> Vec<i32> {
 ///
 /// The relative order among evens and among odds does not matter.
 /// Return the rearranged array.
-pub fn sort_by_parity(_nums: &[i32]) -> Vec<i32> {
+pub fn sort_by_parity(_nums: &[Tracked<i32>]) -> Vec<i32> {
     todo!()
 }
 
@@ -91,7 +91,7 @@ pub fn sort_by_parity(_nums: &[i32]) -> Vec<i32> {
 /// Example:
 ///   arr1 = [2,3,1,3,2,4,6,7,9,2,19], arr2 = [2,1,4,3,9,6]
 ///   Result: [2,2,2,1,4,3,3,9,6,7,19]
-pub fn relative_sort(_arr1: &[i32], _arr2: &[i32]) -> Vec<i32> {
+pub fn relative_sort(_arr1: &[Tracked<i32>], _arr2: &[Tracked<i32>]) -> Vec<i32> {
     todo!()
 }
 
@@ -104,7 +104,7 @@ pub fn relative_sort(_arr1: &[i32], _arr2: &[i32]) -> Vec<i32> {
 /// Key insight: Compare by concatenation — is "ab" > "ba"?
 ///
 /// Example: [3, 30, 34, 5, 9] -> "9534330"
-pub fn largest_number(_nums: &[i32]) -> String {
+pub fn largest_number(_nums: &[Tracked<i32>]) -> String {
     todo!()
 }
 
@@ -116,7 +116,7 @@ pub fn largest_number(_nums: &[i32]) -> String {
 ///
 /// Hint: Sort first, then you can swap adjacent pairs. Or do it greedily
 /// in one pass by swapping elements that violate the wiggle property.
-pub fn wiggle_sort(_nums: &[i32]) -> Vec<i32> {
+pub fn wiggle_sort(_nums: &[Tracked<i32>]) -> Vec<i32> {
     todo!()
 }
 
@@ -130,7 +130,7 @@ pub fn wiggle_sort(_nums: &[i32]) -> Vec<i32> {
 /// Algorithm outline:
 ///   - Find the max element, flip it to the front, then flip it to its
 ///     correct position. Repeat for the next-largest element.
-pub fn pancake_sort(_nums: &[i32]) -> Vec<i32> {
+pub fn pancake_sort(_nums: &[Tracked<i32>]) -> Vec<i32> {
     todo!()
 }
 
@@ -142,7 +142,7 @@ pub fn pancake_sort(_nums: &[i32]) -> Vec<i32> {
 ///
 /// A brute-force O(n^2) approach works. For O(n log n), use a modified
 /// merge sort that counts inversions during the merge step.
-pub fn count_inversions(_nums: &[i32]) -> i64 {
+pub fn count_inversions(_nums: &[Tracked<i32>]) -> i64 {
     todo!()
 }
 
@@ -153,7 +153,7 @@ pub fn count_inversions(_nums: &[i32]) -> i64 {
 /// Example: [3, 0, 6, 1, 5] -> h = 3 (three papers have >= 3 citations)
 ///
 /// Hint: Sort the citations in descending order and find the transition point.
-pub fn h_index(_citations: &[i32]) -> i32 {
+pub fn h_index(_citations: &[Tracked<i32>]) -> i32 {
     todo!()
 }
 
@@ -178,7 +178,7 @@ pub fn custom_sort_string(_order: &str, _s: &str) -> String {
 /// requires (k - 1) swaps to sort.
 ///
 /// Example: [4, 3, 1, 2] -> 3 swaps  (cycle: 1->4->2->3->1, length 4, needs 3)
-pub fn minimum_swaps(_nums: &[i32]) -> i32 {
+pub fn minimum_swaps(_nums: &[Tracked<i32>]) -> i32 {
     todo!()
 }
 
@@ -192,6 +192,6 @@ pub fn minimum_swaps(_nums: &[i32]) -> i32 {
 /// Hint: Use a min-heap (BinaryHeap with Reverse) of size k+1.
 /// Process elements one at a time: push into heap, pop min when heap
 /// has more than k elements. This gives O(n log k) time.
-pub fn sort_nearly_sorted(_nums: &[i32], _k: usize) -> Vec<i32> {
+pub fn sort_nearly_sorted(_nums: &[Tracked<i32>], _k: usize) -> Vec<i32> {
     todo!()
 }

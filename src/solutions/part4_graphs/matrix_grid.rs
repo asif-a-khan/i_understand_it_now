@@ -1,3 +1,4 @@
+use crate::tracker::Tracked;
 // Matrix / Grid Problems — Solution Templates
 // Edit these functions to solve each problem. Run with: cargo run -- solve <problem_id>
 
@@ -8,7 +9,12 @@
 ///
 /// Example: image=[[1,1,1],[1,1,0],[1,0,1]], sr=1, sc=1, new_color=2
 ///          => [[2,2,2],[2,2,0],[2,0,1]]
-pub fn flood_fill(_image: &[Vec<i32>], _sr: usize, _sc: usize, _new_color: i32) -> Vec<Vec<i32>> {
+pub fn flood_fill(
+    _image: &[Vec<Tracked<i32>>],
+    _sr: usize,
+    _sc: usize,
+    _new_color: i32,
+) -> Vec<Vec<i32>> {
     todo!()
 }
 
@@ -16,7 +22,7 @@ pub fn flood_fill(_image: &[Vec<i32>], _sr: usize, _sc: usize, _new_color: i32) 
 /// return its perimeter.
 ///
 /// Example: grid=[[0,1,0,0],[1,1,1,0],[0,1,0,0],[1,1,0,0]] => 16
-pub fn island_perimeter(_grid: &[Vec<i32>]) -> i32 {
+pub fn island_perimeter(_grid: &[Vec<Tracked<i32>>]) -> i32 {
     todo!()
 }
 
@@ -24,14 +30,14 @@ pub fn island_perimeter(_grid: &[Vec<i32>]) -> i32 {
 /// An island is a group of 1s connected 4-directionally. Return 0 if no island.
 ///
 /// Example: grid=[[0,0,1,0],[0,1,1,0],[0,0,0,0]] => 3
-pub fn max_area_island(_grid: &[Vec<i32>]) -> i32 {
+pub fn max_area_island(_grid: &[Vec<Tracked<i32>>]) -> i32 {
     todo!()
 }
 
 /// Number of Islands: return the number of islands in the binary grid.
 ///
 /// Example: grid=[[1,1,0,0],[1,0,0,0],[0,0,1,1]] => 2
-pub fn count_islands(_grid: &[Vec<i32>]) -> i32 {
+pub fn count_islands(_grid: &[Vec<Tracked<i32>>]) -> i32 {
     todo!()
 }
 
@@ -50,7 +56,7 @@ pub fn surrounded_regions(_board: &[Vec<char>]) -> Vec<Vec<char>> {
 /// 0 = empty, 1 = fresh, 2 = rotten. Rotten spreads 4-directionally each minute.
 ///
 /// Example: grid=[[2,1,1],[1,1,0],[0,1,1]] => 4
-pub fn rotting_oranges(_grid: &[Vec<i32>]) -> i32 {
+pub fn rotting_oranges(_grid: &[Vec<Tracked<i32>>]) -> i32 {
     todo!()
 }
 
@@ -59,14 +65,14 @@ pub fn rotting_oranges(_grid: &[Vec<i32>]) -> i32 {
 ///
 /// Example: rooms=[[INF,-1,0,INF],[INF,INF,INF,-1],[INF,-1,INF,-1],[0,-1,INF,INF]]
 ///          => [[3,-1,0,1],[2,2,1,-1],[1,-1,2,-1],[0,-1,3,4]]
-pub fn walls_and_gates(_rooms: &[Vec<i32>]) -> Vec<Vec<i32>> {
+pub fn walls_and_gates(_rooms: &[Vec<Tracked<i32>>]) -> Vec<Vec<i32>> {
     todo!()
 }
 
 /// 01 Matrix: return the distance of the nearest 0 for each cell.
 ///
 /// Example: mat=[[0,0,0],[0,1,0],[1,1,1]] => [[0,0,0],[0,1,0],[1,2,1]]
-pub fn zero_one_matrix(_mat: &[Vec<i32>]) -> Vec<Vec<i32>> {
+pub fn zero_one_matrix(_mat: &[Vec<Tracked<i32>>]) -> Vec<Vec<i32>> {
     todo!()
 }
 
@@ -93,7 +99,7 @@ pub fn unique_paths(_m: usize, _n: usize) -> i32 {
 /// eliminating at most k obstacles. Return -1 if impossible.
 ///
 /// Example: grid=[[0,0,0],[1,1,0],[0,0,0],[0,1,1],[0,0,0]], k=1 => 6
-pub fn shortest_path_eliminating_obstacles(_grid: &[Vec<i32>], _k: i32) -> i32 {
+pub fn shortest_path_eliminating_obstacles(_grid: &[Vec<Tracked<i32>>], _k: i32) -> i32 {
     todo!()
 }
 
@@ -101,7 +107,7 @@ pub fn shortest_path_eliminating_obstacles(_grid: &[Vec<i32>], _k: i32) -> i32 {
 /// level is t. Return minimum time to swim from (0,0) to (n-1,n-1).
 ///
 /// Example: grid=[[0,2],[1,3]] => 3
-pub fn swim_in_water(_grid: &[Vec<i32>]) -> i32 {
+pub fn swim_in_water(_grid: &[Vec<Tracked<i32>>]) -> i32 {
     todo!()
 }
 
@@ -109,7 +115,7 @@ pub fn swim_in_water(_grid: &[Vec<i32>]) -> i32 {
 ///
 /// Example: grid=[[1,0],[0,1]] => 3
 /// Example: grid=[[1,1],[1,0]] => 4
-pub fn making_large_island(_grid: &[Vec<i32>]) -> i32 {
+pub fn making_large_island(_grid: &[Vec<Tracked<i32>>]) -> i32 {
     todo!()
 }
 
@@ -117,7 +123,7 @@ pub fn making_large_island(_grid: &[Vec<i32>]) -> i32 {
 /// increasing path (4-directional movement).
 ///
 /// Example: matrix=[[9,9,4],[6,6,8],[2,1,1]] => 4 (path: 1->2->6->9)
-pub fn longest_increasing_path(_matrix: &[Vec<i32>]) -> i32 {
+pub fn longest_increasing_path(_matrix: &[Vec<Tracked<i32>>]) -> i32 {
     todo!()
 }
 

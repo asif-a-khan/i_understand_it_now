@@ -1,8 +1,11 @@
+use std::cell::RefCell;
+use std::rc::Rc;
+
 use rand::Rng;
 
 use crate::problems::{Difficulty, Problem, SolutionResult, TestCase};
 use crate::solutions::part6_advanced::segment_fenwick as solutions;
-use crate::tracker::OperationLog;
+use crate::tracker::{track_slice, OperationLog, Tracked};
 
 pub fn problems() -> Vec<Box<dyn Problem>> {
     vec![
@@ -299,10 +302,15 @@ impl Problem for SegmentRangeSumQuery {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<RangeSumTest>().unwrap();
         let expected = ref_range_sum_query(&t.arr, &t.ops);
-        let actual = solutions::range_sum_query(&t.arr, &t.ops);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_arr = track_slice(&t.arr, shared_log.clone());
+        let actual = solutions::range_sum_query(&tracked_arr, &t.ops);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("arr={:?}, ops={:?}", t.arr, t.ops),
@@ -368,10 +376,15 @@ impl Problem for FenwickPrefixSum {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<PrefixSumTest>().unwrap();
         let expected = ref_prefix_sum(&t.arr, &t.ops);
-        let actual = solutions::prefix_sum(&t.arr, &t.ops);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_arr = track_slice(&t.arr, shared_log.clone());
+        let actual = solutions::prefix_sum(&tracked_arr, &t.ops);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("arr={:?}, ops={:?}", t.arr, t.ops),
@@ -431,10 +444,15 @@ impl Problem for SegmentRangeMinQuery {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<RangeMinTest>().unwrap();
         let expected = ref_range_min(&t.arr, &t.queries);
-        let actual = solutions::range_min_query(&t.arr, &t.queries);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_arr = track_slice(&t.arr, shared_log.clone());
+        let actual = solutions::range_min_query(&tracked_arr, &t.queries);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("arr={:?}, queries={:?}", t.arr, t.queries),
@@ -485,10 +503,15 @@ impl Problem for FenwickCountInversions {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<InversionsTest>().unwrap();
         let expected = ref_count_inversions(&t.arr);
-        let actual = solutions::count_inversions(&t.arr);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_arr = track_slice(&t.arr, shared_log.clone());
+        let actual = solutions::count_inversions(&tracked_arr);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("arr={:?}", t.arr),
@@ -555,10 +578,15 @@ impl Problem for SegmentPointUpdate {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<PointUpdateTest>().unwrap();
         let expected = ref_point_update_range_query(&t.arr, &t.ops);
-        let actual = solutions::point_update_range_query(&t.arr, &t.ops);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_arr = track_slice(&t.arr, shared_log.clone());
+        let actual = solutions::point_update_range_query(&tracked_arr, &t.ops);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("arr={:?}, ops={:?}", t.arr, t.ops),
@@ -625,13 +653,18 @@ impl Problem for SegmentRangeUpdatePointQuery {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test
             .data
             .downcast_ref::<RangeUpdatePointQueryTest>()
             .unwrap();
         let expected = ref_range_update_point_query(&t.arr, &t.ops);
-        let actual = solutions::range_update_point_query(&t.arr, &t.ops);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_arr = track_slice(&t.arr, shared_log.clone());
+        let actual = solutions::range_update_point_query(&tracked_arr, &t.ops);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("arr={:?}, ops={:?}", t.arr, t.ops),
@@ -682,10 +715,15 @@ impl Problem for SegmentCountSmallerAfter {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<CountSmallerTest>().unwrap();
         let expected = ref_count_smaller_after(&t.nums);
-        let actual = solutions::count_smaller_after(&t.nums);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_nums = track_slice(&t.nums, shared_log.clone());
+        let actual = solutions::count_smaller_after(&tracked_nums);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("nums={:?}", t.nums),
@@ -761,10 +799,25 @@ impl Problem for Fenwick2dSum {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<Fenwick2dTest>().unwrap();
         let expected = ref_2d_sum(&t.matrix, &t.ops);
-        let actual = solutions::fenwick_2d_sum(&t.matrix, &t.ops);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked: Vec<Vec<Tracked<i32>>> = t
+            .matrix
+            .iter()
+            .enumerate()
+            .map(|(r, row)| {
+                row.iter()
+                    .enumerate()
+                    .map(|(c, &v)| Tracked::new(v, r * row.len().max(1) + c, shared_log.clone()))
+                    .collect()
+            })
+            .collect();
+        let actual = solutions::fenwick_2d_sum(&tracked, &t.ops);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("matrix={:?}, ops={:?}", t.matrix, t.ops),
@@ -825,10 +878,15 @@ impl Problem for SegmentMergeSortTree {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<MergeSortTreeTest>().unwrap();
         let expected = ref_count_less_than_k(&t.arr, &t.queries);
-        let actual = solutions::merge_sort_tree(&t.arr, &t.queries);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_arr = track_slice(&t.arr, shared_log.clone());
+        let actual = solutions::merge_sort_tree(&tracked_arr, &t.queries);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("arr={:?}, queries={:?}", t.arr, t.queries),
@@ -894,10 +952,15 @@ impl Problem for SegmentLazyPropagation {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<LazyPropTest>().unwrap();
         let expected = ref_lazy_range_update_query(&t.arr, &t.ops);
-        let actual = solutions::lazy_propagation(&t.arr, &t.ops);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_arr = track_slice(&t.arr, shared_log.clone());
+        let actual = solutions::lazy_propagation(&tracked_arr, &t.ops);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("arr={:?}, ops={:?}", t.arr, t.ops),
@@ -958,10 +1021,15 @@ impl Problem for SegmentPersistent {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<PersistentTest>().unwrap();
         let expected = ref_kth_smallest_in_range(&t.arr, &t.queries);
-        let actual = solutions::persistent_kth_smallest(&t.arr, &t.queries);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_arr = track_slice(&t.arr, shared_log.clone());
+        let actual = solutions::persistent_kth_smallest(&tracked_arr, &t.queries);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("arr={:?}, queries={:?}", t.arr, t.queries),
@@ -1018,10 +1086,25 @@ impl Problem for SegmentIntervalScheduling {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<IntervalSchedTest>().unwrap();
         let expected = ref_max_non_overlapping(&t.intervals);
-        let actual = solutions::max_non_overlapping_intervals(&t.intervals);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked: Vec<(Tracked<i32>, Tracked<i32>)> = t
+            .intervals
+            .iter()
+            .enumerate()
+            .map(|(i, &(a, b))| {
+                (
+                    Tracked::new(a, i * 2, shared_log.clone()),
+                    Tracked::new(b, i * 2 + 1, shared_log.clone()),
+                )
+            })
+            .collect();
+        let actual = solutions::max_non_overlapping_intervals(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("intervals={:?}", t.intervals),
@@ -1087,10 +1170,15 @@ impl Problem for FenwickRangeUpdateRangeQuery {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<FenwickRURQTest>().unwrap();
         let expected = ref_fenwick_range_update_range_query(&t.arr, &t.ops);
-        let actual = solutions::fenwick_range_update_range_query(&t.arr, &t.ops);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_arr = track_slice(&t.arr, shared_log.clone());
+        let actual = solutions::fenwick_range_update_range_query(&tracked_arr, &t.ops);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("arr={:?}, ops={:?}", t.arr, t.ops),
@@ -1150,10 +1238,15 @@ impl Problem for SegmentMaxSubarrayRange {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<MaxSubarrayRangeTest>().unwrap();
         let expected = ref_max_subarray_range(&t.arr, &t.queries);
-        let actual = solutions::max_subarray_in_range(&t.arr, &t.queries);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_arr = track_slice(&t.arr, shared_log.clone());
+        let actual = solutions::max_subarray_in_range(&tracked_arr, &t.queries);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("arr={:?}, queries={:?}", t.arr, t.queries),
@@ -1221,10 +1314,37 @@ impl Problem for SegmentDynamic {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<DynamicSegTest>().unwrap();
         let expected = ref_dynamic_segment(&t.updates, &t.queries);
-        let actual = solutions::dynamic_segment_tree(&t.updates, &t.queries);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_updates: Vec<(Tracked<i32>, Tracked<i32>)> = t
+            .updates
+            .iter()
+            .enumerate()
+            .map(|(i, &(a, b))| {
+                (
+                    Tracked::new(a, i * 2, shared_log.clone()),
+                    Tracked::new(b, i * 2 + 1, shared_log.clone()),
+                )
+            })
+            .collect();
+        let offset = t.updates.len() * 2;
+        let tracked_queries: Vec<(Tracked<i32>, Tracked<i32>)> = t
+            .queries
+            .iter()
+            .enumerate()
+            .map(|(i, &(a, b))| {
+                (
+                    Tracked::new(a, offset + i * 2, shared_log.clone()),
+                    Tracked::new(b, offset + i * 2 + 1, shared_log.clone()),
+                )
+            })
+            .collect();
+        let actual = solutions::dynamic_segment_tree(&tracked_updates, &tracked_queries);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("updates={:?}, queries={:?}", t.updates, t.queries),

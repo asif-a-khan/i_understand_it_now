@@ -1,3 +1,4 @@
+use crate::tracker::Tracked;
 // Dynamic Programming — Solution Templates
 // Edit these functions to solve each problem. Run with: cargo run -- solve <problem_id>
 
@@ -7,12 +8,12 @@ pub fn climbing_stairs(_n: i32) -> i32 {
 }
 
 /// House Robber: return the maximum money you can rob without robbing two adjacent houses.
-pub fn house_robber(_nums: &[i32]) -> i32 {
+pub fn house_robber(_nums: &[Tracked<i32>]) -> i32 {
     todo!()
 }
 
 /// Min Cost Climbing Stairs: return the minimum cost to reach the top.
-pub fn min_cost_stairs(_cost: &[i32]) -> i32 {
+pub fn min_cost_stairs(_cost: &[Tracked<i32>]) -> i32 {
     todo!()
 }
 
@@ -22,17 +23,17 @@ pub fn fibonacci(_n: i32) -> i64 {
 }
 
 /// Maximum Subarray: return the largest sum of any contiguous subarray (Kadane's algorithm).
-pub fn max_subarray(_nums: &[i32]) -> i32 {
+pub fn max_subarray(_nums: &[Tracked<i32>]) -> i32 {
     todo!()
 }
 
 /// Coin Change: return the fewest coins needed to make `amount`. Return -1 if impossible.
-pub fn coin_change(_coins: &[i32], _amount: i32) -> i32 {
+pub fn coin_change(_coins: &[Tracked<i32>], _amount: i32) -> i32 {
     todo!()
 }
 
 /// Longest Increasing Subsequence: return the length of the longest strictly increasing subsequence.
-pub fn longest_increasing_subsequence(_nums: &[i32]) -> i32 {
+pub fn longest_increasing_subsequence(_nums: &[Tracked<i32>]) -> i32 {
     todo!()
 }
 
@@ -57,7 +58,7 @@ pub fn edit_distance(_word1: &str, _word2: &str) -> i32 {
 }
 
 /// Burst Balloons: return the maximum coins collected by bursting all balloons wisely.
-pub fn burst_balloons(_nums: &[i32]) -> i32 {
+pub fn burst_balloons(_nums: &[Tracked<i32>]) -> i32 {
     todo!()
 }
 
@@ -72,6 +73,6 @@ pub fn longest_valid_parentheses(_s: &str) -> i32 {
 }
 
 /// Max Profit with Cooldown: return max stock profit with a 1-day cooldown after selling.
-pub fn max_profit_with_cooldown(_prices: &[i32]) -> i32 {
+pub fn max_profit_with_cooldown(_prices: &[Tracked<i32>]) -> i32 {
     todo!()
 }

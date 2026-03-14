@@ -1,8 +1,10 @@
 use rand::Rng;
+use std::cell::RefCell;
+use std::rc::Rc;
 
 use crate::problems::{Difficulty, Problem, SolutionResult, TestCase};
 use crate::solutions::part4_graphs::topological_sort as solutions;
-use crate::tracker::OperationLog;
+use crate::tracker::{track_slice, OperationLog, Tracked};
 
 pub fn problems() -> Vec<Box<dyn Problem>> {
     vec![
@@ -1296,13 +1298,28 @@ impl Problem for TopoSortLongestIncreasingPath {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test
             .data
             .downcast_ref::<LongestIncreasingPathTopoTest>()
             .unwrap();
         let expected = ref_longest_increasing_path_topo(&t.matrix);
-        let actual = solutions::longest_increasing_path_topo(&t.matrix);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_matrix: Vec<Vec<Tracked<i32>>> = t
+            .matrix
+            .iter()
+            .enumerate()
+            .map(|(r, row)| {
+                row.iter()
+                    .enumerate()
+                    .map(|(c, &v)| Tracked::new(v, r * row.len() + c, shared_log.clone()))
+                    .collect()
+            })
+            .collect();
+        let actual = solutions::longest_increasing_path_topo(&tracked_matrix);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("matrix={:?}", t.matrix),
@@ -1575,10 +1592,26 @@ impl Problem for TopoSortSortItemsByGroups {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<SortItemsByGroupsTest>().unwrap();
         let expected = ref_sort_items_by_groups(t.n, t.m, &t.group, &t.before_items);
-        let actual = solutions::sort_items_by_groups(t.n, t.m, &t.group, &t.before_items);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_group = track_slice(&t.group, shared_log.clone());
+        let tracked_before: Vec<Vec<Tracked<i32>>> = t
+            .before_items
+            .iter()
+            .enumerate()
+            .map(|(r, row)| {
+                row.iter()
+                    .enumerate()
+                    .map(|(c, &v)| Tracked::new(v, r * 1000 + c, shared_log.clone()))
+                    .collect()
+            })
+            .collect();
+        let actual = solutions::sort_items_by_groups(t.n, t.m, &tracked_group, &tracked_before);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         let valid = if expected.is_empty() {
             actual.is_empty()
         } else {
