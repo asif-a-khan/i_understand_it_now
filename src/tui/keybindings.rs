@@ -81,7 +81,8 @@ pub fn render_help(f: &mut Frame, screen: &Screen) {
             ("Arrow keys", "Move cursor"),
             ("Home / End", "Start / end of line"),
             ("PgUp / PgDn", "Page up / down"),
-            ("Ctrl+S", "Save file"),
+            ("Ctrl+S", "Save and check for errors"),
+            ("Ctrl+R", "Reset to original (press twice)"),
             ("Esc", "Close editor"),
         ],
         Screen::VizPicker => vec![

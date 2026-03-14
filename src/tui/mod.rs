@@ -21,7 +21,7 @@ use crate::tracker::Operation;
 use crate::visualizer;
 
 use dashboard::DashboardState;
-use editor::InTuiEditorState;
+use editor::{CheckMessage, InTuiEditorState};
 use lesson_browser::{LessonInfo, LessonListState, LessonReaderState};
 use problem_runner::{
     CaseResult, ComplexityMessage, ComplexityViewState, ProblemDetailState, ProblemInfo,
@@ -55,6 +55,7 @@ struct App {
     // Async receivers
     test_receiver: Option<mpsc::Receiver<TestMessage>>,
     complexity_receiver: Option<mpsc::Receiver<ComplexityMessage>>,
+    check_receiver: Option<mpsc::Receiver<CheckMessage>>,
 
     // Replay data from last test run
     replay_ops: Vec<Operation>,
@@ -86,6 +87,7 @@ impl App {
             viz_player: VizPlayerState::new(),
             test_receiver: None,
             complexity_receiver: None,
+            check_receiver: None,
             replay_ops: Vec::new(),
         }
     }
@@ -136,10 +138,12 @@ impl App {
                     self.complexity_receiver =
                         Some(problem_runner::spawn_complexity_runner(problem_id));
                 }
-                // When pushing InTuiEditor, load the file
+                // When pushing InTuiEditor, load the file and jump to function
                 if let Screen::InTuiEditor { problem_idx } = &screen {
                     let topic = self.problems[*problem_idx].topic.clone();
-                    self.in_tui_editor.load_file(*problem_idx, &topic);
+                    let problem_id = self.problems[*problem_idx].id.clone();
+                    self.in_tui_editor
+                        .load_file(*problem_idx, &topic, &problem_id);
                 }
                 self.screen_stack.push(screen);
                 false
@@ -265,6 +269,26 @@ impl App {
                     self.complexity_receiver = None;
                 }
             }
+        }
+
+        // Poll cargo check results
+        if let Some(ref rx) = self.check_receiver {
+            match rx.try_recv() {
+                Ok(CheckMessage::Done(errors)) => {
+                    self.in_tui_editor.apply_check_result(errors);
+                    self.check_receiver = None;
+                }
+                Err(mpsc::TryRecvError::Empty) => {}
+                Err(mpsc::TryRecvError::Disconnected) => {
+                    self.check_receiver = None;
+                }
+            }
+        }
+
+        // Start cargo check if editor just saved and no check is running
+        if self.in_tui_editor.is_checking() && self.check_receiver.is_none() {
+            let file_path = self.in_tui_editor.file_path().to_string();
+            self.check_receiver = Some(editor::spawn_cargo_check(file_path));
         }
 
         // Advance auto-play visualization
