@@ -908,11 +908,12 @@ fn ref_max_sum_rectangle(matrix: &[Vec<i32>]) -> i32 {
     let rows = matrix.len();
     let cols = matrix[0].len();
     let mut max_sum = i32::MIN;
+    #[allow(clippy::needless_range_loop)]
     for left in 0..cols {
         let mut temp = vec![0i32; rows];
         for right in left..cols {
-            for r in 0..rows {
-                temp[r] += matrix[r][right];
+            for (r, t) in temp.iter_mut().enumerate().take(rows) {
+                *t += matrix[r][right];
             }
             // Kadane's on temp
             let mut cur = temp[0];

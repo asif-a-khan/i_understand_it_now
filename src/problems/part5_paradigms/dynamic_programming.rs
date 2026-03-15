@@ -864,8 +864,8 @@ fn ref_edit_distance(word1: &str, word2: &str) -> i32 {
     for (i, row) in dp.iter_mut().enumerate().take(m + 1) {
         row[0] = i as i32;
     }
-    for j in 0..=n {
-        dp[0][j] = j as i32;
+    for (j, cell) in dp[0].iter_mut().enumerate().take(n + 1) {
+        *cell = j as i32;
     }
     for i in 1..=m {
         for j in 1..=n {

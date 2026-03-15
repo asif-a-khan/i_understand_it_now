@@ -1055,12 +1055,10 @@ fn ref_solve_sudoku(board: &[Vec<u8>]) -> Vec<Vec<u8>> {
         }
         true
     }
+    #[allow(clippy::needless_range_loop)]
     fn is_valid_placement(grid: &[Vec<u8>], row: usize, col: usize, num: u8) -> bool {
         for i in 0..9 {
-            if grid[row][i] == num {
-                return false;
-            }
-            if grid[i][col] == num {
+            if grid[row][i] == num || grid[i][col] == num {
                 return false;
             }
         }

@@ -1253,8 +1253,8 @@ fn ref_solve_sudoku_inplace(board: &mut Vec<Vec<u8>>) -> bool {
 }
 
 fn ref_sudoku_valid(board: &[Vec<u8>], row: usize, col: usize, num: u8) -> bool {
-    for c in 0..9 {
-        if board[row][c] == num {
+    for cell in board[row].iter().take(9) {
+        if *cell == num {
             return false;
         }
     }
