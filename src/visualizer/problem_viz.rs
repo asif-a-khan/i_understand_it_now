@@ -891,7 +891,7 @@ fn viz_two_sum() -> Vec<VizFrame> {
                 (ai, HighlightKind::Target),
                 (bi, HighlightKind::Target),
             ],
-            &[(i, "i")],
+            &[(i, "scan")],
             format!(
                 "Look at nums[{}]={}. We need {} - {} = {} to make the target.",
                 i, num, target, num, complement
@@ -902,7 +902,7 @@ fn viz_two_sum() -> Vec<VizFrame> {
             // Show the match with both pointers
             v.ptrs(
                 &[(j, HighlightKind::Found), (i, HighlightKind::Found)],
-                &[(j, "j"), (i, "i")],
+                &[(j, "match"), (i, "scan")],
                 format!(
                     "Found {}={} in our map at index {}! nums[{}] + nums[{}] = {} + {} = {}",
                     complement, complement, j, j, i, nums[j], num, target
@@ -931,7 +931,7 @@ fn viz_two_sum() -> Vec<VizFrame> {
                 (ai, HighlightKind::Target),
                 (bi, HighlightKind::Target),
             ],
-            &[(i, "i")],
+            &[(i, "scan")],
             format!(
                 "No match. Store {} in map. Seen so far: {{{}}}",
                 num, seen_str
@@ -976,7 +976,7 @@ fn viz_contains_duplicate() -> Vec<VizFrame> {
         let seen_vals: Vec<_> = seen.keys().collect();
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "scan")],
             format!(
                 "First time seeing {}. Add to set. Set: {:?}",
                 num, seen_vals
@@ -1148,7 +1148,7 @@ fn viz_merge_sorted() -> Vec<VizFrame> {
             .map(|x| (x, HighlightKind::Sorted))
             .chain((m..m + n).map(|x| (x, HighlightKind::Active)))
             .collect::<Vec<_>>(),
-        &[(0, "i"), (m, "j")],
+        &[(0, "L"), (m, "R")],
         format!(
             "Left half: {:?}, Right half: {:?}. Start comparing from the fronts.",
             a, b
@@ -1162,7 +1162,7 @@ fn viz_merge_sorted() -> Vec<VizFrame> {
                 (i, HighlightKind::Comparing),
                 (m + j, HighlightKind::Comparing),
             ],
-            &[(i, "i"), (m + j, "j")],
+            &[(i, "L"), (m + j, "R")],
             format!(
                 "Compare left[{}]={} vs right[{}]={}. Take the smaller one ({}).",
                 i,
@@ -1239,7 +1239,7 @@ fn viz_max_subarray() -> Vec<VizFrame> {
     );
     v.ptrs(
         &[(0, HighlightKind::Active)],
-        &[(0, "i")],
+        &[(0, "scan")],
         format!(
             "Start at [0]={}. Current sum={}, best so far={}.",
             nums[0], cur, best
@@ -1250,7 +1250,7 @@ fn viz_max_subarray() -> Vec<VizFrame> {
             cur += num;
             v.ptrs(
                 &[(i, HighlightKind::Active)],
-                &[(i, "i")],
+                &[(i, "scan")],
                 format!(
                     "Extend subarray: {}+{}={}. Extending is better than restarting ({}).",
                     cur - num,
@@ -1264,7 +1264,7 @@ fn viz_max_subarray() -> Vec<VizFrame> {
             start = i;
             v.ptrs(
                 &[(i, HighlightKind::Pivot)],
-                &[(i, "i")],
+                &[(i, "scan")],
                 format!(
                     "Restart subarray at [{}]={}. Starting fresh ({}) beats extending ({}).",
                     i,
@@ -1377,7 +1377,7 @@ fn viz_product_except_self() -> Vec<VizFrame> {
         left *= nums[i];
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "scan")],
             format!(
                 "Left pass: result[{}] = product of everything left of [{}] = {}. \
                  Running left product becomes {}.",
@@ -1391,7 +1391,7 @@ fn viz_product_except_self() -> Vec<VizFrame> {
         right *= nums[i];
         v.ptrs(
             &[(i, HighlightKind::Found)],
-            &[(i, "i")],
+            &[(i, "scan")],
             format!(
                 "Right pass: result[{}] *= right product {} = {}. \
                  Running right product becomes {}.",
@@ -1435,7 +1435,7 @@ fn viz_next_permutation() -> Vec<VizFrame> {
                 (i, HighlightKind::Comparing),
                 (i + 1, HighlightKind::Comparing),
             ],
-            &[(i, "i"), (i + 1, "i+1")],
+            &[(i, "scan"), (i + 1, "nxt")],
             format!(
                 "[{}]={} >= [{}]={}, so this is part of the descending suffix. Scan left.",
                 i,
@@ -1509,7 +1509,7 @@ fn viz_spiral_matrix() -> Vec<VizFrame> {
     for (step, &idx) in order.iter().enumerate() {
         v.ptrs(
             &[(idx, HighlightKind::Found)],
-            &[(idx, "i")],
+            &[(idx, "pos")],
             format!(
                 "Step {}: visit index [{}], direction = {}.",
                 step + 1,
@@ -1635,7 +1635,7 @@ fn viz_first_missing_positive() -> Vec<VizFrame> {
         } else {
             v.ptrs(
                 &[(i, HighlightKind::Active)],
-                &[(i, "i")],
+                &[(i, "scan")],
                 format!(
                     "[{}]={} — {}. Move on.",
                     i,
@@ -1654,7 +1654,7 @@ fn viz_first_missing_positive() -> Vec<VizFrame> {
         if val != (i as i32 + 1) {
             v.ptrs(
                 &[(i, HighlightKind::Found)],
-                &[(i, "i")],
+                &[(i, "scan")],
                 format!(
                     "Scan: [{}]={} but expected {}. Answer: {} is the first missing positive. O(n).",
                     i, val, i + 1, i + 1
@@ -1664,7 +1664,7 @@ fn viz_first_missing_positive() -> Vec<VizFrame> {
         }
         v.ptrs(
             &[(i, HighlightKind::Sorted)],
-            &[(i, "i")],
+            &[(i, "scan")],
             format!("[{}]={} is correct (matches i+1={}).", i, val, i + 1),
         );
     }
@@ -1955,7 +1955,7 @@ fn viz_stacks_valid_parentheses() -> Vec<VizFrame> {
             let top = stack.len() - 1;
             v.ptrs(
                 &[(i, HighlightKind::Active)],
-                &[(i, "i"), (stack[top].1, "top")],
+                &[(i, "scan"), (stack[top].1, "top")],
                 format!("Push {} — stack size {}", labels(ch), stack.len()),
             );
         } else {
@@ -1964,7 +1964,7 @@ fn viz_stacks_valid_parentheses() -> Vec<VizFrame> {
                 if ch == expected_close {
                     v.ptrs(
                         &[(oi, HighlightKind::Swapping), (i, HighlightKind::Swapping)],
-                        &[(i, "i"), (oi, "top")],
+                        &[(i, "scan"), (oi, "top")],
                         format!("Pop {} matches {}", labels(ch), labels(open)),
                     );
                     stack.pop();
@@ -2069,7 +2069,7 @@ fn viz_stacks_queue_using_stacks() -> Vec<VizFrame> {
         out_order.push(idx);
         v.ptrs(
             &[(idx, HighlightKind::Swapping)],
-            &[(idx, "i")],
+            &[(idx, "scan")],
             format!("Move {} to out-stack", nums[idx]),
         );
     }
@@ -2078,7 +2078,7 @@ fn viz_stacks_queue_using_stacks() -> Vec<VizFrame> {
         if let Some(idx) = out_order.pop() {
             v.ptrs(
                 &[(idx, HighlightKind::Found)],
-                &[(idx, "i")],
+                &[(idx, "scan")],
                 format!("Dequeue {} — FIFO order correct", nums[idx]),
             );
         }
@@ -2128,7 +2128,7 @@ fn viz_stacks_baseball_game() -> Vec<VizFrame> {
     if let Some((cancelled, ci)) = stack.pop() {
         v.ptrs(
             &[(ci, HighlightKind::Swapping)],
-            &[(ci, "i")],
+            &[(ci, "pop")],
             format!("Cancel {} — removed from record", cancelled),
         );
     }
@@ -2171,7 +2171,7 @@ fn viz_stacks_next_greater_element() -> Vec<VizFrame> {
                 result[top_idx] = nums[i];
                 v.ptrs(
                     &[(top_idx, HighlightKind::Found), (i, HighlightKind::Active)],
-                    &[(top_idx, "i"), (i, "top")],
+                    &[(top_idx, "pop"), (i, "top")],
                     format!("Found: next greater of {}={}", nums[top_idx], nums[i]),
                 );
             } else {
@@ -2190,7 +2190,7 @@ fn viz_stacks_next_greater_element() -> Vec<VizFrame> {
     for &idx in &stack {
         v.ptrs(
             &[(idx, HighlightKind::Swapping)],
-            &[(idx, "i")],
+            &[(idx, "scan")],
             format!("[{}]={} has no next greater (-1)", idx, nums[idx]),
         );
     }
@@ -2297,7 +2297,7 @@ fn viz_stacks_eval_rpn() -> Vec<VizFrame> {
             stack.push(tok);
             v.ptrs(
                 &[(i, HighlightKind::Active)],
-                &[(i, "i")],
+                &[(i, "scan")],
                 format!("Push {} — stack: {:?}", tok, stack),
             );
         } else {
@@ -2319,7 +2319,7 @@ fn viz_stacks_eval_rpn() -> Vec<VizFrame> {
             stack.push(res);
             v.ptrs(
                 &[(i, HighlightKind::Active)],
-                &[(i, "i")],
+                &[(i, "scan")],
                 format!(
                     "Op {}: {} {} {} = {} — stack: {:?}",
                     op_name(tok),
@@ -2368,17 +2368,17 @@ fn viz_stacks_decode_string() -> Vec<VizFrame> {
 
     v.ptrs(
         &[(0, HighlightKind::Active)],
-        &[(0, "i")],
+        &[(0, "scan")],
         format!("Push repeat count {}", repeat),
     );
     v.ptrs(
         &[(1, HighlightKind::Active)],
-        &[(1, "i")],
+        &[(1, "scan")],
         format!("Push inner repeat count {}", inner_repeat),
     );
     v.ptrs(
         &[(2, HighlightKind::Active)],
-        &[(2, "i")],
+        &[(2, "scan")],
         format!("Push value {}", val),
     );
 
@@ -2386,7 +2386,7 @@ fn viz_stacks_decode_string() -> Vec<VizFrame> {
     let inner_result = val * inner_repeat;
     v.ptrs(
         &[(1, HighlightKind::Swapping), (2, HighlightKind::Swapping)],
-        &[(1, "i"), (2, "top")],
+        &[(1, "scan"), (2, "top")],
         format!(
             "Close inner: {} repeated {} times = {}",
             val, inner_repeat, inner_result
@@ -2397,7 +2397,7 @@ fn viz_stacks_decode_string() -> Vec<VizFrame> {
     let outer_result = inner_result * repeat;
     v.ptrs(
         &[(0, HighlightKind::Swapping)],
-        &[(0, "i")],
+        &[(0, "scan")],
         format!(
             "Close outer: {} repeated {} times = {}",
             inner_result, repeat, outer_result
@@ -2463,7 +2463,7 @@ fn viz_stacks_asteroid_collision() -> Vec<VizFrame> {
                         (top_idx, HighlightKind::Swapping),
                         (i, HighlightKind::Active),
                     ],
-                    &[(top_idx, "top"), (i, "i")],
+                    &[(top_idx, "top"), (i, "scan")],
                     format!("Collision: {} destroyed by {}", top_val, ast),
                 );
             } else if top_val == -ast {
@@ -2474,7 +2474,7 @@ fn viz_stacks_asteroid_collision() -> Vec<VizFrame> {
                         (top_idx, HighlightKind::Swapping),
                         (i, HighlightKind::Swapping),
                     ],
-                    &[(top_idx, "top"), (i, "i")],
+                    &[(top_idx, "top"), (i, "scan")],
                     format!("Collision: {} and {} destroy each other", top_val, ast),
                 );
                 break;
@@ -2485,7 +2485,7 @@ fn viz_stacks_asteroid_collision() -> Vec<VizFrame> {
                         (i, HighlightKind::Swapping),
                         (top_idx, HighlightKind::Active),
                     ],
-                    &[(top_idx, "top"), (i, "i")],
+                    &[(top_idx, "top"), (i, "scan")],
                     format!("Collision: {} destroyed by {}", ast, top_val),
                 );
                 break;
@@ -2548,7 +2548,7 @@ fn viz_stacks_online_stock_span() -> Vec<VizFrame> {
         stack.push(i);
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "scan")],
             format!("Day {}: price={}, span={}", i, prices[i], spans[i]),
         );
     }
@@ -2599,7 +2599,7 @@ fn viz_stacks_sliding_window_max() -> Vec<VizFrame> {
                 deque.pop_back();
                 v.ptrs(
                     &[(back, HighlightKind::Swapping), (i, HighlightKind::Active)],
-                    &[(back, "top"), (i, "i")],
+                    &[(back, "top"), (i, "scan")],
                     format!("Pop {} < {}", nums[back], nums[i]),
                 );
             } else {
@@ -2616,13 +2616,13 @@ fn viz_stacks_sliding_window_max() -> Vec<VizFrame> {
             let front = *deque.front().unwrap();
             v.ptrs(
                 &window_hl,
-                &[(front, "top"), (i, "i")],
+                &[(front, "top"), (i, "scan")],
                 format!("Window [{},{}]: maximum = {} (front of deque). Smaller elements were already removed when this element entered.", i + 1 - k, i, max_val),
             );
         } else {
             v.ptrs(
                 &[(i, HighlightKind::Active)],
-                &[(i, "i")],
+                &[(i, "scan")],
                 format!("Building window: added {}", nums[i]),
             );
         }
@@ -2680,7 +2680,7 @@ fn viz_stacks_largest_rectangle_histogram() -> Vec<VizFrame> {
                 if i < n {
                     v.ptrs(
                         &[(top, HighlightKind::Swapping), (i, HighlightKind::Active)],
-                        &[(top, "top"), (i, "i")],
+                        &[(top, "top"), (i, "scan")],
                         format!("Pop [{}] h={}, area={}x{}={}", top, h, h, w, area),
                     );
                 } else {
@@ -2748,7 +2748,7 @@ fn viz_stacks_trapping_rain_water_stack() -> Vec<VizFrame> {
                             (top, HighlightKind::Found),
                             (i, HighlightKind::Active),
                         ],
-                        &[(left, "L"), (i, "i")],
+                        &[(left, "L"), (i, "scan")],
                         format!(
                             "Trap {}x{}={} between [{}] and [{}], total={}",
                             bounded_h, w, trapped, left, i, water
@@ -2790,7 +2790,7 @@ fn viz_stacks_basic_calculator() -> Vec<VizFrame> {
         &[],
         &[],
         format!(
-            "Basic Calculator: {}+{}-{}+{}",
+            "Goal: Evaluate {}+{}-{}+{}. Strategy: scan left to right, use stack for parentheses and sign. O(n).",
             nums[0], nums[1], nums[2], nums[3]
         ),
     );
@@ -2811,7 +2811,7 @@ fn viz_stacks_basic_calculator() -> Vec<VizFrame> {
         stack_vals.push(val);
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "scan")],
             format!("Process {}: running total = {}", val, result),
         );
         if i + 1 < n {
@@ -2819,7 +2819,7 @@ fn viz_stacks_basic_calculator() -> Vec<VizFrame> {
             let op_str = if sign > 0 { "+" } else { "-" };
             v.ptrs(
                 &[(i + 1, HighlightKind::Pivot)],
-                &[(i + 1, "i")],
+                &[(i + 1, "scan")],
                 format!("Operator: {}", op_str),
             );
         }
@@ -2877,7 +2877,7 @@ fn viz_stacks_max_frequency_stack() -> Vec<VizFrame> {
                 *freq.get_mut(&val).unwrap() -= 1;
                 v.ptrs(
                     &[(idx, HighlightKind::Swapping)],
-                    &[(idx, "i")],
+                    &[(idx, "pop")],
                     format!("Pop {} (freq was {}) — most frequent", val, max_freq),
                 );
                 if indices.is_empty() {
@@ -4030,10 +4030,20 @@ fn viz_binary_search_first_last() -> Vec<VizFrame> {
     let mut nums = rand_arr(&mut rng, n, 1, 8);
     nums.sort();
     let target = nums[rng.random_range(0..n)];
+    let target_indices: Vec<usize> = nums
+        .iter()
+        .enumerate()
+        .filter(|(_, &val)| val == target)
+        .map(|(idx, _)| idx)
+        .collect();
 
     let mut v = VizLog::new(nums.clone());
+    let target_hl: Vec<(usize, HighlightKind)> = target_indices
+        .iter()
+        .map(|&idx| (idx, HighlightKind::Target))
+        .collect();
     v.ptrs(
-        &[],
+        &target_hl,
         &[],
         format!(
             "Goal: find the first and last occurrence of {} in a sorted array. \
@@ -4049,12 +4059,16 @@ fn viz_binary_search_first_last() -> Vec<VizFrame> {
     let mut first = n;
     while lo <= hi {
         let mid = lo + (hi - lo) / 2;
+        let mut hl = vec![
+            (lo, HighlightKind::Active),
+            (mid, HighlightKind::Comparing),
+            (hi, HighlightKind::Active),
+        ];
+        for &ti in &target_indices {
+            hl.push((ti, HighlightKind::Target));
+        }
         v.ptrs(
-            &[
-                (lo, HighlightKind::Active),
-                (mid, HighlightKind::Comparing),
-                (hi, HighlightKind::Active),
-            ],
+            &hl,
             &[(lo, "lo"), (mid, "mid"), (hi, "hi")],
             format!("Find first: [{}]={} vs {}", mid, nums[mid], target),
         );
@@ -4077,12 +4091,16 @@ fn viz_binary_search_first_last() -> Vec<VizFrame> {
     let mut last = 0;
     while lo <= hi {
         let mid = lo + (hi - lo) / 2;
+        let mut hl = vec![
+            (lo, HighlightKind::Active),
+            (mid, HighlightKind::Comparing),
+            (hi, HighlightKind::Active),
+        ];
+        for &ti in &target_indices {
+            hl.push((ti, HighlightKind::Target));
+        }
         v.ptrs(
-            &[
-                (lo, HighlightKind::Active),
-                (mid, HighlightKind::Comparing),
-                (hi, HighlightKind::Active),
-            ],
+            &hl,
             &[(lo, "lo"), (mid, "mid"), (hi, "hi")],
             format!("Find last: [{}]={} vs {}", mid, nums[mid], target),
         );
@@ -4239,7 +4257,7 @@ fn viz_binary_search_rotated_array() -> Vec<VizFrame> {
 
     let mut v = VizLog::new(nums.clone());
     v.ptrs(
-        &[],
+        &[(target_idx, HighlightKind::Target)],
         &[],
         format!(
             "Goal: find {} in a rotated sorted array. Strategy: binary search, \
@@ -4258,6 +4276,7 @@ fn viz_binary_search_rotated_array() -> Vec<VizFrame> {
                 (lo, HighlightKind::Active),
                 (mid, HighlightKind::Comparing),
                 (hi, HighlightKind::Active),
+                (target_idx, HighlightKind::Target),
             ],
             &[(lo, "lo"), (mid, "mid"), (hi, "hi")],
             format!("Check [{}]={}", mid, nums[mid]),
@@ -4273,7 +4292,7 @@ fn viz_binary_search_rotated_array() -> Vec<VizFrame> {
         if nums[lo] <= nums[mid] {
             if nums[lo] <= target && target < nums[mid] {
                 v.ptrs(
-                    &[(lo, HighlightKind::Active), (mid, HighlightKind::Active)],
+                    &[(lo, HighlightKind::Active), (mid, HighlightKind::Active), (target_idx, HighlightKind::Target)],
                     &[(lo, "lo"), (mid, "mid")],
                     format!("Left sorted, {} in [{}..{}]", target, lo, mid),
                 );
@@ -4411,7 +4430,7 @@ fn viz_binary_search_2d_matrix() -> Vec<VizFrame> {
 
     let mut v = VizLog::new(nums.clone());
     v.ptrs(
-        &[],
+        &[(target_idx, HighlightKind::Target)],
         &[],
         format!(
             "Goal: search for target={} in a sorted 2D matrix (treated as flattened sorted array). \
@@ -4429,6 +4448,7 @@ fn viz_binary_search_2d_matrix() -> Vec<VizFrame> {
                 (lo, HighlightKind::Active),
                 (mid, HighlightKind::Comparing),
                 (hi, HighlightKind::Active),
+                (target_idx, HighlightKind::Target),
             ],
             &[(lo, "lo"), (mid, "mid"), (hi, "hi")],
             format!("[{}]={} vs target={}", mid, nums[mid], target),
@@ -4801,7 +4821,7 @@ fn viz_big_o_chart(name: &str, complexity: &str, ops_fn: impl Fn(i32) -> i32) ->
     v.ptrs(
         &[],
         &[],
-        format!("{} — {} — showing ops for n=1..{}", name, complexity, k),
+        format!("Goal: Understand {} growth rate. Strategy: count operations for n=1..{} to see {} scaling.", name, k, complexity),
     );
 
     for n in 0..bars.len() {
@@ -4926,7 +4946,7 @@ fn viz_big_o_amortized_dynamic_array() -> Vec<VizFrame> {
     v.ptrs(
         &[],
         &[],
-        format!("Dynamic Array — amortized O(1) — total ops for n=1..{}", k),
+        format!("Goal: Understand amortized O(1) for dynamic arrays. Strategy: count total ops for n=1..{} including occasional resizing doublings.", k),
     );
 
     for n in 0..bars.len() {
@@ -5143,7 +5163,7 @@ fn viz_strings_is_anagram() -> Vec<VizFrame> {
         *counts.entry(c).or_insert(0) += 1;
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "scan")],
             format!("Count '{}': now {}", c, counts[&c]),
         );
     }
@@ -5155,7 +5175,7 @@ fn viz_strings_is_anagram() -> Vec<VizFrame> {
         *counts.entry(c).or_insert(0) -= 1;
         v2.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "j")],
+            &[(i, "scan")],
             format!("Decrement '{}': now {}", c, counts[&c]),
         );
     }
@@ -5210,14 +5230,14 @@ fn viz_strings_first_unique_char() -> Vec<VizFrame> {
         if count == 1 {
             v.ptrs(
                 &[(i, HighlightKind::Found)],
-                &[(i, "i")],
+                &[(i, "scan")],
                 format!("Found! '{}' at [{}] appears once", c, i),
             );
             return v.into_labeled_frames(char_labels);
         }
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "scan")],
             format!("'{}' at [{}] appears {} times — skip", c, i, count),
         );
     }
@@ -5255,7 +5275,9 @@ fn viz_strings_longest_common_prefix() -> Vec<VizFrame> {
         &[],
         &[],
         format!(
-            "Longest Common Prefix of {:?}",
+            "Goal: find the longest common prefix among {:?}. \
+             Strategy: compare characters column by column across all strings. \
+             Stop at the first column where characters differ.",
             strs.iter()
                 .map(|s| format!("\"{}\"", s))
                 .collect::<Vec<_>>()
@@ -5271,13 +5293,13 @@ fn viz_strings_longest_common_prefix() -> Vec<VizFrame> {
         if all_match {
             v.ptrs(
                 &[(i, HighlightKind::Sorted)],
-                &[(i, "i")],
+                &[(i, "cmp")],
                 format!("Col {}: all have '{}' — extend prefix", i, c),
             );
         } else {
             v.ptrs(
                 &[(i, HighlightKind::Swapping)],
-                &[(i, "i")],
+                &[(i, "cmp")],
                 format!("Col {}: mismatch — stop", i),
             );
             let found: Vec<(usize, HighlightKind)> =
@@ -5418,7 +5440,16 @@ fn viz_strings_group_anagrams() -> Vec<VizFrame> {
         .map(|w| char_val(w.chars().next().unwrap()))
         .collect();
     let mut v = VizLog::new(vals);
-    v.ptrs(&[], &[], format!("Group Anagrams: {:?}", words));
+    v.ptrs(
+        &[],
+        &[],
+        format!(
+            "Goal: group words that are anagrams of each other from {:?}. \
+             Strategy: sort each word\'s characters to create a key. Words with \
+             the same sorted key belong to the same anagram group.",
+            words
+        ),
+    );
 
     let mut groups: HashMap<String, Vec<usize>> = HashMap::new();
     for (i, word) in words.iter().enumerate() {
@@ -5427,7 +5458,7 @@ fn viz_strings_group_anagrams() -> Vec<VizFrame> {
         let sorted_key: String = key.iter().collect();
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "scan")],
             format!("\"{}\" -> sorted key \"{}\"", word, sorted_key),
         );
         groups.entry(sorted_key).or_default().push(i);
@@ -5498,7 +5529,7 @@ fn viz_strings_string_to_integer() -> Vec<VizFrame> {
         }
         v.ptrs(
             &[(i, HighlightKind::Pivot)],
-            &[(i, "i")],
+            &[(i, "scan")],
             format!("Sign: '{}'", chars[i]),
         );
         i += 1;
@@ -5509,7 +5540,7 @@ fn viz_strings_string_to_integer() -> Vec<VizFrame> {
         result = result * 10 + digit;
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "scan")],
             format!("Digit '{}': result = {}", chars[i], result),
         );
         i += 1;
@@ -5553,7 +5584,7 @@ fn viz_strings_zigzag_conversion() -> Vec<VizFrame> {
         rows[row].push(i);
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "scan")],
             format!("'{}' -> row {}", chars[i], row),
         );
         if row == 0 || row == num_rows - 1 {
@@ -5627,9 +5658,9 @@ fn viz_strings_count_and_say() -> Vec<VizFrame> {
         let hl: Vec<(usize, HighlightKind)> =
             (start..=end).map(|j| (j, HighlightKind::Active)).collect();
         let ptrs_list: Vec<(usize, &str)> = if start == end {
-            vec![(start, "i")]
+            vec![(start, "scan")]
         } else {
-            vec![(start, "i"), (end, "j")]
+            vec![(start, "scan"), (end, "end")]
         };
         v.ptrs(
             &hl,
@@ -5895,7 +5926,7 @@ fn viz_strings_regex_matching() -> Vec<VizFrame> {
         }
         v.ptrs(
             &[(i - 1, HighlightKind::Active)],
-            &[(i - 1, "i")],
+            &[(i - 1, "scan")],
             format!(
                 "Check text[{}]='{}' against pattern",
                 i - 1,
@@ -5977,7 +6008,7 @@ fn viz_strings_edit_distance() -> Vec<VizFrame> {
         };
         v.ptrs(
             &[(i - 1, HighlightKind::Active)],
-            &[(i - 1, "i")],
+            &[(i - 1, "scan")],
             format!("Row {}: '{}' — {}", i, chars1[i - 1], op),
         );
     }
@@ -6043,7 +6074,7 @@ fn viz_strings_wildcard_matching() -> Vec<VizFrame> {
         }
         v.ptrs(
             &[(i - 1, HighlightKind::Active)],
-            &[(i - 1, "i")],
+            &[(i - 1, "scan")],
             format!(
                 "Match text[{}]='{}' against pattern",
                 i - 1,
@@ -6269,15 +6300,11 @@ fn viz_linked_lists_has_cycle() -> Vec<VizFrame> {
         &[],
         &[],
         format!(
-            "Detect Cycle — cycle at node [{}]={}",
+            "Goal: detect if a linked list has a cycle (cycle at node [{}]={}). \
+             Strategy: Floyd's tortoise and hare. Slow moves 1 step, fast moves 2 steps. \
+             If they ever meet, there is a cycle.",
             cycle_start, list[cycle_start]
         ),
-    );
-    v.ptrs(
-        &[],
-        &[],
-        "Strategy: Floyd's tortoise and hare. Slow moves 1 step, fast moves 2 steps. \
-         If they ever meet, there is a cycle.",
     );
 
     let mut slow = 0;
@@ -6466,7 +6493,7 @@ fn viz_linked_lists_is_palindrome() -> Vec<VizFrame> {
                     (left, HighlightKind::Comparing),
                     (right, HighlightKind::Comparing),
                 ],
-                &[(left, "L"), (right, "R")],
+                &[(left, "left"), (right, "right")],
                 format!("[{}]={} == [{}]={}", left, list[left], right, list[right]),
             );
         } else {
@@ -6475,7 +6502,7 @@ fn viz_linked_lists_is_palindrome() -> Vec<VizFrame> {
                     (left, HighlightKind::Swapping),
                     (right, HighlightKind::Swapping),
                 ],
-                &[(left, "L"), (right, "R")],
+                &[(left, "left"), (right, "right")],
                 format!(
                     "[{}]={} != [{}]={} — not palindrome",
                     left, list[left], right, list[right]
@@ -6649,14 +6676,14 @@ fn viz_linked_lists_reorder() -> Vec<VizFrame> {
         result.push(list[left]);
         v.ptrs(
             &[(left, HighlightKind::Active)],
-            &[(left, "L")],
+            &[(left, "curr")],
             format!("Take from front: [{}]={}", left, list[left]),
         );
         if left != right {
             result.push(list[right]);
             v.ptrs(
                 &[(right, HighlightKind::Active)],
-                &[(right, "R")],
+                &[(right, "tail")],
                 format!("Take from back: [{}]={}", right, list[right]),
             );
         }
@@ -6740,7 +6767,7 @@ fn viz_linked_lists_sort() -> Vec<VizFrame> {
                         (left_start, HighlightKind::Active),
                         (mid, HighlightKind::Pivot),
                     ],
-                    &[(left_start, "L"), (mid, "R")],
+                    &[(left_start, "left"), (mid, "right")],
                     format!(
                         "Merge [{}..{}] and [{}..{}]",
                         left_start,
@@ -6922,7 +6949,7 @@ fn viz_linked_lists_rotate() -> Vec<VizFrame> {
         (0..split).map(|i| (i, HighlightKind::Active)).collect();
     v.ptrs(
         &first_hl,
-        &[(0, "L"), (split.saturating_sub(1), "R")],
+        &[(0, "head"), (split.saturating_sub(1), "tail")],
         format!("First part [0..{}] moves to end", split - 1),
     );
 
@@ -6930,7 +6957,7 @@ fn viz_linked_lists_rotate() -> Vec<VizFrame> {
         (split..n).map(|i| (i, HighlightKind::Active)).collect();
     v.ptrs(
         &second_hl,
-        &[(split, "L"), (n - 1, "R")],
+        &[(split, "head"), (n - 1, "tail")],
         format!("Second part [{}..{}] becomes new head", split, n - 1),
     );
 
@@ -6994,7 +7021,7 @@ fn viz_linked_lists_reverse_k_group() -> Vec<VizFrame> {
             .collect();
         v.ptrs(
             &group_hl,
-            &[(group_start, "L"), (group_end, "R")],
+            &[(group_start, "left"), (group_end, "right")],
             format!("Group [{}..{}]", group_start, group_end),
         );
 
@@ -7004,7 +7031,7 @@ fn viz_linked_lists_reverse_k_group() -> Vec<VizFrame> {
             list.swap(lo, hi);
             v.ptrs(
                 &[(lo, HighlightKind::Swapping), (hi, HighlightKind::Swapping)],
-                &[(lo, "L"), (hi, "R")],
+                &[(lo, "left"), (hi, "right")],
                 format!("Swap [{}] <-> [{}]", lo, hi),
             );
             lo += 1;
@@ -9150,7 +9177,7 @@ fn viz_heap_sort_basic() -> Vec<VizFrame> {
         hl.push((end, HighlightKind::Swapping));
         v.ptrs(
             &hl,
-            &[(0, "root"), (end, "i")],
+            &[(0, "root"), (end, "child")],
             format!("Extract max [0]={} to [{}]", arr[0], end),
         );
         arr.swap(0, end);
@@ -9194,13 +9221,13 @@ fn viz_heap_sort_kth_largest() -> Vec<VizFrame> {
             heap.sort();
             v.ptrs(
                 &[(i, HighlightKind::Active)],
-                &[(i, "i")],
+                &[(i, "child")],
                 format!("Insert {}. Heap: {:?}", val, heap),
             );
         } else if val > heap[0] {
             v.ptrs(
                 &[(i, HighlightKind::Comparing)],
-                &[(i, "i")],
+                &[(i, "child")],
                 format!("{} > heap min {} — replace the smallest. This new element is closer to being kth largest.", val, heap[0]),
             );
             heap[0] = val;
@@ -9208,7 +9235,7 @@ fn viz_heap_sort_kth_largest() -> Vec<VizFrame> {
         } else {
             v.ptrs(
                 &[(i, HighlightKind::Active)],
-                &[(i, "i")],
+                &[(i, "child")],
                 format!(
                     "{} <= heap min {} — skip. Too small to be in top k.",
                     val, heap[0]
@@ -9390,13 +9417,13 @@ fn viz_heap_sort_k_closest_points() -> Vec<VizFrame> {
             heap.sort_by(|a, b| b.cmp(a));
             v.ptrs(
                 &[(i, HighlightKind::Active)],
-                &[(i, "i")],
+                &[(i, "child")],
                 format!("Insert dist={}. Heap: {:?}", d, heap),
             );
         } else if d < heap[0] {
             v.ptrs(
                 &[(i, HighlightKind::Comparing)],
-                &[(i, "i")],
+                &[(i, "child")],
                 format!("{} < heap max {}, replace", d, heap[0]),
             );
             heap[0] = d;
@@ -9404,7 +9431,7 @@ fn viz_heap_sort_k_closest_points() -> Vec<VizFrame> {
         } else {
             v.ptrs(
                 &[(i, HighlightKind::Active)],
-                &[(i, "i")],
+                &[(i, "child")],
                 format!("{} >= heap max {}, skip", d, heap[0]),
             );
         }
@@ -9434,7 +9461,7 @@ fn viz_heap_sort_top_k_frequent() -> Vec<VizFrame> {
         *freq.entry(val).or_insert(0) += 1;
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "child")],
             format!("Scan arr[{}]={} and increment its frequency to {}. Building the frequency map to identify the most common elements.", i, val, freq[&val]),
         );
     }
@@ -9476,7 +9503,7 @@ fn viz_heap_sort_sort_nearly_sorted() -> Vec<VizFrame> {
         heap.sort();
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "child")],
             format!("Insert {} into the min-heap. Current heap state: {:?}. The heap maintains the smallest elements seen so far.", val, heap),
         );
         if heap.len() > kd + 1 {
@@ -9575,7 +9602,7 @@ fn viz_heap_sort_task_scheduler() -> Vec<VizFrame> {
         *freq.entry(t).or_insert(0) += 1;
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "child")],
             format!("Task {} encountered, frequency now {}. Tracking frequencies to determine the dominant task that dictates the schedule length.", t, freq[&t]),
         );
     }
@@ -9620,7 +9647,7 @@ fn viz_heap_sort_find_median_stream() -> Vec<VizFrame> {
         };
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "child")],
             format!("Insert {}. After rebalancing the two heaps, the current median is {:.1}. The max-heap holds the lower half, min-heap the upper half.", val, median),
         );
     }
@@ -10623,7 +10650,7 @@ fn viz_counting_sort_basic() -> Vec<VizFrame> {
         count[val as usize] += 1;
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "scan")],
             format!(
                 "Place arr[{}]={} into bucket[{}], count now {}. Each bucket tracks how many times its value appears.",
                 i, val, val, count[val as usize]
@@ -10678,7 +10705,7 @@ fn viz_counting_sort_sort_colors() -> Vec<VizFrame> {
                     (mid, HighlightKind::Swapping),
                     (lo, HighlightKind::Swapping),
                 ],
-                &[(lo, "L"), (mid, "i")],
+                &[(lo, "L"), (mid, "scan")],
                 format!(
                     "arr[{}]=0: swap to front position [{}]. Zeros accumulate at the beginning.",
                     mid, lo
@@ -10694,7 +10721,7 @@ fn viz_counting_sort_sort_colors() -> Vec<VizFrame> {
                     (mid, HighlightKind::Swapping),
                     (hi, HighlightKind::Swapping),
                 ],
-                &[(mid, "i"), (hi, "R")],
+                &[(mid, "scan"), (hi, "R")],
                 format!(
                     "arr[{}]=2: swap to back position [{}]. Twos accumulate at the end.",
                     mid, hi
@@ -10709,7 +10736,7 @@ fn viz_counting_sort_sort_colors() -> Vec<VizFrame> {
         } else {
             v.ptrs(
                 &[(mid, HighlightKind::Active)],
-                &[(mid, "i")],
+                &[(mid, "scan")],
                 format!(
                     "arr[{}]=1: already in the middle region where 1s belong. Move on.",
                     mid
@@ -10746,7 +10773,7 @@ fn viz_counting_sort_relative_sort() -> Vec<VizFrame> {
         *freq.entry(val).or_insert(0) += 1;
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "scan")],
             format!("Frequency of {} is now {}. Counting occurrences to reconstruct in the specified order.", val, freq[&val]),
         );
     }
@@ -10798,7 +10825,7 @@ fn viz_counting_sort_height_checker() -> Vec<VizFrame> {
             count += 1;
             v.ptrs(
                 &[(i, HighlightKind::Swapping)],
-                &[(i, "i")],
+                &[(i, "scan")],
                 format!(
                     "Position [{}]: height {} but expected {}. Mismatch! Total mismatches now {}.",
                     i, h, e, count
@@ -10807,7 +10834,7 @@ fn viz_counting_sort_height_checker() -> Vec<VizFrame> {
         } else {
             v.ptrs(
                 &[(i, HighlightKind::Sorted)],
-                &[(i, "i")],
+                &[(i, "scan")],
                 format!(
                     "Position [{}]: height {} matches expected position. Already correctly placed.",
                     i, h
@@ -10817,7 +10844,7 @@ fn viz_counting_sort_height_checker() -> Vec<VizFrame> {
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "out")],
         format!("Total mismatches: {}. Time complexity: O(n log n).", count),
     );
     v.into_frames()
@@ -10835,7 +10862,7 @@ fn viz_counting_sort_sort_by_frequency() -> Vec<VizFrame> {
         *freq.entry(val).or_insert(0) += 1;
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "scan")],
             format!("Frequency of {} is now {}. Counting occurrences to reconstruct in the specified order.", val, freq[&val]),
         );
     }
@@ -10849,7 +10876,7 @@ fn viz_counting_sort_sort_by_frequency() -> Vec<VizFrame> {
         }
         v.ptrs(
             &[(0, HighlightKind::Active)],
-            &[(0, "i")],
+            &[(0, "out")],
             format!("Value {} appears {} times. Sorting by descending frequency places the most common elements first.", val, cnt),
         );
     }
@@ -10883,7 +10910,7 @@ fn viz_radix_sort_basic() -> Vec<VizFrame> {
             buckets[digit].push(val);
             v.ptrs(
                 &[(i, HighlightKind::Active)],
-                &[(i, "i")],
+                &[(i, "scan")],
                 format!("arr[{}]={}: at digit position exp={}, the digit is {}. Route to bucket {} for this radix pass.", i, val, exp, digit, digit),
             );
         }
@@ -10894,7 +10921,7 @@ fn viz_radix_sort_basic() -> Vec<VizFrame> {
         v.array = arr.clone();
         v.ptrs(
             &[(0, HighlightKind::Active)],
-            &[(0, "i")],
+            &[(0, "out")],
             format!("After sorting by digit position exp={}: {:?}. Each pass stably sorts by one digit, building toward the full sort.", exp, arr),
         );
         exp *= 10;
@@ -10978,7 +11005,7 @@ fn viz_bucket_sort_basic() -> Vec<VizFrame> {
         buckets[bi].push(val);
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "scan")],
             format!("arr[{}]={} goes to bucket {}. Elements are distributed by value range across buckets.", i, val, bi),
         );
     }
@@ -11019,7 +11046,7 @@ fn viz_counting_sort_top_k_frequent_words() -> Vec<VizFrame> {
         *freq.entry(val).or_insert(0) += 1;
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "scan")],
             format!("Count word {}={}", val, freq[&val]),
         );
     }
@@ -11028,7 +11055,7 @@ fn viz_counting_sort_top_k_frequent_words() -> Vec<VizFrame> {
     let top: Vec<i32> = items.iter().take(k).map(|&(w, _)| w).collect();
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "out")],
         format!(
             "Top {} frequent: {:?}. Time complexity: O(n log n).",
             k, top
@@ -11059,7 +11086,7 @@ fn viz_counting_sort_reorganize_string() -> Vec<VizFrame> {
                 result[idx] = val;
                 v.ptrs(
                     &[(idx, HighlightKind::Active)],
-                    &[(idx, "i")],
+                    &[(idx, "out")],
                     format!("Place {} at index [{}]. Fill even indices first with the most frequent value, then odd indices, preventing adjacency.", val, idx),
                 );
                 idx += 2;
@@ -11139,7 +11166,7 @@ fn viz_counting_sort_smallest_missing_positive() -> Vec<VizFrame> {
                     (i, HighlightKind::Swapping),
                     (target, HighlightKind::Swapping),
                 ],
-                &[(i, "i")],
+                &[(i, "scan")],
                 format!("Value {} should be at index [{}] (val-1). Swap it there so we can later detect what is missing.", val, target),
             );
             arr.swap(i, target);
@@ -11147,7 +11174,7 @@ fn viz_counting_sort_smallest_missing_positive() -> Vec<VizFrame> {
         } else {
             v.ptrs(
                 &[(i, HighlightKind::Active)],
-                &[(i, "i")],
+                &[(i, "scan")],
                 format!(
                     "arr[{}]={}: out of range [1,n] or already placed correctly. Skip.",
                     i, arr[i]
@@ -11160,7 +11187,7 @@ fn viz_counting_sort_smallest_missing_positive() -> Vec<VizFrame> {
         if val != (i as i32 + 1) {
             v.ptrs(
                 &[(i, HighlightKind::Found)],
-                &[(i, "i")],
+                &[(i, "scan")],
                 format!(
                     "arr[{}]={} but expected {}. The smallest missing positive is {}.",
                     i,
@@ -11173,7 +11200,7 @@ fn viz_counting_sort_smallest_missing_positive() -> Vec<VizFrame> {
         }
         v.ptrs(
             &[(i, HighlightKind::Sorted)],
-            &[(i, "i")],
+            &[(i, "scan")],
             format!(
                 "arr[{}]={} is correctly placed (value = index+1). Continue checking.",
                 i, val
@@ -11182,7 +11209,7 @@ fn viz_counting_sort_smallest_missing_positive() -> Vec<VizFrame> {
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "out")],
         format!("All present, answer={}. Time complexity: O(n).", n + 1),
     );
     v.into_frames()
@@ -11208,14 +11235,14 @@ fn viz_counting_sort_create_maximum_number() -> Vec<VizFrame> {
             drop_count -= 1;
             v.ptrs(
                 &[(i, HighlightKind::Comparing), (di, HighlightKind::Swapping)],
-                &[(i, "i")],
+                &[(i, "scan")],
                 format!("Drop {} from position [{}] because current {} > {}. Removing smaller digits to make room for larger ones.", dropped, di, val, dropped),
             );
         }
         stack.push((val, i));
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "scan")],
             format!("Push {} from position [{}] onto the stack. Building the largest possible number left to right.", val, i),
         );
     }
@@ -11223,7 +11250,7 @@ fn viz_counting_sort_create_maximum_number() -> Vec<VizFrame> {
     let result: Vec<i32> = stack.iter().map(|&(val, _)| val).collect();
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "out")],
         format!("Maximum number: {:?}. Time complexity: O(n).", result),
     );
     v.into_frames()
@@ -11242,14 +11269,14 @@ fn viz_radix_sort_suffix_array() -> Vec<VizFrame> {
     for (rank, &(start, ref _suf)) in suffixes.iter().enumerate() {
         v.ptrs(
             &[(start, HighlightKind::Active)],
-            &[(start, "i")],
+            &[(start, "scan")],
             format!("Lexicographic rank {}: suffix starting at index [{}]. Sorting suffixes reveals repeated patterns.", rank, start),
         );
     }
     let sa: Vec<usize> = suffixes.iter().map(|&(i, _)| i).collect();
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "out")],
         format!("Suffix array: {:?}. Time complexity: O(n^2 log n).", sa),
     );
     v.into_frames()
@@ -11274,7 +11301,7 @@ fn viz_counting_sort_sort_transformed() -> Vec<VizFrame> {
     for (i, (&x, &fx)) in arr.iter().zip(transformed.iter()).enumerate() {
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "scan")],
             format!("f({}) = a*{}^2 + b*{} + c = {}. Applying the quadratic transformation to each element.", x, x, x, fx),
         );
     }
@@ -11338,7 +11365,7 @@ fn viz_recursion_fibonacci() -> Vec<VizFrame> {
     v.ptrs(&[], &[], format!("Goal: Compute Fibonacci numbers F(0) through F(n-1). Strategy: Build bottom-up: each F(i) = F(i-1) + F(i-2), starting from base cases F(0)=0, F(1)=1. Input: Fibonacci — compute F(0)..F({})", n - 1));
     v.ptrs(
         &[(0, HighlightKind::Sorted)],
-        &[(0, "i")],
+        &[(0, "fill")],
         format!(
             "Base case: F(0) = {}. This is the starting point of the Fibonacci sequence.",
             fib[0]
@@ -11346,7 +11373,7 @@ fn viz_recursion_fibonacci() -> Vec<VizFrame> {
     );
     v.ptrs(
         &[(0, HighlightKind::Sorted), (1, HighlightKind::Sorted)],
-        &[(1, "i")],
+        &[(1, "fill")],
         format!(
             "Base case: F(1) = {}. Together with F(0), these bootstrap the recurrence.",
             fib[1]
@@ -11359,7 +11386,7 @@ fn viz_recursion_fibonacci() -> Vec<VizFrame> {
                 (i - 1, HighlightKind::Active),
                 (i, HighlightKind::Found),
             ],
-            &[(i, "i"), (i - 1, "depth")],
+            &[(i, "fill"), (i - 1, "depth")],
             format!(
                 "F({})=F({})+F({})={}+{}={}",
                 i,
@@ -11639,7 +11666,7 @@ fn viz_recursion_subsets() -> Vec<VizFrame> {
                 .unwrap_or(0);
             v.ptrs(
                 &[(last_idx, HighlightKind::Found)],
-                &[(last_idx, "i")],
+                &[(last_idx, "pick")],
                 format!(
                     "Record subset #{}: {:?}. Every intermediate state is a valid subset.",
                     subsets.len(),
@@ -11837,7 +11864,7 @@ fn viz_recursion_tower_of_hanoi() -> Vec<VizFrame> {
         let idx = step.min(7);
         v.ptrs(
             &[(idx, HighlightKind::Active)],
-            &[(idx, "i")],
+            &[(idx, "depth")],
             format!("Move disk {} from peg {} to peg {}. Smaller disks must be moved out of the way first.", disk, from, to),
         );
     }
@@ -11924,7 +11951,7 @@ fn viz_recursion_sudoku_solver() -> Vec<VizFrame> {
     for &pos in &prefilled {
         v.ptrs(
             &[(pos, HighlightKind::Pivot)],
-            &[(pos, "i")],
+            &[(pos, "fill")],
             format!(
                 "Pre-filled cell [{}]={} is given. These are constraints that guide backtracking.",
                 pos, row[pos]
@@ -12003,14 +12030,14 @@ fn viz_recursion_regex_match() -> Vec<VizFrame> {
         if pattern[pi] == 0 {
             v.ptrs(
                 &[(tidx, HighlightKind::Found), (pidx, HighlightKind::Pivot)],
-                &[(tidx, "i"), (pidx, "depth")],
+                &[(tidx, "depth"), (pidx, "depth")],
                 format!("Wildcard * matches all remaining text from position {} to {}. Wildcards consume any number of characters.", ti, n - 1),
             );
             ti = n;
         } else if text[ti] == pattern[pi] {
             v.ptrs(
                 &[(tidx, HighlightKind::Found), (pidx, HighlightKind::Found)],
-                &[(tidx, "i"), (pidx, "depth")],
+                &[(tidx, "depth"), (pidx, "depth")],
                 format!(
                     "Character match: text[{}]={} equals pattern[{}]={}. Both pointers advance together.",
                     ti, text[ti], pi, pattern[pi]
@@ -12024,7 +12051,7 @@ fn viz_recursion_regex_match() -> Vec<VizFrame> {
                     (tidx, HighlightKind::Swapping),
                     (pidx, HighlightKind::Swapping),
                 ],
-                &[(tidx, "i"), (pidx, "depth")],
+                &[(tidx, "depth"), (pidx, "depth")],
                 format!(
                     "Mismatch: text[{}]={} does not equal pattern[{}]={}. Pattern matching fails here.",
                     ti, text[ti], pi, pattern[pi]
@@ -12425,7 +12452,7 @@ fn viz_two_pointers_three_sum() -> Vec<VizFrame> {
         let mut r = n - 1;
         v.ptrs(
             &[(i, HighlightKind::Pivot)],
-            &[(i, "i")],
+            &[(i, "fix")],
             format!("Fix arr[{}]={} as the first element. Search for two more in [{},{}] that sum to {}.", i, arr[i], l, r, -arr[i]),
         );
         while l < r {
@@ -12437,7 +12464,7 @@ fn viz_two_pointers_three_sum() -> Vec<VizFrame> {
                         (l, HighlightKind::Found),
                         (r, HighlightKind::Found),
                     ],
-                    &[(i, "i"), (l, "L"), (r, "R")],
+                    &[(i, "fix"), (l, "L"), (r, "R")],
                     format!(
                         "Found triplet! {}+{}+{} = 0. Three elements that sum to zero.",
                         arr[i], arr[l], arr[r]
@@ -12451,7 +12478,7 @@ fn viz_two_pointers_three_sum() -> Vec<VizFrame> {
                         (l, HighlightKind::Comparing),
                         (r, HighlightKind::Comparing),
                     ],
-                    &[(i, "i"), (l, "L"), (r, "R")],
+                    &[(i, "fix"), (l, "L"), (r, "R")],
                     format!(
                         "Sum {}+{}+{} = {} < 0. Too small, move L right to increase the sum.",
                         arr[i], arr[l], arr[r], sum
@@ -12465,7 +12492,7 @@ fn viz_two_pointers_three_sum() -> Vec<VizFrame> {
                         (l, HighlightKind::Comparing),
                         (r, HighlightKind::Comparing),
                     ],
-                    &[(i, "i"), (l, "L"), (r, "R")],
+                    &[(i, "fix"), (l, "L"), (r, "R")],
                     format!(
                         "{}+{}+{}={} > 0, move R. Time complexity: O(n^2).",
                         arr[i], arr[l], arr[r], sum
@@ -12898,7 +12925,7 @@ fn viz_two_pointers_four_sum() -> Vec<VizFrame> {
             let need = target - arr[i] - arr[j];
             v.ptrs(
                 &[(i, HighlightKind::Pivot), (j, HighlightKind::Pivot)],
-                &[(i, "i"), (j, "j")],
+                &[(i, "fix1"), (j, "fix2")],
                 format!(
                     "Fix arr[{}]={} and arr[{}]={}. Need two more elements summing to {}. Use two pointers on the rest.",
                     i, arr[i], j, arr[j], need
@@ -12914,7 +12941,7 @@ fn viz_two_pointers_four_sum() -> Vec<VizFrame> {
                             (l, HighlightKind::Found),
                             (r, HighlightKind::Found),
                         ],
-                        &[(i, "i"), (j, "j"), (l, "L"), (r, "R")],
+                        &[(i, "fix1"), (j, "fix2"), (l, "L"), (r, "R")],
                         format!(
                             "Found four-sum! {}+{}+{}+{} = {}. Two fixed elements plus two-pointer search.",
                             arr[i], arr[j], arr[l], arr[r], target
@@ -12959,7 +12986,7 @@ fn viz_prefix_sum_range_sum() -> Vec<VizFrame> {
         prefix[i + 1] = prefix[i] + arr[i];
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "fill")],
             format!("prefix[{}] = prefix[{}] + arr[{}] = {}. Each prefix entry stores the cumulative sum up to this index.", i + 1, i, i, prefix[i + 1]),
         );
     }
@@ -12994,7 +13021,7 @@ fn viz_prefix_sum_running_sum() -> Vec<VizFrame> {
     running[0] = arr[0];
     v.ptrs(
         &[(0, HighlightKind::Sorted)],
-        &[(0, "i")],
+        &[(0, "fill")],
         format!(
             "running[0] = arr[0] = {}. The first element starts the cumulative sum.",
             running[0]
@@ -13004,7 +13031,7 @@ fn viz_prefix_sum_running_sum() -> Vec<VizFrame> {
         running[i] = running[i - 1] + arr[i];
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "fill")],
             format!(
                 "running[{}] = {}+{} = {}",
                 i,
@@ -13041,7 +13068,7 @@ fn viz_prefix_sum_pivot_index() -> Vec<VizFrame> {
         if left_sum == right_sum {
             v.ptrs(
                 &[(i, HighlightKind::Found)],
-                &[(i, "i")],
+                &[(i, "scan")],
                 format!(
                     "Pivot found at [{}]={}! Left sum {} equals right sum {}.",
                     i, arr[i], left_sum, right_sum
@@ -13052,7 +13079,7 @@ fn viz_prefix_sum_pivot_index() -> Vec<VizFrame> {
         }
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "scan")],
             format!(
                 "Index [{}]={}: left sum={}, right sum={}. Not equal, so this is not the pivot.",
                 i, arr[i], left_sum, right_sum
@@ -13064,7 +13091,7 @@ fn viz_prefix_sum_pivot_index() -> Vec<VizFrame> {
         Some(idx) => {
             v.ptrs(
                 &[(idx, HighlightKind::Found)],
-                &[(idx, "i")],
+                &[(idx, "scan")],
                 format!(
                     "Pivot index is {}. The sums on both sides are equal at this position.",
                     idx
@@ -13095,7 +13122,7 @@ fn viz_prefix_sum_sum_of_absolute_differences() -> Vec<VizFrame> {
         prefix[i + 1] = prefix[i] + arr[i];
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "fill")],
             format!("prefix[{}] = prefix[{}] + arr[{}] = {}. Each prefix entry stores the cumulative sum up to this index.", i + 1, i, i, prefix[i + 1]),
         );
     }
@@ -13106,7 +13133,7 @@ fn viz_prefix_sum_sum_of_absolute_differences() -> Vec<VizFrame> {
         let sad = left + right;
         v.ptrs(
             &[(i, HighlightKind::Found)],
-            &[(i, "i")],
+            &[(i, "scan")],
             format!(
                 "SAD[{}] = {} (left={}, right={}). Time complexity: O(n).",
                 i, sad, left, right
@@ -13132,7 +13159,7 @@ fn viz_prefix_sum_count_negatives() -> Vec<VizFrame> {
         if arr[i] < 0 {
             v.ptrs(
                 &[(i, HighlightKind::Swapping)],
-                &[(i, "i")],
+                &[(i, "scan")],
                 format!(
                     "arr[{}]={} is negative. Running count of negatives: {}.",
                     i, arr[i], count
@@ -13141,7 +13168,7 @@ fn viz_prefix_sum_count_negatives() -> Vec<VizFrame> {
         } else {
             v.ptrs(
                 &[(i, HighlightKind::Sorted)],
-                &[(i, "i")],
+                &[(i, "scan")],
                 format!(
                     "arr[{}]={} is non-negative. No increment to the negative count.",
                     i, arr[i]
@@ -13151,7 +13178,7 @@ fn viz_prefix_sum_count_negatives() -> Vec<VizFrame> {
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "scan")],
         format!("Total negatives: {}. Time complexity: O(n).", count),
     );
     v.into_frames()
@@ -13180,13 +13207,13 @@ fn viz_prefix_sum_subarray_sum_k() -> Vec<VizFrame> {
             count += cnt;
             v.ptrs(
                 &[(i, HighlightKind::Found)],
-                &[(i, "i")],
+                &[(i, "scan")],
                 format!("Prefix sum={}. We need prefix-k={} to have been seen before. Found! That means a subarray summing to k ends here. Count={}.", prefix, need, count),
             );
         } else {
             v.ptrs(
                 &[(i, HighlightKind::Active)],
-                &[(i, "i")],
+                &[(i, "scan")],
                 format!("Prefix sum={}. Looking for {} in the map but not found. No subarray ending here sums to k.", prefix, need),
             );
         }
@@ -13194,7 +13221,7 @@ fn viz_prefix_sum_subarray_sum_k() -> Vec<VizFrame> {
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "scan")],
         format!(
             "Subarrays summing to {}: {}. Time complexity: O(n).",
             k, count
@@ -13217,7 +13244,7 @@ fn viz_prefix_sum_product_except_self() -> Vec<VizFrame> {
         left *= arr[i];
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "scan")],
             format!(
                 "Left pass: result[{}] = product of all elements to the left = {}.",
                 i, result[i]
@@ -13230,7 +13257,7 @@ fn viz_prefix_sum_product_except_self() -> Vec<VizFrame> {
         right *= arr[i];
         v.ptrs(
             &[(i, HighlightKind::Found)],
-            &[(i, "i")],
+            &[(i, "scan")],
             format!("Right pass: multiply by right product. result[{}] = {} (left product * right product).", i, result[i]),
         );
     }
@@ -13276,7 +13303,7 @@ fn viz_prefix_sum_contiguous_array() -> Vec<VizFrame> {
             } else {
                 v.ptrs(
                     &[(i, HighlightKind::Active)],
-                    &[(i, "i")],
+                    &[(i, "scan")],
                     format!("Prefix sum {} was seen at index {}. Subarray length={}, but not longer than current best.", prefix, prev, len),
                 );
             }
@@ -13284,7 +13311,7 @@ fn viz_prefix_sum_contiguous_array() -> Vec<VizFrame> {
             map.insert(prefix, i + 1);
             v.ptrs(
                 &[(i, HighlightKind::Active)],
-                &[(i, "i")],
+                &[(i, "scan")],
                 format!("Prefix sum {} encountered for the first time. Record this index for future lookups.", prefix),
             );
         }
@@ -13322,7 +13349,7 @@ fn viz_prefix_sum_2d_range_sum() -> Vec<VizFrame> {
         prefix[i + 1] = prefix[i] + arr[i];
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "fill")],
             format!(
                 "prefix[{}]={} at grid position (row={}, col={}). Building cumulative sums over the flattened matrix.",
                 i + 1,
@@ -13428,7 +13455,7 @@ fn viz_prefix_sum_count_range_sum() -> Vec<VizFrame> {
         prefix[i + 1] = prefix[i] + arr[i];
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "fill")],
             format!(
                 "prefix[{}] = prefix[{}] + arr[{}] = {}. Each prefix entry is the cumulative sum.",
                 i + 1,
@@ -13458,7 +13485,7 @@ fn viz_prefix_sum_count_range_sum() -> Vec<VizFrame> {
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "scan")],
         format!("Count of range sums: {}. Time complexity: O(n^2).", count),
     );
     v.into_frames()
@@ -13478,7 +13505,7 @@ fn viz_prefix_sum_max_sum_rectangle() -> Vec<VizFrame> {
         prefix[i + 1] = prefix[i] + arr[i];
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "fill")],
             format!("prefix[{}] = prefix[{}] + arr[{}] = {}. Each prefix entry stores the cumulative sum up to this index.", i + 1, i, i, prefix[i + 1]),
         );
     }
@@ -13539,7 +13566,7 @@ fn viz_prefix_sum_shortest_subarray_sum_k() -> Vec<VizFrame> {
         prefix[i + 1] = prefix[i] + arr[i];
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "fill")],
             format!(
                 "prefix[{}] = prefix[{}] + arr[{}] = {}. Each prefix entry is the cumulative sum.",
                 i + 1,
@@ -13606,7 +13633,7 @@ fn viz_prefix_sum_number_of_subarrays_odd_sum() -> Vec<VizFrame> {
             even_count += 1;
             v.ptrs(
                 &[(i, HighlightKind::Active)],
-                &[(i, "i")],
+                &[(i, "scan")],
                 format!("Prefix sum={} (even). Pairing with {} previous odd prefixes gives odd-sum subarrays. Running total: {}.", prefix, odd_count, total),
             );
         } else {
@@ -13614,7 +13641,7 @@ fn viz_prefix_sum_number_of_subarrays_odd_sum() -> Vec<VizFrame> {
             odd_count += 1;
             v.ptrs(
                 &[(i, HighlightKind::Found)],
-                &[(i, "i")],
+                &[(i, "scan")],
                 format!(
                     "Prefix sum={} (odd). Pairing with {} previous even prefixes gives odd-sum subarrays. Running total: {}.",
                     prefix, even_count, total
@@ -13624,7 +13651,7 @@ fn viz_prefix_sum_number_of_subarrays_odd_sum() -> Vec<VizFrame> {
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "scan")],
         format!("Subarrays with odd sum: {}. Time complexity: O(n).", total),
     );
     v.into_frames()
@@ -13642,7 +13669,7 @@ fn viz_prefix_sum_xor_queries() -> Vec<VizFrame> {
         prefix_xor[i + 1] = prefix_xor[i] ^ arr[i];
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "fill")],
             format!("prefix_xor[{}] = prefix_xor[{}] XOR arr[{}] = {}. XOR is its own inverse, enabling O(1) range queries.", i + 1, i, i, prefix_xor[i + 1]),
         );
     }
@@ -13926,7 +13953,7 @@ fn viz_backtracking_letter_combinations() -> Vec<VizFrame> {
             cur.push(ch);
             v.ptrs(
                 &[(idx, HighlightKind::Active)],
-                &[(idx, "depth")],
+                &[(idx, "pick")],
                 format!("Digit '{}' pick '{}' — \"{}\"", chosen[idx], ch, cur),
             );
             gen(chosen, idx + 1, cur, res, v, mapping);
@@ -13981,7 +14008,7 @@ fn viz_backtracking_generate_parentheses() -> Vec<VizFrame> {
             let depth = cur.len().min(n).saturating_sub(1);
             v.ptrs(
                 &[(depth, HighlightKind::Active)],
-                &[(depth, "depth")],
+                &[(depth, "pick")],
                 format!("Add '(' — \"{}\" open={} close={}", cur, open + 1, close),
             );
             gen(n, open + 1, close, cur, res, v);
@@ -13992,7 +14019,7 @@ fn viz_backtracking_generate_parentheses() -> Vec<VizFrame> {
             let depth = cur.len().min(n).saturating_sub(1);
             v.ptrs(
                 &[(depth, HighlightKind::Active)],
-                &[(depth, "depth")],
+                &[(depth, "pick")],
                 format!("Add ')' — \"{}\" open={} close={}", cur, open, close + 1),
             );
             gen(n, open, close + 1, cur, res, v);
@@ -14103,7 +14130,7 @@ fn viz_backtracking_sudoku_solver() -> Vec<VizFrame> {
         } else {
             v.ptrs(
                 &[(i, HighlightKind::Sorted)],
-                &[(i, "i")],
+                &[(i, "pick")],
                 format!("[{}]={} already set", i, board[i]),
             );
         }
@@ -14167,14 +14194,14 @@ fn viz_backtracking_word_search() -> Vec<VizFrame> {
                     path.push(next);
                     v.ptrs(
                         &[(next, HighlightKind::Active)],
-                        &[(next, "depth")],
+                        &[(next, "pick")],
                         format!("Extend [{}]='{}' matches word[1]", next, nc),
                     );
                     break;
                 }
                 v.ptrs(
                     &[(next, HighlightKind::Swapping)],
-                    &[(next, "depth")],
+                    &[(next, "pick")],
                     format!("[{}]='{}' no match for word[1]", next, nc),
                 );
             }
@@ -14649,7 +14676,7 @@ fn viz_greedy_assign_cookies() -> Vec<VizFrame> {
         if sizes[si] >= greed[gi] {
             v.ptrs(
                 &[(gi, HighlightKind::Found)],
-                &[(gi, "i")],
+                &[(gi, "scan")],
                 format!(
                     "Cookie {}>=greed {} — assign child {}",
                     sizes[si], greed[gi], gi
@@ -14661,7 +14688,7 @@ fn viz_greedy_assign_cookies() -> Vec<VizFrame> {
         } else {
             v.ptrs(
                 &[(gi, HighlightKind::Active)],
-                &[(gi, "i")],
+                &[(gi, "scan")],
                 format!("Cookie {}<greed {} — skip cookie", sizes[si], greed[gi]),
             );
             si += 1;
@@ -14704,14 +14731,14 @@ fn viz_greedy_best_time_stock_ii() -> Vec<VizFrame> {
         } else {
             v.ptrs(
                 &[(i, HighlightKind::Active)],
-                &[(i, "i")],
+                &[(i, "scan")],
                 format!("[{}]={} <= prev={}, skip", i, prices[i], prices[i - 1]),
             );
         }
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "scan")],
         format!("Result: max profit={}. Time complexity: O(n).", profit),
     );
     v.into_frames()
@@ -14731,7 +14758,7 @@ fn viz_greedy_jump_game() -> Vec<VizFrame> {
         if i > max_reach {
             v.ptrs(
                 &[(i, HighlightKind::Swapping)],
-                &[(i, "i")],
+                &[(i, "scan")],
                 format!("[{}] unreachable (max_reach={})", i, max_reach),
             );
             break;
@@ -14741,13 +14768,13 @@ fn viz_greedy_jump_game() -> Vec<VizFrame> {
             max_reach = new_reach;
             v.ptrs(
                 &[(i, HighlightKind::Found)],
-                &[(i, "i")],
+                &[(i, "scan")],
                 format!("[{}]={} extends reach to {}", i, nums[i], max_reach),
             );
         } else {
             v.ptrs(
                 &[(i, HighlightKind::Active)],
-                &[(i, "i")],
+                &[(i, "scan")],
                 format!("[{}]={} reach stays {}", i, nums[i], max_reach),
             );
         }
@@ -14784,7 +14811,7 @@ fn viz_greedy_jump_game_ii() -> Vec<VizFrame> {
         }
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "scan")],
             format!("[{}]={} farthest={}", i, nums[i], farthest),
         );
         if i == cur_end {
@@ -14792,7 +14819,7 @@ fn viz_greedy_jump_game_ii() -> Vec<VizFrame> {
             cur_end = farthest;
             v.ptrs(
                 &[(i, HighlightKind::Found)],
-                &[(i, "i")],
+                &[(i, "scan")],
                 format!("Jump {}! new boundary={}", jumps, cur_end),
             );
             if cur_end >= n - 1 {
@@ -14829,7 +14856,7 @@ fn viz_greedy_gas_station() -> Vec<VizFrame> {
         if tank < 0 {
             v.ptrs(
                 &[(i, HighlightKind::Swapping)],
-                &[(i, "i")],
+                &[(i, "scan")],
                 format!(
                     "[{}] gas={} cost={} tank={}<0, reset",
                     i, gas[i], cost[i], tank
@@ -14840,7 +14867,7 @@ fn viz_greedy_gas_station() -> Vec<VizFrame> {
         } else {
             v.ptrs(
                 &[(i, HighlightKind::Active), (start, HighlightKind::Pivot)],
-                &[(i, "i"), (start, "start")],
+                &[(i, "scan"), (start, "start")],
                 format!("[{}] gas={} cost={} tank={}", i, gas[i], cost[i], tank),
             );
         }
@@ -14879,7 +14906,7 @@ fn viz_greedy_candy() -> Vec<VizFrame> {
                 (i, HighlightKind::Active),
                 (i - 1, HighlightKind::Comparing),
             ],
-            &[(i, "i")],
+            &[(i, "scan")],
             format!("L-pass [{}]={} candy={}", i, ratings[i], candies[i]),
         );
     }
@@ -14893,14 +14920,14 @@ fn viz_greedy_candy() -> Vec<VizFrame> {
                 (i, HighlightKind::Active),
                 (i + 1, HighlightKind::Comparing),
             ],
-            &[(i, "i")],
+            &[(i, "scan")],
             format!("R-pass [{}]={} candy={}", i, ratings[i], candies[i]),
         );
     }
     let total: i32 = candies.iter().sum();
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "scan")],
         format!(
             "Result: {} total candies {:?}. Time complexity: O(n).",
             total, candies
@@ -14940,7 +14967,7 @@ fn viz_greedy_partition_labels() -> Vec<VizFrame> {
         }
         v.ptrs(
             &[(i, HighlightKind::Active), (end, HighlightKind::Pivot)],
-            &[(i, "i"), (end, "end")],
+            &[(i, "scan"), (end, "end")],
             format!("'{}' last={} boundary={}", c, last, end),
         );
         if i == end {
@@ -14977,7 +15004,7 @@ fn viz_greedy_queue_reconstruction() -> Vec<VizFrame> {
         queue.insert(pos, heights[i]);
         v.ptrs(
             &[(i, HighlightKind::Found)],
-            &[(i, "i")],
+            &[(i, "scan")],
             format!("Insert h={} at pos {} — {:?}", heights[i], pos, queue),
         );
     }
@@ -15013,14 +15040,14 @@ fn viz_greedy_non_overlapping_intervals() -> Vec<VizFrame> {
             end = e;
             v.ptrs(
                 &[(i, HighlightKind::Found)],
-                &[(i, "i")],
+                &[(i, "scan")],
                 format!("Keep [{},{}] end={}", s, e, end),
             );
         } else {
             removals += 1;
             v.ptrs(
                 &[(i, HighlightKind::Swapping)],
-                &[(i, "i")],
+                &[(i, "scan")],
                 format!("Remove [{},{}] overlaps (end={})", s, e, end),
             );
         }
@@ -15060,13 +15087,13 @@ fn viz_greedy_min_arrows_burst_balloons() -> Vec<VizFrame> {
             arrow_pos = e;
             v.ptrs(
                 &[(i, HighlightKind::Found)],
-                &[(i, "i")],
+                &[(i, "scan")],
                 format!("Arrow {} at x={} bursts [{},{}]", arrows, e, s, e),
             );
         } else {
             v.ptrs(
                 &[(i, HighlightKind::Active)],
-                &[(i, "i")],
+                &[(i, "scan")],
                 format!("[{},{}] already burst by arrow at {}", s, e, arrow_pos),
             );
         }
@@ -15103,13 +15130,13 @@ fn viz_greedy_task_scheduler() -> Vec<VizFrame> {
         let f = freq.get(&t).copied().unwrap_or(0);
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "scan")],
             format!("Task {} freq={}", t, f),
         );
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "scan")],
         format!(
             "Result: {} time units (max_freq={}, count={}). Time complexity: O(n).",
             result, max_freq, max_count
@@ -15146,7 +15173,7 @@ fn viz_greedy_reorganize_string() -> Vec<VizFrame> {
         let c = (ch - 1 + 'a' as i32) as u8 as char;
         v.ptrs(
             &[(idx, HighlightKind::Active)],
-            &[(idx, "i")],
+            &[(idx, "scan")],
             format!("'{}' appears {} times — place greedily", c, count),
         );
         for _ in 0..count {
@@ -15156,7 +15183,7 @@ fn viz_greedy_reorganize_string() -> Vec<VizFrame> {
     let res: String = result.iter().collect();
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "scan")],
         format!("Result: \"{}\" Time complexity: O(n log n).", res),
     );
     v.into_frames()
@@ -15243,7 +15270,7 @@ fn viz_greedy_minimum_cost_connect_sticks() -> Vec<VizFrame> {
         let idx = step.min(n - 1);
         v.ptrs(
             &[(idx, HighlightKind::Active)],
-            &[(idx, "i")],
+            &[(idx, "scan")],
             format!("Merge {}+{}={} cost_so_far={}", a, b, cost, total_cost),
         );
         if step >= 12 {
@@ -15252,7 +15279,7 @@ fn viz_greedy_minimum_cost_connect_sticks() -> Vec<VizFrame> {
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "scan")],
         format!(
             "Result: total cost={}. Time complexity: O(n log n).",
             total_cost
@@ -15290,13 +15317,13 @@ fn viz_greedy_ipo() -> Vec<VizFrame> {
             w += profits[idx];
             v.ptrs(
                 &[(idx, HighlightKind::Found)],
-                &[(idx, "i")],
+                &[(idx, "best")],
                 format!("Pick project {} profit={} W={}", idx, profits[idx], w),
             );
         } else {
             v.ptrs(
                 &[(0, HighlightKind::Active)],
-                &[(0, "i")],
+                &[(0, "best")],
                 format!("No affordable project with W={}", w),
             );
             break;
@@ -15304,7 +15331,7 @@ fn viz_greedy_ipo() -> Vec<VizFrame> {
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "best")],
         format!(
             "Result: final capital W={}. Time complexity: O(n log n).",
             w
@@ -15498,8 +15525,8 @@ fn viz_binary_trees_is_symmetric() -> Vec<VizFrame> {
     let mut v = VizLog::new(tree.clone());
     v.ptrs(
         &[(0, HighlightKind::Active)],
-        &[(0, "Goal: Check if a binary tree is a mirror of itself. Strategy: Compare pairs of nodes: left child of left subtree with right child of right subtree, and vice versa.")],
-        "Is Symmetric — compare mirror pairs",
+        &[(0, "root")],
+        "Goal: Check if a binary tree is a mirror of itself. Strategy: Compare pairs of nodes: left child of left subtree with right child of right subtree, and vice versa.",
     );
 
     let pairs = [(1, 2), (3, 6), (4, 5)];
@@ -15572,8 +15599,8 @@ fn viz_binary_trees_invert() -> Vec<VizFrame> {
     let mut v = VizLog::new(tree.clone());
     v.ptrs(
         &[],
-        &[(0, "Goal: Invert (mirror) a binary tree by swapping left and right children at every node. Strategy: DFS: swap the left and right children of each node, then recurse into both subtrees.")],
-        "Invert Binary Tree — swap children at each level",
+        &[(0, "root")],
+        "Goal: Invert (mirror) a binary tree by swapping left and right children at every node. Strategy: DFS: swap the left and right children of each node, then recurse into both subtrees.",
     );
 
     // Process nodes that have children, top-down
@@ -15613,8 +15640,8 @@ fn viz_binary_trees_level_order() -> Vec<VizFrame> {
     let mut v = VizLog::new(tree.clone());
     v.ptrs(
         &[],
-        &[(0, "Goal: Traverse the binary tree level by level (BFS). Strategy: BFS with a queue: process all nodes at current depth, enqueue their children for the next level.")],
-        "Level Order Traversal — BFS level by level",
+        &[(0, "root")],
+        "Goal: Traverse the binary tree level by level (BFS). Strategy: BFS with a queue: process all nodes at current depth, enqueue their children for the next level.",
     );
 
     let mut done: Vec<(usize, HighlightKind)> = Vec::new();
@@ -15746,8 +15773,8 @@ fn viz_binary_trees_flatten_to_linked_list() -> Vec<VizFrame> {
     let mut v = VizLog::new(tree.clone());
     v.ptrs(
         &[],
-        &[(0, "Goal: Flatten the binary tree into a linked list following preorder traversal. Strategy: Process nodes right-to-left in reverse preorder, linking each node's right child to the previously processed node.")],
-        "Flatten to Linked List — preorder into right pointers",
+        &[(0, "root")],
+        "Goal: Flatten the binary tree into a linked list following preorder traversal. Strategy: Process nodes right-to-left in reverse preorder, linking each node's right child to the previously processed node.",
     );
 
     let order = dfs_preorder(n);
@@ -16077,13 +16104,13 @@ fn viz_dp_climbing_stairs() -> Vec<VizFrame> {
     v.ptrs(&[], &[], format!("Goal: Count the number of distinct ways to climb n stairs taking 1 or 2 steps at a time. Strategy: DP: dp[i] = dp[i-1] + dp[i-2], since you can arrive at step i from step i-1 or i-2. Input: Climbing Stairs — n={}", n));
     v.ptrs(
         &[(0, HighlightKind::Sorted)],
-        &[(0, "i")],
+        &[(0, "fill")],
         "dp[0]=1 (1 way to reach step 1)".to_string(),
     );
     if n > 1 {
         v.ptrs(
             &[(0, HighlightKind::Sorted), (1, HighlightKind::Sorted)],
-            &[(1, "i")],
+            &[(1, "fill")],
             "dp[1]=2 (2 ways to reach step 2)".to_string(),
         );
     }
@@ -16096,7 +16123,7 @@ fn viz_dp_climbing_stairs() -> Vec<VizFrame> {
                 (i - 1, HighlightKind::Comparing),
                 (i - 2, HighlightKind::Comparing),
             ],
-            &[(i, "i"), (i - 1, "j")],
+            &[(i, "fill"), (i - 1, "prev")],
             format!(
                 "dp[{}] = dp[{}]+dp[{}] = {}+{} = {}",
                 i,
@@ -16135,13 +16162,13 @@ fn viz_dp_house_robber() -> Vec<VizFrame> {
     }
     v.ptrs(
         &[(0, HighlightKind::Active)],
-        &[(0, "i")],
+        &[(0, "fill")],
         format!("dp[0]={}", dp[0]),
     );
     if n > 1 {
         v.ptrs(
             &[(1, HighlightKind::Active)],
-            &[(1, "i")],
+            &[(1, "fill")],
             format!("dp[1]=max({},{})={}", houses[0], houses[1], dp[1]),
         );
     }
@@ -16155,7 +16182,7 @@ fn viz_dp_house_robber() -> Vec<VizFrame> {
         };
         v.ptrs(
             &[(i, kind), (i - 2, HighlightKind::Comparing)],
-            &[(i, "i"), (i - 2, "j")],
+            &[(i, "fill"), (i - 2, "prev")],
             format!(
                 "dp[{}]=max(skip={}, rob={}+{}) = {}",
                 i,
@@ -16168,7 +16195,7 @@ fn viz_dp_house_robber() -> Vec<VizFrame> {
     }
     v.ptrs(
         &[(n - 1, HighlightKind::Found)],
-        &[(n - 1, "i")],
+        &[(n - 1, "fill")],
         format!("Result: max loot = {}. Time complexity: O(n).", dp[n - 1]),
     );
     v.into_frames()
@@ -16190,7 +16217,7 @@ fn viz_dp_coin_change() -> Vec<VizFrame> {
     );
     v.ptrs(
         &[(0, HighlightKind::Sorted)],
-        &[(0, "i")],
+        &[(0, "fill")],
         "dp[0]=0 (0 coins for amount 0)".to_string(),
     );
 
@@ -16205,7 +16232,7 @@ fn viz_dp_coin_change() -> Vec<VizFrame> {
                         (i, HighlightKind::Active),
                         (i - cu, HighlightKind::Comparing),
                     ],
-                    &[(i, "i"), (i - cu, "j")],
+                    &[(i, "fill"), (i - cu, "prev")],
                     format!("dp[{}]=dp[{}]+1={} using coin {}", i, i - cu, dp[i], c),
                 );
             }
@@ -16242,7 +16269,7 @@ fn viz_dp_longest_increasing_subseq() -> Vec<VizFrame> {
                 dp[i] = dp[j] + 1;
                 v.ptrs(
                     &[(i, HighlightKind::Active), (j, HighlightKind::Comparing)],
-                    &[(i, "i"), (j, "j")],
+                    &[(i, "fill"), (j, "prev")],
                     format!(
                         "[{}]={} > [{}]={} dp[{}]={}",
                         i, nums[i], j, nums[j], i, dp[i]
@@ -16252,14 +16279,14 @@ fn viz_dp_longest_increasing_subseq() -> Vec<VizFrame> {
         }
         v.ptrs(
             &[(i, HighlightKind::Sorted)],
-            &[(i, "i")],
+            &[(i, "fill")],
             format!("dp[{}]={} (LIS ending here)", i, dp[i]),
         );
     }
     let lis = *dp.iter().max().unwrap_or(&1);
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "fill")],
         format!("Answer: LIS length = {}. Time: O(n^2) with this DP, O(n log n) with patience sorting. Time complexity: O(n^2).", lis),
     );
     v.into_frames()
@@ -16283,7 +16310,7 @@ fn viz_dp_word_break() -> Vec<VizFrame> {
                     dp[i] = true;
                     v.ptrs(
                         &[(idx, HighlightKind::Found)],
-                        &[(idx, "i")],
+                        &[(idx, "fill")],
                         format!("dp[{}]=true — word found at [{},{}]", i, j, i),
                     );
                     break;
@@ -16294,7 +16321,7 @@ fn viz_dp_word_break() -> Vec<VizFrame> {
             let idx = (i - 1).min(n - 1);
             v.ptrs(
                 &[(idx, HighlightKind::Active)],
-                &[(idx, "i")],
+                &[(idx, "fill")],
                 format!("dp[{}]=false — no word ends here", i),
             );
         }
@@ -16302,7 +16329,7 @@ fn viz_dp_word_break() -> Vec<VizFrame> {
     let result = dp[n];
     v.ptrs(
         &[(n - 1, HighlightKind::Found)],
-        &[(n - 1, "i")],
+        &[(n - 1, "fill")],
         format!("Result: word break = {}. Time complexity: O(n^2).", result),
     );
     v.into_frames()
@@ -16338,7 +16365,7 @@ fn viz_dp_unique_paths() -> Vec<VizFrame> {
                     (up, HighlightKind::Comparing),
                     (left, HighlightKind::Comparing),
                 ],
-                &[(idx, "i"), (up, "j")],
+                &[(idx, "fill"), (up, "prev")],
                 format!(
                     "dp[{},{}]=dp[above]+dp[left]={}+{}={}",
                     r, c, dp[up], dp[left], dp[idx]
@@ -16381,7 +16408,7 @@ fn viz_dp_decode_ways() -> Vec<VizFrame> {
         let idx = (i - 1).min(n - 1);
         v.ptrs(
             &[(idx, HighlightKind::Active)],
-            &[(idx, "i")],
+            &[(idx, "fill")],
             format!(
                 "dp[{}]={} (1-digit={}, 2-digit={})",
                 i, dp[i], one_digit, two_digit
@@ -16390,7 +16417,7 @@ fn viz_dp_decode_ways() -> Vec<VizFrame> {
     }
     v.ptrs(
         &[(n - 1, HighlightKind::Found)],
-        &[(n - 1, "i")],
+        &[(n - 1, "fill")],
         format!("Result: {} decode ways. Time complexity: O(n).", dp[n]),
     );
     v.into_frames()
@@ -16444,7 +16471,7 @@ fn viz_dp_edit_distance() -> Vec<VizFrame> {
             };
             v.ptrs(
                 &[(idx, HighlightKind::Active)],
-                &[(idx, "i")],
+                &[(idx, "fill")],
                 format!(
                     "dp[{},{}]={} '{}' vs '{}' {}",
                     i,
@@ -16459,7 +16486,7 @@ fn viz_dp_edit_distance() -> Vec<VizFrame> {
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "fill")],
         format!(
             "Result: edit distance = {}. Time complexity: O(m * n).",
             dp[m][n_len]
@@ -16492,7 +16519,7 @@ fn viz_dp_knapsack_01() -> Vec<VizFrame> {
         }
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "fill")],
             format!(
                 "Item {} w={} v={} — dp[cap]={}",
                 i, weights[i], values[i], dp[cap]
@@ -16537,7 +16564,7 @@ fn viz_dp_longest_common_subseq() -> Vec<VizFrame> {
                 let idx = (i - 1).min(arr_len - 1);
                 v.ptrs(
                     &[(idx, HighlightKind::Found)],
-                    &[(idx, "i")],
+                    &[(idx, "fill")],
                     format!("Match '{}' dp[{},{}]={}", c1[i - 1], i, j, dp[i][j]),
                 );
             } else {
@@ -16547,7 +16574,7 @@ fn viz_dp_longest_common_subseq() -> Vec<VizFrame> {
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "fill")],
         format!(
             "Result: LCS length = {}. Time complexity: O(m * n).",
             dp[m][n_len]
@@ -16612,7 +16639,7 @@ fn viz_dp_palindrome_substrings() -> Vec<VizFrame> {
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "fill")],
         format!(
             "Result: {} palindromic substrings. Time complexity: O(n^2).",
             count
@@ -16634,7 +16661,7 @@ fn viz_dp_min_cost_climbing() -> Vec<VizFrame> {
         let idx = (i - 1).min(n - 1);
         v.ptrs(
             &[(idx, HighlightKind::Active)],
-            &[(idx, "i")],
+            &[(idx, "fill")],
             format!(
                 "dp[{}]=min({}+{}, {}+{})={}",
                 i,
@@ -16648,7 +16675,7 @@ fn viz_dp_min_cost_climbing() -> Vec<VizFrame> {
     }
     v.ptrs(
         &[(n - 1, HighlightKind::Found)],
-        &[(n - 1, "i")],
+        &[(n - 1, "fill")],
         format!("Result: min cost = {}. Time complexity: O(n).", dp[n]),
     );
     v.into_frames()
@@ -16683,7 +16710,7 @@ fn viz_dp_partition_equal_subset() -> Vec<VizFrame> {
         }
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "fill")],
             format!("Process {} — dp[target={}]={}", nums[i], target, dp[target]),
         );
     }
@@ -16733,7 +16760,7 @@ fn viz_dp_burst_balloons() -> Vec<VizFrame> {
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "fill")],
         format!(
             "Result: max coins = {}. Time complexity: O(n^3).",
             dp[0][m - 1]
@@ -16755,7 +16782,7 @@ fn viz_dp_max_profit_with_cooldown() -> Vec<VizFrame> {
     hold[0] = -prices[0];
     v.ptrs(
         &[(0, HighlightKind::Active)],
-        &[(0, "i")],
+        &[(0, "fill")],
         format!(
             "Day 0: buy stock at price {}. hold={} because we spent {} to acquire it.",
             prices[0], hold[0], prices[0]
@@ -16768,7 +16795,7 @@ fn viz_dp_max_profit_with_cooldown() -> Vec<VizFrame> {
         let best = sold[i].max(rest[i]);
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "fill")],
             format!(
                 "Day {} price={}: hold={} (best if we keep holding), sold={} (sell today), rest={} (cooldown). Pick best action.",
                 i, prices[i], hold[i], sold[i], rest[i]
@@ -16785,7 +16812,7 @@ fn viz_dp_max_profit_with_cooldown() -> Vec<VizFrame> {
     let result = sold[n - 1].max(rest[n - 1]);
     v.ptrs(
         &[(n - 1, HighlightKind::Found)],
-        &[(n - 1, "i")],
+        &[(n - 1, "fill")],
         format!(
             "Result: max profit = {}. Time O(n), space O(n) for the DP arrays.",
             result
@@ -17813,7 +17840,7 @@ fn viz_graph_repr_has_edge() -> Vec<VizFrame> {
     v.ptrs(
         &[],
         &[],
-        format!("Has Edge — check if edge ({},{}) exists", u, w),
+        format!("Goal: Check if edge ({},{}) exists in the graph. Strategy: Scan node {}'s neighbor list for node {}. O(degree) time.", u, w, u, w),
     );
 
     v.ptrs(
@@ -17883,7 +17910,7 @@ fn viz_graph_repr_count_edges() -> Vec<VizFrame> {
     v.ptrs(
         &[],
         &[],
-        "Count Edges — sum degrees / 2 for undirected graph".to_string(),
+        "Goal: Count total edges in an undirected graph. Strategy: Sum all node degrees and divide by 2 (each edge counted twice). O(V) time.".to_string(),
     );
 
     let mut total = 0;
@@ -17926,7 +17953,7 @@ fn viz_graph_repr_is_bipartite() -> Vec<VizFrame> {
     v.ptrs(
         &[],
         &[],
-        format!("Is Bipartite — 2-color BFS on {} nodes", n),
+        "Goal: Determine if the graph is bipartite (2-colorable). Strategy: BFS assigning alternating colors to neighbors. If a neighbor already has the same color, not bipartite. O(V+E).".to_string(),
     );
 
     let mut color_map = vec![-1i32; n];
@@ -17980,7 +18007,7 @@ fn viz_graph_repr_connected_components() -> Vec<VizFrame> {
     v.ptrs(
         &[],
         &[],
-        format!("Connected Components — {} nodes, find all components", n),
+        format!("Goal: Find all connected components in a graph with {} nodes. Strategy: DFS/BFS from each unvisited node -- each new start is a new component. O(V+E).", n),
     );
 
     let mut visited = vec![false; n];
@@ -18047,7 +18074,7 @@ fn viz_graph_repr_has_cycle_undirected() -> Vec<VizFrame> {
     v.ptrs(
         &[],
         &[],
-        format!("Has Cycle (Undirected) — DFS on {} nodes", n),
+        format!("Goal: Detect if the undirected graph with {} nodes contains a cycle. Strategy: DFS tracking parent -- a back edge to a visited non-parent node means a cycle exists. O(V+E).", n),
     );
 
     let mut visited = vec![false; n];
@@ -18125,7 +18152,7 @@ fn viz_graph_repr_has_cycle_directed() -> Vec<VizFrame> {
     v.ptrs(
         &[],
         &[],
-        format!("Has Cycle (Directed) — color DFS on {} nodes", n),
+        format!("Goal: Detect if the directed graph with {} nodes contains a cycle. Strategy: DFS with 3-color marking (white/gray/black) -- a back edge to a gray node means a cycle. O(V+E).", n),
     );
 
     // 0=white, 1=gray, 2=black
@@ -18216,7 +18243,7 @@ fn viz_graph_repr_transpose() -> Vec<VizFrame> {
     v.ptrs(
         &[],
         &[],
-        format!("Transpose Graph — reverse all edges in {} nodes", n),
+        format!("Goal: Build the transpose of a directed graph with {} nodes. Strategy: For each edge u->v, add edge v->u in the new graph. O(V+E).", n),
     );
 
     let mut trans = vec![vec![]; n];
@@ -18275,7 +18302,7 @@ fn viz_graph_repr_strongly_connected() -> Vec<VizFrame> {
     v.ptrs(
         &[],
         &[],
-        format!("Strongly Connected — Kosaraju on {} nodes", n),
+        format!("Goal: Find all strongly connected components in a directed graph with {} nodes. Strategy: Kosaraju's algorithm -- DFS to get finish order, then DFS on transpose in reverse finish order. O(V+E).", n),
     );
 
     // Pass 1: DFS finish order
@@ -18372,7 +18399,7 @@ fn viz_graph_repr_bridges() -> Vec<VizFrame> {
     v.ptrs(
         &[],
         &[],
-        format!("Bridges — find bridge edges in {} node graph", n),
+        format!("Goal: Find all bridge edges whose removal disconnects the graph ({} nodes). Strategy: Tarjan's DFS with disc/low arrays -- edge u-v is a bridge if low[v] > disc[u]. O(V+E).", n),
     );
 
     let mut disc = vec![0i32; n];
@@ -18458,7 +18485,7 @@ fn viz_graph_repr_articulation_points() -> Vec<VizFrame> {
     v.ptrs(
         &[],
         &[],
-        format!("Articulation Points — DFS on {} nodes", n),
+        format!("Goal: Find all articulation points whose removal disconnects the graph ({} nodes). Strategy: Tarjan's DFS with disc/low arrays -- node u is an articulation point if low[child] >= disc[u]. O(V+E).", n),
     );
 
     let mut disc = vec![0i32; n];
@@ -18552,7 +18579,7 @@ fn viz_graph_repr_euler_path() -> Vec<VizFrame> {
     v.ptrs(
         &[],
         &[],
-        format!("Euler Path — check odd-degree nodes in {} node graph", n),
+        format!("Goal: Determine if an Euler path exists in a {} node graph. Strategy: Count nodes with odd degree -- Euler path exists iff 0 or 2 nodes have odd degree. O(V).", n),
     );
 
     let mut odd_count = 0;
@@ -18610,7 +18637,7 @@ fn viz_graph_repr_graph_coloring() -> Vec<VizFrame> {
     v.ptrs(
         &[],
         &[],
-        format!("Graph Coloring — greedy coloring of {} nodes", n),
+        format!("Goal: Color the graph with minimum colors such that no adjacent nodes share a color ({} nodes). Strategy: Greedy -- assign each node the smallest color not used by its neighbors. O(V+E).", n),
     );
 
     let mut colors = vec![-1i32; n];
@@ -18719,7 +18746,7 @@ fn viz_divide_conquer_max_subarray() -> Vec<VizFrame> {
     let result = solve(&arr, 0, n - 1, &mut v);
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "lo")],
         format!(
             "Result: max subarray sum = {}. D&C approach runs in O(n log n). Kadane's does O(n).",
             result
@@ -18827,7 +18854,7 @@ fn viz_divide_conquer_quick_sort() -> Vec<VizFrame> {
                 arr.swap(i, j);
                 v.ptrs(
                     &[(i, HighlightKind::Swapping), (j, HighlightKind::Swapping)],
-                    &[(i, "i"), (j, "j")],
+                    &[(i, "lo"), (j, "hi")],
                     format!(
                         "Swap [{}]={} <-> [{}]={}. Moving smaller element to the left partition.",
                         i, arr[i], j, arr[j]
@@ -18876,7 +18903,7 @@ fn viz_divide_conquer_count_inversions() -> Vec<VizFrame> {
                 inversions += 1;
                 v.ptrs(
                     &[(i, HighlightKind::Comparing), (j, HighlightKind::Comparing)],
-                    &[(i, "i"), (j, "j")],
+                    &[(i, "lo"), (j, "hi")],
                     format!(
                         "Inversion found: [{}]={} > [{}]={}, total={}. Elements out of sorted order.",
                         i, arr[i], j, arr[j], inversions
@@ -18890,7 +18917,7 @@ fn viz_divide_conquer_count_inversions() -> Vec<VizFrame> {
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "lo")],
         format!("Result: {} inversions. More inversions = further from sorted. O(n^2) brute force, O(n log n) via merge sort.", inversions),
     );
     v.into_frames()
@@ -18927,7 +18954,7 @@ fn viz_divide_conquer_closest_pair() -> Vec<VizFrame> {
                 best_j = j;
                 v.ptrs(
                     &[(i, HighlightKind::Comparing), (j, HighlightKind::Comparing)],
-                    &[(i, "i"), (j, "j")],
+                    &[(i, "lo"), (j, "hi")],
                     format!(
                         "Distance({},{})={} — new closest pair. Updating best distance.",
                         points[i], points[j], dist
@@ -18974,13 +19001,13 @@ fn viz_divide_conquer_power() -> Vec<VizFrame> {
             result *= b;
             v.ptrs(
                 &[(idx, HighlightKind::Found)],
-                &[(idx, "i")],
+                &[(idx, "scan")],
                 format!("Exponent {} is odd: multiply result by base. result={}. Then square base and halve exp.", e, result),
             );
         } else {
             v.ptrs(
                 &[(idx, HighlightKind::Active)],
-                &[(idx, "i")],
+                &[(idx, "scan")],
                 format!(
                     "Exponent {} is even: just square base and halve exp. No multiply needed.",
                     e
@@ -18993,7 +19020,7 @@ fn viz_divide_conquer_power() -> Vec<VizFrame> {
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "scan")],
         format!(
             "Answer: {}^{} = {}. Time: O(log n) multiplications.",
             base, exp, result
@@ -19025,7 +19052,7 @@ fn viz_divide_conquer_majority_element() -> Vec<VizFrame> {
     let mut count = 1i32;
     v.ptrs(
         &[(0, HighlightKind::Pivot)],
-        &[(0, "i")],
+        &[(0, "scan")],
         format!(
             "Start: candidate={}, count=1. Increment on match, decrement on mismatch.",
             candidate
@@ -19037,7 +19064,7 @@ fn viz_divide_conquer_majority_element() -> Vec<VizFrame> {
             count = 1;
             v.ptrs(
                 &[(i, HighlightKind::Pivot)],
-                &[(i, "i")],
+                &[(i, "scan")],
                 format!(
                     "Count hit 0 — new candidate={}. Previous candidate got cancelled out.",
                     candidate
@@ -19047,21 +19074,21 @@ fn viz_divide_conquer_majority_element() -> Vec<VizFrame> {
             count += 1;
             v.ptrs(
                 &[(i, HighlightKind::Found)],
-                &[(i, "i")],
+                &[(i, "scan")],
                 format!("[{}]={} matches candidate. Count up to {}. Majority element survives > n/2 cancellations.", i, arr[i], count),
             );
         } else {
             count -= 1;
             v.ptrs(
                 &[(i, HighlightKind::Swapping)],
-                &[(i, "i")],
+                &[(i, "scan")],
                 format!("[{}]={} differs from candidate. Count down to {}. Non-majority elements cancel each other.", i, arr[i], count),
             );
         }
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "scan")],
         format!(
             "Result: majority element = {}. Boyer-Moore is O(n) time, O(1) space.",
             candidate
@@ -19097,7 +19124,7 @@ fn viz_divide_conquer_median_two_sorted() -> Vec<VizFrame> {
         let idx = (merged.len() - 1).min(arr_len - 1);
         v.ptrs(
             &[(idx, HighlightKind::Active)],
-            &[(idx, "i")],
+            &[(idx, "lo")],
             format!(
                 "Merging sorted arrays: {:?}. Take the smaller front element each step.",
                 merged
@@ -19119,7 +19146,7 @@ fn viz_divide_conquer_median_two_sorted() -> Vec<VizFrame> {
     };
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "lo")],
         format!(
             "Result: median = {}. Merge is O(m+n). Optimal is O(log min(m,n)).",
             median
@@ -19161,7 +19188,7 @@ fn viz_divide_conquer_kth_largest() -> Vec<VizFrame> {
             greater.push(arr[i]);
             v.ptrs(
                 &[(i, HighlightKind::Found)],
-                &[(i, "i")],
+                &[(i, "scan")],
                 format!(
                     "[{}]={} >= pivot={}. Goes to 'greater' partition.",
                     i, arr[i], pivot
@@ -19171,7 +19198,7 @@ fn viz_divide_conquer_kth_largest() -> Vec<VizFrame> {
             less.push(arr[i]);
             v.ptrs(
                 &[(i, HighlightKind::Active)],
-                &[(i, "i")],
+                &[(i, "scan")],
                 format!(
                     "[{}]={} < pivot={}. Goes to 'less' partition.",
                     i, arr[i], pivot
@@ -19182,7 +19209,7 @@ fn viz_divide_conquer_kth_largest() -> Vec<VizFrame> {
     let answer = sorted[(k - 1) as usize];
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "scan")],
         format!(
             "Result: {}th largest = {}. QuickSelect is O(n) avg, O(n^2) worst.",
             k, answer
@@ -19218,7 +19245,7 @@ fn viz_divide_conquer_skyline() -> Vec<VizFrame> {
         left_max = left_max.max(heights[i]);
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "lo")],
             format!(
                 "Left half: max height={} so far. Key points where height changes.",
                 left_max
@@ -19231,7 +19258,7 @@ fn viz_divide_conquer_skyline() -> Vec<VizFrame> {
         right_max = right_max.max(heights[i]);
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "lo")],
             format!(
                 "Right half: max height={} so far. Key points where height changes.",
                 right_max
@@ -19261,7 +19288,7 @@ fn viz_divide_conquer_different_ways_parens() -> Vec<VizFrame> {
     let expr = format!("{}{}{}{}{}", nums[0], op1, nums[1], op2, nums[2]);
     let arr = nums.clone();
     let mut v = VizLog::new(arr);
-    v.ptrs(&[], &[], format!("Different Ways Parens — \"{}\"", expr));
+    v.ptrs(&[], &[], format!("Goal: Compute all results from different ways to group sub-expressions. Strategy: D&C -- split at each operator, recursively evaluate left and right, combine all pairs. Expr: \"{}\"", expr));
 
     // ((a op1 b) op2 c)
     let left1 = match op1 {
@@ -19312,7 +19339,7 @@ fn viz_divide_conquer_different_ways_parens() -> Vec<VizFrame> {
     results.dedup();
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "lo")],
         format!(
             "Result: {:?}. All values from different groupings. Count grows as Catalan number.",
             results
@@ -19384,7 +19411,7 @@ fn viz_divide_conquer_longest_substring_k_distinct() -> Vec<VizFrame> {
     v.ptrs(
         &[],
         &[],
-        format!("Longest Substr K={} Distinct — \"{}\"", k, s),
+        format!("Goal: Find the longest substring with at most K={} distinct characters. Strategy: Sliding window -- expand right, shrink left when distinct > K. Input: \"{}\"", k, s),
     );
 
     let chars: Vec<char> = s.chars().collect();
@@ -19462,7 +19489,7 @@ fn viz_divide_conquer_beautiful_array() -> Vec<VizFrame> {
         let idx = i.min(n - 1);
         v.ptrs(
             &[(idx, HighlightKind::Active)],
-            &[(idx, "i")],
+            &[(idx, "mid")],
             format!(
                 "Position {}: place {}. Odds first, then evens prevents arithmetic triples.",
                 i, val
@@ -21247,7 +21274,7 @@ fn viz_graph_bfs_dfs_shortest_path_binary_matrix() -> Vec<VizFrame> {
     v.ptrs(
         &[],
         &[],
-        format!("Shortest Path Binary Matrix — {}x{} (0=open)", side, side),
+        format!("Goal: Find shortest path in a {}x{} binary matrix (0=open, 8-directional). Strategy: BFS from top-left, each step explores all 8 neighbors. O(n^2).", side, side),
     );
 
     let mut dist = vec![-1i32; n];
@@ -21360,7 +21387,7 @@ fn viz_intervals_merge() -> Vec<VizFrame> {
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "scan")],
         format!("Result: {:?}", merged),
     );
     v.into_frames()
@@ -21394,7 +21421,7 @@ fn viz_intervals_insert() -> Vec<VizFrame> {
             result.push((s, e));
             v.ptrs(
                 &[(idx, HighlightKind::Sorted)],
-                &[(idx, "i")],
+                &[(idx, "scan")],
                 format!(
                     "[{},{}] ends before new interval starts. Keep it as-is, no overlap.",
                     s, e
@@ -21432,7 +21459,7 @@ fn viz_intervals_insert() -> Vec<VizFrame> {
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "scan")],
         format!("Result: {:?}", result),
     );
     v.into_frames()
@@ -21461,13 +21488,13 @@ fn viz_intervals_non_overlapping_count() -> Vec<VizFrame> {
             end = e;
             v.ptrs(
                 &[(i, HighlightKind::Found)],
-                &[(i, "i")],
+                &[(i, "scan")],
                 format!("Take [{},{}] (ends earliest). count={}. Greedy: earliest end leaves most room for future intervals.", s, e, count),
             );
         } else {
             v.ptrs(
                 &[(i, HighlightKind::Swapping)],
-                &[(i, "i")],
+                &[(i, "scan")],
                 format!("Skip [{},{}] — overlaps previous (ends before {}). Taking it would reduce total count.", s, e, end),
             );
         }
@@ -21509,13 +21536,13 @@ fn viz_intervals_min_meeting_rooms() -> Vec<VizFrame> {
         max_rooms = max_rooms.max(ends.len());
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "scan")],
             format!("Meeting [{},{}] starts. {} rooms now in use. Need a new room if all existing ones are busy.", s, e, ends.len()),
         );
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "scan")],
         format!(
             "Answer: {} meeting rooms needed. Time: O(n log n).",
             max_rooms
@@ -21560,7 +21587,7 @@ fn viz_intervals_employee_free_time() -> Vec<VizFrame> {
             let idx = i.min(n - 1);
             v.ptrs(
                 &[(idx, HighlightKind::Found)],
-                &[(idx, "i")],
+                &[(idx, "scan")],
                 format!(
                     "Free time gap [{},{}]. No employee is working during this window.",
                     gap_s, gap_e
@@ -21572,7 +21599,7 @@ fn viz_intervals_employee_free_time() -> Vec<VizFrame> {
         if free.is_empty() {
             v.ptrs(
                 &[(i, HighlightKind::Active)],
-                &[(i, "i")],
+                &[(i, "scan")],
                 format!("Work [{},{}]", s, e),
             );
         }
@@ -21648,7 +21675,7 @@ fn viz_intervals_interval_list_intersections() -> Vec<VizFrame> {
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "scan")],
         format!("Result: {:?}", result),
     );
     v.into_frames()
@@ -21677,13 +21704,13 @@ fn viz_intervals_remove_covered() -> Vec<VizFrame> {
             max_end = e;
             v.ptrs(
                 &[(i, HighlightKind::Found)],
-                &[(i, "i")],
+                &[(i, "scan")],
                 format!("Keep [{},{}] — extends beyond max_end={}. Not covered by any previous interval.", s, e, max_end),
             );
         } else {
             v.ptrs(
                 &[(i, HighlightKind::Swapping)],
-                &[(i, "i")],
+                &[(i, "scan")],
                 format!("Remove [{},{}] — fully covered (end {} <= max_end={}). Another interval contains it entirely.", s, e, e, max_end),
             );
         }
@@ -21717,7 +21744,7 @@ fn viz_intervals_summary_ranges() -> Vec<VizFrame> {
             let idx = i.min(arr_len - 1);
             v.ptrs(
                 &[(idx, HighlightKind::Active)],
-                &[(idx, "i")],
+                &[(idx, "scan")],
                 format!(
                     "{} is consecutive (prev+1). Extend current range to [{},{}].",
                     nums[i], start, end
@@ -21728,7 +21755,7 @@ fn viz_intervals_summary_ranges() -> Vec<VizFrame> {
             let idx = (i - 1).min(arr_len - 1);
             v.ptrs(
                 &[(idx, HighlightKind::Found)],
-                &[(idx, "i")],
+                &[(idx, "scan")],
                 format!(
                     "Gap found. Close range [{},{}] and start a new one.",
                     start, end
@@ -21741,7 +21768,7 @@ fn viz_intervals_summary_ranges() -> Vec<VizFrame> {
     ranges.push((start, end));
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "scan")],
         format!("Result: {:?}", ranges),
     );
     v.into_frames()
@@ -21766,7 +21793,7 @@ fn viz_intervals_missing_ranges() -> Vec<VizFrame> {
             let idx = i.min(arr_len - 1);
             v.ptrs(
                 &[(idx, HighlightKind::Found)],
-                &[(idx, "i")],
+                &[(idx, "scan")],
                 format!(
                     "Gap found: [{},{}] is missing from the sequence.",
                     prev + 1,
@@ -21777,7 +21804,7 @@ fn viz_intervals_missing_ranges() -> Vec<VizFrame> {
             let idx = i.min(arr_len - 1);
             v.ptrs(
                 &[(idx, HighlightKind::Active)],
-                &[(idx, "i")],
+                &[(idx, "scan")],
                 format!(
                     "No gap before {} — consecutive with previous value.",
                     nums[i]
@@ -21823,7 +21850,7 @@ fn viz_intervals_data_stream_disjoint() -> Vec<VizFrame> {
         intervals = merged;
         v.ptrs(
             &[(step, HighlightKind::Active)],
-            &[(step, "i")],
+            &[(step, "scan")],
             format!(
                 "Add {} to stream. After merge: {:?}. Adjacent values collapse into ranges.",
                 val, intervals
@@ -21832,7 +21859,7 @@ fn viz_intervals_data_stream_disjoint() -> Vec<VizFrame> {
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "scan")],
         format!("Result: {:?}", intervals),
     );
     v.into_frames()
@@ -21855,7 +21882,7 @@ fn viz_intervals_my_calendar_i() -> Vec<VizFrame> {
             bookings.push((s, e));
             v.ptrs(
                 &[(idx, HighlightKind::Found)],
-                &[(idx, "i")],
+                &[(idx, "scan")],
                 format!(
                     "Book [{},{}] — accepted. No conflict with existing bookings.",
                     s, e
@@ -21864,7 +21891,7 @@ fn viz_intervals_my_calendar_i() -> Vec<VizFrame> {
         } else {
             v.ptrs(
                 &[(idx, HighlightKind::Swapping)],
-                &[(idx, "i")],
+                &[(idx, "scan")],
                 format!(
                     "Book [{},{}] — rejected. Overlaps with an existing booking (double booking).",
                     s, e
@@ -21900,7 +21927,7 @@ fn viz_intervals_my_calendar_ii() -> Vec<VizFrame> {
         if triple {
             v.ptrs(
                 &[(idx, HighlightKind::Swapping)],
-                &[(idx, "i")],
+                &[(idx, "scan")],
                 format!(
                     "Book [{},{}] — rejected. Would create triple booking at some time point.",
                     s, e
@@ -21917,7 +21944,7 @@ fn viz_intervals_my_calendar_ii() -> Vec<VizFrame> {
             bookings.push((s, e));
             v.ptrs(
                 &[(idx, HighlightKind::Found)],
-                &[(idx, "i")],
+                &[(idx, "scan")],
                 format!("Book [{},{}] — accepted", s, e),
             );
         }
@@ -21941,7 +21968,7 @@ fn viz_intervals_skyline() -> Vec<VizFrame> {
             key_points.push((i, max_h));
             v.ptrs(
                 &[(i, HighlightKind::Found)],
-                &[(i, "i")],
+                &[(i, "scan")],
                 format!(
                     "Skyline rises to height {} at position {}. New key point.",
                     max_h, i
@@ -21955,7 +21982,7 @@ fn viz_intervals_skyline() -> Vec<VizFrame> {
                 max_h = heights[i];
                 v.ptrs(
                     &[(i, HighlightKind::Active)],
-                    &[(i, "i")],
+                    &[(i, "scan")],
                     format!(
                         "Skyline drops to {} at position {}. Key point where height decreases.",
                         heights[i], i
@@ -21964,7 +21991,7 @@ fn viz_intervals_skyline() -> Vec<VizFrame> {
             } else {
                 v.ptrs(
                     &[(i, HighlightKind::Active)],
-                    &[(i, "i")],
+                    &[(i, "scan")],
                     format!(
                         "Height {} hidden behind max {}. No skyline change.",
                         heights[i], max_h
@@ -21975,7 +22002,7 @@ fn viz_intervals_skyline() -> Vec<VizFrame> {
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "scan")],
         format!("Result: {} key points", key_points.len()),
     );
     v.into_frames()
@@ -21995,7 +22022,7 @@ fn viz_intervals_rectangle_area() -> Vec<VizFrame> {
         total += area;
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "scan")],
             format!(
                 "Rectangle {}: {}x{} = area {}. Running total = {}.",
                 i, widths[i], heights[i], area, total
@@ -22004,7 +22031,7 @@ fn viz_intervals_rectangle_area() -> Vec<VizFrame> {
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "scan")],
         format!(
             "Result: total area = {}. O(n) time summing all rectangles.",
             total
@@ -22041,7 +22068,7 @@ fn viz_intervals_min_interval_query() -> Vec<VizFrame> {
                 let idx = i.min(arr_len - 1);
                 v.ptrs(
                     &[(idx, HighlightKind::Found)],
-                    &[(idx, "i")],
+                    &[(idx, "scan")],
                     format!("Query {}: contained in [{},{}] (size={}). Smallest containing interval found so far.", q, s, e, best),
                 );
                 break;
@@ -22051,7 +22078,7 @@ fn viz_intervals_min_interval_query() -> Vec<VizFrame> {
             let idx = qi.min(arr_len - 1);
             v.ptrs(
                 &[(idx, HighlightKind::Swapping)],
-                &[(idx, "i")],
+                &[(idx, "scan")],
                 format!("Query {}: no interval in the list contains this point.", q),
             );
         }
@@ -24789,13 +24816,13 @@ fn viz_segment_interval_scheduling() -> Vec<VizFrame> {
             end = e;
             v.ptrs(
                 &[(i, HighlightKind::Found)],
-                &[(i, "i")],
+                &[(i, "node")],
                 format!("Accept [{},{}]: starts at {} >= last end {}, so no overlap. Scheduled count = {}.", s, e, s, if count > 1 { end - (e - s) } else { 0 }, count),
             );
         } else {
             v.ptrs(
                 &[(i, HighlightKind::Active)],
-                &[(i, "i")],
+                &[(i, "node")],
                 format!("Reject [{},{}]: starts at {} < current end {}, so it overlaps a scheduled interval.", s, e, s, end),
             );
         }
@@ -25906,7 +25933,7 @@ fn viz_sparse_table_range_min() -> Vec<VizFrame> {
         table[0][i] = arr[i];
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "fill")],
             format!(
                 "Base level: ST[0][{}] = {} (ranges of length 1 are just the elements themselves).",
                 i, arr[i]
@@ -25921,7 +25948,7 @@ fn viz_sparse_table_range_min() -> Vec<VizFrame> {
                 let end = (i + len - 1).min(n - 1);
                 v.ptrs(
                     &[(i, HighlightKind::Active), (end, HighlightKind::Active)],
-                    &[(i, "i"), (end, "len")],
+                    &[(i, "L"), (end, "len")],
                     format!(
                         "ST[{}][{}] = min(ST[{}][{}], ST[{}][{}]) = min({}, {}) = {}. Covers range [{}, {}].",
                         j, i, j-1, i, j-1, i + (1 << (j-1)),
@@ -25965,7 +25992,7 @@ fn viz_sparse_table_range_max() -> Vec<VizFrame> {
         let idx = j.min(n - 1);
         v.ptrs(
             &[(idx, HighlightKind::Active)],
-            &[(idx, "j")],
+            &[(idx, "fill")],
             format!("Built sparse table level {} (ranges of length {}). Each entry combines two entries from level {} using max.", j, 1 << j, j - 1),
         );
     }
@@ -26003,7 +26030,7 @@ fn viz_sparse_table_range_gcd() -> Vec<VizFrame> {
     for i in 0..n {
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "fill")],
             format!("ST[0][{}]={}", i, arr[i]),
         );
     }
@@ -26012,7 +26039,7 @@ fn viz_sparse_table_range_gcd() -> Vec<VizFrame> {
         let g = gcd(arr[i], arr[i + 1]);
         v.ptrs(
             &[(i, HighlightKind::Active), (i + 1, HighlightKind::Active)],
-            &[(i, "i"), (i + 1, "j")],
+            &[(i, "L"), (i + 1, "R")],
             format!("Level 1: gcd({}, {}) = {}. Pairs of adjacent elements form the first non-trivial level.", arr[i], arr[i + 1], g),
         );
     }
@@ -26049,7 +26076,7 @@ fn viz_sparse_table_build() -> Vec<VizFrame> {
         table[0][i] = arr[i];
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "fill")],
             format!(
                 "Level 0 (base case): ST[0][{}] = {} (single element is its own minimum).",
                 i, arr[i]
@@ -26065,7 +26092,7 @@ fn viz_sparse_table_build() -> Vec<VizFrame> {
                 let end = (i + len - 1).min(n - 1);
                 v.ptrs(
                     &[(i, HighlightKind::Active), (end, HighlightKind::Active)],
-                    &[(i, "i"), (end, "len")],
+                    &[(i, "L"), (end, "len")],
                     format!("Level {}: ST[{}][{}] = {} covering span of {} elements. Computed from two level-{} entries.", j, j, i, table[j][i], len, j - 1),
                 );
             }
@@ -26121,7 +26148,7 @@ fn viz_sparse_table_range_and() -> Vec<VizFrame> {
     for i in 0..n {
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "fill")],
             format!("Element [{}] = {} (binary {:04b}). Each bit position contributes independently to the range AND result.", i, arr[i], arr[i]),
         );
     }
@@ -26151,7 +26178,7 @@ fn viz_sparse_table_range_or() -> Vec<VizFrame> {
     for i in 0..n {
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "fill")],
             format!(
                 "Element [{}] = {} ({:04b}). Each set bit contributes to the range OR result.",
                 i, arr[i], arr[i]
@@ -26183,12 +26210,12 @@ fn viz_sparse_table_idempotent() -> Vec<VizFrame> {
 
     v.ptrs(
         &[(0, HighlightKind::Active)],
-        &[(0, "i")],
+        &[(0, "fill")],
         "Key insight: min(a,a)=a, max(a,a)=a, gcd(a,a)=a. Applying the operation to an element with itself is harmless, so overlapping ranges give correct answers.".to_string(),
     );
     v.ptrs(
         &[(1, HighlightKind::Active)],
-        &[(1, "i")],
+        &[(1, "fill")],
         "Because overlapping is safe, we only need two precomputed ranges (of length 2^k) to cover any query range -- enabling O(1) queries.".to_string(),
     );
 
@@ -26255,7 +26282,7 @@ fn viz_sparse_table_lca_euler() -> Vec<VizFrame> {
     for i in 0..n {
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "fill")],
             format!("Euler tour position {}: depth = {}. The Euler tour visits each node multiple times as DFS enters/exits subtrees.", i, arr[i]),
         );
     }
@@ -26299,7 +26326,7 @@ fn viz_sparse_table_sliding_window_min() -> Vec<VizFrame> {
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "fill")],
         format!("Result: {:?}", result),
     );
     v.into_frames()
@@ -26319,7 +26346,7 @@ fn viz_sparse_table_kth_ancestor() -> Vec<VizFrame> {
     for i in 0..n {
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "fill")],
             format!("Node {} has parent {}. In binary lifting, we also precompute 2nd ancestor, 4th ancestor, etc.", i, parents[i]),
         );
     }
@@ -26333,7 +26360,7 @@ fn viz_sparse_table_kth_ancestor() -> Vec<VizFrame> {
         let idx = cur.min(n - 1);
         v.ptrs(
             &[(idx, HighlightKind::Found)],
-            &[(idx, "i")],
+            &[(idx, "fill")],
             format!(
                 "Jump step {}: move up to node {}. Each step follows a precomputed ancestor link.",
                 step + 1,
@@ -26366,7 +26393,7 @@ fn viz_sparse_table_range_freq() -> Vec<VizFrame> {
             count += 1;
             v.ptrs(
                 &[(i, HighlightKind::Found)],
-                &[(i, "i")],
+                &[(i, "fill")],
                 format!(
                     "[{}]={} matches target={}, count={}",
                     i, arr[i], target, count
@@ -26375,7 +26402,7 @@ fn viz_sparse_table_range_freq() -> Vec<VizFrame> {
         } else {
             v.ptrs(
                 &[(i, HighlightKind::Active)],
-                &[(i, "i")],
+                &[(i, "fill")],
                 format!("[{}]={} != target={}", i, arr[i], target),
             );
         }
@@ -26425,7 +26452,7 @@ fn viz_sparse_table_longest_equal_subarray() -> Vec<VizFrame> {
             cur_start = i;
             v.ptrs(
                 &[(i, HighlightKind::Active)],
-                &[(i, "i")],
+                &[(i, "fill")],
                 format!(
                     "[{}]={} differs from previous element. Start a new run of length 1.",
                     i, arr[i]
@@ -26470,7 +26497,7 @@ fn viz_sparse_table_distinct_in_range() -> Vec<VizFrame> {
         };
         v.ptrs(
             &[(i, kind)],
-            &[(i, "i")],
+            &[(i, "fill")],
             format!(
                 "[{}]={} {} distinct={}",
                 i,
@@ -26510,7 +26537,7 @@ fn viz_shortest_path_unweighted() -> Vec<VizFrame> {
     v.ptrs(
         &[(dst, HighlightKind::Target)],
         &[],
-        format!("Shortest Path (Unweighted) — BFS 0 to {}", dst),
+        format!("Goal: Find shortest path from node 0 to {} in an unweighted graph. Strategy: BFS -- each level is one edge away, first visit is shortest. O(V+E).", dst),
     );
 
     let mut dist = vec![-1i32; n];
@@ -26558,7 +26585,7 @@ fn viz_shortest_path_binary_grid() -> Vec<VizFrame> {
     v.ptrs(
         &[],
         &[],
-        format!("Binary Grid Shortest Path — {}x{}", side, side),
+        format!("Goal: Find shortest path from top-left to bottom-right in a {}x{} binary grid. Strategy: BFS with 8-directional movement on open cells. O(n^2).", side, side),
     );
 
     let mut dist = vec![-1i32; n];
@@ -26617,7 +26644,7 @@ fn viz_shortest_path_min_steps() -> Vec<VizFrame> {
     v.ptrs(
         &[],
         &[],
-        format!("Min Steps — BFS from 0 to {} in {} nodes", n - 1, n),
+        format!("Goal: Find minimum steps to reach node {} from 0 in {} nodes. Strategy: BFS -- each step moves +1 or -1. First arrival at target is the minimum. O(n).", n - 1, n),
     );
 
     let mut dist = vec![-1i32; n];
@@ -26671,7 +26698,7 @@ fn viz_shortest_path_network_delay() -> Vec<VizFrame> {
     v.ptrs(
         &[],
         &[],
-        format!("Network Delay — Dijkstra from node {}", src),
+        format!("Goal: Find the maximum shortest-path distance from node {} to all other nodes (network delay time). Strategy: Dijkstra's algorithm -- greedily finalize the nearest unvisited node. O(V^2) or O(E log V) with heap.", src),
     );
 
     let mut dist = vec![i32::MAX; n];
@@ -26748,10 +26775,7 @@ fn viz_shortest_path_city_fewest_neighbors() -> Vec<VizFrame> {
     v.ptrs(
         &[],
         &[],
-        format!(
-            "City Fewest Neighbors — Dijkstra + threshold on {} nodes",
-            n
-        ),
+        format!("Goal: Find the city with fewest reachable neighbors within a distance threshold ({} nodes). Strategy: Dijkstra from source, count nodes within threshold. O(V^2).", n),
     );
 
     let mut dist = vec![i32::MAX; n];
@@ -26823,7 +26847,7 @@ fn viz_shortest_path_dijkstra() -> Vec<VizFrame> {
     v.ptrs(
         &[(dst, HighlightKind::Target)],
         &[],
-        format!("Dijkstra — {} nodes, find shortest paths from 0", n),
+        format!("Goal: Find shortest paths from node 0 to all nodes in a weighted graph ({} nodes). Strategy: Dijkstra\'s algorithm -- greedily finalize nearest unvisited node and relax its edges. O(V^2) naive, O(E log V) with heap.", n),
     );
 
     let mut dist = vec![i32::MAX; n];
@@ -26907,7 +26931,7 @@ fn viz_shortest_path_bellman_ford() -> Vec<VizFrame> {
     v.ptrs(
         &[(dst, HighlightKind::Target)],
         &[],
-        format!("Bellman-Ford — {} nodes, relax all edges n-1 times", n),
+        format!("Goal: Find shortest paths from node 0 in a graph with {} nodes (handles negative weights). Strategy: Bellman-Ford -- relax all edges V-1 times. If any edge relaxes in round V, a negative cycle exists. O(V*E).", n),
     );
 
     let mut dist = vec![i32::MAX; n];
@@ -26979,7 +27003,7 @@ fn viz_shortest_path_cheapest_flights() -> Vec<VizFrame> {
     v.ptrs(
         &[],
         &[],
-        format!("Cheapest Flights — {} nodes, max {} stops", n, k),
+        format!("Goal: Find cheapest flight from source to destination with at most {} stops among {} nodes. Strategy: Bellman-Ford limited to k+1 rounds -- each round relaxes all edges once. O(V*E).", k, n),
     );
 
     let mut dist = vec![i32::MAX; n];
@@ -27039,7 +27063,7 @@ fn viz_shortest_path_path_with_min_effort() -> Vec<VizFrame> {
     v.ptrs(
         &[],
         &[],
-        format!("Path with Min Effort — {}x{} grid", side, side),
+        format!("Goal: Find path from top-left to bottom-right minimizing the maximum elevation difference between adjacent cells ({}x{} grid). Strategy: Binary search on effort + BFS, or Dijkstra on elevation differences. O(n^2 log n).", side, side),
     );
 
     // Binary search on effort
@@ -27108,7 +27132,7 @@ fn viz_shortest_path_maze() -> Vec<VizFrame> {
     v.ptrs(
         &[],
         &[],
-        format!("Maze — BFS shortest path {}x{}", side, side),
+        format!("Goal: Find shortest path through a {}x{} maze (0=open, 1=wall). Strategy: BFS from start -- first time we reach the exit is the shortest path. O(n^2).", side, side),
     );
 
     let mut dist = vec![-1i32; n];
@@ -27167,7 +27191,7 @@ fn viz_shortest_path_floyd_warshall() -> Vec<VizFrame> {
     v.ptrs(
         &[],
         &[],
-        format!("Floyd-Warshall — all pairs shortest path on {} nodes", n),
+        format!("Goal: Compute shortest paths between all pairs of {} nodes. Strategy: Floyd-Warshall DP -- for each intermediate node k, try improving dist[i][j] via dist[i][k]+dist[k][j]. O(V^3).", n),
     );
 
     let inf = 1000i32;
@@ -27227,7 +27251,7 @@ fn viz_shortest_path_k_shortest() -> Vec<VizFrame> {
     v.ptrs(
         &[],
         &[],
-        format!("K Shortest Paths — find {} shortest 0->{}", k, n - 1),
+        format!("Goal: Find the {} shortest paths from node 0 to node {}. Strategy: Modified Dijkstra allowing each node to be visited up to k times. O(E*k*log(V*k)).", k, n - 1),
     );
 
     // Simulate finding paths using modified Dijkstra
@@ -27295,7 +27319,7 @@ fn viz_shortest_path_minimum_cost_connect_all() -> Vec<VizFrame> {
     v.ptrs(
         &[],
         &[],
-        format!("Min Cost Connect All — Prim's on {} nodes", n),
+        format!("Goal: Find minimum cost to connect all {} nodes into a single component. Strategy: Prim's algorithm -- grow MST by always adding the cheapest edge crossing the cut. O(V^2).", n),
     );
 
     let mut in_mst = vec![false; n];
@@ -27357,7 +27381,7 @@ fn viz_shortest_path_reconstruct() -> Vec<VizFrame> {
     v.ptrs(
         &[],
         &[],
-        format!("Reconstruct Path — BFS 0 to {} with parent tracking", n - 1),
+        format!("Goal: Find and reconstruct the shortest path from node 0 to node {}. Strategy: BFS with parent array -- trace back from destination to source to recover the path. O(V+E).", n - 1),
     );
 
     let dst = n - 1;
@@ -27422,7 +27446,7 @@ fn viz_shortest_path_with_alternating_colors() -> Vec<VizFrame> {
     v.ptrs(
         &[],
         &[],
-        format!("Alternating Colors — BFS with color state on {} nodes", n),
+        format!("Goal: Find shortest paths using alternating red/blue edges in a {} node graph. Strategy: BFS with (node, color) state -- each step alternates edge color. O(V+E).", n),
     );
 
     // BFS with color dimension (0=red, 1=blue)
@@ -27486,7 +27510,7 @@ fn viz_monotonic_next_greater() -> Vec<VizFrame> {
                 result[top_idx] = nums[i];
                 v.ptrs(
                     &[(top_idx, HighlightKind::Found), (i, HighlightKind::Active)],
-                    &[(top_idx, "i"), (i, "top")],
+                    &[(top_idx, "pop"), (i, "scan")],
                     format!("Pop {} from stack: current element {} > {}, so {} is the next greater element for {}.", nums[top_idx], nums[i], nums[top_idx], nums[i], nums[top_idx]),
                 );
             } else {
@@ -27521,7 +27545,7 @@ fn viz_monotonic_daily_temperatures() -> Vec<VizFrame> {
                 answer[top] = (i - top) as i32;
                 v.ptrs(
                     &[(top, HighlightKind::Found), (i, HighlightKind::Active)],
-                    &[(top, "i"), (i, "top")],
+                    &[(top, "pop"), (i, "scan")],
                     format!(
                         "Day {} ({}F) is warmer than day {} ({}F). Day {} waited {} days for warmer weather.",
                         i, temps[i], top, temps[top], top, answer[top]
@@ -27650,7 +27674,7 @@ fn viz_monotonic_trapping_rain_water() -> Vec<VizFrame> {
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "scan")],
         format!("Answer: {} units of water trapped. Time: O(n).", water),
     );
     v.into_frames()
@@ -27733,7 +27757,7 @@ fn viz_monotonic_remove_k_digits() -> Vec<VizFrame> {
     let result: String = stack.iter().map(|(_, d)| d.to_string()).collect();
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "scan")],
         format!("Result: \"{}\"", result),
     );
     v.into_frames()
@@ -27781,7 +27805,7 @@ fn viz_monotonic_sum_subarray_mins() -> Vec<VizFrame> {
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "scan")],
         format!(
             "Answer: sum of all subarray minimums = {} (mod 10^9+7). Time: O(n).",
             total
@@ -27804,7 +27828,7 @@ fn viz_monotonic_max_width_ramp() -> Vec<VizFrame> {
             stack.push(i);
             v.ptrs(
                 &[(i, HighlightKind::Active)],
-                &[(i, "i")],
+                &[(i, "scan")],
                 format!("Push [{}]={} to candidate stack. Only push if value is strictly decreasing -- larger values cannot be optimal left endpoints.", i, arr[i]),
             );
         }
@@ -27825,7 +27849,7 @@ fn viz_monotonic_max_width_ramp() -> Vec<VizFrame> {
                 stack.pop();
                 v.ptrs(
                     &[(top, HighlightKind::Found), (j, HighlightKind::Found)],
-                    &[(top, "i"), (j, "top")],
+                    &[(top, "scan"), (j, "scan")],
                     format!("Found ramp: a[{}]={} <= a[{}]={}, width = {}. Pop {} from stack since any future j will be smaller.", top, arr[top], j, arr[j], width, arr[top]),
                 );
             } else {
@@ -27838,7 +27862,7 @@ fn viz_monotonic_max_width_ramp() -> Vec<VizFrame> {
             (best_i, HighlightKind::Found),
             (best_j, HighlightKind::Found),
         ],
-        &[(best_i, "i"), (best_j, "j")],
+        &[(best_i, "scan"), (best_j, "j")],
         format!(
             "Answer: maximum width ramp = {} (indices {} to {}). Time: O(n).",
             max_width, best_i, best_j
@@ -27877,7 +27901,7 @@ fn viz_monotonic_shortest_subarray_sum_k() -> Vec<VizFrame> {
             let idx = j.min(n - 1);
             v.ptrs(
                 &[(idx, HighlightKind::Found)],
-                &[(idx, "i")],
+                &[(idx, "scan")],
                 format!("Valid subarray found: [{},{}] has sum >= {} with length {}. Dequeue front {} since future subarrays starting here would only be longer.", j, i - 1, k, len, j),
             );
         }
@@ -27940,7 +27964,7 @@ fn viz_monotonic_sliding_window_max() -> Vec<VizFrame> {
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "scan")],
         format!(
             "Answer: sliding window maximums = {:?}. Time: O(n).",
             result
@@ -27967,7 +27991,7 @@ fn viz_monotonic_next_greater_ii() -> Vec<VizFrame> {
                         result[top] = nums[i];
                         v.ptrs(
                             &[(top, HighlightKind::Found), (i, HighlightKind::Active)],
-                            &[(top, "i"), (i, "top")],
+                            &[(top, "pop"), (i, "scan")],
                             format!(
                                 "Pass {} NGE of [{}]={} is {}",
                                 pass + 1,
@@ -28010,7 +28034,7 @@ fn viz_monotonic_buildings_ocean_view() -> Vec<VizFrame> {
         } else {
             v.ptrs(
                 &[(i, HighlightKind::Active)],
-                &[(i, "i")],
+                &[(i, "scan")],
                 format!("[{}] height={} <= max_right={}, so this building is BLOCKED and cannot see the ocean.", i, heights[i], max_so_far),
             );
         }
@@ -28018,7 +28042,7 @@ fn viz_monotonic_buildings_ocean_view() -> Vec<VizFrame> {
     result.reverse();
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "scan")],
         format!(
             "Answer: buildings {:?} have ocean view. Time: O(n).",
             result
@@ -28041,7 +28065,7 @@ fn viz_monotonic_132_pattern() -> Vec<VizFrame> {
         if arr[i] < s3 {
             v.ptrs(
                 &[(i, HighlightKind::Found)],
-                &[(i, "i")],
+                &[(i, "scan")],
                 format!("Found the \"1\"! a[{}]={} < s3={} (the \"2\"). There exists j,k to the right forming a 132 pattern.", i, arr[i], s3),
             );
             found = true;
@@ -28103,13 +28127,13 @@ fn viz_monotonic_max_chunks_sorted() -> Vec<VizFrame> {
         }
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "scan")],
             format!("[{}]={}: after processing, we can form {} independent chunks so far. Each chunk's max fits within its range.", i, arr[i], stack.len()),
         );
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "scan")],
         format!("Answer: maximum {} chunks. Time: O(n).", stack.len()),
     );
     v.into_frames()
@@ -28128,7 +28152,7 @@ fn viz_monotonic_max_binary_string() -> Vec<VizFrame> {
     if let Some(fz) = first_zero {
         v.ptrs(
             &[(fz, HighlightKind::Active)],
-            &[(fz, "i")],
+            &[(fz, "scan")],
             format!("First 0 at position {}", fz),
         );
         // Count zeros from first_zero onward
@@ -28143,19 +28167,19 @@ fn viz_monotonic_max_binary_string() -> Vec<VizFrame> {
         let idx = target_pos.min(n - 1);
         v.ptrs(
             &[(idx, HighlightKind::Pivot)],
-            &[(idx, "i")],
+            &[(idx, "scan")],
             format!("Move {} zeros to pos {}", zeros, target_pos),
         );
         let res: String = result.iter().map(|x| x.to_string()).collect();
         v.ptrs(
             &[(0, HighlightKind::Found)],
-            &[(0, "i")],
+            &[(0, "scan")],
             format!("Result: \"{}\"", res),
         );
     } else {
         v.ptrs(
             &[(0, HighlightKind::Found)],
-            &[(0, "i")],
+            &[(0, "scan")],
             format!("Already max: \"{}\"", s),
         );
     }
@@ -28182,7 +28206,7 @@ fn viz_mst_min_cost_connect() -> Vec<VizFrame> {
     v.ptrs(
         &[],
         &[],
-        format!("Min Cost Connect — Prim's MST on {}x{} grid", rows, cols),
+        format!("Goal: Find minimum cost to connect all nodes using Prim's MST on a {}x{} grid. Strategy: Greedily add the cheapest edge connecting an MST node to a non-MST node. O(V^2).", rows, cols),
     );
 
     let mut in_mst = vec![false; n];
@@ -28243,10 +28267,7 @@ fn viz_mst_is_tree() -> Vec<VizFrame> {
     v.ptrs(
         &[],
         &[],
-        format!(
-            "Is Tree — check {}x{} grid: connected + no cycle",
-            rows, cols
-        ),
+        format!("Goal: Determine if a {}x{} grid graph is a tree. Strategy: Check two conditions -- (1) the graph is connected (BFS reaches all nodes) and (2) edges == nodes - 1. O(V+E).", rows, cols),
     );
 
     let mut edge_count = 0;
@@ -28363,7 +28384,7 @@ fn viz_mst_min_spanning_weight() -> Vec<VizFrame> {
     v.ptrs(
         &[],
         &[],
-        format!("Min Spanning Weight — Kruskal on {}x{} grid", rows, cols),
+        format!("Goal: Find the total weight of the minimum spanning tree on a {}x{} grid. Strategy: Kruskal's algorithm -- sort edges by weight, add if it connects two different components (Union-Find). O(E log E).", rows, cols),
     );
 
     let mut parent: Vec<usize> = (0..n).collect();
@@ -28429,7 +28450,7 @@ fn viz_mst_max_edge_in_mst() -> Vec<VizFrame> {
     v.ptrs(
         &[],
         &[],
-        format!("Max Edge in MST — Kruskal on {}x{} grid", rows, cols),
+        format!("Goal: Find the maximum weight edge in the MST of a {}x{} grid. Strategy: Kruskal's algorithm -- the last MST edge added (heaviest in MST) is the answer. O(E log E).", rows, cols),
     );
 
     let mut parent: Vec<usize> = (0..n).collect();
@@ -28484,12 +28505,7 @@ fn viz_mst_kruskal() -> Vec<VizFrame> {
     v.ptrs(
         &[],
         &[],
-        format!(
-            "Kruskal's MST — {}x{} grid, {} edges",
-            rows,
-            cols,
-            edges.len()
-        ),
+        format!("Goal: Build MST of a {}x{} grid using Kruskal's algorithm ({} edges). Strategy: Sort edges by weight, greedily add cheapest non-cycle edge using Union-Find. O(E log E).", rows, cols, edges.len()),
     );
 
     let mut parent: Vec<usize> = (0..n).collect();
@@ -28791,10 +28807,7 @@ fn viz_mst_max_spanning_tree() -> Vec<VizFrame> {
     v.ptrs(
         &[],
         &[],
-        format!(
-            "Max Spanning Tree — reverse Kruskal on {}x{} grid",
-            rows, cols
-        ),
+        format!("Goal: Find the maximum spanning tree of a {}x{} grid. Strategy: Reverse Kruskal -- sort edges descending by weight, greedily add heaviest non-cycle edge. O(E log E).", rows, cols),
     );
 
     let mut parent: Vec<usize> = (0..n).collect();
@@ -28849,7 +28862,7 @@ fn viz_mst_min_bottleneck_path() -> Vec<VizFrame> {
     v.ptrs(
         &[],
         &[],
-        format!("Min Bottleneck Path — MST on {}x{} grid", rows, cols),
+        format!("Goal: Find the path from 0 to n-1 minimizing the heaviest edge (bottleneck) on a {}x{} grid. Strategy: Add edges in weight order (Kruskal's) until source and destination are connected. O(E log E).", rows, cols),
     );
 
     let mut parent: Vec<usize> = (0..n).collect();
@@ -28903,10 +28916,7 @@ fn viz_mst_optimize_network() -> Vec<VizFrame> {
     v.ptrs(
         &[],
         &[],
-        format!(
-            "Optimize Network — MST removes redundant edges, {}x{} grid",
-            rows, cols
-        ),
+        format!("Goal: Optimize a {}x{} grid network by removing redundant edges while keeping connectivity. Strategy: Build MST using Prim\'s -- MST edges are the minimum needed to stay connected. O(V^2).", rows, cols),
     );
 
     let mut in_mst = vec![false; n];
@@ -28994,10 +29004,7 @@ fn viz_mst_steiner_tree() -> Vec<VizFrame> {
     v.ptrs(
         &[],
         &[],
-        format!(
-            "Steiner Tree — connect terminals {:?} in {}x{} grid",
-            terminals, rows, cols
-        ),
+        format!("Goal: Find minimum-cost tree connecting terminals {:?} in a {}x{} grid. Strategy: Approximate Steiner tree by greedily connecting each terminal to the nearest already-connected terminal. NP-hard exact, O(V^2) approx.", terminals, rows, cols),
     );
 
     // Approximate: MST of terminals using shortest paths
@@ -29120,13 +29127,13 @@ fn viz_bits_single_number() -> Vec<VizFrame> {
         xor ^= arr[i];
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "num")],
             format!("XOR with element [{}]={}: running XOR = {}. Paired elements cancel to 0, so only the single number survives.", i, arr[i], xor),
         );
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "num")],
         format!(
             "Answer: the single number is {}. Time: O(n), Space: O(1).",
             xor
@@ -29146,14 +29153,14 @@ fn viz_bits_count_ones() -> Vec<VizFrame> {
         let bits = arr[i].count_ones();
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "num")],
             format!("Element [{}] = {} (binary {:04b}) has {} set bits. Each 1-bit contributes to the total Hamming weight.", i, arr[i], arr[i], bits),
         );
     }
     let total: u32 = arr.iter().map(|x| x.count_ones()).sum();
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "num")],
         format!(
             "Answer: {} total set bits across all elements. Time: O(n).",
             total
@@ -29178,7 +29185,7 @@ fn viz_bits_power_of_two() -> Vec<VizFrame> {
         };
         v.ptrs(
             &[(i, kind)],
-            &[(i, "i")],
+            &[(i, "num")],
             format!(
                 "[{}]={} ({:04b}) & {} ({:04b}) = {} — {}",
                 i,
@@ -29206,7 +29213,7 @@ fn viz_bits_reverse_bits() -> Vec<VizFrame> {
         let reversed = ((val & 1) << 3) | ((val & 2) << 1) | ((val & 4) >> 1) | ((val & 8) >> 3);
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "num")],
             format!(
                 "[{}]={} ({:04b}) -> {} ({:04b})",
                 i, val, val, reversed, reversed
@@ -29237,14 +29244,14 @@ fn viz_bits_missing_number() -> Vec<VizFrame> {
         xor ^= i as i32;
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "num")],
             format!("XOR [{}]={} with idx={} result={}", i, arr[i], i, xor),
         );
     }
     xor ^= arr_len as i32;
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "num")],
         format!("Answer: missing number = {}. Time: O(n), Space: O(1).", xor),
     );
     v.into_frames()
@@ -29262,14 +29269,14 @@ fn viz_bits_bitwise_and_range() -> Vec<VizFrame> {
     let mut result = arr[l];
     v.ptrs(
         &[(l, HighlightKind::Active)],
-        &[(l, "i")],
+        &[(l, "num")],
         format!("Start with [{}]={} ({:04b})", l, arr[l], arr[l]),
     );
     for i in l + 1..=r {
         result &= arr[i];
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "num")],
             format!(
                 "AND [{}]={} ({:04b}) result={} ({:04b})",
                 i, arr[i], arr[i], result, result
@@ -29301,13 +29308,13 @@ fn viz_bits_total_hamming_distance() -> Vec<VizFrame> {
         let idx = bit.min(n - 1);
         v.ptrs(
             &[(idx, HighlightKind::Active)],
-            &[(idx, "i")],
+            &[(idx, "bit")],
             format!("Bit position {}: {} numbers have this bit set, {} do not. Each (0,1) pair contributes 1 to Hamming distance, so this bit adds {} to the total.", bit, ones, zeros, contrib),
         );
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "bit")],
         format!(
             "Answer: total Hamming distance = {}. Time: O(n * 32) = O(n).",
             total
@@ -29347,13 +29354,13 @@ fn viz_bits_single_number_ii() -> Vec<VizFrame> {
         twos &= !common;
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "num")],
             format!("Process [{}]={}: ones={}, twos={}. Bits appearing once are in \"ones\", twice in \"twos\", three times get cleared from both.", i, arr[i], ones, twos),
         );
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "num")],
         format!(
             "Answer: the single element = {}. Time: O(n), Space: O(1).",
             ones
@@ -29392,7 +29399,7 @@ fn viz_bits_single_number_iii() -> Vec<VizFrame> {
         xor_all ^= arr[i];
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "num")],
             format!("XOR [{}]={} total={}", i, arr[i], xor_all),
         );
     }
@@ -29408,7 +29415,7 @@ fn viz_bits_single_number_iii() -> Vec<VizFrame> {
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "num")],
         format!(
             "Answer: the two unique numbers are {} and {}. Time: O(n), Space: O(1).",
             group1, group2
@@ -29429,7 +29436,7 @@ fn viz_bits_counting_bits() -> Vec<VizFrame> {
         let bits = (i as u32).count_ones();
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "num")],
             format!("{} = {:04b} has {} ones", i, i, bits),
         );
     }
@@ -29493,7 +29500,7 @@ fn viz_bits_max_xor_two() -> Vec<VizFrame> {
                 best_j = j;
                 v.ptrs(
                     &[(i, HighlightKind::Comparing), (j, HighlightKind::Comparing)],
-                    &[(i, "i"), (j, "j")],
+                    &[(i, "num"), (j, "j")],
                     format!("{}^{}={} new max", arr[i], arr[j], xor),
                 );
             }
@@ -29504,7 +29511,7 @@ fn viz_bits_max_xor_two() -> Vec<VizFrame> {
             (best_i, HighlightKind::Found),
             (best_j, HighlightKind::Found),
         ],
-        &[(best_i, "i"), (best_j, "j")],
+        &[(best_i, "num"), (best_j, "j")],
         format!(
             "Result: max XOR = {} ({}^{})",
             max_xor, arr[best_i], arr[best_j]
@@ -29525,7 +29532,7 @@ fn viz_bits_divide_without_operator() -> Vec<VizFrame> {
     v.ptrs(
         &[],
         &[],
-        format!("Divide {} / {} without / operator", dividend, divisor),
+        format!("Goal: Divide {} by {} without using the division operator. Strategy: Use bit shifting -- repeatedly subtract the largest power-of-2 multiple of divisor from dividend. O(log^2 n) time.", dividend, divisor),
     );
 
     let mut quotient = 0i32;
@@ -29542,7 +29549,7 @@ fn viz_bits_divide_without_operator() -> Vec<VizFrame> {
         step += 1;
         v.ptrs(
             &[(idx, HighlightKind::Active)],
-            &[(idx, "i")],
+            &[(idx, "bit")],
             format!(
                 "Sub {}<<{}={} remain={} q={}",
                 divisor,
@@ -29558,7 +29565,7 @@ fn viz_bits_divide_without_operator() -> Vec<VizFrame> {
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "bit")],
         format!(
             "Result: {}/{} = {} rem {}",
             dividend, divisor, quotient, remain
@@ -29595,7 +29602,7 @@ fn viz_bits_utf8_validation() -> Vec<VizFrame> {
         };
         v.ptrs(
             &[(i, kind)],
-            &[(i, "i")],
+            &[(i, "num")],
             format!(
                 "[{}]={} ({:08b}) {}bytes {}",
                 i,
@@ -29609,7 +29616,7 @@ fn viz_bits_utf8_validation() -> Vec<VizFrame> {
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "num")],
         "UTF-8 validation complete".to_string(),
     );
     v.into_frames()
@@ -29627,7 +29634,7 @@ fn viz_bits_gray_code() -> Vec<VizFrame> {
         let idx = i as usize;
         v.ptrs(
             &[(idx, HighlightKind::Active)],
-            &[(idx, "i")],
+            &[(idx, "num")],
             format!("{} -> gray {} ({:03b})", i, gray, gray),
         );
     }
@@ -29797,10 +29804,7 @@ fn viz_union_find_redundant_connection() -> Vec<VizFrame> {
     v.ptrs(
         &[],
         &[],
-        format!(
-            "Redundant Connection — {}x{} grid, find extra edge",
-            rows, cols
-        ),
+        format!("Goal: Find the redundant edge whose removal makes the {}x{} grid a tree (no cycles). Strategy: Union-Find -- process edges in order; the first edge connecting two already-connected nodes is redundant. O(E * alpha(V)).", rows, cols),
     );
 
     // Collect edges from grid adjacency + one extra edge
@@ -29861,10 +29865,7 @@ fn viz_union_find_earliest_connection() -> Vec<VizFrame> {
     v.ptrs(
         &[],
         &[],
-        format!(
-            "Earliest Connection — {} nodes, process timestamped edges",
-            n
-        ),
+        format!("Goal: Find the earliest time when all {} nodes become connected. Strategy: Process timestamped edges in order, union endpoints. All connected when component count reaches 1. O(E * alpha(V)).", n),
     );
 
     let mut components = n;
@@ -29967,7 +29968,7 @@ fn viz_union_find_num_islands_ii() -> Vec<VizFrame> {
     v.ptrs(
         &[],
         &[],
-        format!("Num Islands II — add land to {}x{} grid", rows, cols),
+        format!("Goal: Count islands after each land addition in a {}x{} grid. Strategy: Union-Find -- each new land cell starts as its own island, then merge with adjacent land cells. O(ops * alpha(n)).", rows, cols),
     );
 
     let mut grid = vec![0i32; n];
@@ -30031,7 +30032,7 @@ fn viz_union_find_satisfiability() -> Vec<VizFrame> {
     v.ptrs(
         &[],
         &[],
-        format!("Satisfiability — {} variables, check equations", n),
+        format!("Goal: Check if equality/inequality constraints among {} variables are satisfiable. Strategy: Union-Find -- process equalities first (union), then check inequalities (same root = contradiction). O(n * alpha(n)).", n),
     );
 
     // Process equalities first
@@ -30102,7 +30103,7 @@ fn viz_union_find_regions_by_slashes() -> Vec<VizFrame> {
     v.ptrs(
         &[],
         &[],
-        format!("Regions by Slashes — {}x{} grid", side, side),
+        format!("Goal: Count distinct regions in a {}x{} grid divided by slash characters. Strategy: Split each cell into 4 triangles, use Union-Find to merge triangles based on slashes and adjacency. O(n^2 * alpha(n)).", side, side),
     );
 
     // Each cell split into 4 triangles
@@ -30166,7 +30167,7 @@ fn viz_union_find_longest_consecutive() -> Vec<VizFrame> {
     v.ptrs(
         &[],
         &[],
-        format!("Longest Consecutive — UF on {} values", n),
+        format!("Goal: Find the longest consecutive sequence among {} values. Strategy: Union-Find -- for each value, union with value-1 and value+1 if present. Track component sizes. O(n * alpha(n)).", n),
     );
 
     let mut parent: Vec<usize> = (0..n).collect();
@@ -30230,7 +30231,7 @@ fn viz_union_find_number_of_islands_removal() -> Vec<VizFrame> {
     v.ptrs(
         &[],
         &[],
-        format!("Islands After Removal — {}x{} grid", rows, cols),
+        format!("Goal: Count islands after removing land cells from a {}x{} grid. Strategy: Union-Find to count initial islands, then rebuild after removals. O(n * alpha(n)).", rows, cols),
     );
 
     // Count initial islands
@@ -30309,7 +30310,7 @@ fn viz_union_find_swim_in_water() -> Vec<VizFrame> {
     v.ptrs(
         &[],
         &[],
-        format!("Swim in Water (UF) — {}x{} elevations", side, side),
+        format!("Goal: Find minimum time to swim from top-left to bottom-right in a {}x{} elevation grid. Strategy: Process cells in elevation order, union adjacent active cells. Connected when source reaches destination. O(n^2 * alpha(n)).", side, side),
     );
 
     let mut order: Vec<usize> = (0..n).collect();
@@ -30483,7 +30484,7 @@ fn viz_union_find_checking_existence_edge_length() -> Vec<VizFrame> {
     v.ptrs(
         &[],
         &[],
-        format!("Edge Length Queries — {}x{} grid, sorted edges", rows, cols),
+        format!("Goal: Answer reachability queries with edge weight limits on a {}x{} grid. Strategy: Sort edges by weight and queries by limit. Process edges up to each query limit using Union-Find. O((E+Q) log E).", rows, cols),
     );
 
     // Process queries: can a reach b using edges <= limit?
@@ -30556,7 +30557,7 @@ fn viz_string_algo_pattern_match() -> Vec<VizFrame> {
     v.ptrs(
         &[],
         &[],
-        format!("Pattern Match \"{}\" in \"{}\"", pat, text),
+        format!("Goal: Find all occurrences of pattern \"{}\" in text \"{}\". Strategy: Brute force -- slide pattern across text, check each position. O(n*m) time.", pat, text),
     );
 
     let pat_chars: Vec<char> = pat.chars().collect();
@@ -30570,14 +30571,14 @@ fn viz_string_algo_pattern_match() -> Vec<VizFrame> {
                 .collect();
             v.ptrs(
                 &hl,
-                &[(i, "i"), (i + pat_len - 1, "j")],
+                &[(i, "text"), (i + pat_len - 1, "pat")],
                 format!("Match at position {}", i),
             );
             found = true;
         } else {
             v.ptrs(
                 &[(i, HighlightKind::Active)],
-                &[(i, "i")],
+                &[(i, "text")],
                 format!("No match at {}", i),
             );
         }
@@ -30623,7 +30624,7 @@ fn viz_string_algo_kmp() -> Vec<VizFrame> {
     }
     v.ptrs(
         &[(0, HighlightKind::Active)],
-        &[(0, "i")],
+        &[(0, "text")],
         format!("Failure function computed: {:?}. fail[i] = length of longest proper prefix of pattern[0..i] that is also a suffix. This enables O(1) fallback on mismatch.", fail),
     );
 
@@ -30639,7 +30640,7 @@ fn viz_string_algo_kmp() -> Vec<VizFrame> {
         }
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "text")],
             format!(
                 "Compare text[{}]='{}' with pattern position {}. Matched {} chars so far. On mismatch, fall back using failure function instead of restarting.",
                 i, text_chars[i], j, j
@@ -30650,7 +30651,7 @@ fn viz_string_algo_kmp() -> Vec<VizFrame> {
             let hl: Vec<_> = (start..=i).map(|k| (k, HighlightKind::Found)).collect();
             v.ptrs(
                 &hl,
-                &[(start, "i"), (i, "j")],
+                &[(start, "text"), (i, "pat")],
                 format!("KMP match found at position {}! Pattern fully matched. Use failure function to continue searching for overlapping matches.", start),
             );
             j = fail[j - 1];
@@ -30678,7 +30679,7 @@ fn viz_string_algo_rabin_karp() -> Vec<VizFrame> {
     let pat_hash: i32 = pat.chars().map(|c| c as i32).sum();
     v.ptrs(
         &[(0, HighlightKind::Active)],
-        &[(0, "i")],
+        &[(0, "text")],
         format!("Pattern hash = {}. We will compare this against the rolling hash of each text window of the same length.", pat_hash),
     );
 
@@ -30693,20 +30694,20 @@ fn viz_string_algo_rabin_karp() -> Vec<VizFrame> {
                     .collect();
                 v.ptrs(
                     &hl,
-                    &[(i, "i"), (i + pat_len - 1, "j")],
+                    &[(i, "text"), (i + pat_len - 1, "pat")],
                     format!("Hash match at position {} AND character verification passed -- genuine match found!", i),
                 );
             } else {
                 v.ptrs(
                     &[(i, HighlightKind::Swapping)],
-                    &[(i, "i")],
+                    &[(i, "text")],
                     format!("Hash collision at position {}: hashes matched but characters differ. This is why verification is needed -- hash collisions are possible.", i),
                 );
             }
         } else {
             v.ptrs(
                 &[(i, HighlightKind::Active)],
-                &[(i, "i")],
+                &[(i, "text")],
                 format!("Window hash {} != pattern hash {} at position {}. Skip -- no need to verify characters.", window_hash, pat_hash, i),
             );
         }
@@ -30739,7 +30740,7 @@ fn viz_string_algo_z_function() -> Vec<VizFrame> {
         z[i] = j as i32;
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "text")],
             format!("Z[{}] = {}: the substring starting at position {} matches the first {} characters of the string.", i, z[i], i, z[i]),
         );
     }
@@ -30763,7 +30764,7 @@ fn viz_string_algo_longest_palindrome_substr() -> Vec<VizFrame> {
     v.ptrs(
         &[],
         &[],
-        format!("Longest Palindrome Substring — \"{}\"", s),
+        format!("Goal: Find the longest palindromic substring in \"{}\". Strategy: Expand around each center (both odd and even length), tracking the best palindrome found. O(n^2) time.", s),
     );
 
     let chars: Vec<char> = s.chars().collect();
@@ -30823,14 +30824,14 @@ fn viz_string_algo_suffix_array_basic() -> Vec<VizFrame> {
         let i = idx.min(n - 1);
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "text")],
             format!("Rank {}: suffix[{}]=\"{}\"", rank, idx, suffix),
         );
     }
     let sa: Vec<usize> = suffixes.iter().map(|&(i, _)| i).collect();
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "text")],
         format!("Suffix array: {:?}", sa),
     );
     v.into_frames()
@@ -30858,14 +30859,14 @@ fn viz_string_algo_repeated_substring() -> Vec<VizFrame> {
                 let hl: Vec<_> = (0..len).map(|i| (i, HighlightKind::Found)).collect();
                 v.ptrs(
                     &hl,
-                    &[(0, "i"), (len - 1, "j")],
+                    &[(0, "text"), (len - 1, "pat")],
                     format!("Found: \"{}\" repeated {} times", pat, n / len),
                 );
                 break;
             }
             v.ptrs(
                 &[(0, HighlightKind::Active)],
-                &[(0, "i")],
+                &[(0, "text")],
                 format!("Try len={}: \"{}\" — no", len, pat),
             );
         }
@@ -30898,7 +30899,7 @@ fn viz_string_algo_shortest_palindrome() -> Vec<VizFrame> {
             let hl: Vec<_> = (0..=end).map(|i| (i, HighlightKind::Found)).collect();
             v.ptrs(
                 &hl,
-                &[(0, "i"), (end, "j")],
+                &[(0, "text"), (end, "pat")],
                 format!("Palindrome prefix \"{}\" len={}", &s[..=end], end + 1),
             );
             break;
@@ -30908,7 +30909,7 @@ fn viz_string_algo_shortest_palindrome() -> Vec<VizFrame> {
     let result = format!("{}{}", suffix_to_add, s);
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "text")],
         format!(
             "Result: \"{}\" (add {} chars)",
             &result[..result.len().min(15)],
@@ -30935,7 +30936,7 @@ fn viz_string_algo_distinct_subsequences() -> Vec<VizFrame> {
     v.ptrs(
         &[],
         &[],
-        format!("Distinct Subsequences \"{}\" in \"{}\"", t, s),
+        format!("Goal: Count distinct subsequences of \"{}\" in \"{}\". Strategy: DP where dp[i][j] = number of ways to form t[0..j] from s[0..i]. O(n*m) time.", t, s),
     );
 
     let s_chars: Vec<char> = s.chars().collect();
@@ -30955,13 +30956,13 @@ fn viz_string_algo_distinct_subsequences() -> Vec<VizFrame> {
         let idx = (i - 1).min(n - 1);
         v.ptrs(
             &[(idx, HighlightKind::Active)],
-            &[(idx, "i")],
+            &[(idx, "text")],
             format!("s[{}]='{}' dp[..][m]={}", i - 1, s_chars[i - 1], dp[i][m]),
         );
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "text")],
         format!("Result: {} distinct subsequences", dp[n][m]),
     );
     v.into_frames()
@@ -31057,7 +31058,7 @@ fn viz_string_algo_wildcard_match() -> Vec<VizFrame> {
         if p_chars[pi] == '*' {
             v.ptrs(
                 &[(idx, HighlightKind::Pivot)],
-                &[(idx, "i")],
+                &[(idx, "text")],
                 format!("'*' matches any sequence at pos {}", si),
             );
             pi += 1;
@@ -31065,7 +31066,7 @@ fn viz_string_algo_wildcard_match() -> Vec<VizFrame> {
         } else if p_chars[pi] == '?' || p_chars[pi] == s_chars[si] {
             v.ptrs(
                 &[(idx, HighlightKind::Found)],
-                &[(idx, "i")],
+                &[(idx, "text")],
                 format!("Match '{}' == '{}'", s_chars[si], p_chars[pi]),
             );
             si += 1;
@@ -31073,7 +31074,7 @@ fn viz_string_algo_wildcard_match() -> Vec<VizFrame> {
         } else {
             v.ptrs(
                 &[(idx, HighlightKind::Swapping)],
-                &[(idx, "i")],
+                &[(idx, "text")],
                 format!("Mismatch '{}' != '{}'", s_chars[si], p_chars[pi]),
             );
             break;
@@ -31081,7 +31082,7 @@ fn viz_string_algo_wildcard_match() -> Vec<VizFrame> {
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "text")],
         "Wildcard matching complete".to_string(),
     );
     v.into_frames()
@@ -31106,7 +31107,7 @@ fn viz_string_algo_regular_expression() -> Vec<VizFrame> {
         let idx = i.min(n - 1);
         v.ptrs(
             &[(idx, HighlightKind::Active)],
-            &[(idx, "i")],
+            &[(idx, "text")],
             format!(
                 "Check s[{}]='{}' against pattern",
                 i,
@@ -31117,7 +31118,7 @@ fn viz_string_algo_regular_expression() -> Vec<VizFrame> {
     // Simplified result
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "text")],
         format!("Result: \"{}\" matches \"{}\"", s, pat),
     );
     v.into_frames()
@@ -31139,7 +31140,7 @@ fn viz_string_algo_longest_repeating_char_replacement() -> Vec<VizFrame> {
     v.ptrs(
         &[],
         &[],
-        format!("Longest Repeating Char Replacement k={}", k),
+        format!("Goal: Find the longest substring where at most k={} replacements make all characters the same. Strategy: Sliding window tracking max frequency character in the window.", k),
     );
 
     let chars: Vec<char> = s.chars().collect();
@@ -31165,7 +31166,7 @@ fn viz_string_algo_longest_repeating_char_replacement() -> Vec<VizFrame> {
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "text")],
         format!("Result: longest = {}", best),
     );
     v.into_frames()
@@ -31188,14 +31189,14 @@ fn viz_string_algo_string_rotation() -> Vec<VizFrame> {
     v.ptrs(
         &[],
         &[],
-        format!("String Rotation — \"{}\" rot by {}", s, rot),
+        format!("Goal: Check if a string is a rotation of another. Strategy: A rotation of s is always a substring of s+s. String: \"{}\", rotation offset: {}", s, rot),
     );
 
     // Check s+s contains rotated
     let doubled = format!("{}{}", s, s);
     v.ptrs(
         &[(rot, HighlightKind::Pivot)],
-        &[(rot, "i")],
+        &[(rot, "text")],
         format!("Rotate at {} — \"{}\"", rot, rotated),
     );
 
@@ -31205,13 +31206,13 @@ fn viz_string_algo_string_rotation() -> Vec<VizFrame> {
         let idx = pos.min(n - 1);
         v.ptrs(
             &[(idx, HighlightKind::Found)],
-            &[(idx, "i")],
+            &[(idx, "text")],
             format!("Found in s+s at pos {} — is rotation", pos),
         );
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "text")],
         format!(
             "Result: \"{}\" is rotation of \"{}\" = {}",
             rotated, s, found
@@ -31237,7 +31238,7 @@ fn viz_string_algo_longest_common_substring() -> Vec<VizFrame> {
     v.ptrs(
         &[],
         &[],
-        format!("Longest Common Substring \"{}\" vs \"{}\"", s1, s2),
+        format!("Goal: Find the longest common substring between \"{}\" and \"{}\". Strategy: DP where dp[i][j] = length of common substring ending at s1[i] and s2[j]. O(n*m) time.", s1, s2),
     );
 
     let c1: Vec<char> = s1.chars().collect();
@@ -31255,7 +31256,7 @@ fn viz_string_algo_longest_common_substring() -> Vec<VizFrame> {
                     let idx = (i - 1).min(arr_len - 1);
                     v.ptrs(
                         &[(idx, HighlightKind::Found)],
-                        &[(idx, "i")],
+                        &[(idx, "text")],
                         format!(
                             "Match '{}' dp[{},{}]={} best={}",
                             c1[i - 1],
@@ -31273,7 +31274,7 @@ fn viz_string_algo_longest_common_substring() -> Vec<VizFrame> {
     let substring: String = c1[best_start..best_end].iter().collect();
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "text")],
         format!("Result: \"{}\" length={}", substring, best),
     );
     v.into_frames()
@@ -31302,13 +31303,13 @@ fn viz_math_gcd() -> Vec<VizFrame> {
         result = gcd(result, arr[i]);
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "num")],
             format!("gcd({}, {}) = {}. The running GCD can only stay the same or decrease as we fold in more elements.", old, arr[i], result),
         );
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "num")],
         format!(
             "Answer: GCD of entire array = {}. Time: O(n * log(max_val)).",
             result
@@ -31338,13 +31339,13 @@ fn viz_math_lcm() -> Vec<VizFrame> {
         result = result / g * arr[i] as i64;
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "num")],
             format!("LCM with {} = {}", arr[i], result),
         );
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "num")],
         format!(
             "Answer: LCM of entire array = {}. Time: O(n * log(max_val)).",
             result
@@ -31370,7 +31371,7 @@ fn viz_math_sieve_of_eratosthenes() -> Vec<VizFrame> {
         if is_prime[i] {
             v.ptrs(
                 &[(i, HighlightKind::Found)],
-                &[(i, "i")],
+                &[(i, "num")],
                 format!("{} is prime (not crossed out by any smaller prime). Now cross out all its multiples.", i),
             );
             let mut j = i * 2;
@@ -31395,7 +31396,7 @@ fn viz_math_sieve_of_eratosthenes() -> Vec<VizFrame> {
     let primes: Vec<usize> = (0..n).filter(|&i| is_prime[i]).collect();
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "num")],
         format!(
             "Answer: primes up to {} = {:?}. Time: O(n log log n).",
             n - 1,
@@ -31416,7 +31417,7 @@ fn viz_math_modular_exponentiation() -> Vec<VizFrame> {
     v.ptrs(
         &[],
         &[],
-        format!("Modular Exp: {}^{} mod {}", base, exp, modulus),
+        format!("Goal: Compute {}^{} mod {} efficiently. Strategy: Binary exponentiation -- square base each step, multiply into result when exponent bit is set. O(log n) multiplications.", base, exp, modulus),
     );
 
     let mut result = 1i64;
@@ -31430,7 +31431,7 @@ fn viz_math_modular_exponentiation() -> Vec<VizFrame> {
             result = (result * b) % m;
             v.ptrs(
                 &[(idx, HighlightKind::Found)],
-                &[(idx, "i")],
+                &[(idx, "step")],
                 format!(
                     "exp odd: result={}*{} mod {}={}",
                     result * m / (b.max(1)) + result % (b.max(1)),
@@ -31449,7 +31450,7 @@ fn viz_math_modular_exponentiation() -> Vec<VizFrame> {
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "step")],
         format!("Result: {}^{} mod {} = {}", base, exp, modulus, result),
     );
     v.into_frames()
@@ -31480,7 +31481,7 @@ fn viz_math_is_prime() -> Vec<VizFrame> {
         };
         v.ptrs(
             &[(i, kind)],
-            &[(i, "i")],
+            &[(i, "num")],
             format!(
                 "{} is {}",
                 num,
@@ -31508,7 +31509,7 @@ fn viz_math_count_primes() -> Vec<VizFrame> {
             count += 1;
             v.ptrs(
                 &[(i, HighlightKind::Found)],
-                &[(i, "i")],
+                &[(i, "num")],
                 format!("{} is prime, count={}", i, count),
             );
             let mut j = i * 2;
@@ -31519,14 +31520,14 @@ fn viz_math_count_primes() -> Vec<VizFrame> {
         } else {
             v.ptrs(
                 &[(i, HighlightKind::Active)],
-                &[(i, "i")],
+                &[(i, "num")],
                 format!("{} is composite", i),
             );
         }
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "num")],
         format!(
             "Answer: {} primes below {}. Time: O(n log log n).",
             count, n
@@ -31552,7 +31553,7 @@ fn viz_math_trailing_zeroes_factorial() -> Vec<VizFrame> {
         let idx = step.min(arr_len - 1);
         v.ptrs(
             &[(idx, HighlightKind::Active)],
-            &[(idx, "i")],
+            &[(idx, "step")],
             format!("{}/{} = {} — total zeros={}", n, power_of_5, count, zeros),
         );
         power_of_5 *= 5;
@@ -31560,7 +31561,7 @@ fn viz_math_trailing_zeroes_factorial() -> Vec<VizFrame> {
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "step")],
         format!(
             "Answer: {}! has {} trailing zeroes. Time: O(log_5(n)).",
             n, zeros
@@ -31589,7 +31590,7 @@ fn viz_math_multiply_strings() -> Vec<VizFrame> {
             let idx = i.min(arr_len - 1);
             v.ptrs(
                 &[(idx, HighlightKind::Active)],
-                &[(idx, "i")],
+                &[(idx, "num")],
                 format!("{}*{} = {} pos {}", a[i], b[j], product, i + j),
             );
         }
@@ -31597,7 +31598,7 @@ fn viz_math_multiply_strings() -> Vec<VizFrame> {
     let result = a_val * b_val;
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "num")],
         format!("Result: {} x {} = {}", a_str, b_str, result),
     );
     v.into_frames()
@@ -31632,13 +31633,13 @@ fn viz_math_max_points_on_line() -> Vec<VizFrame> {
         }
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "num")],
             format!("From ({},{}) max_collinear={}", xs[i], ys[i], max_points),
         );
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "num")],
         format!("Result: {} max points on a line", max_points),
     );
     v.into_frames()
@@ -31658,7 +31659,7 @@ fn viz_math_convex_hull() -> Vec<VizFrame> {
     for (i, &(x, y)) in points.iter().enumerate() {
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "num")],
             format!(
                 "Point {} at ({},{}). Points are sorted by x-coordinate to process left-to-right.",
                 i, x, y
@@ -31727,7 +31728,7 @@ fn viz_math_sqrt_integer() -> Vec<VizFrame> {
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "num")],
         format!(
             "Answer: floor(sqrt({})) = {}. Time: O(log n).",
             target, result
@@ -31755,13 +31756,13 @@ fn viz_math_pow_x_n() -> Vec<VizFrame> {
             result *= b;
             v.ptrs(
                 &[(idx, HighlightKind::Found)],
-                &[(idx, "i")],
+                &[(idx, "step")],
                 format!("Odd exp: result*={}={}", b, result),
             );
         } else {
             v.ptrs(
                 &[(idx, HighlightKind::Active)],
-                &[(idx, "i")],
+                &[(idx, "step")],
                 "Even exp: square base".to_string(),
             );
         }
@@ -31771,7 +31772,7 @@ fn viz_math_pow_x_n() -> Vec<VizFrame> {
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "step")],
         format!(
             "Result: {}^{} = {}. Only O(log {}) multiplications instead of {}.",
             base, exp, result, exp, exp
@@ -31793,7 +31794,7 @@ fn viz_math_random_pick_with_weight() -> Vec<VizFrame> {
         prefix[i] = prefix[i - 1] + weights[i];
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "num")],
             format!("prefix[{}]={}", i, prefix[i]),
         );
     }
@@ -31805,13 +31806,13 @@ fn viz_math_random_pick_with_weight() -> Vec<VizFrame> {
         let idx = prefix.iter().position(|&x| x >= target).unwrap_or(0);
         v.ptrs(
             &[(idx, HighlightKind::Found)],
-            &[(idx, "i")],
+            &[(idx, "num")],
             format!("Pick rand={} -> index {} (w={})", target, idx, weights[idx]),
         );
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "num")],
         format!("Total weight={}, {} picks done", total, 3),
     );
     v.into_frames()
@@ -31835,7 +31836,7 @@ fn viz_math_rectangle_overlap() -> Vec<VizFrame> {
     );
     v.ptrs(
         &[(0, HighlightKind::Active), (r2_idx, HighlightKind::Active)],
-        &[(0, "i"), (r2_idx, "j")],
+        &[(0, "num"), (r2_idx, "num")],
         format!(
             "R1=[{},{},{},{}] R2=[{},{},{},{}]",
             r1.0, r1.1, r1.2, r1.3, r2.0, r2.1, r2.2, r2.3
@@ -31852,19 +31853,19 @@ fn viz_math_rectangle_overlap() -> Vec<VizFrame> {
         let oh = r1.3.min(r2.3) - oy;
         v.ptrs(
             &[(0, HighlightKind::Found), (r2_idx, HighlightKind::Found)],
-            &[(0, "i"), (r2_idx, "j")],
+            &[(0, "num"), (r2_idx, "j")],
             format!("Overlap area = {}x{} = {}", ow, oh, ow * oh),
         );
     } else {
         v.ptrs(
             &[(0, HighlightKind::Swapping)],
-            &[(0, "i")],
+            &[(0, "num")],
             "No overlap".to_string(),
         );
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "num")],
         format!("Result: overlap = {}", overlaps),
     );
     v.into_frames()
@@ -31998,7 +31999,7 @@ fn viz_backtracking_combination_sum_ii() -> Vec<VizFrame> {
         &[],
         &[],
         format!(
-            "Combination Sum II — target={}, {:?}",
+            "Goal: Find all unique combinations summing to target (each element used at most once). Strategy: Sort, backtrack with skip-duplicates at same depth. Target={}, {:?}",
             target,
             &candidates[..n]
         ),
@@ -32095,7 +32096,7 @@ fn viz_greedy_lemonade_change() -> Vec<VizFrame> {
             fives += 1;
             v.ptrs(
                 &[(i, HighlightKind::Found)],
-                &[(i, "i")],
+                &[(i, "scan")],
                 format!("$5 — no change (5s={} 10s={})", fives, tens),
             );
         } else if bill == 10 {
@@ -32104,14 +32105,14 @@ fn viz_greedy_lemonade_change() -> Vec<VizFrame> {
                 tens += 1;
                 v.ptrs(
                     &[(i, HighlightKind::Active)],
-                    &[(i, "i")],
+                    &[(i, "scan")],
                     format!("$10 — give $5 (5s={} 10s={})", fives, tens),
                 );
             } else {
                 ok = false;
                 v.ptrs(
                     &[(i, HighlightKind::Swapping)],
-                    &[(i, "i")],
+                    &[(i, "scan")],
                     "Cannot make change for $10".to_string(),
                 );
                 break;
@@ -32121,21 +32122,21 @@ fn viz_greedy_lemonade_change() -> Vec<VizFrame> {
             fives -= 1;
             v.ptrs(
                 &[(i, HighlightKind::Active)],
-                &[(i, "i")],
+                &[(i, "scan")],
                 format!("$20 — give $10+$5 (5s={} 10s={})", fives, tens),
             );
         } else if fives >= 3 {
             fives -= 3;
             v.ptrs(
                 &[(i, HighlightKind::Active)],
-                &[(i, "i")],
+                &[(i, "scan")],
                 format!("$20 — give 3x$5 (5s={} 10s={})", fives, tens),
             );
         } else {
             ok = false;
             v.ptrs(
                 &[(i, HighlightKind::Swapping)],
-                &[(i, "i")],
+                &[(i, "scan")],
                 "Cannot make change for $20".to_string(),
             );
             break;
@@ -32143,7 +32144,7 @@ fn viz_greedy_lemonade_change() -> Vec<VizFrame> {
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "scan")],
         format!("Result: {}", if ok { "success" } else { "failed" }),
     );
     v.into_frames()
@@ -32160,7 +32161,7 @@ fn viz_greedy_maximum_units() -> Vec<VizFrame> {
     v.ptrs(
         &[],
         &[],
-        format!("Maximum Units — truck fits {} boxes", truck_size),
+        format!("Goal: Maximize total units loaded onto a truck. Strategy: Greedy -- sort by units per box descending, load highest-value boxes first. Truck fits {} boxes.", truck_size),
     );
 
     let mut total = 0i32;
@@ -32180,7 +32181,7 @@ fn viz_greedy_maximum_units() -> Vec<VizFrame> {
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "best")],
         format!("Result: {} total units", total),
     );
     v.into_frames()
@@ -32210,7 +32211,7 @@ fn viz_greedy_can_place_flowers() -> Vec<VizFrame> {
             count += 1;
             v.ptrs(
                 &[(i, HighlightKind::Found)],
-                &[(i, "i")],
+                &[(i, "scan")],
                 format!("Plant at {} (count={})", i, count),
             );
         } else {
@@ -32221,14 +32222,14 @@ fn viz_greedy_can_place_flowers() -> Vec<VizFrame> {
             };
             v.ptrs(
                 &[(i, kind)],
-                &[(i, "i")],
+                &[(i, "scan")],
                 format!("[{}]={} skip", i, bed[i]),
             );
         }
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "scan")],
         format!("Result: can place {} flowers", count),
     );
     v.into_frames()
@@ -32259,20 +32260,20 @@ fn viz_greedy_min_number_arrows() -> Vec<VizFrame> {
             arrow_pos = e;
             v.ptrs(
                 &[(idx, HighlightKind::Found)],
-                &[(idx, "i")],
+                &[(idx, "scan")],
                 format!("Arrow {} at {} for [{},{}]", arrows, e, s, e),
             );
         } else {
             v.ptrs(
                 &[(idx, HighlightKind::Active)],
-                &[(idx, "i")],
+                &[(idx, "scan")],
                 format!("[{},{}] burst by arrow at {}", s, e, arrow_pos),
             );
         }
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "scan")],
         format!("Result: {} arrows", arrows),
     );
     v.into_frames()
@@ -32297,7 +32298,7 @@ fn viz_dp_min_cost_stairs() -> Vec<VizFrame> {
                 (i - 1, HighlightKind::Comparing),
                 (i - 2, HighlightKind::Comparing),
             ],
-            &[(i, "i")],
+            &[(i, "scan")],
             format!(
                 "dp[{}] = {} + min({},{}) = {}",
                 i,
@@ -32311,7 +32312,7 @@ fn viz_dp_min_cost_stairs() -> Vec<VizFrame> {
     let result = dp[n - 1].min(dp[n - 2]);
     v.ptrs(
         &[(n - 1, HighlightKind::Found)],
-        &[(n - 1, "i")],
+        &[(n - 1, "fill")],
         format!("Answer: minimum cost to reach the top = {}. Time: O(n), Space: O(1) with optimization.", result),
     );
     v.into_frames()
@@ -32329,13 +32330,13 @@ fn viz_dp_fibonacci() -> Vec<VizFrame> {
     v.ptrs(&[], &[], format!("Goal: Compute the first {} Fibonacci numbers using DP. Strategy: Bottom-up tabulation. dp[0]=0, dp[1]=1, dp[i] = dp[i-1] + dp[i-2]. Each number is the sum of the two preceding ones.", n));
     v.ptrs(
         &[(0, HighlightKind::Sorted)],
-        &[(0, "i")],
+        &[(0, "fill")],
         "dp[0]=0".to_string(),
     );
     if n > 1 {
         v.ptrs(
             &[(1, HighlightKind::Sorted)],
-            &[(1, "i")],
+            &[(1, "fill")],
             "dp[1]=1".to_string(),
         );
     }
@@ -32348,7 +32349,7 @@ fn viz_dp_fibonacci() -> Vec<VizFrame> {
                 (i - 1, HighlightKind::Comparing),
                 (i - 2, HighlightKind::Comparing),
             ],
-            &[(i, "i")],
+            &[(i, "fill")],
             format!(
                 "dp[{}] = dp[{}]+dp[{}] = {}+{} = {}",
                 i,
@@ -32385,7 +32386,7 @@ fn viz_dp_max_subarray() -> Vec<VizFrame> {
     let mut best_end = 0;
     v.ptrs(
         &[(0, HighlightKind::Active)],
-        &[(0, "i")],
+        &[(0, "fill")],
         format!("cur={} max={}", cur_sum, max_sum),
     );
     for i in 1..n {
@@ -32400,7 +32401,7 @@ fn viz_dp_max_subarray() -> Vec<VizFrame> {
         }
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "fill")],
             format!("[{}]={}: extend or restart? cur_sum={}. Extending is better if cur_sum + nums[i] > nums[i]. Global max = {}.", i, nums[i], cur_sum, max_sum),
         );
     }
@@ -32429,7 +32430,7 @@ fn viz_dp_longest_increasing_subsequence() -> Vec<VizFrame> {
                 dp[i] = dp[j] + 1;
                 v.ptrs(
                     &[(i, HighlightKind::Active), (j, HighlightKind::Comparing)],
-                    &[(i, "i"), (j, "j")],
+                    &[(i, "fill"), (j, "prev")],
                     format!(
                         "[{}]={} > [{}]={} dp[{}]={}",
                         i, nums[i], j, nums[j], i, dp[i]
@@ -32439,14 +32440,14 @@ fn viz_dp_longest_increasing_subsequence() -> Vec<VizFrame> {
         }
         v.ptrs(
             &[(i, HighlightKind::Sorted)],
-            &[(i, "i")],
+            &[(i, "fill")],
             format!("dp[{}]={}", i, dp[i]),
         );
     }
     let lis = *dp.iter().max().unwrap_or(&1);
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "fill")],
         format!("Result: LIS length = {}", lis),
     );
     v.into_frames()
@@ -32477,7 +32478,7 @@ fn viz_dp_longest_common_subsequence() -> Vec<VizFrame> {
         let idx = (i - 1).min(display_len - 1);
         v.ptrs(
             &[(idx, HighlightKind::Active)],
-            &[(idx, "i")],
+            &[(idx, "fill")],
             format!(
                 "Row {}: a[{}]={} best so far={}",
                 i,
@@ -32534,14 +32535,14 @@ fn viz_dp_regular_expression() -> Vec<VizFrame> {
         let idx = (i - 1).min(n - 1);
         v.ptrs(
             &[(idx, HighlightKind::Active)],
-            &[(idx, "i")],
+            &[(idx, "fill")],
             format!("Row {} match so far={}", i, dp[i][m]),
         );
     }
     let result = dp[n][m];
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "fill")],
         format!("Answer: regex match = {}. Time: O(n*m).", result),
     );
     v.into_frames()
@@ -32568,7 +32569,7 @@ fn viz_dp_longest_valid_parentheses() -> Vec<VizFrame> {
         &[],
         &[],
         format!(
-            "Longest Valid Parens — {} (1='(' 2=')')",
+            "Goal: Find the length of the longest valid parentheses substring. Strategy: DP where dp[i] tracks longest valid ending at i. Input: {} (1='(' 2=')')",
             parens
                 .iter()
                 .map(|&x| if x == 1 { '(' } else { ')' })
@@ -32594,13 +32595,13 @@ fn viz_dp_longest_valid_parentheses() -> Vec<VizFrame> {
         }
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "fill")],
             format!("dp[{}]={} max={}", i, dp[i], max_len),
         );
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "fill")],
         format!(
             "Answer: longest valid parentheses = {}. Time: O(n).",
             max_len
@@ -32698,7 +32699,7 @@ fn viz_divide_conquer_different_ways() -> Vec<VizFrame> {
     v.ptrs(
         &[],
         &[],
-        format!("Different Ways to Add Parens — {:?}", arr),
+        format!("Goal: Compute all possible results from different groupings of additions. Strategy: D&C -- try each split point, recursively evaluate left and right subarrays, combine. Input: {:?}", arr),
     );
 
     for split in 1..n {
@@ -32716,7 +32717,7 @@ fn viz_divide_conquer_different_ways() -> Vec<VizFrame> {
     let total: i32 = arr.iter().sum();
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "lo")],
         format!("Result: total={} with various groupings", total),
     );
     v.into_frames()
@@ -32732,7 +32733,7 @@ fn viz_divide_conquer_count_range_sum() -> Vec<VizFrame> {
     v.ptrs(
         &[],
         &[],
-        format!("Count Range Sum [{},{}] — {:?}", lower, upper, arr),
+        format!("Goal: Count subarrays with sum in range [{},{}]. Strategy: Prefix sums + D&C merge sort counts valid pairs in O(n log n). Input: {:?}", lower, upper, arr),
     );
 
     let mut prefix = vec![0i64; n + 1];
@@ -32748,7 +32749,7 @@ fn viz_divide_conquer_count_range_sum() -> Vec<VizFrame> {
                 count += 1;
                 v.ptrs(
                     &[(i, HighlightKind::Active), (j, HighlightKind::Found)],
-                    &[(i, "i"), (j, "j")],
+                    &[(i, "lo"), (j, "hi")],
                     format!("sum[{},{}]={} in range", i, j, s),
                 );
             }
@@ -32759,7 +32760,7 @@ fn viz_divide_conquer_count_range_sum() -> Vec<VizFrame> {
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "lo")],
         format!("Result: {} range sums in [{},{}]", count, lower, upper),
     );
     v.into_frames()
@@ -32779,7 +32780,7 @@ fn viz_divide_conquer_reverse_pairs() -> Vec<VizFrame> {
                 count += 1;
                 v.ptrs(
                     &[(i, HighlightKind::Active), (j, HighlightKind::Found)],
-                    &[(i, "i"), (j, "j")],
+                    &[(i, "lo"), (j, "hi")],
                     format!(
                         "Pair ({},{}) {}>{} (2*{}={})",
                         i,
@@ -32798,7 +32799,7 @@ fn viz_divide_conquer_reverse_pairs() -> Vec<VizFrame> {
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "lo")],
         format!(
             "Answer: {} reverse pairs found. Time: O(n^2) brute force, O(n log n) with merge sort.",
             count
@@ -32831,7 +32832,7 @@ fn viz_intervals_meeting_rooms() -> Vec<VizFrame> {
             can_attend = false;
             v.ptrs(
                 &[(idx, HighlightKind::Swapping)],
-                &[(idx, "i")],
+                &[(idx, "scan")],
                 format!(
                     "Overlap: [{},{}] and [{},{}]",
                     intervals[i - 1].0,
@@ -32844,13 +32845,13 @@ fn viz_intervals_meeting_rooms() -> Vec<VizFrame> {
         }
         v.ptrs(
             &[(idx, HighlightKind::Found)],
-            &[(idx, "i")],
+            &[(idx, "scan")],
             format!("[{},{}] ok", intervals[i].0, intervals[i].1),
         );
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "scan")],
         format!(
             "Answer: can attend all = {}. Time: O(n log n) for sorting.",
             can_attend
@@ -32884,7 +32885,7 @@ fn viz_intervals_covered_length() -> Vec<VizFrame> {
             cur_end = e;
             v.ptrs(
                 &[(idx, HighlightKind::Active)],
-                &[(idx, "i")],
+                &[(idx, "scan")],
                 format!("New segment [{},{}] total={}", s, e, total),
             );
         } else if e > cur_end {
@@ -32892,20 +32893,20 @@ fn viz_intervals_covered_length() -> Vec<VizFrame> {
             cur_end = e;
             v.ptrs(
                 &[(idx, HighlightKind::Found)],
-                &[(idx, "i")],
+                &[(idx, "scan")],
                 format!("Extend to {} total={}", e, total),
             );
         } else {
             v.ptrs(
                 &[(idx, HighlightKind::Sorted)],
-                &[(idx, "i")],
+                &[(idx, "scan")],
                 format!("[{},{}] fully covered", s, e),
             );
         }
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "scan")],
         format!(
             "Answer: total covered length = {}. Time: O(n log n) for sorting + O(n) sweep.",
             total
@@ -32939,13 +32940,13 @@ fn viz_intervals_meeting_rooms_ii() -> Vec<VizFrame> {
             ends.remove(pos);
             v.ptrs(
                 &[(idx, HighlightKind::Found)],
-                &[(idx, "i")],
+                &[(idx, "scan")],
                 format!("[{},{}] reuse room (rooms={})", s, e, ends.len() + 1),
             );
         } else {
             v.ptrs(
                 &[(idx, HighlightKind::Active)],
-                &[(idx, "i")],
+                &[(idx, "scan")],
                 format!("[{},{}] new room (rooms={})", s, e, ends.len() + 1),
             );
         }
@@ -32954,7 +32955,7 @@ fn viz_intervals_meeting_rooms_ii() -> Vec<VizFrame> {
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "scan")],
         format!(
             "Result: {} meeting rooms needed. Peak concurrency determines the answer. O(n log n).",
             max_rooms
@@ -32988,20 +32989,20 @@ fn viz_intervals_non_overlapping() -> Vec<VizFrame> {
             end = e;
             v.ptrs(
                 &[(idx, HighlightKind::Found)],
-                &[(idx, "i")],
+                &[(idx, "scan")],
                 format!("Keep [{},{}] (count={})", s, e, keep),
             );
         } else {
             v.ptrs(
                 &[(idx, HighlightKind::Swapping)],
-                &[(idx, "i")],
+                &[(idx, "scan")],
                 format!("Remove [{},{}] overlaps", s, e),
             );
         }
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "scan")],
         format!(
             "Answer: remove {} intervals (keep {}). Time: O(n log n) for sorting.",
             n as i32 - keep,
@@ -33036,20 +33037,20 @@ fn viz_intervals_min_arrows() -> Vec<VizFrame> {
             arrow_pos = e;
             v.ptrs(
                 &[(idx, HighlightKind::Found)],
-                &[(idx, "i")],
+                &[(idx, "scan")],
                 format!("Arrow {} at {} for [{},{}]", arrows, e, s, e),
             );
         } else {
             v.ptrs(
                 &[(idx, HighlightKind::Active)],
-                &[(idx, "i")],
+                &[(idx, "scan")],
                 format!("[{},{}] burst by arrow at {}", s, e, arrow_pos),
             );
         }
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "scan")],
         format!("Result: {} arrows needed", arrows),
     );
     v.into_frames()
@@ -33081,7 +33082,7 @@ fn viz_intervals_interval_intersection() -> Vec<VizFrame> {
     v.ptrs(
         &[],
         &[],
-        format!("Interval Intersection A={:?} B={:?}", a_ivs, b_ivs),
+        format!("Goal: Find all intersections between two sorted interval lists. Strategy: Two pointers -- compute overlap, advance the one that ends first. A={:?} B={:?}", a_ivs, b_ivs),
     );
 
     let mut ai = 0usize;
@@ -33095,13 +33096,13 @@ fn viz_intervals_interval_intersection() -> Vec<VizFrame> {
             result.push((lo, hi));
             v.ptrs(
                 &[(idx, HighlightKind::Found)],
-                &[(idx, "i")],
+                &[(idx, "scan")],
                 format!("Intersect [{},{}]", lo, hi),
             );
         } else {
             v.ptrs(
                 &[(idx, HighlightKind::Active)],
-                &[(idx, "i")],
+                &[(idx, "scan")],
                 format!("No overlap A={:?} B={:?}", a_ivs[ai], b_ivs[bi]),
             );
         }
@@ -33113,7 +33114,7 @@ fn viz_intervals_interval_intersection() -> Vec<VizFrame> {
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "scan")],
         format!("Result: {:?}", result),
     );
     v.into_frames()
@@ -33141,21 +33142,21 @@ fn viz_intervals_my_calendar() -> Vec<VizFrame> {
         if conflict {
             v.ptrs(
                 &[(idx, HighlightKind::Swapping)],
-                &[(idx, "i")],
+                &[(idx, "scan")],
                 format!("[{},{}] conflicts — rejected", s, e),
             );
         } else {
             booked.push((s, e));
             v.ptrs(
                 &[(idx, HighlightKind::Found)],
-                &[(idx, "i")],
+                &[(idx, "scan")],
                 format!("[{},{}] booked (total={})", s, e, booked.len()),
             );
         }
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "scan")],
         format!(
             "Answer: {} events booked. Time: O(n^2) with linear scan per booking.",
             booked.len()
@@ -33190,20 +33191,20 @@ fn viz_intervals_max_events() -> Vec<VizFrame> {
             last_day = day;
             v.ptrs(
                 &[(idx, HighlightKind::Found)],
-                &[(idx, "i")],
+                &[(idx, "scan")],
                 format!("Attend [{},{}] on day {} (count={})", s, e, day, attended),
             );
         } else {
             v.ptrs(
                 &[(idx, HighlightKind::Swapping)],
-                &[(idx, "i")],
+                &[(idx, "scan")],
                 format!("[{},{}] cannot attend", s, e),
             );
         }
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "scan")],
         format!("Answer: {} events attended. Time: O(n log n).", attended),
     );
     v.into_frames()
@@ -33267,7 +33268,7 @@ fn viz_segment_range_update_point_query() -> Vec<VizFrame> {
         updated[i] += add_val;
         v.ptrs(
             &[(i, HighlightKind::Found)],
-            &[(i, "i")],
+            &[(i, "node")],
             format!("[{}]: {} -> {}", i, arr[i], updated[i]),
         );
     }
@@ -33311,7 +33312,7 @@ fn viz_fenwick_2d_sum() -> Vec<VizFrame> {
         prefix[i + 1] = prefix[i] + arr[i];
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "node")],
             format!("prefix[{}]={}", i + 1, prefix[i + 1]),
         );
     }
@@ -33395,7 +33396,7 @@ fn viz_segment_max_subarray_range() -> Vec<VizFrame> {
         }
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "node")],
             format!("[{}]={} cur={} max={}", i, arr[i], cur_sum, max_sum),
         );
     }
@@ -33428,7 +33429,7 @@ fn viz_sparse_table_static_rmq() -> Vec<VizFrame> {
         let idx = j.min(n - 1);
         v.ptrs(
             &[(idx, HighlightKind::Active)],
-            &[(idx, "j")],
+            &[(idx, "fill")],
             format!("Built level {} (len={})", j, 1 << j),
         );
     }
@@ -33469,7 +33470,7 @@ fn viz_sparse_table_lca() -> Vec<VizFrame> {
         };
         v.ptrs(
             &[(i, kind)],
-            &[(i, "i")],
+            &[(i, "fill")],
             format!("depth[{}]={}", i, depth[i]),
         );
     }
@@ -33504,7 +33505,7 @@ fn viz_sparse_table_second_minimum() -> Vec<VizFrame> {
         }
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "fill")],
             format!("[{}]={} min1={} min2={}", i, arr[i], first, second),
         );
     }
@@ -33562,7 +33563,7 @@ fn viz_sparse_table_2d_rmq() -> Vec<VizFrame> {
         }
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "fill")],
             format!("[{}]={} running_min={}", i, arr[i], min_val),
         );
     }
@@ -33595,20 +33596,20 @@ fn viz_sparse_table_range_frequency() -> Vec<VizFrame> {
             count += 1;
             v.ptrs(
                 &[(i, HighlightKind::Found)],
-                &[(i, "i")],
+                &[(i, "fill")],
                 format!("[{}]={} match! count={}", i, arr[i], count),
             );
         } else {
             v.ptrs(
                 &[(i, HighlightKind::Active)],
-                &[(i, "i")],
+                &[(i, "fill")],
                 format!("[{}]={} skip", i, arr[i]),
             );
         }
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "fill")],
         format!(
             "Result: {} appears {} times in [{},{}]",
             target, count, l, r
@@ -33635,7 +33636,7 @@ fn viz_sparse_table_longest_common_prefix_array() -> Vec<VizFrame> {
         lcp[i] = len;
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "fill")],
             format!("lcp[{}]={} (prefix match len)", i, lcp[i]),
         );
     }
@@ -33726,7 +33727,7 @@ fn viz_monotonic_maximal_rectangle() -> Vec<VizFrame> {
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "scan")],
         format!("Result: max rectangle = {}", max_area),
     );
     v.into_frames()
@@ -33748,13 +33749,13 @@ fn viz_monotonic_sum_of_subarray_minimums() -> Vec<VizFrame> {
         }
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "scan")],
             format!("Subarrays starting at {} — running total={}", i, total),
         );
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "scan")],
         format!("Result: sum of mins = {}", total),
     );
     v.into_frames()
@@ -33819,7 +33820,7 @@ fn viz_monotonic_sum_subarray_ranges() -> Vec<VizFrame> {
             if j > i {
                 v.ptrs(
                     &[(i, HighlightKind::Active), (j, HighlightKind::Active)],
-                    &[(i, "i"), (j, "j")],
+                    &[(i, "scan"), (j, "j")],
                     format!(
                         "[{},{}] range={}-{}={} total={}",
                         i,
@@ -33835,7 +33836,7 @@ fn viz_monotonic_sum_subarray_ranges() -> Vec<VizFrame> {
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "scan")],
         format!("Result: sum of ranges = {}", total),
     );
     v.into_frames()
@@ -33859,7 +33860,7 @@ fn viz_bits_is_power_of_two() -> Vec<VizFrame> {
         };
         v.ptrs(
             &[(i, kind)],
-            &[(i, "i")],
+            &[(i, "num")],
             format!(
                 "[{}]={} ({:04b}) — {}",
                 i,
@@ -33902,7 +33903,7 @@ fn viz_bits_sum_without_arithmetic() -> Vec<VizFrame> {
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "num")],
         "Done: all sums computed without +".to_string(),
     );
     v.into_frames()
@@ -33929,7 +33930,7 @@ fn viz_bits_maximum_xor() -> Vec<VizFrame> {
         }
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "num")],
             format!("[{}]={} best XOR so far={}", i, arr[i], max_xor),
         );
     }
@@ -33965,7 +33966,7 @@ fn viz_bits_max_and_pair() -> Vec<VizFrame> {
         }
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "num")],
             format!("[{}]={} ({:04b}) best AND={}", i, arr[i], arr[i], max_and),
         );
     }
@@ -34006,7 +34007,7 @@ fn viz_bits_min_flips() -> Vec<VizFrame> {
     let total: u32 = (0..n - 1).map(|i| (arr[i] ^ arr[i + 1]).count_ones()).sum();
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "num")],
         format!("Result: {} total flips", total),
     );
     v.into_frames()
@@ -34040,18 +34041,18 @@ fn viz_string_algo_count_occurrences() -> Vec<VizFrame> {
             let hl: Vec<_> = (i..i + pat_len)
                 .map(|j| (j, HighlightKind::Found))
                 .collect();
-            v.ptrs(&hl, &[(i, "i")], format!("Match #{} at {}", count, i));
+            v.ptrs(&hl, &[(i, "text")], format!("Match #{} at {}", count, i));
         } else {
             v.ptrs(
                 &[(i, HighlightKind::Active)],
-                &[(i, "i")],
+                &[(i, "text")],
                 format!("No match at {}", i),
             );
         }
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "text")],
         format!("Result: {} occurrences", count),
     );
     v.into_frames()
@@ -34092,7 +34093,7 @@ fn viz_string_algo_is_rotation() -> Vec<VizFrame> {
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "text")],
         format!("Result: IS a rotation by {}", rot),
     );
     v.into_frames()
@@ -34125,7 +34126,7 @@ fn viz_string_algo_longest_prefix_suffix() -> Vec<VizFrame> {
                     (i, HighlightKind::Found),
                     (len - 1, HighlightKind::Comparing),
                 ],
-                &[(i, "i"), (len - 1, "len")],
+                &[(i, "text"), (len - 1, "len")],
                 format!("Match: lps[{}]={}", i, lps[i]),
             );
             i += 1;
@@ -34135,7 +34136,7 @@ fn viz_string_algo_longest_prefix_suffix() -> Vec<VizFrame> {
             lps[i] = 0;
             v.ptrs(
                 &[(i, HighlightKind::Active)],
-                &[(i, "i")],
+                &[(i, "text")],
                 format!("lps[{}]=0", i),
             );
             i += 1;
@@ -34144,7 +34145,7 @@ fn viz_string_algo_longest_prefix_suffix() -> Vec<VizFrame> {
     let max_lps = *lps.iter().max().unwrap_or(&0);
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "text")],
         format!("Result: longest prefix-suffix = {}", max_lps),
     );
     v.into_frames()
@@ -34159,7 +34160,7 @@ fn viz_string_algo_repeated_string_match() -> Vec<VizFrame> {
     v.ptrs(
         &[],
         &[],
-        format!("Repeated String Match — repeat {:?} x{}", arr, repeat_count),
+        format!("Goal: Find minimum repeats of a pattern needed to contain a target. Strategy: Repeat the pattern until it is long enough, then check containment. Array: {:?}, repeats: {}", arr, repeat_count),
     );
 
     let mut repeated = arr.clone();
@@ -34170,13 +34171,13 @@ fn viz_string_algo_repeated_string_match() -> Vec<VizFrame> {
         let idx = (r - 1).min(n - 1);
         v.ptrs(
             &[(idx, HighlightKind::Active)],
-            &[(idx, "i")],
+            &[(idx, "text")],
             format!("Repeat {} — len={}", r, repeated.len()),
         );
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "text")],
         format!("Result: need {} repeats", repeat_count),
     );
     v.into_frames()
@@ -34212,7 +34213,7 @@ fn viz_string_algo_longest_duplicate_substring() -> Vec<VizFrame> {
             let hl: Vec<_> = (best_start..best_start + best_len)
                 .map(|i| (i, HighlightKind::Found))
                 .collect();
-            v.ptrs(&hl, &[(best_start, "i")], format!("Dup len={}", best_len));
+            v.ptrs(&hl, &[(best_start, "text")], format!("Dup len={}", best_len));
             break;
         }
     }
@@ -34225,7 +34226,7 @@ fn viz_string_algo_longest_duplicate_substring() -> Vec<VizFrame> {
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "text")],
         format!("Result: longest dup len={}", best_len),
     );
     v.into_frames()
@@ -34245,14 +34246,14 @@ fn viz_string_algo_suffix_array() -> Vec<VizFrame> {
         let vi = (*idx).min(n - 1);
         v.ptrs(
             &[(vi, HighlightKind::Active)],
-            &[(vi, "i")],
+            &[(vi, "text")],
             format!("Rank {}: suffix starting at {}", rank, idx),
         );
     }
     let sa: Vec<usize> = suffixes.iter().map(|(idx, _)| *idx).collect();
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "text")],
         format!("Suffix Array: {:?}", sa),
     );
     v.into_frames()
@@ -34280,13 +34281,13 @@ fn viz_string_algo_lcp_array() -> Vec<VizFrame> {
         let vi = suffixes[i].0.min(n - 1);
         v.ptrs(
             &[(vi, HighlightKind::Active)],
-            &[(vi, "i")],
+            &[(vi, "text")],
             format!("LCP[{}]={}", i, l),
         );
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "text")],
         format!("LCP Array: {:?}", &lcp_arr[..n]),
     );
     v.into_frames()
@@ -34308,7 +34309,7 @@ fn viz_string_algo_distinct_substrings() -> Vec<VizFrame> {
                 let end = (i + length - 1).min(n - 1);
                 v.ptrs(
                     &[(i, HighlightKind::Found), (end, HighlightKind::Found)],
-                    &[(i, "i"), (end, "j")],
+                    &[(i, "text"), (end, "pat")],
                     format!("New substr [{},{}] total={}", i, i + length - 1, seen.len()),
                 );
             }
@@ -34316,7 +34317,7 @@ fn viz_string_algo_distinct_substrings() -> Vec<VizFrame> {
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "text")],
         format!("Result: {} distinct substrings", seen.len()),
     );
     v.into_frames()
@@ -34341,7 +34342,7 @@ fn viz_string_algo_palindrome_partitioning_min() -> Vec<VizFrame> {
             dp[i] = 0;
             v.ptrs(
                 &[(i, HighlightKind::Found)],
-                &[(i, "i")],
+                &[(i, "text")],
                 format!("[0..{}] is palindrome, dp[{}]=0", i, i),
             );
             continue;
@@ -34355,13 +34356,13 @@ fn viz_string_algo_palindrome_partitioning_min() -> Vec<VizFrame> {
         }
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "text")],
             format!("dp[{}]={} cuts", i, dp[i]),
         );
     }
     v.ptrs(
         &[(n - 1, HighlightKind::Found)],
-        &[(n - 1, "i")],
+        &[(n - 1, "text")],
         format!("Result: min cuts = {}", dp[n - 1]),
     );
     v.into_frames()
@@ -34414,7 +34415,7 @@ fn viz_math_power_mod() -> Vec<VizFrame> {
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "step")],
         format!("Result: {}^{} mod {} = {}", base, exp, modulus, result),
     );
     v.into_frames()
@@ -34437,7 +34438,7 @@ fn viz_math_reverse_integer() -> Vec<VizFrame> {
         }
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "num")],
             format!("{} -> {}", original, reversed),
         );
     }
@@ -34457,7 +34458,7 @@ fn viz_math_ugly_number() -> Vec<VizFrame> {
     );
     v.ptrs(
         &[(0, HighlightKind::Sorted)],
-        &[(0, "i")],
+        &[(0, "num")],
         "ugly[0]=1".to_string(),
     );
 
@@ -34479,7 +34480,7 @@ fn viz_math_ugly_number() -> Vec<VizFrame> {
         v.array = ugly.clone();
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "num")],
             format!("ugly[{}]={} (p2={} p3={} p5={})", i, next, i2, i3, i5),
         );
     }
@@ -34502,14 +34503,14 @@ fn viz_math_next_permutation() -> Vec<VizFrame> {
             i_opt = Some(i);
             v.ptrs(
                 &[(i, HighlightKind::Found)],
-                &[(i, "i")],
+                &[(i, "num")],
                 format!("Found ascent at {} ({}<{})", i, arr[i], arr[i + 1]),
             );
             break;
         }
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "num")],
             format!("[{}]={} >= [{}]={}, continue", i, arr[i], i + 1, arr[i + 1]),
         );
     }
@@ -34520,7 +34521,7 @@ fn viz_math_next_permutation() -> Vec<VizFrame> {
             if arr[j] > arr[i] {
                 v.ptrs(
                     &[(i, HighlightKind::Pivot), (j, HighlightKind::Active)],
-                    &[(i, "i"), (j, "j")],
+                    &[(i, "num"), (j, "num")],
                     format!("Swap [{}]={} with [{}]={}", i, arr[i], j, arr[j]),
                 );
                 arr.swap(i, j);
@@ -34564,7 +34565,7 @@ fn viz_math_modular_inverse() -> Vec<VizFrame> {
         }
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "num")],
             format!("{}^(-1) mod {} = {}", a, p, result),
         );
     }
@@ -34619,7 +34620,7 @@ fn viz_math_matrix_exponentiation() -> Vec<VizFrame> {
     }
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "step")],
         format!("Result: fib({}) = {}", exp, result[0][0]),
     );
     v.into_frames()
@@ -34636,7 +34637,7 @@ fn viz_math_chinese_remainder() -> Vec<VizFrame> {
         &[],
         &[],
         format!(
-            "CRT — x={}(mod {}), x={}(mod {}), x={}(mod {})",
+            "Goal: Solve the system of congruences using the Chinese Remainder Theorem. Strategy: For each modulus, compute the product of other moduli, find its inverse, and accumulate the weighted remainders. x={}(mod {}), x={}(mod {}), x={}(mod {})",
             remainders[0], mods[0], remainders[1], mods[1], remainders[2], mods[2]
         ),
     );
@@ -34658,14 +34659,14 @@ fn viz_math_chinese_remainder() -> Vec<VizFrame> {
         result += term;
         v.ptrs(
             &[(i, HighlightKind::Active)],
-            &[(i, "i")],
+            &[(i, "num")],
             format!("mod {}: N/m={} inv={} term={}", mods[i], ni, inv, term),
         );
     }
     result %= product;
     v.ptrs(
         &[(0, HighlightKind::Found)],
-        &[(0, "i")],
+        &[(0, "num")],
         format!("Result: x = {} (mod {})", result, product),
     );
     v.into_frames()

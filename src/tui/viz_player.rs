@@ -363,7 +363,7 @@ impl VizPlayerState {
             frames: Vec::new(),
             current_frame: 0,
             auto_play: false,
-            delay_ms: 400,
+            delay_ms: 500,
             last_tick: std::time::Instant::now(),
             viz_name: String::new(),
             loaded_idx: None,
@@ -406,7 +406,7 @@ impl VizPlayerState {
         }
 
         match key.code {
-            KeyCode::Right | KeyCode::Enter | KeyCode::Char(' ') => {
+            KeyCode::Right | KeyCode::Enter => {
                 self.auto_play = false;
                 if self.current_frame + 1 < len {
                     self.current_frame += 1;
@@ -428,7 +428,7 @@ impl VizPlayerState {
                 self.current_frame = len - 1;
                 Action::None
             }
-            KeyCode::Char('a') => {
+            KeyCode::Char(' ') | KeyCode::Char('a') => {
                 self.auto_play = !self.auto_play;
                 self.last_tick = std::time::Instant::now();
                 // If at end, restart
@@ -477,7 +477,8 @@ impl VizPlayerState {
             Constraint::Length(2), // Annotation (centered at top)
             Constraint::Length(1), // Progress bar
             Constraint::Fill(1),   // Visualization area (all remaining space)
-            Constraint::Length(1), // Metrics + legend
+            Constraint::Length(1), // Metrics
+            Constraint::Length(1), // Legend
             Constraint::Length(1), // Controls
         ])
         .split(area);
@@ -539,14 +540,13 @@ impl VizPlayerState {
             VizData::None { message } => render_no_viz(f, chunks[2], message),
         }
 
-        // ── Metrics + legend (single line) ──
+        // ── Metrics (separate line) ──
         let (cmp_count, swap_count, read_count, write_count) = self.cumulative_metrics();
-        // ── Metrics + legend (centered, only relevant items) ──
         let mut metric_spans: Vec<Span> = Vec::new();
         let metrics: Vec<(&str, usize, Color)> = vec![
             ("cmp", cmp_count, Color::Yellow),
             ("swp", swap_count, Color::Red),
-            ("read", read_count, Color::Cyan),
+            ("read", read_count, Color::LightCyan),
             ("write", write_count, Color::Magenta),
         ];
         for (label, count, color) in &metrics {
@@ -562,58 +562,68 @@ impl VizPlayerState {
                 metric_spans.push(Span::raw("  "));
             }
         }
-        // Legend: only show kinds that appear in any frame
+        f.render_widget(
+            Paragraph::new(Line::from(metric_spans)).alignment(Alignment::Center),
+            chunks[3],
+        );
+
+        // ── Legend (separate line, only show kinds that appear) ──
         let has_kind = |kind: HighlightKind| -> bool {
             self.frames
                 .iter()
                 .any(|f| f.highlights.iter().any(|(_, k)| *k == kind))
         };
-        metric_spans.push(Span::raw("  "));
+        let mut legend_spans: Vec<Span> = Vec::new();
         let legend_items: Vec<(&str, Color)> = [
             ("cmp", Color::Yellow, HighlightKind::Comparing),
             ("swp", Color::Red, HighlightKind::Swapping),
             ("done", Color::Green, HighlightKind::Sorted),
-            ("read", Color::Cyan, HighlightKind::Reading),
+            ("active", Color::Cyan, HighlightKind::Active),
+            ("pivot", Color::LightMagenta, HighlightKind::Pivot),
+            ("found", Color::LightGreen, HighlightKind::Found),
+            ("read", Color::LightCyan, HighlightKind::Reading),
             ("write", Color::Magenta, HighlightKind::Writing),
-            ("target", Color::LightRed, HighlightKind::Target),
+            ("target", Color::Red, HighlightKind::Target),
         ]
         .iter()
         .filter(|(_, _, kind)| has_kind(*kind))
         .map(|(label, color, _)| (*label, *color))
         .collect();
         for (label, color) in &legend_items {
-            metric_spans.push(Span::styled("█", Style::new().fg(*color)));
-            metric_spans.push(Span::styled(
+            legend_spans.push(Span::styled("█", Style::new().fg(*color)));
+            legend_spans.push(Span::styled(
                 format!(" {} ", label),
                 Style::new().fg(Color::DarkGray),
             ));
         }
         f.render_widget(
-            Paragraph::new(Line::from(metric_spans)).alignment(Alignment::Center),
-            chunks[3],
+            Paragraph::new(Line::from(legend_spans)).alignment(Alignment::Center),
+            chunks[4],
         );
 
         // ── Controls (centered, adaptive to terminal width) ──
-        let w = chunks[4].width as usize;
+        let w = chunks[5].width as usize;
         let mut ctrl_spans: Vec<Span> = vec![
             Span::styled("[←/→]", Style::new().fg(Color::DarkGray)),
             Span::raw(" step "),
-            Span::styled("[A]", Style::new().fg(Color::DarkGray)),
-            Span::raw(" play "),
+            Span::styled("[Space]", Style::new().fg(Color::DarkGray)),
+            Span::raw(" play/pause "),
         ];
-        if w >= 50 {
+        if w >= 55 {
             ctrl_spans.push(Span::styled("[+/-]", Style::new().fg(Color::DarkGray)));
             ctrl_spans.push(Span::raw(" speed "));
         }
-        if w >= 70 {
+        if w >= 75 {
             ctrl_spans.push(Span::styled("[Home/End]", Style::new().fg(Color::DarkGray)));
             ctrl_spans.push(Span::raw(" jump "));
         }
+        ctrl_spans.push(Span::styled("[?]", Style::new().fg(Color::DarkGray)));
+        ctrl_spans.push(Span::raw(" help "));
         ctrl_spans.push(Span::styled("[Esc]", Style::new().fg(Color::DarkGray)));
         ctrl_spans.push(Span::raw(" back"));
         f.render_widget(
             Paragraph::new(Line::from(ctrl_spans)).alignment(Alignment::Center),
-            chunks[4],
+            chunks[5],
         );
     }
 
@@ -650,11 +660,11 @@ fn highlight_color(kind: Option<&HighlightKind>) -> Color {
         Some(HighlightKind::Swapping) => Color::Red,
         Some(HighlightKind::Sorted) => Color::Green,
         Some(HighlightKind::Active) => Color::Cyan,
-        Some(HighlightKind::Pivot) => Color::Magenta,
-        Some(HighlightKind::Found) => Color::Green,
-        Some(HighlightKind::Reading) => Color::Cyan,
+        Some(HighlightKind::Pivot) => Color::LightMagenta,
+        Some(HighlightKind::Found) => Color::LightGreen,
+        Some(HighlightKind::Reading) => Color::LightCyan,
         Some(HighlightKind::Writing) => Color::Magenta,
-        Some(HighlightKind::Target) => Color::LightRed,
+        Some(HighlightKind::Target) => Color::Red,
         None => Color::White,
     }
 }
@@ -680,19 +690,19 @@ fn highlight_style(kind: Option<&HighlightKind>) -> Style {
             .add_modifier(Modifier::BOLD),
         Some(HighlightKind::Target) => Style::new()
             .fg(Color::White)
-            .bg(Color::LightRed)
-            .add_modifier(Modifier::BOLD),
+            .bg(Color::Red)
+            .add_modifier(Modifier::BOLD | Modifier::UNDERLINED),
         Some(HighlightKind::Found) => Style::new()
-            .fg(Color::White)
-            .bg(Color::Green)
+            .fg(Color::Black)
+            .bg(Color::LightGreen)
             .add_modifier(Modifier::BOLD),
         Some(HighlightKind::Pivot) => Style::new()
-            .fg(Color::White)
-            .bg(Color::Magenta)
+            .fg(Color::Black)
+            .bg(Color::LightMagenta)
             .add_modifier(Modifier::BOLD),
         Some(HighlightKind::Reading) => Style::new()
             .fg(Color::Black)
-            .bg(Color::Cyan)
+            .bg(Color::LightCyan)
             .add_modifier(Modifier::BOLD),
         Some(HighlightKind::Writing) => Style::new()
             .fg(Color::White)
@@ -766,6 +776,43 @@ fn render_array(f: &mut Frame, area: Rect, values: &[String], frame: &VizFrame) 
     let dim = Style::new().fg(Color::DarkGray);
     let mut lines: Vec<Line> = Vec::new();
 
+    // Pointer labels above arrows (labels → arrows → cells)
+    if has_pointers {
+        let mut label_spans = vec![Span::raw(" ")];
+        for col in 0..num_cells {
+            if let Some((label, ptr_color)) = pointer_map.get(&col) {
+                label_spans.push(Span::styled(
+                    format!("{:^width$}", label, width = cell_w),
+                    Style::new().fg(*ptr_color).add_modifier(Modifier::BOLD),
+                ));
+            } else {
+                label_spans.push(Span::raw(" ".repeat(cell_w)));
+            }
+            if col + 1 < num_cells {
+                label_spans.push(Span::raw(" ".repeat(gap)));
+            }
+        }
+        lines.push(Line::from(label_spans));
+
+        // Pointer arrows (▼ pointing down to cells)
+        let mut arrow_spans = vec![Span::raw(" ")];
+        for col in 0..num_cells {
+            let content = if let Some((_, ptr_color)) = pointer_map.get(&col) {
+                Span::styled(
+                    format!("{:^width$}", "▼", width = cell_w),
+                    Style::new().fg(*ptr_color).add_modifier(Modifier::BOLD),
+                )
+            } else {
+                Span::raw(" ".repeat(cell_w))
+            };
+            arrow_spans.push(content);
+            if col + 1 < num_cells {
+                arrow_spans.push(Span::raw(" ".repeat(gap)));
+            }
+        }
+        lines.push(Line::from(arrow_spans));
+    }
+
     // Index row
     let mut idx_spans = vec![Span::raw(" ")];
     for col in 0..num_cells {
@@ -818,52 +865,39 @@ fn render_array(f: &mut Frame, area: Rect, values: &[String], frame: &VizFrame) 
     }
     lines.push(Line::from(bot_spans));
 
-    // Arrow row
-    let mut arrow_spans = vec![Span::raw(" ")];
-    for col in 0..num_cells {
-        let content = if let Some((_, ptr_color)) = pointer_map.get(&col) {
-            Span::styled(
-                format!("{:^width$}", "▲", width = cell_w),
-                Style::new().fg(*ptr_color).add_modifier(Modifier::BOLD),
-            )
-        } else if let Some(kind) = highlight_map.get(&col) {
-            let sym = match kind {
-                HighlightKind::Sorted => "✓",
-                HighlightKind::Found => "★",
-                HighlightKind::Target => "◎",
-                _ => " ",
-            };
-            Span::styled(
-                format!("{:^width$}", sym, width = cell_w),
-                Style::new().fg(highlight_color(Some(kind))),
-            )
-        } else {
-            Span::raw(" ".repeat(cell_w))
-        };
-        arrow_spans.push(content);
-        if col + 1 < num_cells {
-            arrow_spans.push(Span::raw(" ".repeat(gap)));
-        }
-    }
-    lines.push(Line::from(arrow_spans));
-
-    // Pointer label row
-    if has_pointers {
-        let mut label_spans = vec![Span::raw(" ")];
+    // Status symbols below cells (✓ for sorted, ★ for found, ◎ for target)
+    let has_status = frame.highlights.iter().any(|(_, k)| {
+        matches!(
+            k,
+            HighlightKind::Sorted | HighlightKind::Found | HighlightKind::Target
+        )
+    });
+    if has_status {
+        let mut status_spans = vec![Span::raw(" ")];
         for col in 0..num_cells {
-            if let Some((label, ptr_color)) = pointer_map.get(&col) {
-                label_spans.push(Span::styled(
-                    format!("{:^width$}", label, width = cell_w),
-                    Style::new().fg(*ptr_color).add_modifier(Modifier::BOLD),
-                ));
+            // Only show status symbols for non-pointer cells
+            let content = if pointer_map.contains_key(&col) {
+                Span::raw(" ".repeat(cell_w))
+            } else if let Some(kind) = highlight_map.get(&col) {
+                let sym = match kind {
+                    HighlightKind::Sorted => "✓",
+                    HighlightKind::Found => "★",
+                    HighlightKind::Target => "◎",
+                    _ => " ",
+                };
+                Span::styled(
+                    format!("{:^width$}", sym, width = cell_w),
+                    Style::new().fg(highlight_color(Some(kind))),
+                )
             } else {
-                label_spans.push(Span::raw(" ".repeat(cell_w)));
-            }
+                Span::raw(" ".repeat(cell_w))
+            };
+            status_spans.push(content);
             if col + 1 < num_cells {
-                label_spans.push(Span::raw(" ".repeat(gap)));
+                status_spans.push(Span::raw(" ".repeat(gap)));
             }
         }
-        lines.push(Line::from(label_spans));
+        lines.push(Line::from(status_spans));
     }
 
     // Center vertically
@@ -935,7 +969,7 @@ fn render_tree(f: &mut Frame, area: Rect, nodes: &[Option<String>], frame: &VizF
             let color = if node_idx < nodes.len() && nodes[node_idx].is_some() {
                 highlight_color(highlight_map.get(&node_idx))
             } else {
-                Color::DarkGray
+                Color::Gray
             };
 
             if node_idx < nodes.len() {
@@ -986,7 +1020,7 @@ fn render_tree(f: &mut Frame, area: Rect, nodes: &[Option<String>], frame: &VizF
                     if parent_x > c1_end {
                         conn1.push(Span::raw(" ".repeat(parent_x - c1_end)));
                     }
-                    conn1.push(Span::styled("│", Style::new().fg(Color::DarkGray)));
+                    conn1.push(Span::styled("│", Style::new().fg(Color::Gray)));
                     c1_end = parent_x + 1;
 
                     // Horizontal branch line
@@ -1009,20 +1043,20 @@ fn render_tree(f: &mut Frame, area: Rect, nodes: &[Option<String>], frame: &VizF
                                     "─".repeat(parent_x - left_child_x - 1),
                                     "─".repeat(right_child_x - parent_x - 1)
                                 ),
-                                Style::new().fg(Color::DarkGray),
+                                Style::new().fg(Color::Gray),
                             ));
                         }
                     } else if has_left {
                         if left_child_x < parent_x {
                             conn2.push(Span::styled(
                                 format!("┌{}┘", "─".repeat(parent_x - left_child_x - 1)),
-                                Style::new().fg(Color::DarkGray),
+                                Style::new().fg(Color::Gray),
                             ));
                         }
                     } else if has_right && parent_x < right_child_x {
                         conn2.push(Span::styled(
                             format!("└{}┐", "─".repeat(right_child_x - parent_x - 1)),
-                            Style::new().fg(Color::DarkGray),
+                            Style::new().fg(Color::Gray),
                         ));
                     }
                     c2_end = branch_right + 1;
@@ -1090,7 +1124,7 @@ fn render_tree_node_indented(
         lines.push(Line::from(vec![
             Span::styled(
                 format!("  {}{}", prefix, connector),
-                Style::new().fg(Color::DarkGray),
+                Style::new().fg(Color::Gray),
             ),
             Span::styled(
                 val.clone(),
@@ -1520,17 +1554,26 @@ fn render_grid(f: &mut Frame, area: Rect, cells: &[Vec<String>], frame: &VizFram
         let last_cell = data_rows * cols - 1;
 
         // Helper: get cell style considering walls, start, end
+        // S/E markers always overlay on top of any highlight color
         let cell_style = |flat_idx: usize, row: &[String]| -> Style {
             let c = flat_idx % cols;
             let val = if c < row.len() { row[c].as_str() } else { "" };
             if val == "-2" {
                 Style::new().fg(Color::DarkGray).bg(Color::DarkGray)
-            } else if flat_idx == 0 && !highlight_map.contains_key(&flat_idx) {
-                Style::new().fg(Color::Black).bg(Color::Green)
-            } else if flat_idx == last_cell && !highlight_map.contains_key(&flat_idx) {
-                Style::new().fg(Color::White).bg(Color::LightRed)
+            } else if let Some(kind) = highlight_map.get(&flat_idx) {
+                highlight_style(Some(kind))
+            } else if flat_idx == 0 {
+                Style::new()
+                    .fg(Color::Black)
+                    .bg(Color::Green)
+                    .add_modifier(Modifier::BOLD)
+            } else if flat_idx == last_cell {
+                Style::new()
+                    .fg(Color::White)
+                    .bg(Color::Red)
+                    .add_modifier(Modifier::BOLD)
             } else {
-                highlight_style(highlight_map.get(&flat_idx))
+                highlight_style(None)
             }
         };
 
@@ -1553,27 +1596,32 @@ fn render_grid(f: &mut Frame, area: Rect, cells: &[Vec<String>], frame: &VizFram
             let val = if c < row.len() { row[c].as_str() } else { "" };
 
             // Special cell types: walls, start, end
+            // S/E labels always visible, overlaid on highlight color
             let (display_val, style) = if val == "-2" {
                 // Wall cell: solid dark block
                 ("█", Style::new().fg(Color::DarkGray).bg(Color::DarkGray))
-            } else if flat_idx == 0 && !highlight_map.contains_key(&flat_idx) {
-                // Start cell (when not otherwise highlighted)
-                (
-                    "S",
+            } else if flat_idx == 0 {
+                // Start cell — always show "S", use highlight bg if active
+                let base = if let Some(kind) = highlight_map.get(&flat_idx) {
+                    highlight_style(Some(kind))
+                } else {
                     Style::new()
                         .fg(Color::Black)
                         .bg(Color::Green)
-                        .add_modifier(Modifier::BOLD),
-                )
-            } else if flat_idx == last_cell && !highlight_map.contains_key(&flat_idx) {
-                // End cell (when not otherwise highlighted)
-                (
-                    "E",
+                        .add_modifier(Modifier::BOLD)
+                };
+                ("S", base)
+            } else if flat_idx == last_cell {
+                // End cell — always show "E", use highlight bg if active
+                let base = if let Some(kind) = highlight_map.get(&flat_idx) {
+                    highlight_style(Some(kind))
+                } else {
                     Style::new()
                         .fg(Color::White)
-                        .bg(Color::LightRed)
-                        .add_modifier(Modifier::BOLD),
-                )
+                        .bg(Color::Red)
+                        .add_modifier(Modifier::BOLD)
+                };
+                ("E", base)
             } else {
                 (val, highlight_style(highlight_map.get(&flat_idx)))
             };

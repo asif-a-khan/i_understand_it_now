@@ -201,12 +201,12 @@ fn render_frame(
         match kind {
             Some(HighlightKind::Comparing) => Color::Yellow,
             Some(HighlightKind::Swapping) => Color::Red,
-            Some(HighlightKind::Sorted) => Color::Green,
-            Some(HighlightKind::Active) => Color::Cyan,
+            Some(HighlightKind::Sorted) => Color::DarkGreen,
+            Some(HighlightKind::Active) => Color::DarkCyan,
             Some(HighlightKind::Pivot) => Color::Magenta,
             Some(HighlightKind::Found) => Color::Green,
             Some(HighlightKind::Reading) => Color::Cyan,
-            Some(HighlightKind::Writing) => Color::Magenta,
+            Some(HighlightKind::Writing) => Color::DarkMagenta,
             Some(HighlightKind::Target) => Color::Red,
             None => Color::White,
         }
@@ -273,11 +273,15 @@ fn render_frame(
     // Legend
     queue!(stdout, style::Print("  "))?;
     let legend = [
-        ("██ Comparing", Color::Yellow),
-        ("██ Swapping", Color::Red),
-        ("██ Sorted", Color::Green),
-        ("██ Active", Color::Cyan),
-        ("██ Pivot", Color::Magenta),
+        ("██ cmp", Color::Yellow),
+        ("██ swp", Color::Red),
+        ("██ done", Color::DarkGreen),
+        ("██ active", Color::DarkCyan),
+        ("██ pivot", Color::Magenta),
+        ("██ found", Color::Green),
+        ("██ read", Color::Cyan),
+        ("██ write", Color::DarkMagenta),
+        ("██ target", Color::Red),
     ];
     for (label, color) in &legend {
         queue!(
