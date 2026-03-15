@@ -4292,7 +4292,11 @@ fn viz_binary_search_rotated_array() -> Vec<VizFrame> {
         if nums[lo] <= nums[mid] {
             if nums[lo] <= target && target < nums[mid] {
                 v.ptrs(
-                    &[(lo, HighlightKind::Active), (mid, HighlightKind::Active), (target_idx, HighlightKind::Target)],
+                    &[
+                        (lo, HighlightKind::Active),
+                        (mid, HighlightKind::Active),
+                        (target_idx, HighlightKind::Target),
+                    ],
                     &[(lo, "lo"), (mid, "mid")],
                     format!("Left sorted, {} in [{}..{}]", target, lo, mid),
                 );
@@ -34213,7 +34217,11 @@ fn viz_string_algo_longest_duplicate_substring() -> Vec<VizFrame> {
             let hl: Vec<_> = (best_start..best_start + best_len)
                 .map(|i| (i, HighlightKind::Found))
                 .collect();
-            v.ptrs(&hl, &[(best_start, "text")], format!("Dup len={}", best_len));
+            v.ptrs(
+                &hl,
+                &[(best_start, "text")],
+                format!("Dup len={}", best_len),
+            );
             break;
         }
     }

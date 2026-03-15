@@ -1,6 +1,6 @@
 [package]
 name = "iuin"
-version = "0.1.0"
+version = "0.1.0-alpha"
 edition = "2021"
 description = "I Understand It Now — an interactive terminal app for learning data structures and algorithms in Rust"
 license = "MIT"
