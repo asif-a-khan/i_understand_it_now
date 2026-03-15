@@ -1,9 +1,11 @@
 use rand::Rng;
+use std::cell::RefCell;
 use std::collections::HashMap;
+use std::rc::Rc;
 
 use crate::problems::{Difficulty, Problem, SolutionResult, TestCase};
 use crate::solutions::part1_foundations::strings as solutions;
-use crate::tracker::OperationLog;
+use crate::tracker::{track_string, OperationLog};
 
 pub fn problems() -> Vec<Box<dyn Problem>> {
     vec![
@@ -90,10 +92,15 @@ impl Problem for ReverseString {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<ReverseTest>().unwrap();
         let expected: String = t.s.chars().rev().collect();
-        let actual = solutions::reverse(&t.s);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_string(&t.s, shared_log.clone());
+        let actual = solutions::reverse(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("s={:?}", t.s),
@@ -162,10 +169,15 @@ impl Problem for ValidPalindrome {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<ValidPalindromeTest>().unwrap();
         let expected = ref_is_palindrome(&t.s);
-        let actual = solutions::is_palindrome(&t.s);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_string(&t.s, shared_log.clone());
+        let actual = solutions::is_palindrome(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("s={:?}", t.s),
@@ -239,10 +251,16 @@ impl Problem for IsAnagram {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<IsAnagramTest>().unwrap();
         let expected = ref_is_anagram(&t.s, &t.t);
-        let actual = solutions::is_anagram(&t.s, &t.t);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_s = track_string(&t.s, shared_log.clone());
+        let tracked_t = track_string(&t.t, shared_log.clone());
+        let actual = solutions::is_anagram(&tracked_s, &tracked_t);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("s={:?}, t={:?}", t.s, t.t),
@@ -303,10 +321,15 @@ impl Problem for FirstUniqueChar {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<FirstUniqueCharTest>().unwrap();
         let expected = ref_first_unique_char(&t.s);
-        let actual = solutions::first_unique_char(&t.s);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_string(&t.s, shared_log.clone());
+        let actual = solutions::first_unique_char(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("s={:?}", t.s),
@@ -454,10 +477,15 @@ impl Problem for LongestPalindromicSubstring {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<LPSTest>().unwrap();
         let expected = ref_longest_palindromic_substring(&t.s);
-        let actual = solutions::longest_palindromic_substring(&t.s);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_string(&t.s, shared_log.clone());
+        let actual = solutions::longest_palindromic_substring(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
 
         // Validate: actual must be a palindrome and same length as expected
         let actual_chars: Vec<char> = actual.chars().collect();
@@ -677,10 +705,15 @@ impl Problem for StringToInteger {
         tests
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<AtoiTest>().unwrap();
         let expected = ref_string_to_integer(&t.s);
-        let actual = solutions::string_to_integer(&t.s);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_string(&t.s, shared_log.clone());
+        let actual = solutions::string_to_integer(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("s={:?}", t.s),
@@ -771,10 +804,15 @@ impl Problem for ZigzagConversion {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<ZigzagTest>().unwrap();
         let expected = ref_zigzag_convert(&t.s, t.num_rows);
-        let actual = solutions::zigzag_convert(&t.s, t.num_rows);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_string(&t.s, shared_log.clone());
+        let actual = solutions::zigzag_convert(&tracked, t.num_rows);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("s={:?}, num_rows={}", t.s, t.num_rows),
@@ -927,10 +965,15 @@ impl Problem for LongestSubstringNoRepeat {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<LSNRTest>().unwrap();
         let expected = ref_longest_substring_no_repeat(&t.s);
-        let actual = solutions::longest_substring_no_repeat(&t.s);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_string(&t.s, shared_log.clone());
+        let actual = solutions::longest_substring_no_repeat(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("s={:?}", t.s),
@@ -1015,10 +1058,16 @@ impl Problem for MinimumWindowSubstring {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<MWSTest>().unwrap();
         let expected = ref_min_window(&t.s, &t.t);
-        let actual = solutions::min_window(&t.s, &t.t);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_s = track_string(&t.s, shared_log.clone());
+        let tracked_t = track_string(&t.t, shared_log.clone());
+        let actual = solutions::min_window(&tracked_s, &tracked_t);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("s={:?}, t={:?}", t.s, t.t),
@@ -1157,10 +1206,16 @@ impl Problem for RegexMatching {
         tests
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<RegexTest>().unwrap();
         let expected = ref_is_match_regex(&t.s, &t.p);
-        let actual = solutions::is_match_regex(&t.s, &t.p);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_s = track_string(&t.s, shared_log.clone());
+        let tracked_p = track_string(&t.p, shared_log.clone());
+        let actual = solutions::is_match_regex(&tracked_s, &tracked_p);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("s={:?}, p={:?}", t.s, t.p),
@@ -1246,10 +1301,16 @@ impl Problem for EditDistance {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<EditDistanceTest>().unwrap();
         let expected = ref_edit_distance(&t.word1, &t.word2);
-        let actual = solutions::edit_distance(&t.word1, &t.word2);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_w1 = track_string(&t.word1, shared_log.clone());
+        let tracked_w2 = track_string(&t.word2, shared_log.clone());
+        let actual = solutions::edit_distance(&tracked_w1, &tracked_w2);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("word1={:?}, word2={:?}", t.word1, t.word2),
@@ -1358,10 +1419,16 @@ impl Problem for WildcardMatching {
         tests
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<WildcardTest>().unwrap();
         let expected = ref_is_match_wildcard(&t.s, &t.p);
-        let actual = solutions::is_match_wildcard(&t.s, &t.p);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_s = track_string(&t.s, shared_log.clone());
+        let tracked_p = track_string(&t.p, shared_log.clone());
+        let actual = solutions::is_match_wildcard(&tracked_s, &tracked_p);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("s={:?}, p={:?}", t.s, t.p),

@@ -1,8 +1,10 @@
 use rand::Rng;
+use std::cell::RefCell;
+use std::rc::Rc;
 
 use crate::problems::{Difficulty, Problem, SolutionResult, TestCase};
 use crate::solutions::part6_advanced::string_algorithms as solutions;
-use crate::tracker::OperationLog;
+use crate::tracker::{track_string, OperationLog};
 
 pub fn problems() -> Vec<Box<dyn Problem>> {
     vec![
@@ -379,10 +381,16 @@ impl Problem for StringAlgoPatternMatch {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<PatternMatchTest>().unwrap();
         let expected = ref_pattern_match(&t.text, &t.pattern);
-        let actual = solutions::pattern_match(&t.text, &t.pattern);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_text = track_string(&t.text, shared_log.clone());
+        let tracked_pattern = track_string(&t.pattern, shared_log.clone());
+        let actual = solutions::pattern_match(&tracked_text, &tracked_pattern);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("text=\"{}\", pattern=\"{}\"", t.text, t.pattern),
@@ -436,10 +444,16 @@ impl Problem for StringAlgoCountOccurrences {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<CountOccTest>().unwrap();
         let expected = ref_count_occurrences(&t.text, &t.pattern);
-        let actual = solutions::count_occurrences(&t.text, &t.pattern);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_text = track_string(&t.text, shared_log.clone());
+        let tracked_pattern = track_string(&t.pattern, shared_log.clone());
+        let actual = solutions::count_occurrences(&tracked_text, &tracked_pattern);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("text=\"{}\", pattern=\"{}\"", t.text, t.pattern),
@@ -498,10 +512,16 @@ impl Problem for StringAlgoIsRotation {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<RotationTest>().unwrap();
         let expected = ref_is_rotation(&t.s1, &t.s2);
-        let actual = solutions::is_rotation(&t.s1, &t.s2);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_s1 = track_string(&t.s1, shared_log.clone());
+        let tracked_s2 = track_string(&t.s2, shared_log.clone());
+        let actual = solutions::is_rotation(&tracked_s1, &tracked_s2);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("s1=\"{}\", s2=\"{}\"", t.s1, t.s2),
@@ -552,10 +572,15 @@ impl Problem for StringAlgoLongestPrefixSuffix {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<LpsTest>().unwrap();
         let expected = ref_longest_prefix_suffix(&t.s);
-        let actual = solutions::longest_prefix_suffix(&t.s);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_string(&t.s, shared_log.clone());
+        let actual = solutions::longest_prefix_suffix(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("s=\"{}\"", t.s),
@@ -617,10 +642,16 @@ impl Problem for StringAlgoRepeatedStringMatch {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<RepeatedMatchTest>().unwrap();
         let expected = ref_repeated_string_match(&t.a, &t.b);
-        let actual = solutions::repeated_string_match(&t.a, &t.b);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_a = track_string(&t.a, shared_log.clone());
+        let tracked_b = track_string(&t.b, shared_log.clone());
+        let actual = solutions::repeated_string_match(&tracked_a, &tracked_b);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("a=\"{}\", b=\"{}\"", t.a, t.b),
@@ -675,10 +706,16 @@ impl Problem for StringAlgoKmp {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<KmpTest>().unwrap();
         let expected = ref_kmp_search(&t.text, &t.pattern);
-        let actual = solutions::kmp_search(&t.text, &t.pattern);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_text = track_string(&t.text, shared_log.clone());
+        let tracked_pattern = track_string(&t.pattern, shared_log.clone());
+        let actual = solutions::kmp_search(&tracked_text, &tracked_pattern);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("text=\"{}\", pattern=\"{}\"", t.text, t.pattern),
@@ -734,10 +771,16 @@ impl Problem for StringAlgoRabinKarp {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<RabinKarpTest>().unwrap();
         let expected = ref_kmp_search(&t.text, &t.pattern); // same result
-        let actual = solutions::rabin_karp(&t.text, &t.pattern);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_text = track_string(&t.text, shared_log.clone());
+        let tracked_pattern = track_string(&t.pattern, shared_log.clone());
+        let actual = solutions::rabin_karp(&tracked_text, &tracked_pattern);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("text=\"{}\", pattern=\"{}\"", t.text, t.pattern),
@@ -788,10 +831,15 @@ impl Problem for StringAlgoZFunction {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<ZFuncTest>().unwrap();
         let expected = ref_z_function(&t.s);
-        let actual = solutions::z_function(&t.s);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_string(&t.s, shared_log.clone());
+        let actual = solutions::z_function(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("s=\"{}\"", t.s),
@@ -842,10 +890,15 @@ impl Problem for StringAlgoLongestDuplicateSubstring {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<LongestDupTest>().unwrap();
         let expected = ref_longest_duplicate_substring(&t.s);
-        let actual = solutions::longest_duplicate_substring(&t.s);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_string(&t.s, shared_log.clone());
+        let actual = solutions::longest_duplicate_substring(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         // Accept any answer of the same length that occurs at least twice
         let valid = actual.len() == expected.len()
             && (actual.is_empty() || t.s.match_indices(&actual).count() >= 2);
@@ -898,10 +951,15 @@ impl Problem for StringAlgoShortestPalindrome {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<ShortPalTest>().unwrap();
         let expected = ref_shortest_palindrome(&t.s);
-        let actual = solutions::shortest_palindrome(&t.s);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_string(&t.s, shared_log.clone());
+        let actual = solutions::shortest_palindrome(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("s=\"{}\"", t.s),
@@ -952,10 +1010,15 @@ impl Problem for StringAlgoSuffixArray {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<SuffixArrayTest>().unwrap();
         let expected = ref_suffix_array(&t.s);
-        let actual = solutions::suffix_array(&t.s);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_string(&t.s, shared_log.clone());
+        let actual = solutions::suffix_array(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("s=\"{}\"", t.s),
@@ -1006,10 +1069,15 @@ impl Problem for StringAlgoLcpArray {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<LcpArrayTest>().unwrap();
         let expected = ref_lcp_array(&t.s);
-        let actual = solutions::lcp_array(&t.s);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_string(&t.s, shared_log.clone());
+        let actual = solutions::lcp_array(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("s=\"{}\"", t.s),
@@ -1060,10 +1128,15 @@ impl Problem for StringAlgoDistinctSubstrings {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<DistinctSubTest>().unwrap();
         let expected = ref_distinct_substrings(&t.s);
-        let actual = solutions::distinct_substrings(&t.s);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_string(&t.s, shared_log.clone());
+        let actual = solutions::distinct_substrings(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("s=\"{}\"", t.s),
@@ -1113,10 +1186,15 @@ impl Problem for StringAlgoPalindromePartitioningMin {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<PalPartTest>().unwrap();
         let expected = ref_palindrome_partitioning_min(&t.s);
-        let actual = solutions::palindrome_partitioning_min(&t.s);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_string(&t.s, shared_log.clone());
+        let actual = solutions::palindrome_partitioning_min(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("s=\"{}\"", t.s),
@@ -1170,10 +1248,16 @@ impl Problem for StringAlgoLongestCommonSubstring {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<LcsTest>().unwrap();
         let expected = ref_longest_common_substring(&t.s1, &t.s2);
-        let actual = solutions::longest_common_substring(&t.s1, &t.s2);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_s1 = track_string(&t.s1, shared_log.clone());
+        let tracked_s2 = track_string(&t.s2, shared_log.clone());
+        let actual = solutions::longest_common_substring(&tracked_s1, &tracked_s2);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         // Accept any answer of the same length that is a substring of both
         let valid = actual.len() == expected.len()
             && (actual.is_empty() || (t.s1.contains(&actual) && t.s2.contains(&actual)));

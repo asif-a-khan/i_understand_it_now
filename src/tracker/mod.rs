@@ -221,6 +221,244 @@ impl<T: Neg<Output = T> + Clone> Neg for Tracked<T> {
     }
 }
 
+// ═══════════════════════════════════════════════════════════════════════
+// Type-specific convenience methods
+// ═══════════════════════════════════════════════════════════════════════
+
+// ─── Tracked<i32> ────────────────────────────────────────────────────
+
+#[allow(dead_code)]
+impl Tracked<i32> {
+    pub fn abs(&self) -> i32 {
+        self.value.abs()
+    }
+    pub fn pow(&self, exp: u32) -> i32 {
+        self.value.pow(exp)
+    }
+    pub fn wrapping_add(&self, rhs: i32) -> i32 {
+        self.value.wrapping_add(rhs)
+    }
+    pub fn wrapping_sub(&self, rhs: i32) -> i32 {
+        self.value.wrapping_sub(rhs)
+    }
+    pub fn checked_add(&self, rhs: i32) -> Option<i32> {
+        self.value.checked_add(rhs)
+    }
+    pub fn checked_sub(&self, rhs: i32) -> Option<i32> {
+        self.value.checked_sub(rhs)
+    }
+    pub fn signum(&self) -> i32 {
+        self.value.signum()
+    }
+}
+
+impl PartialEq<i32> for Tracked<i32> {
+    fn eq(&self, other: &i32) -> bool {
+        self.value == *other
+    }
+}
+
+impl PartialOrd<i32> for Tracked<i32> {
+    fn partial_cmp(&self, other: &i32) -> Option<std::cmp::Ordering> {
+        self.value.partial_cmp(other)
+    }
+}
+
+// ─── Tracked<i64> ────────────────────────────────────────────────────
+
+#[allow(dead_code)]
+impl Tracked<i64> {
+    pub fn abs(&self) -> i64 {
+        self.value.abs()
+    }
+    pub fn pow(&self, exp: u32) -> i64 {
+        self.value.pow(exp)
+    }
+    pub fn signum(&self) -> i64 {
+        self.value.signum()
+    }
+}
+
+impl PartialEq<i64> for Tracked<i64> {
+    fn eq(&self, other: &i64) -> bool {
+        self.value == *other
+    }
+}
+
+impl PartialOrd<i64> for Tracked<i64> {
+    fn partial_cmp(&self, other: &i64) -> Option<std::cmp::Ordering> {
+        self.value.partial_cmp(other)
+    }
+}
+
+// ─── Tracked<f64> ────────────────────────────────────────────────────
+
+#[allow(dead_code)]
+impl Tracked<f64> {
+    pub fn abs(&self) -> f64 {
+        self.value.abs()
+    }
+    pub fn sqrt(&self) -> f64 {
+        self.value.sqrt()
+    }
+    pub fn floor(&self) -> f64 {
+        self.value.floor()
+    }
+    pub fn ceil(&self) -> f64 {
+        self.value.ceil()
+    }
+    pub fn round(&self) -> f64 {
+        self.value.round()
+    }
+    pub fn is_finite(&self) -> bool {
+        self.value.is_finite()
+    }
+    pub fn is_nan(&self) -> bool {
+        self.value.is_nan()
+    }
+    pub fn min_f(&self, other: f64) -> f64 {
+        self.value.min(other)
+    }
+    pub fn max_f(&self, other: f64) -> f64 {
+        self.value.max(other)
+    }
+}
+
+impl PartialEq<f64> for Tracked<f64> {
+    fn eq(&self, other: &f64) -> bool {
+        self.value == *other
+    }
+}
+
+impl PartialOrd<f64> for Tracked<f64> {
+    fn partial_cmp(&self, other: &f64) -> Option<std::cmp::Ordering> {
+        self.value.partial_cmp(other)
+    }
+}
+
+// ─── Tracked<char> ───────────────────────────────────────────────────
+
+#[allow(dead_code)]
+impl Tracked<char> {
+    pub fn is_alphabetic(&self) -> bool {
+        self.value.is_alphabetic()
+    }
+    pub fn is_alphanumeric(&self) -> bool {
+        self.value.is_alphanumeric()
+    }
+    pub fn is_ascii(&self) -> bool {
+        self.value.is_ascii()
+    }
+    pub fn is_ascii_lowercase(&self) -> bool {
+        self.value.is_ascii_lowercase()
+    }
+    pub fn is_ascii_uppercase(&self) -> bool {
+        self.value.is_ascii_uppercase()
+    }
+    pub fn is_ascii_digit(&self) -> bool {
+        self.value.is_ascii_digit()
+    }
+    pub fn is_ascii_alphabetic(&self) -> bool {
+        self.value.is_ascii_alphabetic()
+    }
+    pub fn is_ascii_whitespace(&self) -> bool {
+        self.value.is_ascii_whitespace()
+    }
+    pub fn is_whitespace(&self) -> bool {
+        self.value.is_whitespace()
+    }
+    pub fn to_ascii_lowercase(&self) -> char {
+        self.value.to_ascii_lowercase()
+    }
+    pub fn to_ascii_uppercase(&self) -> char {
+        self.value.to_ascii_uppercase()
+    }
+    pub fn is_numeric(&self) -> bool {
+        self.value.is_ascii_digit()
+    }
+    pub fn to_digit(&self, radix: u32) -> Option<u32> {
+        self.value.to_digit(radix)
+    }
+}
+
+impl PartialEq<char> for Tracked<char> {
+    fn eq(&self, other: &char) -> bool {
+        self.value == *other
+    }
+}
+
+impl PartialOrd<char> for Tracked<char> {
+    fn partial_cmp(&self, other: &char) -> Option<std::cmp::Ordering> {
+        self.value.partial_cmp(other)
+    }
+}
+
+// ─── Tracked<Option<i32>> ────────────────────────────────────────────
+
+#[allow(dead_code)]
+impl Tracked<Option<i32>> {
+    pub fn is_some(&self) -> bool {
+        self.value.is_some()
+    }
+    pub fn is_none(&self) -> bool {
+        self.value.is_none()
+    }
+    pub fn unwrap(&self) -> i32 {
+        self.value.unwrap()
+    }
+    pub fn unwrap_or(&self, default: i32) -> i32 {
+        self.value.unwrap_or(default)
+    }
+    pub fn map<F: FnOnce(i32) -> i32>(&self, f: F) -> Option<i32> {
+        self.value.map(f)
+    }
+}
+
+// ─── Tracked<Option<usize>> ─────────────────────────────────────────
+
+#[allow(dead_code)]
+impl Tracked<Option<usize>> {
+    pub fn is_some(&self) -> bool {
+        self.value.is_some()
+    }
+    pub fn is_none(&self) -> bool {
+        self.value.is_none()
+    }
+    pub fn unwrap(&self) -> usize {
+        self.value.unwrap()
+    }
+    pub fn unwrap_or(&self, default: usize) -> usize {
+        self.value.unwrap_or(default)
+    }
+}
+
+// ─── TrackedString trait for [Tracked<char>] ─────────────────────────
+
+/// String-like operations on tracked character slices.
+#[allow(dead_code)]
+pub trait TrackedString {
+    /// Collect all characters into a String.
+    fn to_string_value(&self) -> String;
+    /// Check if the slice contains a specific character.
+    fn contains_char(&self, c: char) -> bool;
+    /// Extract raw characters as a Vec.
+    fn chars_vec(&self) -> Vec<char>;
+}
+
+impl TrackedString for [Tracked<char>] {
+    fn to_string_value(&self) -> String {
+        self.iter().map(|t| t.value).collect()
+    }
+    fn contains_char(&self, c: char) -> bool {
+        self.iter().any(|t| t.value == c)
+    }
+    fn chars_vec(&self) -> Vec<char> {
+        self.iter().map(|t| t.value).collect()
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+
 /// Create a tracked slice from a regular slice, sharing one OperationLog.
 pub fn track_slice<T: Clone>(values: &[T], log: Rc<RefCell<OperationLog>>) -> Vec<Tracked<T>> {
     values
@@ -228,6 +466,12 @@ pub fn track_slice<T: Clone>(values: &[T], log: Rc<RefCell<OperationLog>>) -> Ve
         .enumerate()
         .map(|(i, v)| Tracked::new(v.clone(), i, log.clone()))
         .collect()
+}
+
+/// Create a tracked char slice from a string.
+pub fn track_string(s: &str, log: Rc<RefCell<OperationLog>>) -> Vec<Tracked<char>> {
+    let chars: Vec<char> = s.chars().collect();
+    track_slice(&chars, log)
 }
 
 /// Record a swap between two positions in a tracked slice.
