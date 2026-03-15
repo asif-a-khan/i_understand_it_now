@@ -104,23 +104,6 @@ impl VizLog {
     }
 
     /// Convert all frames to use VizData::Graph.
-    pub fn into_graph_frames(self, edges: &[(usize, usize)], directed: bool) -> Vec<VizFrame> {
-        self.frames
-            .into_iter()
-            .map(|mut f| {
-                let n = f.array.len();
-                f.data = Some(super::VizData::Graph {
-                    n,
-                    labels: (0..n).map(|i| i.to_string()).collect(),
-                    edges: edges.to_vec(),
-                    weighted_edges: vec![],
-                    directed,
-                });
-                f
-            })
-            .collect()
-    }
-
     /// Convert all frames to use VizData::Grid with given dimensions.
     pub fn into_grid_frames(self, rows: usize, cols: usize) -> Vec<VizFrame> {
         self.frames
@@ -17222,69 +17205,78 @@ fn viz_bst_merge_two() -> Vec<VizFrame> {
 
 // ─── Graph Helper Functions ──────────────────────────────────
 
-/// Build a random undirected connected graph as adjacency list.
-/// Returns (adj_list, node_count). Values in the array represent node IDs.
-fn rand_graph_undirected(rng: &mut impl Rng, n: usize) -> Vec<Vec<usize>> {
-    let mut adj = vec![vec![]; n];
-    // Ensure connected: chain 0-1-2-..-(n-1)
-    for i in 0..n - 1 {
-        adj[i].push(i + 1);
-        adj[i + 1].push(i);
-    }
-    // Add a few random edges
-    let extra = rng.random_range(1..=n / 2);
-    for _ in 0..extra {
-        let u = rng.random_range(0..n);
-        let v = rng.random_range(0..n);
-        if u != v && !adj[u].contains(&v) {
-            adj[u].push(v);
-            adj[v].push(u);
+/// Build a grid graph where each cell connects only to its 4 neighbors (up/down/left/right).
+/// Some cells are randomly blocked as walls. Returns (adjacency_list, is_wall).
+/// Start (0) and end (n-1) are never walls. Ensures a path exists from 0 to n-1.
+fn rand_grid_graph(
+    rng: &mut impl Rng,
+    rows: usize,
+    cols: usize,
+    wall_pct: f64,
+) -> (Vec<Vec<usize>>, Vec<bool>) {
+    let n = rows * cols;
+    let mut is_wall = vec![false; n];
+
+    // Randomly block ~wall_pct of cells (never block start=0 or end=n-1)
+    for i in 1..n - 1 {
+        if (rng.random_range(0..100) as f64) < wall_pct * 100.0 {
+            is_wall[i] = true;
         }
     }
-    adj
+
+    // Ensure a path exists: clear walls along a simple path (right then down)
+    for c in 0..cols {
+        is_wall[c] = false; // top row
+    }
+    for r in 0..rows {
+        is_wall[r * cols + cols - 1] = false; // right column
+    }
+
+    // Build adjacency list from grid neighbors
+    let mut adj = vec![vec![]; n];
+    for r in 0..rows {
+        for c in 0..cols {
+            let idx = r * cols + c;
+            if is_wall[idx] {
+                continue;
+            }
+            // Right neighbor
+            if c + 1 < cols && !is_wall[idx + 1] {
+                adj[idx].push(idx + 1);
+                adj[idx + 1].push(idx);
+            }
+            // Down neighbor
+            if r + 1 < rows && !is_wall[idx + cols] {
+                adj[idx].push(idx + cols);
+                adj[idx + cols].push(idx);
+            }
+        }
+    }
+    // Deduplicate adjacency lists
+    for neighbors in &mut adj {
+        neighbors.sort_unstable();
+        neighbors.dedup();
+    }
+    (adj, is_wall)
 }
 
-/// Build a random DAG as adjacency list.
-fn rand_dag(rng: &mut impl Rng, n: usize) -> Vec<Vec<usize>> {
+/// Build a weighted grid graph. Returns (adj_list_with_weights, is_wall).
+fn rand_weighted_grid_graph(
+    rng: &mut impl Rng,
+    rows: usize,
+    cols: usize,
+    wall_pct: f64,
+) -> (Vec<Vec<(usize, i32)>>, Vec<bool>) {
+    let (unweighted_adj, is_wall) = rand_grid_graph(rng, rows, cols, wall_pct);
+    let n = rows * cols;
     let mut adj = vec![vec![]; n];
-    for i in 0..n - 1 {
-        let j = rng.random_range(i + 1..n);
-        adj[i].push(j);
-    }
-    let extra = rng.random_range(1..=n / 2);
-    for _ in 0..extra {
-        let u = rng.random_range(0..n);
-        let v = rng.random_range(u + 1..n);
-        if u < n - 1 && v < n && !adj[u].contains(&v) {
-            adj[u].push(v);
+    for (u, neighbors) in unweighted_adj.iter().enumerate() {
+        for &v in neighbors {
+            let weight = rng.random_range(1..=5);
+            adj[u].push((v, weight));
         }
     }
-    adj
-}
-
-/// Build a random weighted graph; returns (adj_list_with_weights, flat_weights).
-/// The flat array stores edge weight for node i as node value.
-fn rand_weighted_graph(rng: &mut impl Rng, n: usize) -> (Vec<Vec<(usize, i32)>>, Vec<i32>) {
-    let mut adj: Vec<Vec<(usize, i32)>> = vec![vec![]; n];
-    let mut weights = vec![0i32; n];
-    for i in 0..n - 1 {
-        let w = rng.random_range(1..=10);
-        adj[i].push((i + 1, w));
-        adj[i + 1].push((i, w));
-        weights[i] = w;
-    }
-    let extra = rng.random_range(1..=n / 2);
-    for _ in 0..extra {
-        let u = rng.random_range(0..n);
-        let v = rng.random_range(0..n);
-        if u != v && !adj[u].iter().any(|(x, _)| *x == v) {
-            let w = rng.random_range(1..=10);
-            adj[u].push((v, w));
-            adj[v].push((u, w));
-        }
-    }
-    weights[n - 1] = rng.random_range(1..=10);
-    (adj, weights)
+    (adj, is_wall)
 }
 
 /// Simple Union-Find for graph helpers.
@@ -17316,9 +17308,16 @@ fn uf_union(parent: &mut [usize], rank: &mut [usize], a: usize, b: usize) -> boo
 
 fn viz_graph_repr_adjacency_list() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(10..=14);
-    let adj = rand_graph_undirected(&mut rng, n);
-    let vals: Vec<i32> = (0..n).map(|i| adj[i].len() as i32).collect();
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (adj, is_wall) = rand_grid_graph(&mut rng, rows, cols, 0.25);
+    let mut vals: Vec<i32> = (0..n).map(|i| adj[i].len() as i32).collect();
+    for (i, &wall) in is_wall.iter().enumerate() {
+        if wall {
+            vals[i] = -2;
+        }
+    }
 
     let mut v = VizLog::new(vals);
     v.ptrs(
@@ -17328,6 +17327,9 @@ fn viz_graph_repr_adjacency_list() -> Vec<VizFrame> {
     );
 
     for i in 0..n {
+        if is_wall[i] {
+            continue;
+        }
         let neighbors: Vec<String> = adj[i].iter().map(|x| x.to_string()).collect();
         v.ptrs(
             &[(i, HighlightKind::Active)],
@@ -17342,22 +17344,21 @@ fn viz_graph_repr_adjacency_list() -> Vec<VizFrame> {
         &[(0, "start"), (n - 1, "end")],
         format!("Result: adjacency list built for {} nodes. O(V+E) space, O(1) to add edge, O(degree) to check neighbors.", n),
     );
-    let mut edges: Vec<(usize, usize)> = Vec::new();
-    for (u, neighbors) in adj.iter().enumerate() {
-        for &w in neighbors {
-            if u < w {
-                edges.push((u, w));
-            }
-        }
-    }
-    v.into_graph_frames(&edges, false)
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_graph_repr_adjacency_matrix() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(10..=14);
-    let adj = rand_graph_undirected(&mut rng, n);
-    let vals: Vec<i32> = (0..n).map(|i| adj[i].len() as i32).collect();
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (adj, is_wall) = rand_grid_graph(&mut rng, rows, cols, 0.25);
+    let mut vals: Vec<i32> = (0..n).map(|i| adj[i].len() as i32).collect();
+    for (i, &wall) in is_wall.iter().enumerate() {
+        if wall {
+            vals[i] = -2;
+        }
+    }
 
     let mut v = VizLog::new(vals);
     v.ptrs(
@@ -17367,6 +17368,9 @@ fn viz_graph_repr_adjacency_matrix() -> Vec<VizFrame> {
     );
 
     for i in 0..n {
+        if is_wall[i] {
+            continue;
+        }
         let mut row = vec![0; n];
         for &nb in &adj[i] {
             row[nb] = 1;
@@ -17389,22 +17393,21 @@ fn viz_graph_repr_adjacency_matrix() -> Vec<VizFrame> {
         &[(0, "start"), (n - 1, "end")],
         format!("Result: {}x{} adjacency matrix built. O(1) edge lookup, but O(V^2) space even for sparse graphs.", n, n),
     );
-    let mut edges: Vec<(usize, usize)> = Vec::new();
-    for (u, neighbors) in adj.iter().enumerate() {
-        for &w in neighbors {
-            if u < w {
-                edges.push((u, w));
-            }
-        }
-    }
-    v.into_graph_frames(&edges, false)
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_graph_repr_degree_count() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(10..=14);
-    let adj = rand_graph_undirected(&mut rng, n);
-    let degrees: Vec<i32> = (0..n).map(|i| adj[i].len() as i32).collect();
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (adj, is_wall) = rand_grid_graph(&mut rng, rows, cols, 0.25);
+    let mut degrees: Vec<i32> = (0..n).map(|i| adj[i].len() as i32).collect();
+    for (i, &wall) in is_wall.iter().enumerate() {
+        if wall {
+            degrees[i] = -2;
+        }
+    }
 
     let mut v = VizLog::new(degrees.clone());
     v.ptrs(
@@ -17416,6 +17419,9 @@ fn viz_graph_repr_degree_count() -> Vec<VizFrame> {
     let mut max_deg = 0;
     let mut max_node = 0;
     for i in 0..n {
+        if is_wall[i] {
+            continue;
+        }
         if degrees[i] > max_deg {
             max_deg = degrees[i];
             max_node = i;
@@ -17435,25 +17441,25 @@ fn viz_graph_repr_degree_count() -> Vec<VizFrame> {
             max_deg, max_node
         ),
     );
-    let mut edges: Vec<(usize, usize)> = Vec::new();
-    for (u, neighbors) in adj.iter().enumerate() {
-        for &w in neighbors {
-            if u < w {
-                edges.push((u, w));
-            }
-        }
-    }
-    v.into_graph_frames(&edges, false)
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_graph_repr_has_edge() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(10..=14);
-    let adj = rand_graph_undirected(&mut rng, n);
-    let vals: Vec<i32> = (0..n).map(|i| adj[i].len() as i32).collect();
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (adj, is_wall) = rand_grid_graph(&mut rng, rows, cols, 0.25);
+    let mut vals: Vec<i32> = (0..n).map(|i| adj[i].len() as i32).collect();
+    for (i, &wall) in is_wall.iter().enumerate() {
+        if wall {
+            vals[i] = -2;
+        }
+    }
 
-    let u = rng.random_range(0..n);
-    let w = rng.random_range(0..n);
+    let non_walls: Vec<usize> = (0..n).filter(|&i| !is_wall[i]).collect();
+    let u = non_walls[rng.random_range(0..non_walls.len())];
+    let w = non_walls[rng.random_range(0..non_walls.len())];
     let has = adj[u].contains(&w);
 
     let mut v = VizLog::new(vals);
@@ -17510,22 +17516,21 @@ fn viz_graph_repr_has_edge() -> Vec<VizFrame> {
             if has { "does" } else { "does not" }
         ),
     );
-    let mut edges: Vec<(usize, usize)> = Vec::new();
-    for (u, neighbors) in adj.iter().enumerate() {
-        for &w in neighbors {
-            if u < w {
-                edges.push((u, w));
-            }
-        }
-    }
-    v.into_graph_frames(&edges, false)
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_graph_repr_count_edges() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(10..=14);
-    let adj = rand_graph_undirected(&mut rng, n);
-    let degrees: Vec<i32> = (0..n).map(|i| adj[i].len() as i32).collect();
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (adj, is_wall) = rand_grid_graph(&mut rng, rows, cols, 0.25);
+    let mut degrees: Vec<i32> = (0..n).map(|i| adj[i].len() as i32).collect();
+    for (i, &wall) in is_wall.iter().enumerate() {
+        if wall {
+            degrees[i] = -2;
+        }
+    }
 
     let mut v = VizLog::new(degrees.clone());
     v.ptrs(
@@ -17536,6 +17541,9 @@ fn viz_graph_repr_count_edges() -> Vec<VizFrame> {
 
     let mut total = 0;
     for i in 0..n {
+        if is_wall[i] {
+            continue;
+        }
         total += degrees[i];
         v.ptrs(
             &[(i, HighlightKind::Active)],
@@ -17544,40 +17552,30 @@ fn viz_graph_repr_count_edges() -> Vec<VizFrame> {
         );
     }
 
-    let edges = total / 2;
+    let edge_count = total / 2;
     let all: Vec<(usize, HighlightKind)> = (0..n).map(|i| (i, HighlightKind::Sorted)).collect();
     v.ptrs(
         &all,
         &[(0, "start"), (n - 1, "end")],
-        format!("Result: {} edges (sum_deg={}/2)", edges, total),
+        format!("Result: {} edges (sum_deg={}/2)", edge_count, total),
     );
-    let mut graph_edges: Vec<(usize, usize)> = Vec::new();
-    for (u, neighbors) in adj.iter().enumerate() {
-        for &w in neighbors {
-            if u < w {
-                graph_edges.push((u, w));
-            }
-        }
-    }
-    v.into_graph_frames(&graph_edges, false)
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_graph_repr_is_bipartite() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
-    // Build bipartite: even nodes connect to odd nodes only
-    let mut adj = vec![vec![]; n];
-    for i in (0..n).step_by(2) {
-        for j in (1..n).step_by(2) {
-            if rng.random_range(0..3) == 0 || (i + 1 == j) {
-                adj[i].push(j);
-                adj[j].push(i);
-            }
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (adj, is_wall) = rand_grid_graph(&mut rng, rows, cols, 0.25);
+    let mut vals: Vec<i32> = (0..n).map(|i| if i % 2 == 0 { 1 } else { 2 }).collect();
+    for (i, &wall) in is_wall.iter().enumerate() {
+        if wall {
+            vals[i] = -2;
         }
     }
-    let colors: Vec<i32> = (0..n).map(|i| if i % 2 == 0 { 1 } else { 2 }).collect();
 
-    let mut v = VizLog::new(colors.clone());
+    let mut v = VizLog::new(vals);
     v.ptrs(
         &[],
         &[],
@@ -17615,33 +17613,22 @@ fn viz_graph_repr_is_bipartite() -> Vec<VizFrame> {
         &[(0, "grp0"), (1.min(n - 1), "grp1")],
         "Result: graph is bipartite".to_string(),
     );
-    let mut edges: Vec<(usize, usize)> = Vec::new();
-    for (u, neighbors) in adj.iter().enumerate() {
-        for &w in neighbors {
-            if u < w {
-                edges.push((u, w));
-            }
-        }
-    }
-    v.into_graph_frames(&edges, false)
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_graph_repr_connected_components() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(7..=9);
-    // Build 2-3 components
-    let mut adj = vec![vec![]; n];
-    let split = rng.random_range(3..n - 2);
-    for i in 0..split - 1 {
-        adj[i].push(i + 1);
-        adj[i + 1].push(i);
-    }
-    for i in split..n - 1 {
-        adj[i].push(i + 1);
-        adj[i + 1].push(i);
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (adj, is_wall) = rand_grid_graph(&mut rng, rows, cols, 0.25);
+    let mut vals: Vec<i32> = vec![0; n];
+    for (i, &wall) in is_wall.iter().enumerate() {
+        if wall {
+            vals[i] = -2;
+        }
     }
 
-    let vals: Vec<i32> = vec![0; n];
     let mut v = VizLog::new(vals);
     v.ptrs(
         &[],
@@ -17653,7 +17640,7 @@ fn viz_graph_repr_connected_components() -> Vec<VizFrame> {
     let mut comp_id = 0;
 
     for start in 0..n {
-        if visited[start] {
+        if visited[start] || is_wall[start] {
             continue;
         }
         comp_id += 1;
@@ -17693,22 +17680,21 @@ fn viz_graph_repr_connected_components() -> Vec<VizFrame> {
         &[(0, "start"), (n - 1, "end")],
         format!("Result: {} connected components", comp_id),
     );
-    let mut edges: Vec<(usize, usize)> = Vec::new();
-    for (u, neighbors) in adj.iter().enumerate() {
-        for &w in neighbors {
-            if u < w {
-                edges.push((u, w));
-            }
-        }
-    }
-    v.into_graph_frames(&edges, false)
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_graph_repr_has_cycle_undirected() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(10..=14);
-    let adj = rand_graph_undirected(&mut rng, n);
-    let vals: Vec<i32> = (0..n).map(|i| adj[i].len() as i32).collect();
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (adj, is_wall) = rand_grid_graph(&mut rng, rows, cols, 0.25);
+    let mut vals: Vec<i32> = (0..n).map(|i| adj[i].len() as i32).collect();
+    for (i, &wall) in is_wall.iter().enumerate() {
+        if wall {
+            vals[i] = -2;
+        }
+    }
 
     let mut v = VizLog::new(vals);
     v.ptrs(
@@ -17763,30 +17749,30 @@ fn viz_graph_repr_has_cycle_undirected() -> Vec<VizFrame> {
             if found_cycle { "detected" } else { "not found" }
         ),
     );
-    let mut edges: Vec<(usize, usize)> = Vec::new();
-    for (u, neighbors) in adj.iter().enumerate() {
-        for &w in neighbors {
-            if u < w {
-                edges.push((u, w));
-            }
-        }
-    }
-    v.into_graph_frames(&edges, false)
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_graph_repr_has_cycle_directed() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(10..=14);
-    let mut adj = rand_dag(&mut rng, n);
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (mut adj, is_wall) = rand_grid_graph(&mut rng, rows, cols, 0.15);
     // Add a back edge to create cycle
-    if n > 2 {
-        let from = rng.random_range(n / 2..n);
-        let to = rng.random_range(0..n / 2);
+    let non_walls: Vec<usize> = (0..n).filter(|&i| !is_wall[i]).collect();
+    if non_walls.len() > 2 {
+        let from = non_walls[rng.random_range(non_walls.len() / 2..non_walls.len())];
+        let to = non_walls[rng.random_range(0..non_walls.len() / 2)];
         if !adj[from].contains(&to) {
             adj[from].push(to);
         }
     }
-    let vals: Vec<i32> = (0..n as i32).collect();
+    let mut vals: Vec<i32> = (0..n as i32).collect();
+    for (i, &wall) in is_wall.iter().enumerate() {
+        if wall {
+            vals[i] = -2;
+        }
+    }
 
     let mut v = VizLog::new(vals);
     v.ptrs(
@@ -17863,20 +17849,21 @@ fn viz_graph_repr_has_cycle_directed() -> Vec<VizFrame> {
             if found_cycle { "detected" } else { "not found" }
         ),
     );
-    let mut edges: Vec<(usize, usize)> = Vec::new();
-    for (u, neighbors) in adj.iter().enumerate() {
-        for &w in neighbors {
-            edges.push((u, w));
-        }
-    }
-    v.into_graph_frames(&edges, true)
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_graph_repr_transpose() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(10..=14);
-    let adj = rand_dag(&mut rng, n);
-    let vals: Vec<i32> = (0..n).map(|i| adj[i].len() as i32).collect();
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (adj, is_wall) = rand_grid_graph(&mut rng, rows, cols, 0.15);
+    let mut vals: Vec<i32> = (0..n).map(|i| adj[i].len() as i32).collect();
+    for (i, &wall) in is_wall.iter().enumerate() {
+        if wall {
+            vals[i] = -2;
+        }
+    }
 
     let mut v = VizLog::new(vals);
     v.ptrs(
@@ -17887,6 +17874,9 @@ fn viz_graph_repr_transpose() -> Vec<VizFrame> {
 
     let mut trans = vec![vec![]; n];
     for u in 0..n {
+        if is_wall[u] {
+            continue;
+        }
         for &nb in &adj[u] {
             trans[nb].push(u);
             v.ptrs(
@@ -17897,7 +17887,12 @@ fn viz_graph_repr_transpose() -> Vec<VizFrame> {
         }
     }
 
-    let new_vals: Vec<i32> = (0..n).map(|i| trans[i].len() as i32).collect();
+    let mut new_vals: Vec<i32> = (0..n).map(|i| trans[i].len() as i32).collect();
+    for (i, &wall) in is_wall.iter().enumerate() {
+        if wall {
+            new_vals[i] = -2;
+        }
+    }
     let mut v2 = VizLog::new(new_vals);
     v2.ptrs(
         &[],
@@ -17911,31 +17906,23 @@ fn viz_graph_repr_transpose() -> Vec<VizFrame> {
         format!("Result: transpose complete for {} nodes", n),
     );
 
-    let mut edges: Vec<(usize, usize)> = Vec::new();
-    for (u, neighbors) in adj.iter().enumerate() {
-        for &w in neighbors {
-            edges.push((u, w));
-        }
-    }
-    let trans_edges: Vec<(usize, usize)> = edges.iter().map(|&(u, w)| (w, u)).collect();
-    let mut frames = v.into_graph_frames(&edges, true);
-    frames.extend(v2.into_graph_frames(&trans_edges, true));
+    let mut frames = v.into_grid_frames(rows, cols);
+    frames.extend(v2.into_grid_frames(rows, cols));
     frames
 }
 
 fn viz_graph_repr_strongly_connected() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
-    // Build a graph with a strong component: cycle among first few nodes
-    let mut adj = vec![vec![]; n];
-    let scc_size = rng.random_range(3..=n.min(5));
-    for i in 0..scc_size {
-        adj[i].push((i + 1) % scc_size);
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (adj, is_wall) = rand_grid_graph(&mut rng, rows, cols, 0.25);
+    let mut vals: Vec<i32> = (0..n as i32).collect();
+    for (i, &wall) in is_wall.iter().enumerate() {
+        if wall {
+            vals[i] = -2;
+        }
     }
-    for i in scc_size..n {
-        adj[i - 1].push(i);
-    }
-    let vals: Vec<i32> = (0..n as i32).collect();
 
     let mut v = VizLog::new(vals);
     v.ptrs(
@@ -17948,7 +17935,7 @@ fn viz_graph_repr_strongly_connected() -> Vec<VizFrame> {
     let mut visited = vec![false; n];
     let mut finish_order = vec![];
     for start in 0..n {
-        if visited[start] {
+        if visited[start] || is_wall[start] {
             continue;
         }
         let mut stack = vec![(start, false)];
@@ -18018,20 +18005,21 @@ fn viz_graph_repr_strongly_connected() -> Vec<VizFrame> {
         &[(0, "start")],
         format!("Result: {} strongly connected components", scc_count),
     );
-    let mut edges: Vec<(usize, usize)> = Vec::new();
-    for (u, neighbors) in adj.iter().enumerate() {
-        for &w in neighbors {
-            edges.push((u, w));
-        }
-    }
-    v.into_graph_frames(&edges, true)
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_graph_repr_bridges() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(10..=14);
-    let adj = rand_graph_undirected(&mut rng, n);
-    let vals: Vec<i32> = (0..n).map(|i| adj[i].len() as i32).collect();
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (adj, is_wall) = rand_grid_graph(&mut rng, rows, cols, 0.25);
+    let mut vals: Vec<i32> = (0..n).map(|i| adj[i].len() as i32).collect();
+    for (i, &wall) in is_wall.iter().enumerate() {
+        if wall {
+            vals[i] = -2;
+        }
+    }
 
     let mut v = VizLog::new(vals);
     v.ptrs(
@@ -18103,22 +18091,21 @@ fn viz_graph_repr_bridges() -> Vec<VizFrame> {
         &[(0, "start")],
         format!("Result: {} bridge(s) found", bridges.len()),
     );
-    let mut edges: Vec<(usize, usize)> = Vec::new();
-    for (u, neighbors) in adj.iter().enumerate() {
-        for &w in neighbors {
-            if u < w {
-                edges.push((u, w));
-            }
-        }
-    }
-    v.into_graph_frames(&edges, false)
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_graph_repr_articulation_points() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(10..=14);
-    let adj = rand_graph_undirected(&mut rng, n);
-    let vals: Vec<i32> = (0..n).map(|i| adj[i].len() as i32).collect();
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (adj, is_wall) = rand_grid_graph(&mut rng, rows, cols, 0.25);
+    let mut vals: Vec<i32> = (0..n).map(|i| adj[i].len() as i32).collect();
+    for (i, &wall) in is_wall.iter().enumerate() {
+        if wall {
+            vals[i] = -2;
+        }
+    }
 
     let mut v = VizLog::new(vals);
     v.ptrs(
@@ -18198,27 +18185,21 @@ fn viz_graph_repr_articulation_points() -> Vec<VizFrame> {
         &[(0, "start")],
         format!("Result: {} articulation point(s)", ap_set.len()),
     );
-    let mut edges: Vec<(usize, usize)> = Vec::new();
-    for (u, neighbors) in adj.iter().enumerate() {
-        for &w in neighbors {
-            if u < w {
-                edges.push((u, w));
-            }
-        }
-    }
-    v.into_graph_frames(&edges, false)
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_graph_repr_euler_path() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
-    // Build graph where euler path exists (0 or 2 odd-degree nodes)
-    let mut adj = vec![vec![]; n];
-    for i in 0..n - 1 {
-        adj[i].push(i + 1);
-        adj[i + 1].push(i);
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (adj, is_wall) = rand_grid_graph(&mut rng, rows, cols, 0.25);
+    let mut degrees: Vec<i32> = (0..n).map(|i| adj[i].len() as i32).collect();
+    for (i, &wall) in is_wall.iter().enumerate() {
+        if wall {
+            degrees[i] = -2;
+        }
     }
-    let degrees: Vec<i32> = (0..n).map(|i| adj[i].len() as i32).collect();
 
     let mut v = VizLog::new(degrees.clone());
     v.ptrs(
@@ -18229,6 +18210,9 @@ fn viz_graph_repr_euler_path() -> Vec<VizFrame> {
 
     let mut odd_count = 0;
     for i in 0..n {
+        if is_wall[i] {
+            continue;
+        }
         let deg = adj[i].len();
         let kind = if deg % 2 == 1 {
             odd_count += 1;
@@ -18259,22 +18243,21 @@ fn viz_graph_repr_euler_path() -> Vec<VizFrame> {
             if has_path { "exists" } else { "does not exist" }
         ),
     );
-    let mut edges: Vec<(usize, usize)> = Vec::new();
-    for (u, neighbors) in adj.iter().enumerate() {
-        for &w in neighbors {
-            if u < w {
-                edges.push((u, w));
-            }
-        }
-    }
-    v.into_graph_frames(&edges, false)
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_graph_repr_graph_coloring() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(10..=14);
-    let adj = rand_graph_undirected(&mut rng, n);
-    let vals: Vec<i32> = vec![0; n];
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (adj, is_wall) = rand_grid_graph(&mut rng, rows, cols, 0.25);
+    let mut vals: Vec<i32> = vec![0; n];
+    for (i, &wall) in is_wall.iter().enumerate() {
+        if wall {
+            vals[i] = -2;
+        }
+    }
 
     let mut v = VizLog::new(vals);
     v.ptrs(
@@ -18287,6 +18270,9 @@ fn viz_graph_repr_graph_coloring() -> Vec<VizFrame> {
     let mut max_color = 0;
 
     for u in 0..n {
+        if is_wall[u] {
+            continue;
+        }
         let mut used: HashSet<i32> = HashSet::new();
         for &nb in &adj[u] {
             if colors[nb] >= 0 {
@@ -18321,15 +18307,7 @@ fn viz_graph_repr_graph_coloring() -> Vec<VizFrame> {
         &[(0, "start"), (n - 1, "end")],
         format!("Result: {} colors used", max_color + 1),
     );
-    let mut edges: Vec<(usize, usize)> = Vec::new();
-    for (u, neighbors) in adj.iter().enumerate() {
-        for &w in neighbors {
-            if u < w {
-                edges.push((u, w));
-            }
-        }
-    }
-    v.into_graph_frames(&edges, false)
+    v.into_grid_frames(rows, cols)
 }
 
 // ─── Part 5: Divide & Conquer Visualizations ───────────────────
@@ -19987,17 +19965,15 @@ fn viz_heaps_skyline() -> Vec<VizFrame> {
 
 fn viz_graph_bfs_dfs_bfs_order() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(10..=14);
-    let adj = rand_graph_undirected(&mut rng, n);
-    let vals: Vec<i32> = (0..n as i32).collect();
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (adj, is_wall) = rand_grid_graph(&mut rng, rows, cols, 0.25);
 
-    // Collect edges for graph renderer
-    let mut edges: Vec<(usize, usize)> = Vec::new();
-    for (u, neighbors) in adj.iter().enumerate() {
-        for &v in neighbors {
-            if u < v {
-                edges.push((u, v));
-            }
+    let mut vals: Vec<i32> = (0..n as i32).collect();
+    for (i, &wall) in is_wall.iter().enumerate() {
+        if wall {
+            vals[i] = -2;
         }
     }
 
@@ -20031,8 +20007,12 @@ fn viz_graph_bfs_dfs_bfs_order() -> Vec<VizFrame> {
             if !visited[nb] {
                 visited[nb] = true;
                 queue.push_back(nb);
+                let mut hl: Vec<(usize, HighlightKind)> =
+                    order.iter().map(|&i| (i, HighlightKind::Sorted)).collect();
+                hl.push((u, HighlightKind::Active));
+                hl.push((nb, HighlightKind::Comparing));
                 v.ptrs(
-                    &[(u, HighlightKind::Active), (nb, HighlightKind::Comparing)],
+                    &hl,
                     &[(u, "node"), (nb, "enq")],
                     format!("Enqueue neighbor {}. It will be visited after all nodes at the current level.", nb),
                 );
@@ -20049,14 +20029,22 @@ fn viz_graph_bfs_dfs_bfs_order() -> Vec<VizFrame> {
             order
         ),
     );
-    v.into_graph_frames(&edges, false)
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_graph_bfs_dfs_dfs_order() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(10..=14);
-    let adj = rand_graph_undirected(&mut rng, n);
-    let vals: Vec<i32> = (0..n as i32).collect();
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (adj, is_wall) = rand_grid_graph(&mut rng, rows, cols, 0.25);
+
+    let mut vals: Vec<i32> = (0..n as i32).collect();
+    for (i, &wall) in is_wall.iter().enumerate() {
+        if wall {
+            vals[i] = -2;
+        }
+    }
 
     let mut v = VizLog::new(vals);
     v.ptrs(
@@ -20100,22 +20088,21 @@ fn viz_graph_bfs_dfs_dfs_order() -> Vec<VizFrame> {
             order
         ),
     );
-    let mut edges: Vec<(usize, usize)> = Vec::new();
-    for (u, neighbors) in adj.iter().enumerate() {
-        for &w in neighbors {
-            if u < w {
-                edges.push((u, w));
-            }
-        }
-    }
-    v.into_graph_frames(&edges, false)
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_graph_bfs_dfs_is_connected() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(10..=14);
-    let adj = rand_graph_undirected(&mut rng, n);
-    let vals: Vec<i32> = (0..n as i32).collect();
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (adj, is_wall) = rand_grid_graph(&mut rng, rows, cols, 0.25);
+    let mut vals: Vec<i32> = (0..n as i32).collect();
+    for (i, &wall) in is_wall.iter().enumerate() {
+        if wall {
+            vals[i] = -2;
+        }
+    }
 
     let mut v = VizLog::new(vals);
     v.ptrs(
@@ -20148,7 +20135,8 @@ fn viz_graph_bfs_dfs_is_connected() -> Vec<VizFrame> {
         }
     }
 
-    let connected = count == n;
+    let non_wall_count = is_wall.iter().filter(|&&w| !w).count();
+    let connected = count == non_wall_count;
     let all: Vec<(usize, HighlightKind)> = (0..n).map(|i| (i, HighlightKind::Sorted)).collect();
     v.ptrs(
         &all,
@@ -20161,27 +20149,27 @@ fn viz_graph_bfs_dfs_is_connected() -> Vec<VizFrame> {
                 "disconnected"
             },
             count,
-            n
+            non_wall_count
         ),
     );
-    let mut edges: Vec<(usize, usize)> = Vec::new();
-    for (u, neighbors) in adj.iter().enumerate() {
-        for &w in neighbors {
-            if u < w {
-                edges.push((u, w));
-            }
-        }
-    }
-    v.into_graph_frames(&edges, false)
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_graph_bfs_dfs_shortest_path_unweighted() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(10..=14);
-    let adj = rand_graph_undirected(&mut rng, n);
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (adj, is_wall) = rand_grid_graph(&mut rng, rows, cols, 0.25);
+
     let src = 0;
     let dst = n - 1;
-    let vals: Vec<i32> = vec![-1; n];
+    let mut vals: Vec<i32> = vec![-1; n];
+    for (i, &wall) in is_wall.iter().enumerate() {
+        if wall {
+            vals[i] = -2;
+        }
+    }
 
     let mut v = VizLog::new(vals);
     v.ptrs(
@@ -20194,16 +20182,24 @@ fn viz_graph_bfs_dfs_shortest_path_unweighted() -> Vec<VizFrame> {
     let mut queue = VecDeque::new();
     dist[src] = 0;
     queue.push_back(src);
+    let mut visited_hl: Vec<(usize, HighlightKind)> = Vec::new();
 
     while let Some(u) = queue.pop_front() {
+        visited_hl.push((u, HighlightKind::Sorted));
+        let mut hl = visited_hl.clone();
+        hl.push((u, HighlightKind::Active));
+        hl.push((dst, HighlightKind::Target));
         v.ptrs(
-            &[(u, HighlightKind::Active), (dst, HighlightKind::Target)],
+            &hl,
             &[(u, "node")],
             format!("Visit node {} at distance {}. BFS guarantees this is the shortest distance from source.", u, dist[u]),
         );
         if u == dst {
+            let mut hl = visited_hl.clone();
+            hl.push((u, HighlightKind::Found));
+            hl.push((dst, HighlightKind::Target));
             v.ptrs(
-                &[(u, HighlightKind::Found)],
+                &hl,
                 &[(u, "dst")],
                 format!("Found destination {}! Shortest path = {} edges. BFS explores nearest nodes first.", dst, dist[u]),
             );
@@ -20213,8 +20209,12 @@ fn viz_graph_bfs_dfs_shortest_path_unweighted() -> Vec<VizFrame> {
             if dist[nb] == -1 {
                 dist[nb] = dist[u] + 1;
                 queue.push_back(nb);
+                let mut hl = visited_hl.clone();
+                hl.push((u, HighlightKind::Active));
+                hl.push((nb, HighlightKind::Comparing));
+                hl.push((dst, HighlightKind::Target));
                 v.ptrs(
-                    &[(u, HighlightKind::Active), (nb, HighlightKind::Comparing), (dst, HighlightKind::Target)],
+                    &hl,
                     &[(u, "node"), (nb, "enq")],
                     format!("Set dist[{}]={} (parent dist + 1). First visit = shortest path in unweighted graph.", nb, dist[nb]),
                 );
@@ -20228,24 +20228,24 @@ fn viz_graph_bfs_dfs_shortest_path_unweighted() -> Vec<VizFrame> {
         &[(src, "src"), (dst, "dst")],
         format!("Result: shortest path {} -> {} = {} edges. BFS is optimal for unweighted graphs. O(V+E).", src, dst, dist[dst]),
     );
-    let mut edges: Vec<(usize, usize)> = Vec::new();
-    for (u, neighbors) in adj.iter().enumerate() {
-        for &w in neighbors {
-            if u < w {
-                edges.push((u, w));
-            }
-        }
-    }
-    v.into_graph_frames(&edges, false)
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_graph_bfs_dfs_find_path() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(10..=14);
-    let adj = rand_graph_undirected(&mut rng, n);
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (adj, is_wall) = rand_grid_graph(&mut rng, rows, cols, 0.25);
+
     let src = 0;
     let dst = n - 1;
-    let vals: Vec<i32> = (0..n as i32).collect();
+    let mut vals: Vec<i32> = (0..n as i32).collect();
+    for (i, &wall) in is_wall.iter().enumerate() {
+        if wall {
+            vals[i] = -2;
+        }
+    }
 
     let mut v = VizLog::new(vals);
     v.ptrs(&[], &[], format!("Goal: Find any path from {} to {}. Strategy: DFS with parent tracking — backtrack from destination to reconstruct path. O(V+E) time.", src, dst));
@@ -20254,14 +20254,19 @@ fn viz_graph_bfs_dfs_find_path() -> Vec<VizFrame> {
     let mut parent = vec![usize::MAX; n];
     let mut stack = vec![src];
     let mut found = false;
+    let mut visited_hl: Vec<(usize, HighlightKind)> = Vec::new();
 
     while let Some(u) = stack.pop() {
         if visited[u] {
             continue;
         }
         visited[u] = true;
+        visited_hl.push((u, HighlightKind::Sorted));
+        let mut hl = visited_hl.clone();
+        hl.push((u, HighlightKind::Active));
+        hl.push((dst, HighlightKind::Target));
         v.ptrs(
-            &[(u, HighlightKind::Active)],
+            &hl,
             &[(u, "node")],
             format!(
                 "DFS visit node {}. Exploring as deep as possible before backtracking.",
@@ -20305,22 +20310,21 @@ fn viz_graph_bfs_dfs_find_path() -> Vec<VizFrame> {
             format!("Result: no path from {} to {}. DFS explored all reachable nodes without finding destination.", src, dst),
         );
     }
-    let mut edges: Vec<(usize, usize)> = Vec::new();
-    for (u, neighbors) in adj.iter().enumerate() {
-        for &w in neighbors {
-            if u < w {
-                edges.push((u, w));
-            }
-        }
-    }
-    v.into_graph_frames(&edges, false)
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_graph_bfs_dfs_clone_graph() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(10..=14);
-    let adj = rand_graph_undirected(&mut rng, n);
-    let vals: Vec<i32> = (0..n as i32).collect();
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (adj, is_wall) = rand_grid_graph(&mut rng, rows, cols, 0.25);
+    let mut vals: Vec<i32> = (0..n as i32).collect();
+    for (i, &wall) in is_wall.iter().enumerate() {
+        if wall {
+            vals[i] = -2;
+        }
+    }
 
     let mut v = VizLog::new(vals);
     v.ptrs(&[], &[], format!("Goal: Deep copy the graph ({} nodes). Strategy: BFS traversal — clone each node when first visited, copy edges. O(V+E) time.", n));
@@ -20355,26 +20359,25 @@ fn viz_graph_bfs_dfs_clone_graph() -> Vec<VizFrame> {
             cloned
         ),
     );
-    let mut edges: Vec<(usize, usize)> = Vec::new();
-    for (u, neighbors) in adj.iter().enumerate() {
-        for &w in neighbors {
-            if u < w {
-                edges.push((u, w));
-            }
-        }
-    }
-    v.into_graph_frames(&edges, false)
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_graph_bfs_dfs_course_schedule() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(10..=14);
-    let adj = rand_dag(&mut rng, n);
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (adj, is_wall) = rand_grid_graph(&mut rng, rows, cols, 0.15);
     let in_deg: Vec<i32> = {
         let mut d = vec![0i32; n];
         for u in 0..n {
             for &nb in &adj[u] {
                 d[nb] += 1;
+            }
+        }
+        for (i, &wall) in is_wall.iter().enumerate() {
+            if wall {
+                d[i] = -2;
             }
         }
         d
@@ -20434,24 +20437,25 @@ fn viz_graph_bfs_dfs_course_schedule() -> Vec<VizFrame> {
             n
         ),
     );
-    let mut edges: Vec<(usize, usize)> = Vec::new();
-    for (u, neighbors) in adj.iter().enumerate() {
-        for &w in neighbors {
-            edges.push((u, w));
-        }
-    }
-    v.into_graph_frames(&edges, true)
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_graph_bfs_dfs_course_schedule_ii() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(10..=14);
-    let adj = rand_dag(&mut rng, n);
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (adj, is_wall) = rand_grid_graph(&mut rng, rows, cols, 0.15);
     let in_deg: Vec<i32> = {
         let mut d = vec![0i32; n];
         for u in 0..n {
             for &nb in &adj[u] {
                 d[nb] += 1;
+            }
+        }
+        for (i, &wall) in is_wall.iter().enumerate() {
+            if wall {
+                d[i] = -2;
             }
         }
         d
@@ -20497,13 +20501,7 @@ fn viz_graph_bfs_dfs_course_schedule_ii() -> Vec<VizFrame> {
             order
         ),
     );
-    let mut edges: Vec<(usize, usize)> = Vec::new();
-    for (u, neighbors) in adj.iter().enumerate() {
-        for &w in neighbors {
-            edges.push((u, w));
-        }
-    }
-    v.into_graph_frames(&edges, true)
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_graph_bfs_dfs_number_of_islands() -> Vec<VizFrame> {
@@ -20823,9 +20821,16 @@ fn viz_graph_bfs_dfs_pacific_atlantic() -> Vec<VizFrame> {
 
 fn viz_graph_bfs_dfs_all_paths() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(10..=14);
-    let adj = rand_dag(&mut rng, n);
-    let vals: Vec<i32> = (0..n as i32).collect();
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (adj, is_wall) = rand_grid_graph(&mut rng, rows, cols, 0.15);
+    let mut vals: Vec<i32> = (0..n as i32).collect();
+    for (i, &wall) in is_wall.iter().enumerate() {
+        if wall {
+            vals[i] = -2;
+        }
+    }
     let dst = n - 1;
 
     let mut v = VizLog::new(vals);
@@ -20880,13 +20885,7 @@ fn viz_graph_bfs_dfs_all_paths() -> Vec<VizFrame> {
         &[(0, "src"), (dst, "dst")],
         format!("Result: {} paths from 0 to {}. DFS backtracking explores all possibilities. O(2^V * V) worst case.", all_paths.len(), dst),
     );
-    let mut edges: Vec<(usize, usize)> = Vec::new();
-    for (u, neighbors) in adj.iter().enumerate() {
-        for &w in neighbors {
-            edges.push((u, w));
-        }
-    }
-    v.into_graph_frames(&edges, true)
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_graph_bfs_dfs_shortest_path_binary_matrix() -> Vec<VizFrame> {
@@ -22380,8 +22379,8 @@ fn viz_balanced_bst_rank_from_stream() -> Vec<VizFrame> {
 
 fn viz_matrix_grid_flood_fill() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let rows = 3;
-    let cols = rng.random_range(2..=3);
+    let rows = 5;
+    let cols = 5;
     let n = rows * cols;
     let mut grid: Vec<i32> = (0..n).map(|_| rng.random_range(1..=3)).collect();
     let start = rng.random_range(0..n);
@@ -22451,8 +22450,8 @@ fn viz_matrix_grid_flood_fill() -> Vec<VizFrame> {
 
 fn viz_matrix_grid_island_perimeter() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let rows = 3;
-    let cols = rng.random_range(2..=3);
+    let rows = 5;
+    let cols = 5;
     let n = rows * cols;
     let grid: Vec<i32> = (0..n).map(|_| rng.random_range(0..=1)).collect();
 
@@ -22505,8 +22504,8 @@ fn viz_matrix_grid_island_perimeter() -> Vec<VizFrame> {
 
 fn viz_matrix_grid_max_area_island() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let rows = 3;
-    let cols = rng.random_range(2..=3);
+    let rows = 5;
+    let cols = 5;
     let n = rows * cols;
     let mut grid: Vec<i32> = (0..n).map(|_| rng.random_range(0..=1)).collect();
     grid[0] = 1;
@@ -22584,8 +22583,8 @@ fn viz_matrix_grid_max_area_island() -> Vec<VizFrame> {
 
 fn viz_matrix_grid_count_islands() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let rows = 3;
-    let cols = rng.random_range(2..=3);
+    let rows = 5;
+    let cols = 5;
     let n = rows * cols;
     let mut grid: Vec<i32> = (0..n).map(|_| rng.random_range(0..=1)).collect();
     grid[0] = 1;
@@ -22636,8 +22635,8 @@ fn viz_matrix_grid_count_islands() -> Vec<VizFrame> {
 
 fn viz_matrix_grid_surrounded_regions() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let rows = 3;
-    let cols = rng.random_range(2..=3);
+    let rows = 5;
+    let cols = 5;
     let n = rows * cols;
     let grid: Vec<i32> = (0..n).map(|_| rng.random_range(0..=1)).collect();
 
@@ -22707,8 +22706,8 @@ fn viz_matrix_grid_surrounded_regions() -> Vec<VizFrame> {
 
 fn viz_matrix_grid_rotting_oranges() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let rows = 3;
-    let cols = rng.random_range(2..=3);
+    let rows = 5;
+    let cols = 5;
     let n = rows * cols;
     // 0=empty, 1=fresh, 2=rotten
     let mut grid: Vec<i32> = (0..n).map(|_| rng.random_range(0..=2)).collect();
@@ -22773,8 +22772,8 @@ fn viz_matrix_grid_rotting_oranges() -> Vec<VizFrame> {
 
 fn viz_matrix_grid_walls_and_gates() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let rows = 3;
-    let cols = rng.random_range(2..=3);
+    let rows = 5;
+    let cols = 5;
     let n = rows * cols;
     // 0=gate, -1=wall, large=empty
     let mut grid: Vec<i32> = (0..n)
@@ -22844,8 +22843,8 @@ fn viz_matrix_grid_walls_and_gates() -> Vec<VizFrame> {
 
 fn viz_matrix_grid_01_matrix() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let rows = 3;
-    let cols = rng.random_range(2..=3);
+    let rows = 5;
+    let cols = 5;
     let n = rows * cols;
     let grid: Vec<i32> = (0..n).map(|_| rng.random_range(0..=1)).collect();
 
@@ -22904,8 +22903,8 @@ fn viz_matrix_grid_01_matrix() -> Vec<VizFrame> {
 
 fn viz_matrix_grid_word_search() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let rows = 3;
-    let cols = rng.random_range(2..=3);
+    let rows = 5;
+    let cols = 5;
     let n = rows * cols;
     let grid: Vec<i32> = (0..n).map(|_| rng.random_range(1..=9)).collect();
 
@@ -22965,8 +22964,8 @@ fn viz_matrix_grid_word_search() -> Vec<VizFrame> {
 
 fn viz_matrix_grid_unique_paths() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let rows = 3;
-    let cols = rng.random_range(2..=3);
+    let rows = 5;
+    let cols = 5;
     let n = rows * cols;
     let mut dp = vec![1i32; n];
 
@@ -23007,7 +23006,7 @@ fn viz_matrix_grid_unique_paths() -> Vec<VizFrame> {
 
 fn viz_matrix_grid_shortest_path_obstacles() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let side = 3;
+    let side = 5;
     let n = side * side;
     let mut grid: Vec<i32> = (0..n).map(|_| rng.random_range(0..=1)).collect();
     grid[0] = 0;
@@ -23072,7 +23071,7 @@ fn viz_matrix_grid_shortest_path_obstacles() -> Vec<VizFrame> {
 
 fn viz_matrix_grid_swim_in_water() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let side = 3;
+    let side = 5;
     let n = side * side;
     let grid = rand_unique(&mut rng, n, 0, (n as i32) - 1);
 
@@ -23121,8 +23120,8 @@ fn viz_matrix_grid_swim_in_water() -> Vec<VizFrame> {
 
 fn viz_matrix_grid_making_large_island() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let rows = 3;
-    let cols = rng.random_range(2..=3);
+    let rows = 5;
+    let cols = 5;
     let n = rows * cols;
     let grid: Vec<i32> = (0..n).map(|_| rng.random_range(0..=1)).collect();
 
@@ -23231,8 +23230,8 @@ fn viz_matrix_grid_making_large_island() -> Vec<VizFrame> {
 
 fn viz_matrix_grid_longest_increasing_path() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let rows = 3;
-    let cols = rng.random_range(2..=3);
+    let rows = 5;
+    let cols = 5;
     let n = rows * cols;
     let grid: Vec<i32> = (0..n).map(|_| rng.random_range(1..=15)).collect();
 
@@ -23288,8 +23287,8 @@ fn viz_matrix_grid_longest_increasing_path() -> Vec<VizFrame> {
 
 fn viz_matrix_grid_treasure_island() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let rows = 3;
-    let cols = rng.random_range(2..=3);
+    let rows = 5;
+    let cols = 5;
     let n = rows * cols;
     // 0=open, 1=obstacle, 2=treasure
     let mut grid: Vec<i32> = (0..n).map(|_| rng.random_range(0..=1)).collect();
@@ -24541,9 +24540,12 @@ fn viz_segment_dynamic() -> Vec<VizFrame> {
 
 fn viz_topo_sort_basic() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(10..=14);
-    let adj = rand_dag(&mut rng, n);
-    let in_deg: Vec<i32> = {
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (adj, is_wall) = rand_grid_graph(&mut rng, rows, cols, 0.15);
+
+    let mut vals: Vec<i32> = {
         let mut d = vec![0i32; n];
         for u in 0..n {
             for &nb in &adj[u] {
@@ -24552,18 +24554,23 @@ fn viz_topo_sort_basic() -> Vec<VizFrame> {
         }
         d
     };
+    for (i, &wall) in is_wall.iter().enumerate() {
+        if wall {
+            vals[i] = -2;
+        }
+    }
 
-    let mut v = VizLog::new(in_deg.clone());
+    let mut v = VizLog::new(vals.clone());
     v.ptrs(
         &[],
         &[],
         format!("Goal: Find a linear ordering of nodes such that for every edge u->v, u comes before v. Strategy: Kahn's algorithm (BFS) -- repeatedly remove nodes with in-degree 0 and add them to the ordering. {} nodes.", n),
     );
 
-    let mut deg = in_deg;
+    let mut deg = vals.clone();
     let mut queue = VecDeque::new();
     for i in 0..n {
-        if deg[i] == 0 {
+        if !is_wall[i] && deg[i] == 0 {
             queue.push_back(i);
         }
     }
@@ -24590,20 +24597,17 @@ fn viz_topo_sort_basic() -> Vec<VizFrame> {
         &[(0, "start")],
         format!("Answer: topological order = {:?}. Time: O(V + E).", order),
     );
-    let mut edges: Vec<(usize, usize)> = Vec::new();
-    for (u, neighbors) in adj.iter().enumerate() {
-        for &w in neighbors {
-            edges.push((u, w));
-        }
-    }
-    v.into_graph_frames(&edges, true)
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_topo_sort_can_finish() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(10..=14);
-    let adj = rand_dag(&mut rng, n);
-    let in_deg: Vec<i32> = {
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (adj, is_wall) = rand_grid_graph(&mut rng, rows, cols, 0.15);
+
+    let mut vals: Vec<i32> = {
         let mut d = vec![0i32; n];
         for u in 0..n {
             for &nb in &adj[u] {
@@ -24612,14 +24616,20 @@ fn viz_topo_sort_can_finish() -> Vec<VizFrame> {
         }
         d
     };
+    for (i, &wall) in is_wall.iter().enumerate() {
+        if wall {
+            vals[i] = -2;
+        }
+    }
+    let non_wall = is_wall.iter().filter(|&&w| !w).count();
 
-    let mut v = VizLog::new(in_deg.clone());
-    v.ptrs(&[], &[], format!("Goal: Determine if all courses can be finished (i.e., the prerequisite graph is a DAG). Strategy: Run Kahn's BFS -- if we process all {} nodes, there is no cycle; otherwise a cycle blocks completion.", n));
+    let mut v = VizLog::new(vals.clone());
+    v.ptrs(&[], &[], format!("Goal: Determine if all courses can be finished (i.e., the prerequisite graph is a DAG). Strategy: Run Kahn's BFS -- if we process all {} non-wall nodes, there is no cycle; otherwise a cycle blocks completion.", non_wall));
 
-    let mut deg = in_deg;
+    let mut deg = vals.clone();
     let mut queue = VecDeque::new();
     for i in 0..n {
-        if deg[i] == 0 {
+        if !is_wall[i] && deg[i] == 0 {
             queue.push_back(i);
         }
     }
@@ -24630,7 +24640,7 @@ fn viz_topo_sort_can_finish() -> Vec<VizFrame> {
         v.ptrs(
             &[(u, HighlightKind::Sorted)],
             &[(u, "take")],
-            format!("Process node {}: in-degree was 0, so all prerequisites met. Progress: {}/{} nodes completed.", u, count, n),
+            format!("Process node {}: in-degree was 0, so all prerequisites met. Progress: {}/{} nodes completed.", u, count, non_wall),
         );
         for &nb in &adj[u] {
             deg[nb] -= 1;
@@ -24646,29 +24656,26 @@ fn viz_topo_sort_can_finish() -> Vec<VizFrame> {
         &[(0, "start")],
         format!(
             "Answer: {} ({}/{} nodes processed). Time: O(V + E).",
-            if count == n {
+            if count == non_wall {
                 "Can finish -- no cycle detected"
             } else {
                 "Cannot finish -- cycle exists, some nodes unreachable"
             },
             count,
-            n
+            non_wall
         ),
     );
-    let mut edges: Vec<(usize, usize)> = Vec::new();
-    for (u, neighbors) in adj.iter().enumerate() {
-        for &w in neighbors {
-            edges.push((u, w));
-        }
-    }
-    v.into_graph_frames(&edges, true)
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_topo_sort_find_order() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(10..=14);
-    let adj = rand_dag(&mut rng, n);
-    let in_deg: Vec<i32> = {
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (adj, is_wall) = rand_grid_graph(&mut rng, rows, cols, 0.15);
+
+    let mut vals: Vec<i32> = {
         let mut d = vec![0i32; n];
         for u in 0..n {
             for &nb in &adj[u] {
@@ -24677,14 +24684,19 @@ fn viz_topo_sort_find_order() -> Vec<VizFrame> {
         }
         d
     };
+    for (i, &wall) in is_wall.iter().enumerate() {
+        if wall {
+            vals[i] = -2;
+        }
+    }
 
-    let mut v = VizLog::new(in_deg.clone());
-    v.ptrs(&[], &[], format!("Goal: Find a valid order to take {} courses given prerequisites. Strategy: Kahn's BFS topological sort -- start with courses that have no prerequisites, then unlock dependent courses.", n));
+    let mut v = VizLog::new(vals.clone());
+    v.ptrs(&[], &[], format!("Goal: Find a valid order to take courses given prerequisites. Strategy: Kahn's BFS topological sort -- start with courses that have no prerequisites, then unlock dependent courses. {} nodes.", n));
 
-    let mut deg = in_deg;
+    let mut deg = vals.clone();
     let mut queue = VecDeque::new();
     for i in 0..n {
-        if deg[i] == 0 {
+        if !is_wall[i] && deg[i] == 0 {
             queue.push_back(i);
         }
     }
@@ -24714,20 +24726,21 @@ fn viz_topo_sort_find_order() -> Vec<VizFrame> {
         &[(0, "start")],
         format!("Answer: valid course order = {:?}. Time: O(V + E).", order),
     );
-    let mut edges: Vec<(usize, usize)> = Vec::new();
-    for (u, neighbors) in adj.iter().enumerate() {
-        for &w in neighbors {
-            edges.push((u, w));
-        }
-    }
-    v.into_graph_frames(&edges, true)
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_topo_sort_is_dag() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(10..=14);
-    let adj = rand_dag(&mut rng, n);
-    let vals: Vec<i32> = (0..n as i32).collect();
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (adj, is_wall) = rand_grid_graph(&mut rng, rows, cols, 0.15);
+    let mut vals: Vec<i32> = (0..n as i32).collect();
+    for (i, &wall) in is_wall.iter().enumerate() {
+        if wall {
+            vals[i] = -2;
+        }
+    }
 
     let mut v = VizLog::new(vals);
     v.ptrs(&[], &[], format!("Goal: Determine if the directed graph is acyclic (a DAG). Strategy: DFS with 3-color marking -- white (unvisited), gray (in progress), black (done). A back edge to a gray node means a cycle exists. {} nodes.", n));
@@ -24736,7 +24749,7 @@ fn viz_topo_sort_is_dag() -> Vec<VizFrame> {
     let mut is_dag = true;
 
     for start in 0..n {
-        if color[start] != 0 {
+        if is_wall[start] || color[start] != 0 {
             continue;
         }
         let mut stack = vec![(start, 0usize)];
@@ -24801,20 +24814,17 @@ fn viz_topo_sort_is_dag() -> Vec<VizFrame> {
             }
         ),
     );
-    let mut edges: Vec<(usize, usize)> = Vec::new();
-    for (u, neighbors) in adj.iter().enumerate() {
-        for &w in neighbors {
-            edges.push((u, w));
-        }
-    }
-    v.into_graph_frames(&edges, true)
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_topo_sort_kahn_bfs() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(10..=14);
-    let adj = rand_dag(&mut rng, n);
-    let in_deg: Vec<i32> = {
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (adj, is_wall) = rand_grid_graph(&mut rng, rows, cols, 0.15);
+
+    let mut vals: Vec<i32> = {
         let mut d = vec![0i32; n];
         for u in 0..n {
             for &nb in &adj[u] {
@@ -24823,14 +24833,19 @@ fn viz_topo_sort_kahn_bfs() -> Vec<VizFrame> {
         }
         d
     };
+    for (i, &wall) in is_wall.iter().enumerate() {
+        if wall {
+            vals[i] = -2;
+        }
+    }
 
-    let mut v = VizLog::new(in_deg.clone());
+    let mut v = VizLog::new(vals.clone());
     v.ptrs(&[], &[], format!("Goal: Topologically sort {} nodes using BFS (Kahn's algorithm). Strategy: Maintain a queue of nodes with in-degree 0. Dequeue one, reduce neighbors' in-degrees, enqueue any that reach 0.", n));
 
-    let mut deg = in_deg;
+    let mut deg = vals;
     let mut queue = VecDeque::new();
     for i in 0..n {
-        if deg[i] == 0 {
+        if !is_wall[i] && deg[i] == 0 {
             queue.push_back(i);
         }
     }
@@ -24867,20 +24882,17 @@ fn viz_topo_sort_kahn_bfs() -> Vec<VizFrame> {
         &[(0, "start")],
         format!("Answer: topological order = {:?}. Time: O(V + E).", order),
     );
-    let mut edges: Vec<(usize, usize)> = Vec::new();
-    for (u, neighbors) in adj.iter().enumerate() {
-        for &w in neighbors {
-            edges.push((u, w));
-        }
-    }
-    v.into_graph_frames(&edges, true)
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_topo_sort_parallel_courses() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(10..=14);
-    let adj = rand_dag(&mut rng, n);
-    let in_deg: Vec<i32> = {
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (adj, is_wall) = rand_grid_graph(&mut rng, rows, cols, 0.15);
+
+    let mut vals: Vec<i32> = {
         let mut d = vec![0i32; n];
         for u in 0..n {
             for &nb in &adj[u] {
@@ -24889,18 +24901,23 @@ fn viz_topo_sort_parallel_courses() -> Vec<VizFrame> {
         }
         d
     };
+    for (i, &wall) in is_wall.iter().enumerate() {
+        if wall {
+            vals[i] = -2;
+        }
+    }
 
-    let mut v = VizLog::new(in_deg.clone());
+    let mut v = VizLog::new(vals.clone());
     v.ptrs(
         &[],
         &[],
-        format!("Goal: Find the minimum number of semesters to finish all {} courses. Strategy: Level-order BFS (Kahn's) -- each BFS level represents one semester of courses taken in parallel.", n),
+        format!("Goal: Find the minimum number of semesters to finish all courses. Strategy: Level-order BFS (Kahn's) -- each BFS level represents one semester of courses taken in parallel. {} nodes.", n),
     );
 
-    let mut deg = in_deg;
+    let mut deg = vals;
     let mut queue = VecDeque::new();
     for i in 0..n {
-        if deg[i] == 0 {
+        if !is_wall[i] && deg[i] == 0 {
             queue.push_back(i);
         }
     }
@@ -24939,20 +24956,22 @@ fn viz_topo_sort_parallel_courses() -> Vec<VizFrame> {
         &[(0, "start")],
         format!("Answer: {} semesters needed for {} courses. This equals the longest dependency chain. Time: O(V + E).", semesters, taken),
     );
-    let mut edges: Vec<(usize, usize)> = Vec::new();
-    for (u, neighbors) in adj.iter().enumerate() {
-        for &w in neighbors {
-            edges.push((u, w));
-        }
-    }
-    v.into_graph_frames(&edges, true)
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_topo_sort_all_ancestors() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(10..=14);
-    let adj = rand_dag(&mut rng, n);
-    let vals: Vec<i32> = (0..n as i32).collect();
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (adj, is_wall) = rand_grid_graph(&mut rng, rows, cols, 0.15);
+
+    let mut vals: Vec<i32> = (0..n as i32).collect();
+    for (i, &wall) in is_wall.iter().enumerate() {
+        if wall {
+            vals[i] = -2;
+        }
+    }
 
     let mut v = VizLog::new(vals);
     v.ptrs(
@@ -24971,7 +24990,7 @@ fn viz_topo_sort_all_ancestors() -> Vec<VizFrame> {
     }
     let mut queue = VecDeque::new();
     for i in 0..n {
-        if in_deg[i] == 0 {
+        if !is_wall[i] && in_deg[i] == 0 {
             queue.push_back(i);
         }
     }
@@ -25006,20 +25025,22 @@ fn viz_topo_sort_all_ancestors() -> Vec<VizFrame> {
         &[(0, "start")],
         format!("Answer: all ancestors computed for {} nodes. Time: O(V^2) in the worst case due to ancestor set sizes.", n),
     );
-    let mut edges: Vec<(usize, usize)> = Vec::new();
-    for (u, neighbors) in adj.iter().enumerate() {
-        for &w in neighbors {
-            edges.push((u, w));
-        }
-    }
-    v.into_graph_frames(&edges, true)
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_topo_sort_longest_path_dag() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(10..=14);
-    let adj = rand_dag(&mut rng, n);
-    let vals: Vec<i32> = (0..n as i32).collect();
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (adj, is_wall) = rand_grid_graph(&mut rng, rows, cols, 0.15);
+
+    let mut vals: Vec<i32> = (0..n as i32).collect();
+    for (i, &wall) in is_wall.iter().enumerate() {
+        if wall {
+            vals[i] = -2;
+        }
+    }
 
     let mut v = VizLog::new(vals);
     v.ptrs(&[], &[], format!("Goal: Find the longest path in a DAG (critical path). Strategy: Process nodes in topological order, relaxing edges to maximize distance. dist[v] = max(dist[u] + 1) for all predecessors u of v. {} nodes.", n));
@@ -25033,7 +25054,7 @@ fn viz_topo_sort_longest_path_dag() -> Vec<VizFrame> {
     }
     let mut queue = VecDeque::new();
     for i in 0..n {
-        if in_deg[i] == 0 {
+        if !is_wall[i] && in_deg[i] == 0 {
             queue.push_back(i);
         }
     }
@@ -25073,20 +25094,17 @@ fn viz_topo_sort_longest_path_dag() -> Vec<VizFrame> {
             best
         ),
     );
-    let mut edges: Vec<(usize, usize)> = Vec::new();
-    for (u, neighbors) in adj.iter().enumerate() {
-        for &w in neighbors {
-            edges.push((u, w));
-        }
-    }
-    v.into_graph_frames(&edges, true)
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_topo_sort_sequence_reconstruction() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(10..=14);
-    let adj = rand_dag(&mut rng, n);
-    let in_deg: Vec<i32> = {
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (adj, is_wall) = rand_grid_graph(&mut rng, rows, cols, 0.15);
+
+    let mut vals: Vec<i32> = {
         let mut d = vec![0i32; n];
         for u in 0..n {
             for &nb in &adj[u] {
@@ -25095,18 +25113,23 @@ fn viz_topo_sort_sequence_reconstruction() -> Vec<VizFrame> {
         }
         d
     };
+    for (i, &wall) in is_wall.iter().enumerate() {
+        if wall {
+            vals[i] = -2;
+        }
+    }
 
-    let mut v = VizLog::new(in_deg.clone());
+    let mut v = VizLog::new(vals.clone());
     v.ptrs(
         &[],
         &[],
         format!("Goal: Determine if the topological order is uniquely determined by the given constraints. Strategy: Run Kahn's -- if at any point the queue has more than one element, multiple valid orderings exist (not unique). {} nodes.", n),
     );
 
-    let mut deg = in_deg;
+    let mut deg = vals;
     let mut queue = VecDeque::new();
     for i in 0..n {
-        if deg[i] == 0 {
+        if !is_wall[i] && deg[i] == 0 {
             queue.push_back(i);
         }
     }
@@ -25147,20 +25170,17 @@ fn viz_topo_sort_sequence_reconstruction() -> Vec<VizFrame> {
             if unique { "IS" } else { "is NOT" }
         ),
     );
-    let mut edges: Vec<(usize, usize)> = Vec::new();
-    for (u, neighbors) in adj.iter().enumerate() {
-        for &w in neighbors {
-            edges.push((u, w));
-        }
-    }
-    v.into_graph_frames(&edges, true)
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_topo_sort_build_order() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(10..=14);
-    let adj = rand_dag(&mut rng, n);
-    let in_deg: Vec<i32> = {
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (adj, is_wall) = rand_grid_graph(&mut rng, rows, cols, 0.15);
+
+    let mut vals: Vec<i32> = {
         let mut d = vec![0i32; n];
         for u in 0..n {
             for &nb in &adj[u] {
@@ -25169,14 +25189,19 @@ fn viz_topo_sort_build_order() -> Vec<VizFrame> {
         }
         d
     };
+    for (i, &wall) in is_wall.iter().enumerate() {
+        if wall {
+            vals[i] = -2;
+        }
+    }
 
-    let mut v = VizLog::new(in_deg.clone());
-    v.ptrs(&[], &[], format!("Goal: Find a valid build order for {} packages respecting dependencies. Strategy: Topological sort via Kahn's BFS -- packages with no unbuilt dependencies are built first.", n));
+    let mut v = VizLog::new(vals.clone());
+    v.ptrs(&[], &[], format!("Goal: Find a valid build order for packages respecting dependencies. Strategy: Topological sort via Kahn's BFS -- packages with no unbuilt dependencies are built first. {} nodes.", n));
 
-    let mut deg = in_deg;
+    let mut deg = vals;
     let mut queue = VecDeque::new();
     for i in 0..n {
-        if deg[i] == 0 {
+        if !is_wall[i] && deg[i] == 0 {
             queue.push_back(i);
         }
     }
@@ -25206,20 +25231,17 @@ fn viz_topo_sort_build_order() -> Vec<VizFrame> {
         &[(0, "start")],
         format!("Answer: build order = {:?}. Time: O(V + E).", order),
     );
-    let mut edges: Vec<(usize, usize)> = Vec::new();
-    for (u, neighbors) in adj.iter().enumerate() {
-        for &w in neighbors {
-            edges.push((u, w));
-        }
-    }
-    v.into_graph_frames(&edges, true)
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_topo_sort_alien_dictionary() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(10..=14);
-    let adj = rand_dag(&mut rng, n);
-    let in_deg: Vec<i32> = {
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (adj, is_wall) = rand_grid_graph(&mut rng, rows, cols, 0.15);
+
+    let mut vals: Vec<i32> = {
         let mut d = vec![0i32; n];
         for u in 0..n {
             for &nb in &adj[u] {
@@ -25228,18 +25250,23 @@ fn viz_topo_sort_alien_dictionary() -> Vec<VizFrame> {
         }
         d
     };
+    for (i, &wall) in is_wall.iter().enumerate() {
+        if wall {
+            vals[i] = -2;
+        }
+    }
 
-    let mut v = VizLog::new(in_deg.clone());
+    let mut v = VizLog::new(vals.clone());
     v.ptrs(
         &[],
         &[],
-        format!("Goal: Determine the character ordering in an alien alphabet from sorted words. Strategy: Build a directed graph where edge a->b means 'a comes before b', then topologically sort. {} characters.", n),
+        format!("Goal: Determine the character ordering in an alien alphabet from sorted words. Strategy: Build a directed graph where edge a->b means 'a comes before b', then topologically sort. {} nodes.", n),
     );
 
-    let mut deg = in_deg;
+    let mut deg = vals;
     let mut queue = VecDeque::new();
     for i in 0..n {
-        if deg[i] == 0 {
+        if !is_wall[i] && deg[i] == 0 {
             queue.push_back(i);
         }
     }
@@ -25247,7 +25274,7 @@ fn viz_topo_sort_alien_dictionary() -> Vec<VizFrame> {
     let mut order = vec![];
     while let Some(u) = queue.pop_front() {
         order.push(u);
-        let ch = (b'a' + u as u8) as char;
+        let ch = (b'a' + (u % 26) as u8) as char;
         v.ptrs(
             &[(u, HighlightKind::Sorted)],
             &[(u, "char")],
@@ -25262,26 +25289,31 @@ fn viz_topo_sort_alien_dictionary() -> Vec<VizFrame> {
     }
 
     let all: Vec<(usize, HighlightKind)> = (0..n).map(|i| (i, HighlightKind::Sorted)).collect();
-    let result: String = order.iter().map(|&u| (b'a' + u as u8) as char).collect();
+    let result: String = order
+        .iter()
+        .map(|&u| (b'a' + (u % 26) as u8) as char)
+        .collect();
     v.ptrs(
         &all,
         &[(0, "start")],
         format!("Result: alien order \"{}\"", result),
     );
-    let mut edges: Vec<(usize, usize)> = Vec::new();
-    for (u, neighbors) in adj.iter().enumerate() {
-        for &w in neighbors {
-            edges.push((u, w));
-        }
-    }
-    v.into_graph_frames(&edges, true)
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_topo_sort_minimum_height_trees() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(10..=14);
-    let adj = rand_graph_undirected(&mut rng, n);
-    let degrees: Vec<i32> = (0..n).map(|i| adj[i].len() as i32).collect();
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (adj, is_wall) = rand_grid_graph(&mut rng, rows, cols, 0.25);
+
+    let mut degrees: Vec<i32> = (0..n).map(|i| adj[i].len() as i32).collect();
+    for (i, &wall) in is_wall.iter().enumerate() {
+        if wall {
+            degrees[i] = -2;
+        }
+    }
 
     let mut v = VizLog::new(degrees.clone());
     v.ptrs(
@@ -25292,7 +25324,12 @@ fn viz_topo_sort_minimum_height_trees() -> Vec<VizFrame> {
 
     let mut deg: Vec<i32> = degrees;
     let mut removed = vec![false; n];
-    let mut remaining = n;
+    for (i, &wall) in is_wall.iter().enumerate() {
+        if wall {
+            removed[i] = true;
+        }
+    }
+    let mut remaining = is_wall.iter().filter(|&&w| !w).count();
 
     while remaining > 2 {
         let mut leaves = vec![];
@@ -25321,25 +25358,25 @@ fn viz_topo_sort_minimum_height_trees() -> Vec<VizFrame> {
     }
 
     let roots: Vec<usize> = (0..n).filter(|&i| !removed[i]).collect();
-    let hl: Vec<(usize, HighlightKind)> =
-        roots.iter().map(|&i| (i, HighlightKind::Found)).collect();
-    v.ptrs(
-        &hl,
-        &[(roots[0], "root")],
-        format!(
-            "Answer: MHT root(s) = {:?}. These are the centroid(s) of the tree. Time: O(V).",
-            roots
-        ),
-    );
-    let mut edges: Vec<(usize, usize)> = Vec::new();
-    for (u, neighbors) in adj.iter().enumerate() {
-        for &w in neighbors {
-            if u < w {
-                edges.push((u, w));
-            }
-        }
+    if roots.is_empty() {
+        v.ptrs(
+            &[],
+            &[],
+            "Answer: no MHT roots found (empty graph).".to_string(),
+        );
+    } else {
+        let hl: Vec<(usize, HighlightKind)> =
+            roots.iter().map(|&i| (i, HighlightKind::Found)).collect();
+        v.ptrs(
+            &hl,
+            &[(roots[0], "root")],
+            format!(
+                "Answer: MHT root(s) = {:?}. These are the centroid(s) of the tree. Time: O(V).",
+                roots
+            ),
+        );
     }
-    v.into_graph_frames(&edges, false)
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_topo_sort_longest_increasing_path() -> Vec<VizFrame> {
@@ -25381,9 +25418,16 @@ fn viz_topo_sort_longest_increasing_path() -> Vec<VizFrame> {
 
 fn viz_topo_sort_critical_connections() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(10..=14);
-    let adj = rand_graph_undirected(&mut rng, n);
-    let vals: Vec<i32> = (0..n as i32).collect();
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (adj, is_wall) = rand_grid_graph(&mut rng, rows, cols, 0.25);
+    let mut vals: Vec<i32> = (0..n as i32).collect();
+    for (i, &wall) in is_wall.iter().enumerate() {
+        if wall {
+            vals[i] = -2;
+        }
+    }
 
     let mut v = VizLog::new(vals);
     v.ptrs(
@@ -25458,15 +25502,7 @@ fn viz_topo_sort_critical_connections() -> Vec<VizFrame> {
             bridges.len()
         ),
     );
-    let mut edges: Vec<(usize, usize)> = Vec::new();
-    for (u, neighbors) in adj.iter().enumerate() {
-        for &w in neighbors {
-            if u < w {
-                edges.push((u, w));
-            }
-        }
-    }
-    v.into_graph_frames(&edges, false)
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_topo_sort_sort_items_by_groups() -> Vec<VizFrame> {
@@ -26110,9 +26146,17 @@ fn viz_sparse_table_distinct_in_range() -> Vec<VizFrame> {
 
 fn viz_shortest_path_unweighted() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(10..=14);
-    let adj = rand_graph_undirected(&mut rng, n);
-    let vals: Vec<i32> = vec![-1; n];
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (adj, is_wall) = rand_grid_graph(&mut rng, rows, cols, 0.25);
+
+    let mut vals: Vec<i32> = vec![-1; n];
+    for (i, &wall) in is_wall.iter().enumerate() {
+        if wall {
+            vals[i] = -2;
+        }
+    }
 
     let dst = n - 1;
     let mut v = VizLog::new(vals);
@@ -26126,10 +26170,15 @@ fn viz_shortest_path_unweighted() -> Vec<VizFrame> {
     let mut queue = VecDeque::new();
     dist[0] = 0;
     queue.push_back(0);
+    let mut visited_hl: Vec<(usize, HighlightKind)> = Vec::new();
 
     while let Some(u) = queue.pop_front() {
+        visited_hl.push((u, HighlightKind::Sorted));
+        let mut hl = visited_hl.clone();
+        hl.push((u, HighlightKind::Active));
+        hl.push((dst, HighlightKind::Target));
         v.ptrs(
-            &[(u, HighlightKind::Active), (dst, HighlightKind::Target)],
+            &hl,
             &[(u, "node")],
             format!("Visit node {}, dist={}", u, dist[u]),
         );
@@ -26147,15 +26196,7 @@ fn viz_shortest_path_unweighted() -> Vec<VizFrame> {
         &[(0, "src"), (dst, "dst")],
         format!("Result: dist[{}] = {}", dst, dist[dst]),
     );
-    let mut edges: Vec<(usize, usize)> = Vec::new();
-    for (u, neighbors) in adj.iter().enumerate() {
-        for &w in neighbors {
-            if u < w {
-                edges.push((u, w));
-            }
-        }
-    }
-    v.into_graph_frames(&edges, false)
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_shortest_path_binary_grid() -> Vec<VizFrame> {
@@ -26266,11 +26307,20 @@ fn viz_shortest_path_min_steps() -> Vec<VizFrame> {
 
 fn viz_shortest_path_network_delay() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
-    let (adj, weights) = rand_weighted_graph(&mut rng, n);
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (adj, is_wall) = rand_weighted_grid_graph(&mut rng, rows, cols, 0.25);
+
+    let mut vals: Vec<i32> = (0..n as i32).collect();
+    for (i, &wall) in is_wall.iter().enumerate() {
+        if wall {
+            vals[i] = -2;
+        }
+    }
     let src = 0;
 
-    let mut v = VizLog::new(weights);
+    let mut v = VizLog::new(vals);
     v.ptrs(
         &[],
         &[],
@@ -26280,6 +26330,7 @@ fn viz_shortest_path_network_delay() -> Vec<VizFrame> {
     let mut dist = vec![i32::MAX; n];
     dist[src] = 0;
     let mut visited = vec![false; n];
+    let mut visited_hl: Vec<(usize, HighlightKind)> = Vec::new();
 
     for _ in 0..n {
         let mut u = n;
@@ -26294,16 +26345,22 @@ fn viz_shortest_path_network_delay() -> Vec<VizFrame> {
             break;
         }
         visited[u] = true;
+        visited_hl.push((u, HighlightKind::Sorted));
+        let mut hl = visited_hl.clone();
+        hl.push((u, HighlightKind::Active));
         v.ptrs(
-            &[(u, HighlightKind::Sorted)],
+            &hl,
             &[(u, "node")],
             format!("Visit node {}, dist={}", u, dist[u]),
         );
         for &(nb, w) in &adj[u] {
             if dist[u] + w < dist[nb] {
                 dist[nb] = dist[u] + w;
+                let mut hl = visited_hl.clone();
+                hl.push((u, HighlightKind::Active));
+                hl.push((nb, HighlightKind::Comparing));
                 v.ptrs(
-                    &[(u, HighlightKind::Active), (nb, HighlightKind::Comparing)],
+                    &hl,
                     &[(u, "node"), (nb, "relax")],
                     format!("Relax: dist[{}] = {} via {}", nb, dist[nb], u),
                 );
@@ -26323,23 +26380,24 @@ fn viz_shortest_path_network_delay() -> Vec<VizFrame> {
         &[(0, "src")],
         format!("Result: network delay = {}", max_dist),
     );
-    let mut edges: Vec<(usize, usize)> = Vec::new();
-    for (u, neighbors) in adj.iter().enumerate() {
-        for &(w, _weight) in neighbors {
-            if u < w {
-                edges.push((u, w));
-            }
-        }
-    }
-    v.into_graph_frames(&edges, false)
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_shortest_path_city_fewest_neighbors() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
-    let (adj, weights) = rand_weighted_graph(&mut rng, n);
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (adj, is_wall) = rand_weighted_grid_graph(&mut rng, rows, cols, 0.25);
 
-    let mut v = VizLog::new(weights);
+    let mut vals: Vec<i32> = (0..n as i32).collect();
+    for (i, &wall) in is_wall.iter().enumerate() {
+        if wall {
+            vals[i] = -2;
+        }
+    }
+
+    let mut v = VizLog::new(vals);
     v.ptrs(
         &[],
         &[],
@@ -26396,24 +26454,25 @@ fn viz_shortest_path_city_fewest_neighbors() -> Vec<VizFrame> {
         &[(best_city, "best")],
         format!("Result: city {} has fewest reachable neighbors", best_city),
     );
-    let mut edges: Vec<(usize, usize)> = Vec::new();
-    for (u, neighbors) in adj.iter().enumerate() {
-        for &(w, _weight) in neighbors {
-            if u < w {
-                edges.push((u, w));
-            }
-        }
-    }
-    v.into_graph_frames(&edges, false)
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_shortest_path_dijkstra() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
-    let (adj, weights) = rand_weighted_graph(&mut rng, n);
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (adj, is_wall) = rand_weighted_grid_graph(&mut rng, rows, cols, 0.25);
+
+    let mut vals: Vec<i32> = (0..n as i32).collect();
+    for (i, &wall) in is_wall.iter().enumerate() {
+        if wall {
+            vals[i] = -2;
+        }
+    }
 
     let dst = n - 1;
-    let mut v = VizLog::new(weights);
+    let mut v = VizLog::new(vals);
     v.ptrs(
         &[(dst, HighlightKind::Target)],
         &[],
@@ -26423,6 +26482,7 @@ fn viz_shortest_path_dijkstra() -> Vec<VizFrame> {
     let mut dist = vec![i32::MAX; n];
     dist[0] = 0;
     let mut visited = vec![false; n];
+    let mut visited_hl: Vec<(usize, HighlightKind)> = Vec::new();
 
     for _ in 0..n {
         let mut u = n;
@@ -26437,20 +26497,24 @@ fn viz_shortest_path_dijkstra() -> Vec<VizFrame> {
             break;
         }
         visited[u] = true;
+        visited_hl.push((u, HighlightKind::Sorted));
+        let mut hl = visited_hl.clone();
+        hl.push((u, HighlightKind::Active));
+        hl.push((dst, HighlightKind::Target));
         v.ptrs(
-            &[(u, HighlightKind::Sorted), (dst, HighlightKind::Target)],
+            &hl,
             &[(u, "node")],
             format!("Finalize node {}, dist={}", u, dist[u]),
         );
         for &(nb, w) in &adj[u] {
             if dist[u] + w < dist[nb] {
                 dist[nb] = dist[u] + w;
+                let mut hl = visited_hl.clone();
+                hl.push((u, HighlightKind::Active));
+                hl.push((nb, HighlightKind::Comparing));
+                hl.push((dst, HighlightKind::Target));
                 v.ptrs(
-                    &[
-                        (u, HighlightKind::Active),
-                        (nb, HighlightKind::Comparing),
-                        (dst, HighlightKind::Target),
-                    ],
+                    &hl,
                     &[(u, "from"), (nb, "relax")],
                     format!("Relax {}->{}: dist[{}] = {}", u, nb, nb, dist[nb]),
                 );
@@ -26474,24 +26538,25 @@ fn viz_shortest_path_dijkstra() -> Vec<VizFrame> {
         &[(0, "src"), (dst, "dst")],
         format!("Result: dists [{}]", dists.join(",")),
     );
-    let mut edges: Vec<(usize, usize)> = Vec::new();
-    for (u, neighbors) in adj.iter().enumerate() {
-        for &(w, _weight) in neighbors {
-            if u < w {
-                edges.push((u, w));
-            }
-        }
-    }
-    v.into_graph_frames(&edges, false)
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_shortest_path_bellman_ford() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
-    let (adj, weights) = rand_weighted_graph(&mut rng, n);
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (adj, is_wall) = rand_weighted_grid_graph(&mut rng, rows, cols, 0.25);
+
+    let mut vals: Vec<i32> = (0..n as i32).collect();
+    for (i, &wall) in is_wall.iter().enumerate() {
+        if wall {
+            vals[i] = -2;
+        }
+    }
 
     let dst = n - 1;
-    let mut v = VizLog::new(weights);
+    let mut v = VizLog::new(vals);
     v.ptrs(
         &[(dst, HighlightKind::Target)],
         &[],
@@ -26509,17 +26574,25 @@ fn viz_shortest_path_bellman_ford() -> Vec<VizFrame> {
         }
     }
 
+    let mut visited_hl: Vec<(usize, HighlightKind)> = Vec::new();
+    visited_hl.push((0, HighlightKind::Sorted));
+
     for round in 0..n - 1 {
         let mut updated = false;
         for &(u, nb, w) in &edges {
             if dist[u] < i32::MAX && dist[u] + w < dist[nb] {
                 dist[nb] = dist[u] + w;
                 updated = true;
+                if !visited_hl.iter().any(|&(idx, _)| idx == nb) {
+                    visited_hl.push((nb, HighlightKind::Sorted));
+                }
             }
         }
+        let mut hl = visited_hl.clone();
+        hl.push((dst, HighlightKind::Target));
         v.ptrs(
-            &[(round, HighlightKind::Active), (dst, HighlightKind::Target)],
-            &[(round, "rnd")],
+            &hl,
+            &[],
             format!("Round {}: relaxed edges, updated={}", round + 1, updated),
         );
         if !updated {
@@ -26537,24 +26610,25 @@ fn viz_shortest_path_bellman_ford() -> Vec<VizFrame> {
             if dist[dst] == i32::MAX { -1 } else { dist[dst] }
         ),
     );
-    let mut graph_edges: Vec<(usize, usize)> = Vec::new();
-    for (u, neighbors) in adj.iter().enumerate() {
-        for &(w, _weight) in neighbors {
-            if u < w {
-                graph_edges.push((u, w));
-            }
-        }
-    }
-    v.into_graph_frames(&graph_edges, false)
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_shortest_path_cheapest_flights() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
-    let (adj, weights) = rand_weighted_graph(&mut rng, n);
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (adj, is_wall) = rand_weighted_grid_graph(&mut rng, rows, cols, 0.25);
+
+    let mut vals: Vec<i32> = (0..n as i32).collect();
+    for (i, &wall) in is_wall.iter().enumerate() {
+        if wall {
+            vals[i] = -2;
+        }
+    }
     let k = rng.random_range(2..=4);
 
-    let mut v = VizLog::new(weights);
+    let mut v = VizLog::new(vals);
     v.ptrs(
         &[],
         &[],
@@ -26563,6 +26637,9 @@ fn viz_shortest_path_cheapest_flights() -> Vec<VizFrame> {
 
     let mut dist = vec![i32::MAX; n];
     dist[0] = 0;
+    let dst = n - 1;
+    let mut visited_hl: Vec<(usize, HighlightKind)> = Vec::new();
+    visited_hl.push((0, HighlightKind::Sorted));
 
     for stop in 0..k {
         let prev = dist.clone();
@@ -26573,21 +26650,22 @@ fn viz_shortest_path_cheapest_flights() -> Vec<VizFrame> {
             for &(nb, w) in &adj[u] {
                 if prev[u] + w < dist[nb] {
                     dist[nb] = prev[u] + w;
+                    if !visited_hl.iter().any(|&(idx, _)| idx == nb) {
+                        visited_hl.push((nb, HighlightKind::Sorted));
+                    }
                 }
             }
         }
+        let mut hl = visited_hl.clone();
+        hl.push((dst, HighlightKind::Target));
         v.ptrs(
-            &[(stop.min(n - 1), HighlightKind::Active)],
-            &[(stop.min(n - 1), "stop")],
+            &hl,
+            &[],
             format!(
                 "Stop {}: dist[{}]={}",
                 stop + 1,
-                n - 1,
-                if dist[n - 1] == i32::MAX {
-                    -1
-                } else {
-                    dist[n - 1]
-                }
+                dst,
+                if dist[dst] == i32::MAX { -1 } else { dist[dst] }
             ),
         );
     }
@@ -26595,25 +26673,13 @@ fn viz_shortest_path_cheapest_flights() -> Vec<VizFrame> {
     let all: Vec<(usize, HighlightKind)> = (0..n).map(|i| (i, HighlightKind::Sorted)).collect();
     v.ptrs(
         &all,
-        &[(0, "src"), (n - 1, "dst")],
+        &[(0, "src"), (dst, "dst")],
         format!(
             "Result: cheapest = {}",
-            if dist[n - 1] == i32::MAX {
-                -1
-            } else {
-                dist[n - 1]
-            }
+            if dist[dst] == i32::MAX { -1 } else { dist[dst] }
         ),
     );
-    let mut edges: Vec<(usize, usize)> = Vec::new();
-    for (u, neighbors) in adj.iter().enumerate() {
-        for &(w, _weight) in neighbors {
-            if u < w {
-                edges.push((u, w));
-            }
-        }
-    }
-    v.into_graph_frames(&edges, false)
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_shortest_path_path_with_min_effort() -> Vec<VizFrame> {
@@ -26738,10 +26804,19 @@ fn viz_shortest_path_maze() -> Vec<VizFrame> {
 
 fn viz_shortest_path_floyd_warshall() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
-    let (adj, weights) = rand_weighted_graph(&mut rng, n);
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (adj, is_wall) = rand_weighted_grid_graph(&mut rng, rows, cols, 0.25);
 
-    let mut v = VizLog::new(weights);
+    let mut vals: Vec<i32> = (0..n as i32).collect();
+    for (i, &wall) in is_wall.iter().enumerate() {
+        if wall {
+            vals[i] = -2;
+        }
+    }
+
+    let mut v = VizLog::new(vals);
     v.ptrs(
         &[],
         &[],
@@ -26760,6 +26835,9 @@ fn viz_shortest_path_floyd_warshall() -> Vec<VizFrame> {
     }
 
     for k in 0..n {
+        if is_wall[k] {
+            continue;
+        }
         for i in 0..n {
             for j in 0..n {
                 if dist[i][k] + dist[k][j] < dist[i][j] {
@@ -26780,24 +26858,25 @@ fn viz_shortest_path_floyd_warshall() -> Vec<VizFrame> {
         &[(0, "start")],
         format!("Result: all-pairs shortest paths computed for {} nodes", n),
     );
-    let mut edges: Vec<(usize, usize)> = Vec::new();
-    for (u, neighbors) in adj.iter().enumerate() {
-        for &(w, _weight) in neighbors {
-            if u < w {
-                edges.push((u, w));
-            }
-        }
-    }
-    v.into_graph_frames(&edges, false)
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_shortest_path_k_shortest() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
-    let (adj, weights) = rand_weighted_graph(&mut rng, n);
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (adj, is_wall) = rand_weighted_grid_graph(&mut rng, rows, cols, 0.25);
     let k = 2;
 
-    let mut v = VizLog::new(weights);
+    let mut vals: Vec<i32> = (0..n as i32).collect();
+    for (i, &wall) in is_wall.iter().enumerate() {
+        if wall {
+            vals[i] = -2;
+        }
+    }
+
+    let mut v = VizLog::new(vals);
     v.ptrs(
         &[],
         &[],
@@ -26848,23 +26927,24 @@ fn viz_shortest_path_k_shortest() -> Vec<VizFrame> {
             }
         ),
     );
-    let mut edges: Vec<(usize, usize)> = Vec::new();
-    for (u, neighbors) in adj.iter().enumerate() {
-        for &(w, _weight) in neighbors {
-            if u < w {
-                edges.push((u, w));
-            }
-        }
-    }
-    v.into_graph_frames(&edges, false)
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_shortest_path_minimum_cost_connect_all() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
-    let (_, weights) = rand_weighted_graph(&mut rng, n);
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (adj, is_wall) = rand_weighted_grid_graph(&mut rng, rows, cols, 0.25);
 
-    let mut v = VizLog::new(weights);
+    let mut vals: Vec<i32> = (0..n as i32).collect();
+    for (i, &wall) in is_wall.iter().enumerate() {
+        if wall {
+            vals[i] = -2;
+        }
+    }
+
+    let mut v = VizLog::new(vals);
     v.ptrs(
         &[],
         &[],
@@ -26880,7 +26960,7 @@ fn viz_shortest_path_minimum_cost_connect_all() -> Vec<VizFrame> {
         let mut u = n;
         let mut best = i32::MAX;
         for i in 0..n {
-            if !in_mst[i] && cost[i] < best {
+            if !in_mst[i] && !is_wall[i] && cost[i] < best {
                 best = cost[i];
                 u = i;
             }
@@ -26895,13 +26975,10 @@ fn viz_shortest_path_minimum_cost_connect_all() -> Vec<VizFrame> {
             &[(u, "add")],
             format!("Add node {}, edge cost={}, total={}", u, cost[u], total),
         );
-        // Update costs to neighbors
-        for j in 0..n {
-            if !in_mst[j] {
-                let w = rng.random_range(1..=10);
-                if w < cost[j] {
-                    cost[j] = w;
-                }
+        // Update costs to neighbors via grid adjacency
+        for &(nb, w) in &adj[u] {
+            if !in_mst[nb] && w < cost[nb] {
+                cost[nb] = w;
             }
         }
     }
@@ -26912,14 +26989,22 @@ fn viz_shortest_path_minimum_cost_connect_all() -> Vec<VizFrame> {
         &[(0, "start")],
         format!("Result: min cost to connect all = {}", total),
     );
-    v.into_frames()
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_shortest_path_reconstruct() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(10..=14);
-    let adj = rand_graph_undirected(&mut rng, n);
-    let vals: Vec<i32> = (0..n as i32).collect();
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (adj, is_wall) = rand_grid_graph(&mut rng, rows, cols, 0.25);
+
+    let mut vals: Vec<i32> = (0..n as i32).collect();
+    for (i, &wall) in is_wall.iter().enumerate() {
+        if wall {
+            vals[i] = -2;
+        }
+    }
 
     let mut v = VizLog::new(vals);
     v.ptrs(
@@ -26928,15 +27013,21 @@ fn viz_shortest_path_reconstruct() -> Vec<VizFrame> {
         format!("Reconstruct Path — BFS 0 to {} with parent tracking", n - 1),
     );
 
+    let dst = n - 1;
     let mut dist = vec![-1i32; n];
     let mut parent = vec![usize::MAX; n];
     let mut queue = VecDeque::new();
     dist[0] = 0;
     queue.push_back(0);
+    let mut visited_hl: Vec<(usize, HighlightKind)> = Vec::new();
 
     while let Some(u) = queue.pop_front() {
+        visited_hl.push((u, HighlightKind::Sorted));
+        let mut hl = visited_hl.clone();
+        hl.push((u, HighlightKind::Active));
+        hl.push((dst, HighlightKind::Target));
         v.ptrs(
-            &[(u, HighlightKind::Active)],
+            &hl,
             &[(u, "node")],
             format!("Visit {}, dist={}", u, dist[u]),
         );
@@ -26951,7 +27042,7 @@ fn viz_shortest_path_reconstruct() -> Vec<VizFrame> {
 
     // Reconstruct path
     let mut path = vec![];
-    let mut cur = n - 1;
+    let mut cur = dst;
     while cur != usize::MAX {
         path.push(cur);
         cur = parent[cur];
@@ -26963,22 +27054,22 @@ fn viz_shortest_path_reconstruct() -> Vec<VizFrame> {
         &[(0, "src"), (n - 1, "dst")],
         format!("Result: path {:?}", path),
     );
-    let mut edges: Vec<(usize, usize)> = Vec::new();
-    for (u, neighbors) in adj.iter().enumerate() {
-        for &w in neighbors {
-            if u < w {
-                edges.push((u, w));
-            }
-        }
-    }
-    v.into_graph_frames(&edges, false)
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_shortest_path_with_alternating_colors() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(10..=14);
-    let adj = rand_graph_undirected(&mut rng, n);
-    let vals: Vec<i32> = (0..n as i32).collect();
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (adj, is_wall) = rand_grid_graph(&mut rng, rows, cols, 0.25);
+
+    let mut vals: Vec<i32> = (0..n as i32).collect();
+    for (i, &wall) in is_wall.iter().enumerate() {
+        if wall {
+            vals[i] = -2;
+        }
+    }
 
     let mut v = VizLog::new(vals);
     v.ptrs(
@@ -27027,15 +27118,7 @@ fn viz_shortest_path_with_alternating_colors() -> Vec<VizFrame> {
         .collect();
     let all: Vec<(usize, HighlightKind)> = (0..n).map(|i| (i, HighlightKind::Sorted)).collect();
     v.ptrs(&all, &[(0, "src")], format!("Result: {:?}", result));
-    let mut edges: Vec<(usize, usize)> = Vec::new();
-    for (u, neighbors) in adj.iter().enumerate() {
-        for &w in neighbors {
-            if u < w {
-                edges.push((u, w));
-            }
-        }
-    }
-    v.into_graph_frames(&edges, false)
+    v.into_grid_frames(rows, cols)
 }
 
 // ─── Part 6: Monotonic Stacks/Queues Visualizations ────────────
@@ -27736,14 +27819,23 @@ fn viz_monotonic_max_binary_string() -> Vec<VizFrame> {
 
 fn viz_mst_min_cost_connect() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
-    let (adj, weights) = rand_weighted_graph(&mut rng, n);
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (adj, is_wall) = rand_weighted_grid_graph(&mut rng, rows, cols, 0.25);
 
-    let mut v = VizLog::new(weights);
+    let mut vals: Vec<i32> = (0..n as i32).collect();
+    for i in 0..n {
+        if is_wall[i] {
+            vals[i] = -2;
+        }
+    }
+
+    let mut v = VizLog::new(vals);
     v.ptrs(
         &[],
         &[],
-        format!("Min Cost Connect — Prim's MST on {} nodes", n),
+        format!("Min Cost Connect — Prim's MST on {}x{} grid", rows, cols),
     );
 
     let mut in_mst = vec![false; n];
@@ -27755,7 +27847,7 @@ fn viz_mst_min_cost_connect() -> Vec<VizFrame> {
         let mut u = n;
         let mut best = i32::MAX;
         for i in 0..n {
-            if !in_mst[i] && key[i] < best {
+            if !in_mst[i] && !is_wall[i] && key[i] < best {
                 best = key[i];
                 u = i;
             }
@@ -27783,33 +27875,38 @@ fn viz_mst_min_cost_connect() -> Vec<VizFrame> {
         &[(0, "start")],
         format!("Result: MST cost = {}", total),
     );
-    let mut edges: Vec<(usize, usize)> = Vec::new();
-    for (u, neighbors) in adj.iter().enumerate() {
-        for &(w, _weight) in neighbors {
-            if u < w {
-                edges.push((u, w));
-            }
-        }
-    }
-    v.into_graph_frames(&edges, false)
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_mst_is_tree() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(10..=14);
-    let adj = rand_graph_undirected(&mut rng, n);
-    let vals: Vec<i32> = (0..n).map(|i| adj[i].len() as i32).collect();
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (adj, is_wall) = rand_grid_graph(&mut rng, rows, cols, 0.25);
+
+    let mut vals: Vec<i32> = (0..n).map(|i| adj[i].len() as i32).collect();
+    for i in 0..n {
+        if is_wall[i] {
+            vals[i] = -2;
+        }
+    }
 
     let mut v = VizLog::new(vals);
     v.ptrs(
         &[],
         &[],
-        format!("Is Tree — check {} nodes: connected + no cycle", n),
+        format!(
+            "Is Tree — check {}x{} grid: connected + no cycle",
+            rows, cols
+        ),
     );
 
     let mut edge_count = 0;
     for i in 0..n {
-        edge_count += adj[i].len();
+        if !is_wall[i] {
+            edge_count += adj[i].len();
+        }
     }
     edge_count /= 2;
 
@@ -27845,15 +27942,7 @@ fn viz_mst_is_tree() -> Vec<VizFrame> {
             edge_count
         ),
     );
-    let mut edges: Vec<(usize, usize)> = Vec::new();
-    for (u, neighbors) in adj.iter().enumerate() {
-        for &w in neighbors {
-            if u < w {
-                edges.push((u, w));
-            }
-        }
-    }
-    v.into_graph_frames(&edges, false)
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_mst_connected_components() -> Vec<VizFrame> {
@@ -27901,29 +27990,33 @@ fn viz_mst_connected_components() -> Vec<VizFrame> {
 
 fn viz_mst_min_spanning_weight() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
-    // Generate edges
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (adj, is_wall) = rand_weighted_grid_graph(&mut rng, rows, cols, 0.25);
+
+    // Extract edge list from weighted adjacency
     let mut edges: Vec<(i32, usize, usize)> = vec![];
-    for i in 0..n - 1 {
-        let w = rng.random_range(1..=10);
-        edges.push((w, i, i + 1));
-    }
-    for _ in 0..rng.random_range(1..=n / 2) {
-        let u = rng.random_range(0..n);
-        let vv = rng.random_range(0..n);
-        if u != vv {
-            let w = rng.random_range(1..=10);
-            edges.push((w, u, vv));
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &(vv, w) in neighbors {
+            if u < vv {
+                edges.push((w, u, vv));
+            }
         }
     }
     edges.sort();
 
-    let weights: Vec<i32> = (0..n).map(|i| edges.get(i).map_or(0, |e| e.0)).collect();
-    let mut v = VizLog::new(weights);
+    let mut vals: Vec<i32> = (0..n as i32).collect();
+    for i in 0..n {
+        if is_wall[i] {
+            vals[i] = -2;
+        }
+    }
+    let mut v = VizLog::new(vals);
     v.ptrs(
         &[],
         &[],
-        format!("Min Spanning Weight — Kruskal on {} nodes", n),
+        format!("Min Spanning Weight — Kruskal on {}x{} grid", rows, cols),
     );
 
     let mut parent: Vec<usize> = (0..n).collect();
@@ -27959,25 +28052,37 @@ fn viz_mst_min_spanning_weight() -> Vec<VizFrame> {
         &[(0, "start")],
         format!("Result: MST weight = {}", total),
     );
-    let graph_edges: Vec<(usize, usize)> = edges.iter().map(|&(_w, u, vv)| (u, vv)).collect();
-    v.into_graph_frames(&graph_edges, false)
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_mst_max_edge_in_mst() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (adj, is_wall) = rand_weighted_grid_graph(&mut rng, rows, cols, 0.25);
+
     let mut edges: Vec<(i32, usize, usize)> = vec![];
-    for i in 0..n - 1 {
-        edges.push((rng.random_range(1..=10), i, i + 1));
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &(vv, w) in neighbors {
+            if u < vv {
+                edges.push((w, u, vv));
+            }
+        }
     }
     edges.sort();
 
-    let weights: Vec<i32> = (0..n).map(|i| edges.get(i).map_or(0, |e| e.0)).collect();
-    let mut v = VizLog::new(weights);
+    let mut vals: Vec<i32> = (0..n as i32).collect();
+    for i in 0..n {
+        if is_wall[i] {
+            vals[i] = -2;
+        }
+    }
+    let mut v = VizLog::new(vals);
     v.ptrs(
         &[],
         &[],
-        format!("Max Edge in MST — Kruskal on {} nodes", n),
+        format!("Max Edge in MST — Kruskal on {}x{} grid", rows, cols),
     );
 
     let mut parent: Vec<usize> = (0..n).collect();
@@ -28002,32 +28107,42 @@ fn viz_mst_max_edge_in_mst() -> Vec<VizFrame> {
         &[(0, "start")],
         format!("Result: max MST edge = {}", max_edge),
     );
-    let graph_edges: Vec<(usize, usize)> = edges.iter().map(|&(_w, u, vv)| (u, vv)).collect();
-    v.into_graph_frames(&graph_edges, false)
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_mst_kruskal() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (adj, is_wall) = rand_weighted_grid_graph(&mut rng, rows, cols, 0.25);
+
     let mut edges: Vec<(i32, usize, usize)> = vec![];
-    for i in 0..n - 1 {
-        edges.push((rng.random_range(1..=10), i, i + 1));
-    }
-    for _ in 0..rng.random_range(2..=n) {
-        let u = rng.random_range(0..n);
-        let vv = rng.random_range(0..n);
-        if u != vv {
-            edges.push((rng.random_range(1..=10), u, vv));
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &(vv, w) in neighbors {
+            if u < vv {
+                edges.push((w, u, vv));
+            }
         }
     }
     edges.sort();
 
-    let weights: Vec<i32> = (0..n).map(|i| edges.get(i).map_or(0, |e| e.0)).collect();
-    let mut v = VizLog::new(weights);
+    let mut vals: Vec<i32> = (0..n as i32).collect();
+    for i in 0..n {
+        if is_wall[i] {
+            vals[i] = -2;
+        }
+    }
+    let mut v = VizLog::new(vals);
     v.ptrs(
         &[],
         &[],
-        format!("Kruskal's MST — {} nodes, {} edges", n, edges.len()),
+        format!(
+            "Kruskal's MST — {}x{} grid, {} edges",
+            rows,
+            cols,
+            edges.len()
+        ),
     );
 
     let mut parent: Vec<usize> = (0..n).collect();
@@ -28052,17 +28167,25 @@ fn viz_mst_kruskal() -> Vec<VizFrame> {
         &[(0, "start")],
         format!("Result: Kruskal MST = {}", total),
     );
-    let graph_edges: Vec<(usize, usize)> = edges.iter().map(|&(_w, u, vv)| (u, vv)).collect();
-    v.into_graph_frames(&graph_edges, false)
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_mst_prim() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
-    let (adj, weights) = rand_weighted_graph(&mut rng, n);
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (adj, is_wall) = rand_weighted_grid_graph(&mut rng, rows, cols, 0.25);
 
-    let mut v = VizLog::new(weights);
-    v.ptrs(&[], &[], format!("Goal: Find the Minimum Spanning Tree using Prim's algorithm. Strategy: Grow the MST one node at a time, always adding the cheapest edge connecting an MST node to a non-MST node. {} nodes.", n));
+    let mut vals: Vec<i32> = (0..n as i32).collect();
+    for i in 0..n {
+        if is_wall[i] {
+            vals[i] = -2;
+        }
+    }
+
+    let mut v = VizLog::new(vals);
+    v.ptrs(&[], &[], format!("Goal: Find the Minimum Spanning Tree using Prim's algorithm. Strategy: Grow the MST one node at a time, always adding the cheapest edge connecting an MST node to a non-MST node. {}x{} grid.", rows, cols));
 
     let mut in_mst = vec![false; n];
     let mut key = vec![i32::MAX; n];
@@ -28073,7 +28196,7 @@ fn viz_mst_prim() -> Vec<VizFrame> {
         let mut u = n;
         let mut best = i32::MAX;
         for i in 0..n {
-            if !in_mst[i] && key[i] < best {
+            if !in_mst[i] && !is_wall[i] && key[i] < best {
                 best = key[i];
                 u = i;
             }
@@ -28101,29 +28224,34 @@ fn viz_mst_prim() -> Vec<VizFrame> {
         &[(0, "start")],
         format!("Answer: Prim's MST total weight = {}. Time: O(V^2) naive, O(E log V) with priority queue.", total),
     );
-    let mut edges: Vec<(usize, usize)> = Vec::new();
-    for (u, neighbors) in adj.iter().enumerate() {
-        for &(w, _weight) in neighbors {
-            if u < w {
-                edges.push((u, w));
-            }
-        }
-    }
-    v.into_graph_frames(&edges, false)
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_mst_min_cost_repair_roads() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (adj, is_wall) = rand_weighted_grid_graph(&mut rng, rows, cols, 0.25);
+
     let mut edges: Vec<(i32, usize, usize)> = vec![];
-    for i in 0..n - 1 {
-        edges.push((rng.random_range(1..=10), i, i + 1));
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &(vv, w) in neighbors {
+            if u < vv {
+                edges.push((w, u, vv));
+            }
+        }
     }
     edges.sort();
 
-    let weights: Vec<i32> = (0..n).map(|i| edges.get(i).map_or(0, |e| e.0)).collect();
-    let mut v = VizLog::new(weights);
-    v.ptrs(&[], &[], format!("Goal: Find the minimum cost to connect all cities (some already connected). Strategy: Kruskal's MST on the repair edges, skipping pairs already connected via pre-existing roads. {} cities.", n));
+    let mut vals: Vec<i32> = (0..n as i32).collect();
+    for i in 0..n {
+        if is_wall[i] {
+            vals[i] = -2;
+        }
+    }
+    let mut v = VizLog::new(vals);
+    v.ptrs(&[], &[], format!("Goal: Find the minimum cost to connect all cities (some already connected). Strategy: Kruskal's MST on the repair edges, skipping pairs already connected via pre-existing roads. {}x{} grid.", rows, cols));
 
     let mut parent: Vec<usize> = (0..n).collect();
     let mut rank = vec![0usize; n];
@@ -28161,29 +28289,34 @@ fn viz_mst_min_cost_repair_roads() -> Vec<VizFrame> {
         &[(0, "start")],
         format!("Result: repair cost = {}", total),
     );
-    let graph_edges: Vec<(usize, usize)> = edges.iter().map(|&(_w, u, vv)| (u, vv)).collect();
-    v.into_graph_frames(&graph_edges, false)
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_mst_second_mst() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (adj, is_wall) = rand_weighted_grid_graph(&mut rng, rows, cols, 0.25);
+
     let mut edges: Vec<(i32, usize, usize)> = vec![];
-    for i in 0..n - 1 {
-        edges.push((rng.random_range(1..=10), i, i + 1));
-    }
-    for _ in 0..rng.random_range(2..=n) {
-        let u = rng.random_range(0..n);
-        let vv = rng.random_range(0..n);
-        if u != vv {
-            edges.push((rng.random_range(1..=10), u, vv));
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &(vv, w) in neighbors {
+            if u < vv {
+                edges.push((w, u, vv));
+            }
         }
     }
     edges.sort();
 
-    let weights: Vec<i32> = (0..n).map(|i| edges.get(i).map_or(0, |e| e.0)).collect();
-    let mut v = VizLog::new(weights);
-    v.ptrs(&[], &[], format!("Goal: Find the second minimum spanning tree. Strategy: First build the MST using Kruskal's, then for each MST edge, try replacing it with the best non-MST edge to get the next-best total. {} nodes.", n));
+    let mut vals: Vec<i32> = (0..n as i32).collect();
+    for i in 0..n {
+        if is_wall[i] {
+            vals[i] = -2;
+        }
+    }
+    let mut v = VizLog::new(vals);
+    v.ptrs(&[], &[], format!("Goal: Find the second minimum spanning tree. Strategy: First build the MST using Kruskal's, then for each MST edge, try replacing it with the best non-MST edge to get the next-best total. {}x{} grid.", rows, cols));
 
     // First MST
     let mut parent: Vec<usize> = (0..n).collect();
@@ -28216,22 +28349,34 @@ fn viz_mst_second_mst() -> Vec<VizFrame> {
         &[(0, "start")],
         format!("Result: MST={}, second MST computed", total),
     );
-    let graph_edges: Vec<(usize, usize)> = edges.iter().map(|&(_w, u, vv)| (u, vv)).collect();
-    v.into_graph_frames(&graph_edges, false)
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_mst_critical_edges() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (adj, is_wall) = rand_weighted_grid_graph(&mut rng, rows, cols, 0.25);
+
     let mut edges: Vec<(i32, usize, usize)> = vec![];
-    for i in 0..n - 1 {
-        edges.push((rng.random_range(1..=10), i, i + 1));
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &(vv, w) in neighbors {
+            if u < vv {
+                edges.push((w, u, vv));
+            }
+        }
     }
     edges.sort();
 
-    let weights: Vec<i32> = (0..n).map(|i| edges.get(i).map_or(0, |e| e.0)).collect();
-    let mut v = VizLog::new(weights);
-    v.ptrs(&[], &[], format!("Goal: Identify which MST edges are critical (removing them increases MST cost). Strategy: For each MST edge, rebuild MST without it. If the new cost is higher (or graph disconnects), the edge is critical. {} nodes.", n));
+    let mut vals: Vec<i32> = (0..n as i32).collect();
+    for i in 0..n {
+        if is_wall[i] {
+            vals[i] = -2;
+        }
+    }
+    let mut v = VizLog::new(vals);
+    v.ptrs(&[], &[], format!("Goal: Identify which MST edges are critical (removing them increases MST cost). Strategy: For each MST edge, rebuild MST without it. If the new cost is higher (or graph disconnects), the edge is critical. {}x{} grid.", rows, cols));
 
     let mut parent: Vec<usize> = (0..n).collect();
     let mut rank = vec![0usize; n];
@@ -28269,32 +28414,40 @@ fn viz_mst_critical_edges() -> Vec<VizFrame> {
         &[(0, "start")],
         format!("Result: {} critical edges", critical),
     );
-    let graph_edges: Vec<(usize, usize)> = edges.iter().map(|&(_w, u, vv)| (u, vv)).collect();
-    v.into_graph_frames(&graph_edges, false)
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_mst_max_spanning_tree() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (adj, is_wall) = rand_weighted_grid_graph(&mut rng, rows, cols, 0.25);
+
     let mut edges: Vec<(i32, usize, usize)> = vec![];
-    for i in 0..n - 1 {
-        edges.push((rng.random_range(1..=10), i, i + 1));
-    }
-    for _ in 0..rng.random_range(1..=n / 2) {
-        let u = rng.random_range(0..n);
-        let vv = rng.random_range(0..n);
-        if u != vv {
-            edges.push((rng.random_range(1..=10), u, vv));
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &(vv, w) in neighbors {
+            if u < vv {
+                edges.push((w, u, vv));
+            }
         }
     }
     edges.sort_by(|a, b| b.0.cmp(&a.0)); // descending
 
-    let weights: Vec<i32> = (0..n).map(|i| edges.get(i).map_or(0, |e| e.0)).collect();
-    let mut v = VizLog::new(weights);
+    let mut vals: Vec<i32> = (0..n as i32).collect();
+    for i in 0..n {
+        if is_wall[i] {
+            vals[i] = -2;
+        }
+    }
+    let mut v = VizLog::new(vals);
     v.ptrs(
         &[],
         &[],
-        format!("Max Spanning Tree — reverse Kruskal on {} nodes", n),
+        format!(
+            "Max Spanning Tree — reverse Kruskal on {}x{} grid",
+            rows, cols
+        ),
     );
 
     let mut parent: Vec<usize> = (0..n).collect();
@@ -28319,25 +28472,37 @@ fn viz_mst_max_spanning_tree() -> Vec<VizFrame> {
         &[(0, "start")],
         format!("Result: max spanning tree = {}", total),
     );
-    let graph_edges: Vec<(usize, usize)> = edges.iter().map(|&(_w, u, vv)| (u, vv)).collect();
-    v.into_graph_frames(&graph_edges, false)
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_mst_min_bottleneck_path() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (adj, is_wall) = rand_weighted_grid_graph(&mut rng, rows, cols, 0.25);
+
     let mut edges: Vec<(i32, usize, usize)> = vec![];
-    for i in 0..n - 1 {
-        edges.push((rng.random_range(1..=10), i, i + 1));
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &(vv, w) in neighbors {
+            if u < vv {
+                edges.push((w, u, vv));
+            }
+        }
     }
     edges.sort();
 
-    let weights: Vec<i32> = (0..n).map(|i| edges.get(i).map_or(0, |e| e.0)).collect();
-    let mut v = VizLog::new(weights);
+    let mut vals: Vec<i32> = (0..n as i32).collect();
+    for i in 0..n {
+        if is_wall[i] {
+            vals[i] = -2;
+        }
+    }
+    let mut v = VizLog::new(vals);
     v.ptrs(
         &[],
         &[],
-        format!("Min Bottleneck Path — MST on {} nodes", n),
+        format!("Min Bottleneck Path — MST on {}x{} grid", rows, cols),
     );
 
     let mut parent: Vec<usize> = (0..n).collect();
@@ -28370,22 +28535,30 @@ fn viz_mst_min_bottleneck_path() -> Vec<VizFrame> {
         &[(0, "src"), (n - 1, "dst")],
         format!("Result: min bottleneck = {}", bottleneck),
     );
-    let graph_edges: Vec<(usize, usize)> = edges.iter().map(|&(_w, u, vv)| (u, vv)).collect();
-    v.into_graph_frames(&graph_edges, false)
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_mst_optimize_network() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
-    let (adj, weights) = rand_weighted_graph(&mut rng, n);
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (adj, is_wall) = rand_weighted_grid_graph(&mut rng, rows, cols, 0.25);
 
-    let mut v = VizLog::new(weights);
+    let mut vals: Vec<i32> = (0..n as i32).collect();
+    for i in 0..n {
+        if is_wall[i] {
+            vals[i] = -2;
+        }
+    }
+
+    let mut v = VizLog::new(vals);
     v.ptrs(
         &[],
         &[],
         format!(
-            "Optimize Network — MST removes redundant edges, {} nodes",
-            n
+            "Optimize Network — MST removes redundant edges, {}x{} grid",
+            rows, cols
         ),
     );
 
@@ -28398,7 +28571,7 @@ fn viz_mst_optimize_network() -> Vec<VizFrame> {
         let mut u = n;
         let mut best = i32::MAX;
         for i in 0..n {
-            if !in_mst[i] && key[i] < best {
+            if !in_mst[i] && !is_wall[i] && key[i] < best {
                 best = key[i];
                 u = i;
             }
@@ -28422,10 +28595,17 @@ fn viz_mst_optimize_network() -> Vec<VizFrame> {
 
     let mut total_edges = 0;
     for i in 0..n {
-        total_edges += adj[i].len();
+        if !is_wall[i] {
+            total_edges += adj[i].len();
+        }
     }
     total_edges /= 2;
-    let removed = total_edges - (n - 1);
+    let non_wall = (0..n).filter(|&i| !is_wall[i]).count();
+    let removed = if total_edges >= non_wall.saturating_sub(1) {
+        total_edges - (non_wall - 1)
+    } else {
+        0
+    };
 
     let all: Vec<(usize, HighlightKind)> = (0..n).map(|i| (i, HighlightKind::Sorted)).collect();
     v.ptrs(
@@ -28433,23 +28613,20 @@ fn viz_mst_optimize_network() -> Vec<VizFrame> {
         &[(0, "start")],
         format!("Result: MST={}, removed {} redundant edges", total, removed),
     );
-    let mut edges: Vec<(usize, usize)> = Vec::new();
-    for (u, neighbors) in adj.iter().enumerate() {
-        for &(w, _weight) in neighbors {
-            if u < w {
-                edges.push((u, w));
-            }
-        }
-    }
-    v.into_graph_frames(&edges, false)
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_mst_steiner_tree() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (_adj, is_wall) = rand_weighted_grid_graph(&mut rng, rows, cols, 0.25);
+
+    let non_wall_indices: Vec<usize> = (0..n).filter(|&i| !is_wall[i]).collect();
     let terminals: Vec<usize> = {
-        let k = rng.random_range(3..=n.min(5));
-        let mut t: Vec<usize> = (0..n).collect();
+        let k = rng.random_range(3..=non_wall_indices.len().min(5));
+        let mut t = non_wall_indices.clone();
         for i in (1..t.len()).rev() {
             let j = rng.random_range(0..=i);
             t.swap(i, j);
@@ -28458,15 +28635,21 @@ fn viz_mst_steiner_tree() -> Vec<VizFrame> {
         t.sort();
         t
     };
-    let (adj, weights) = rand_weighted_graph(&mut rng, n);
 
-    let mut v = VizLog::new(weights);
+    let mut vals: Vec<i32> = (0..n as i32).collect();
+    for i in 0..n {
+        if is_wall[i] {
+            vals[i] = -2;
+        }
+    }
+
+    let mut v = VizLog::new(vals);
     v.ptrs(
         &[],
         &[],
         format!(
-            "Steiner Tree — connect terminals {:?} in {} nodes",
-            terminals, n
+            "Steiner Tree — connect terminals {:?} in {}x{} grid",
+            terminals, rows, cols
         ),
     );
 
@@ -28496,24 +28679,25 @@ fn viz_mst_steiner_tree() -> Vec<VizFrame> {
         &[(terminals[0], "root")],
         format!("Result: Steiner tree cost ~ {}", total),
     );
-    let mut edges: Vec<(usize, usize)> = Vec::new();
-    for (u, neighbors) in adj.iter().enumerate() {
-        for &(w, _weight) in neighbors {
-            if u < w {
-                edges.push((u, w));
-            }
-        }
-    }
-    v.into_graph_frames(&edges, false)
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_mst_min_degree_spanning_tree() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
-    let (adj, weights) = rand_weighted_graph(&mut rng, n);
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (adj, is_wall) = rand_weighted_grid_graph(&mut rng, rows, cols, 0.25);
 
-    let mut v = VizLog::new(weights);
-    v.ptrs(&[], &[], format!("Goal: Find a spanning tree minimizing the maximum node degree. Strategy: Start with Prim's MST, then iteratively swap edges to reduce high-degree nodes. {} nodes.", n));
+    let mut vals: Vec<i32> = (0..n as i32).collect();
+    for i in 0..n {
+        if is_wall[i] {
+            vals[i] = -2;
+        }
+    }
+
+    let mut v = VizLog::new(vals);
+    v.ptrs(&[], &[], format!("Goal: Find a spanning tree minimizing the maximum node degree. Strategy: Start with Prim's MST, then iteratively swap edges to reduce high-degree nodes. {}x{} grid.", rows, cols));
 
     // Build MST first
     let mut in_mst = vec![false; n];
@@ -28525,7 +28709,7 @@ fn viz_mst_min_degree_spanning_tree() -> Vec<VizFrame> {
         let mut u = n;
         let mut best = i32::MAX;
         for i in 0..n {
-            if !in_mst[i] && key[i] < best {
+            if !in_mst[i] && !is_wall[i] && key[i] < best {
                 best = key[i];
                 u = i;
             }
@@ -28547,22 +28731,18 @@ fn viz_mst_min_degree_spanning_tree() -> Vec<VizFrame> {
         }
     }
 
-    let max_deg = (0..n).map(|i| adj[i].len()).max().unwrap_or(0);
+    let max_deg = (0..n)
+        .filter(|&i| !is_wall[i])
+        .map(|i| adj[i].len())
+        .max()
+        .unwrap_or(0);
     let all: Vec<(usize, HighlightKind)> = (0..n).map(|i| (i, HighlightKind::Sorted)).collect();
     v.ptrs(
         &all,
         &[(0, "start")],
         format!("Result: MST built, max degree = {}", max_deg),
     );
-    let mut edges: Vec<(usize, usize)> = Vec::new();
-    for (u, neighbors) in adj.iter().enumerate() {
-        for &(w, _weight) in neighbors {
-            if u < w {
-                edges.push((u, w));
-            }
-        }
-    }
-    v.into_graph_frames(&edges, false)
+    v.into_grid_frames(rows, cols)
 }
 
 // ─── Part 6: Bit Manipulation Visualizations ───────────────────
@@ -29252,27 +29432,47 @@ fn viz_union_find_friend_circles() -> Vec<VizFrame> {
 
 fn viz_union_find_redundant_connection() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (adj, is_wall) = rand_grid_graph(&mut rng, rows, cols, 0.25);
+
     let mut parent: Vec<usize> = (0..n).collect();
     let mut rank = vec![0usize; n];
-    let vals: Vec<i32> = (0..n as i32).collect();
+    let mut vals: Vec<i32> = (0..n as i32).collect();
+    for i in 0..n {
+        if is_wall[i] {
+            vals[i] = -2;
+        }
+    }
 
     let mut v = VizLog::new(vals);
     v.ptrs(
         &[],
         &[],
-        format!("Redundant Connection — {} nodes, find extra edge", n),
+        format!(
+            "Redundant Connection — {}x{} grid, find extra edge",
+            rows, cols
+        ),
     );
 
-    // Build tree + one extra edge
+    // Collect edges from grid adjacency + one extra edge
     let mut edges = vec![];
-    for i in 0..n - 1 {
-        edges.push((i, i + 1));
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &w in neighbors {
+            if u < w {
+                edges.push((u, w));
+            }
+        }
     }
-    let a = rng.random_range(0..n);
-    let b = rng.random_range(0..n);
-    if a != b {
-        edges.push((a, b));
+    // Add one extra edge to guarantee a cycle
+    let non_wall: Vec<usize> = (0..n).filter(|&i| !is_wall[i]).collect();
+    if non_wall.len() >= 2 {
+        let a = non_wall[rng.random_range(0..non_wall.len())];
+        let b = non_wall[rng.random_range(0..non_wall.len())];
+        if a != b {
+            edges.push((a, b));
+        }
     }
 
     let mut redundant = (0, 0);
@@ -29300,8 +29500,7 @@ fn viz_union_find_redundant_connection() -> Vec<VizFrame> {
         &[(0, "start")],
         format!("Result: redundant edge ({},{})", redundant.0, redundant.1),
     );
-    let graph_edges: Vec<(usize, usize)> = edges.clone();
-    v.into_graph_frames(&graph_edges, false)
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_union_find_earliest_connection() -> Vec<VizFrame> {
@@ -29813,23 +30012,29 @@ fn viz_union_find_swim_in_water() -> Vec<VizFrame> {
 
 fn viz_union_find_min_cost_connect_cities() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (adj, is_wall) = rand_weighted_grid_graph(&mut rng, rows, cols, 0.25);
+
     let mut edges: Vec<(i32, usize, usize)> = vec![];
-    for i in 0..n - 1 {
-        edges.push((rng.random_range(1..=10), i, i + 1));
-    }
-    for _ in 0..rng.random_range(1..=n / 2) {
-        let u = rng.random_range(0..n);
-        let vv = rng.random_range(0..n);
-        if u != vv {
-            edges.push((rng.random_range(1..=10), u, vv));
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &(vv, w) in neighbors {
+            if u < vv {
+                edges.push((w, u, vv));
+            }
         }
     }
     edges.sort();
 
-    let weights: Vec<i32> = (0..n).map(|i| edges.get(i).map_or(0, |e| e.0)).collect();
-    let mut v = VizLog::new(weights);
-    v.ptrs(&[], &[], format!("Goal: Connect all {} cities with minimum total cost. Strategy: Kruskal's algorithm -- sort edges by weight, greedily add cheapest edge that connects two unconnected components using Union-Find.", n));
+    let mut vals: Vec<i32> = (0..n as i32).collect();
+    for i in 0..n {
+        if is_wall[i] {
+            vals[i] = -2;
+        }
+    }
+    let mut v = VizLog::new(vals);
+    v.ptrs(&[], &[], format!("Goal: Connect all cities in {}x{} grid with minimum total cost. Strategy: Kruskal's algorithm -- sort edges by weight, greedily add cheapest edge that connects two unconnected components using Union-Find.", rows, cols));
 
     let mut parent: Vec<usize> = (0..n).collect();
     let mut rank = vec![0usize; n];
@@ -29853,8 +30058,7 @@ fn viz_union_find_min_cost_connect_cities() -> Vec<VizFrame> {
         &[(0, "start")],
         format!("Result: min cost = {}", total),
     );
-    let graph_edges: Vec<(usize, usize)> = edges.iter().map(|&(_w, u, vv)| (u, vv)).collect();
-    v.into_graph_frames(&graph_edges, false)
+    v.into_grid_frames(rows, cols)
 }
 
 fn viz_union_find_remove_stones() -> Vec<VizFrame> {
@@ -29907,29 +30111,36 @@ fn viz_union_find_remove_stones() -> Vec<VizFrame> {
 
 fn viz_union_find_checking_existence_edge_length() -> Vec<VizFrame> {
     let mut rng = rand::rng();
-    let n = rng.random_range(6..=8);
+    let rows = 7;
+    let cols = 7;
+    let n = rows * cols;
+    let (adj, is_wall) = rand_weighted_grid_graph(&mut rng, rows, cols, 0.25);
+
     let mut edges: Vec<(i32, usize, usize)> = vec![];
-    for i in 0..n - 1 {
-        edges.push((rng.random_range(1..=10), i, i + 1));
-    }
-    for _ in 0..rng.random_range(1..=n / 2) {
-        let u = rng.random_range(0..n);
-        let vv = rng.random_range(0..n);
-        if u != vv {
-            edges.push((rng.random_range(1..=10), u, vv));
+    for (u, neighbors) in adj.iter().enumerate() {
+        for &(vv, w) in neighbors {
+            if u < vv {
+                edges.push((w, u, vv));
+            }
         }
     }
     edges.sort();
 
-    let weights: Vec<i32> = (0..n).map(|i| edges.get(i).map_or(0, |e| e.0)).collect();
-    let mut v = VizLog::new(weights);
+    let mut vals: Vec<i32> = (0..n as i32).collect();
+    for i in 0..n {
+        if is_wall[i] {
+            vals[i] = -2;
+        }
+    }
+    let mut v = VizLog::new(vals);
     v.ptrs(
         &[],
         &[],
-        format!("Edge Length Queries — {} nodes, sorted edges", n),
+        format!("Edge Length Queries — {}x{} grid, sorted edges", rows, cols),
     );
 
     // Process queries: can a reach b using edges <= limit?
+    let non_wall: Vec<usize> = (0..n).filter(|&i| !is_wall[i]).collect();
     let queries = rng.random_range(2..=4);
     let mut parent: Vec<usize> = (0..n).collect();
     let mut rank = vec![0usize; n];
@@ -29937,8 +30148,8 @@ fn viz_union_find_checking_existence_edge_length() -> Vec<VizFrame> {
 
     for q in 0..queries {
         let limit = rng.random_range(3..=12);
-        let a = rng.random_range(0..n);
-        let b = rng.random_range(0..n);
+        let a = non_wall[rng.random_range(0..non_wall.len())];
+        let b = non_wall[rng.random_range(0..non_wall.len())];
 
         while edge_idx < edges.len() && edges[edge_idx].0 <= limit {
             let (_, u, vv) = edges[edge_idx];
@@ -29976,8 +30187,7 @@ fn viz_union_find_checking_existence_edge_length() -> Vec<VizFrame> {
         &[(0, "start")],
         format!("Result: {} queries answered", queries),
     );
-    let graph_edges: Vec<(usize, usize)> = edges.iter().map(|&(_w, u, vv)| (u, vv)).collect();
-    v.into_graph_frames(&graph_edges, false)
+    v.into_grid_frames(rows, cols)
 }
 
 // ─── Part 6: String Algorithm Visualizations ───────────────────

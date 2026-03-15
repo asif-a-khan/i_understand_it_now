@@ -659,9 +659,25 @@ fn highlight_color(kind: Option<&HighlightKind>) -> Color {
     }
 }
 
-/// Return a full style for a highlight kind — uses bg color for Target.
+/// Return a full style for a highlight kind — fills cell background for all states.
 fn highlight_style(kind: Option<&HighlightKind>) -> Style {
     match kind {
+        Some(HighlightKind::Active) => Style::new()
+            .fg(Color::Black)
+            .bg(Color::Cyan)
+            .add_modifier(Modifier::BOLD),
+        Some(HighlightKind::Sorted) => Style::new()
+            .fg(Color::Black)
+            .bg(Color::Green)
+            .add_modifier(Modifier::BOLD),
+        Some(HighlightKind::Comparing) => Style::new()
+            .fg(Color::Black)
+            .bg(Color::Yellow)
+            .add_modifier(Modifier::BOLD),
+        Some(HighlightKind::Swapping) => Style::new()
+            .fg(Color::White)
+            .bg(Color::Red)
+            .add_modifier(Modifier::BOLD),
         Some(HighlightKind::Target) => Style::new()
             .fg(Color::White)
             .bg(Color::LightRed)
@@ -670,9 +686,19 @@ fn highlight_style(kind: Option<&HighlightKind>) -> Style {
             .fg(Color::White)
             .bg(Color::Green)
             .add_modifier(Modifier::BOLD),
-        other => Style::new()
-            .fg(highlight_color(other))
+        Some(HighlightKind::Pivot) => Style::new()
+            .fg(Color::White)
+            .bg(Color::Magenta)
             .add_modifier(Modifier::BOLD),
+        Some(HighlightKind::Reading) => Style::new()
+            .fg(Color::Black)
+            .bg(Color::Cyan)
+            .add_modifier(Modifier::BOLD),
+        Some(HighlightKind::Writing) => Style::new()
+            .fg(Color::White)
+            .bg(Color::Magenta)
+            .add_modifier(Modifier::BOLD),
+        None => Style::new().fg(Color::White).add_modifier(Modifier::BOLD),
     }
 }
 
@@ -1400,26 +1426,83 @@ fn render_grid(f: &mut Frame, area: Rect, cells: &[Vec<String>], frame: &VizFram
         return;
     }
 
-    let rows = cells.len();
+    let data_rows = cells.len();
     let cols = cells[0].len();
 
     let highlight_map: std::collections::HashMap<usize, HighlightKind> =
         frame.highlights.iter().cloned().collect();
 
-    // Compute cell width from max content
-    let max_content_w = cells
+    // ── Compute square cell dimensions that fit the available space ──
+    //
+    // Total width  = 2 + cols * cell_w + (cols - 1)   ["┌" + cells + separators + "┐"]
+    // Total height = rows * (cell_h + 1) + 1          [cells + separators + top/bottom borders]
+    //
+    // Terminal chars are ~2:1 (height:width), so cell_w = 2 * cell_h for visual squares.
+
+    let avail_w = area.width as usize;
+    let avail_h = area.height as usize;
+
+    // Content minimum width
+    let min_content_w = cells
         .iter()
         .flat_map(|row| row.iter())
         .map(|c| c.len())
         .max()
         .unwrap_or(1)
-        .max(1);
-    let cell_w = max_content_w + 2; // padding
+        .max(1)
+        + 2; // padding
+
+    // Max cell_w that fits horizontally: avail_w >= 2 + cols * cell_w + (cols - 1)
+    let max_cell_w = if cols > 0 {
+        avail_w.saturating_sub(1 + cols) / cols
+    } else {
+        4
+    };
+
+    // Max cell_h that fits vertically: avail_h >= rows * (cell_h + 1) + 1
+    let max_cell_h = if data_rows > 0 {
+        avail_h.saturating_sub(1) / data_rows
+    } else {
+        2
+    };
+    let max_cell_h = max_cell_h.saturating_sub(1); // subtract 1 for the separator row per data row
+
+    // Start with square aspect: cell_w = 2 * cell_h
+    let mut cell_h = max_cell_h.min(max_cell_w / 2).max(1);
+    let mut cell_w = (cell_h * 2).max(min_content_w);
+
+    // Clamp cell_w to fit horizontally
+    if cell_w > max_cell_w {
+        cell_w = max_cell_w.max(min_content_w);
+        cell_h = (cell_w / 2).max(1);
+    }
+
+    // Final safety: verify total fits, shrink if not
+    loop {
+        let total_w = 2 + cols * cell_w + cols.saturating_sub(1);
+        let total_h = data_rows * (cell_h + 1) + 1;
+        if total_w <= avail_w && total_h <= avail_h {
+            break;
+        }
+        // Shrink
+        if total_w > avail_w && cell_w > min_content_w {
+            cell_w -= 1;
+            cell_h = (cell_w / 2).max(1);
+        } else if total_h > avail_h && cell_h > 1 {
+            cell_h -= 1;
+            cell_w = (cell_h * 2).max(min_content_w);
+        } else {
+            // Can't shrink further — force cell_h=1
+            cell_h = 1;
+            cell_w = cell_w.min(max_cell_w).max(min_content_w);
+            break;
+        }
+    }
 
     let mut lines: Vec<Line> = Vec::new();
 
     // Top border
-    let mut top = String::from("  ┌");
+    let mut top = String::from("┌");
     for c in 0..cols {
         top.push_str(&"─".repeat(cell_w));
         if c + 1 < cols {
@@ -1429,9 +1512,25 @@ fn render_grid(f: &mut Frame, area: Rect, cells: &[Vec<String>], frame: &VizFram
     top.push('┐');
     lines.push(Line::styled(top, Style::new().fg(Color::DarkGray)));
 
-    for (r, row) in cells.iter().enumerate().take(rows) {
-        // Value row
-        let mut val_spans: Vec<Span> = vec![Span::styled("  │", Style::new().fg(Color::DarkGray))];
+    for (r, row) in cells.iter().enumerate().take(data_rows) {
+        // Pad lines above content (vertically center text in cell)
+        let pad_above = (cell_h.saturating_sub(1)) / 2;
+        let pad_below = cell_h.saturating_sub(1).saturating_sub(pad_above);
+
+        for _ in 0..pad_above {
+            let mut pad_spans: Vec<Span> =
+                vec![Span::styled("│", Style::new().fg(Color::DarkGray))];
+            for c in 0..cols {
+                let flat_idx = r * cols + c;
+                let style = highlight_style(highlight_map.get(&flat_idx));
+                pad_spans.push(Span::styled(" ".repeat(cell_w), style));
+                pad_spans.push(Span::styled("│", Style::new().fg(Color::DarkGray)));
+            }
+            lines.push(Line::from(pad_spans));
+        }
+
+        // Content row (with value centered)
+        let mut val_spans: Vec<Span> = vec![Span::styled("│", Style::new().fg(Color::DarkGray))];
         for c in 0..cols {
             let flat_idx = r * cols + c;
             let style = highlight_style(highlight_map.get(&flat_idx));
@@ -1444,9 +1543,21 @@ fn render_grid(f: &mut Frame, area: Rect, cells: &[Vec<String>], frame: &VizFram
         }
         lines.push(Line::from(val_spans));
 
+        for _ in 0..pad_below {
+            let mut pad_spans: Vec<Span> =
+                vec![Span::styled("│", Style::new().fg(Color::DarkGray))];
+            for c in 0..cols {
+                let flat_idx = r * cols + c;
+                let style = highlight_style(highlight_map.get(&flat_idx));
+                pad_spans.push(Span::styled(" ".repeat(cell_w), style));
+                pad_spans.push(Span::styled("│", Style::new().fg(Color::DarkGray)));
+            }
+            lines.push(Line::from(pad_spans));
+        }
+
         // Row separator
-        if r + 1 < rows {
-            let mut sep = String::from("  ├");
+        if r + 1 < data_rows {
+            let mut sep = String::from("├");
             for c in 0..cols {
                 sep.push_str(&"─".repeat(cell_w));
                 if c + 1 < cols {
@@ -1459,7 +1570,7 @@ fn render_grid(f: &mut Frame, area: Rect, cells: &[Vec<String>], frame: &VizFram
     }
 
     // Bottom border
-    let mut bot = String::from("  └");
+    let mut bot = String::from("└");
     for c in 0..cols {
         bot.push_str(&"─".repeat(cell_w));
         if c + 1 < cols {
@@ -1469,14 +1580,23 @@ fn render_grid(f: &mut Frame, area: Rect, cells: &[Vec<String>], frame: &VizFram
     bot.push('┘');
     lines.push(Line::styled(bot, Style::new().fg(Color::DarkGray)));
 
-    // Center vertically
+    // Center both vertically and horizontally
     let content_height = lines.len();
-    let top_pad = (area.height as usize).saturating_sub(content_height) / 2;
+    let grid_total_w = 1 + cols * cell_w + cols.saturating_sub(1) + 1; // "┌" + cells + separators + "┐"
+    let left_pad = (avail_w).saturating_sub(grid_total_w) / 2;
+    let left_pad_str = " ".repeat(left_pad);
+    let top_pad = (avail_h).saturating_sub(content_height) / 2;
+
     let mut padded: Vec<Line> = Vec::new();
     for _ in 0..top_pad {
         padded.push(Line::raw(""));
     }
-    padded.append(&mut lines);
+    // Prepend horizontal padding to each line
+    for line in lines {
+        let mut spans = vec![Span::raw(left_pad_str.clone())];
+        spans.extend(line.spans);
+        padded.push(Line::from(spans));
+    }
 
     f.render_widget(Paragraph::new(padded), area);
 }
