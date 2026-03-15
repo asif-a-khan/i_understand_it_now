@@ -55,8 +55,12 @@ pub enum TestMessage {
         swaps: usize,
         ops: usize,
     },
-    /// All tests done. Includes operation log from first test for replay.
-    Done { replay_ops: Vec<Operation> },
+    /// All tests done. Includes operation log + context from first test for replay.
+    Done {
+        replay_ops: Vec<Operation>,
+        replay_input_desc: String,
+        replay_topic: String,
+    },
     /// A panic occurred (e.g., todo!()).
     Panicked(String),
 }
@@ -874,9 +878,11 @@ pub fn spawn_test_runner(problem_id: String) -> mpsc::Receiver<TestMessage> {
                 return;
             };
 
+            let topic = problem.topic().to_string();
             let test_cases = problem.generate_tests();
             let total = test_cases.len();
             let mut first_ops: Vec<Operation> = Vec::new();
+            let mut first_input_desc = String::new();
 
             for (i, test) in test_cases.iter().enumerate() {
                 let mut log = OperationLog::new();
@@ -886,13 +892,16 @@ pub fn spawn_test_runner(problem_id: String) -> mpsc::Receiver<TestMessage> {
                     problem.run_solution(test, &mut log)
                 }));
 
-                // Capture ops from the first test for replay
+                // Capture ops and input from the first test for replay
                 if i == 0 {
                     first_ops = log.operations().to_vec();
                 }
 
                 match case_result {
                     Ok(result) => {
+                        if i == 0 {
+                            first_input_desc = result.input_description.clone();
+                        }
                         let _ = tx.send(TestMessage::CaseResult {
                             index: i,
                             total,
@@ -929,6 +938,8 @@ pub fn spawn_test_runner(problem_id: String) -> mpsc::Receiver<TestMessage> {
             }
             let _ = tx.send(TestMessage::Done {
                 replay_ops: first_ops,
+                replay_input_desc: first_input_desc,
+                replay_topic: topic,
             });
         }));
 

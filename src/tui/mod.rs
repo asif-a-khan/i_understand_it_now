@@ -59,6 +59,8 @@ struct App {
 
     // Replay data from last test run
     replay_ops: Vec<Operation>,
+    replay_input_desc: String,
+    replay_topic: String,
     /// After tests complete, go to replay instead of results
     replay_after_tests: Option<usize>,
 }
@@ -91,6 +93,8 @@ impl App {
             complexity_receiver: None,
             check_receiver: None,
             replay_ops: Vec::new(),
+            replay_input_desc: String::new(),
+            replay_topic: String::new(),
             replay_after_tests: None,
         }
     }
@@ -132,7 +136,9 @@ impl App {
                         self.viz_player.load_replay_frames(frames, name);
                     } else {
                         let name = format!("Replay: {}", pid);
-                        let frames = visualizer::instrumented::replay_from_ops(&self.replay_ops);
+                        let topic = &self.problems[*problem_idx].topic;
+                        let frames =
+                            visualizer::instrumented::replay_from_ops(&self.replay_ops, topic);
                         self.viz_player.load_replay_frames(frames, name);
                     }
                 }
@@ -223,10 +229,16 @@ impl App {
                             ops,
                         });
                     }
-                    Ok(TestMessage::Done { replay_ops }) => {
+                    Ok(TestMessage::Done {
+                        replay_ops,
+                        replay_input_desc,
+                        replay_topic,
+                    }) => {
                         self.problem_running.done = true;
                         self.test_receiver = None;
                         self.replay_ops = replay_ops;
+                        self.replay_input_desc = replay_input_desc;
+                        self.replay_topic = replay_topic;
                         self.save_test_progress();
                         if let Some(Screen::ProblemRunning { problem_idx }) =
                             self.screen_stack.last().cloned()
@@ -234,17 +246,13 @@ impl App {
                             self.screen_stack.pop();
                             if let Some(target_idx) = self.replay_after_tests.take() {
                                 // Check if there are any useful ops to replay
-                                let has_ops = self.replay_ops.iter().any(|op| {
-                                    matches!(
-                                        op,
-                                        crate::tracker::Operation::Compare { .. }
-                                            | crate::tracker::Operation::Swap { .. }
-                                    )
-                                });
+                                let has_ops = !self.replay_ops.is_empty();
                                 if has_ops {
                                     let name = format!("Replay: {}", self.problems[target_idx].id);
-                                    let frames =
-                                        visualizer::instrumented::replay_from_ops(&self.replay_ops);
+                                    let frames = visualizer::instrumented::replay_from_ops(
+                                        &self.replay_ops,
+                                        &self.replay_topic,
+                                    );
                                     self.viz_player.load_replay_frames(frames, name);
                                     self.screen_stack.push(Screen::ReplayPlayer {
                                         problem_idx: target_idx,

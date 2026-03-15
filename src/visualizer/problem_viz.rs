@@ -90,6 +90,20 @@ impl VizLog {
         self.frames
     }
 
+    /// Convert all frames to use VizData::Array with custom string labels.
+    /// The labels override the integer array values for display.
+    pub fn into_labeled_frames(self, labels: Vec<String>) -> Vec<VizFrame> {
+        self.frames
+            .into_iter()
+            .map(|mut f| {
+                f.data = Some(super::VizData::Array {
+                    values: labels.clone(),
+                });
+                f
+            })
+            .collect()
+    }
+
     /// Convert all frames to use VizData::Tree (level-order array → tree nodes).
     pub fn into_tree_frames(self) -> Vec<VizFrame> {
         self.frames
@@ -1913,6 +1927,18 @@ fn viz_stacks_valid_parentheses() -> Vec<VizFrame> {
         seq.push(p.1);
     }
     let n = seq.len();
+    let bracket_labels: Vec<String> = seq
+        .iter()
+        .map(|&x| match x {
+            1 => "(".to_string(),
+            2 => ")".to_string(),
+            3 => "[".to_string(),
+            4 => "]".to_string(),
+            5 => "{".to_string(),
+            6 => "}".to_string(),
+            _ => "?".to_string(),
+        })
+        .collect();
     let mut v = VizLog::new(seq.clone());
     v.ptrs(
         &[],
@@ -1951,7 +1977,7 @@ fn viz_stacks_valid_parentheses() -> Vec<VizFrame> {
         &all,
         "Answer: valid — all brackets matched. Stack is empty. O(n).",
     );
-    v.into_frames()
+    v.into_labeled_frames(bracket_labels)
 }
 
 fn viz_stacks_min_stack() -> Vec<VizFrame> {
@@ -3152,6 +3178,17 @@ fn viz_hash_maps_isomorphic_strings() -> Vec<VizFrame> {
     let mut display = s.clone();
     display.extend(&t);
     let total = display.len();
+    let char_labels: Vec<String> = display
+        .iter()
+        .map(|&x| {
+            let c = if (1..=9).contains(&x) {
+                (b'a' + (x as u8 - 1)) as char
+            } else {
+                (b'p' + (x as u8 - 10)) as char
+            };
+            c.to_string()
+        })
+        .collect();
 
     let mut v = VizLog::new(display.clone());
     v.ptrs(
@@ -3193,7 +3230,7 @@ fn viz_hash_maps_isomorphic_strings() -> Vec<VizFrame> {
         &[],
         "Answer: strings are isomorphic. O(n) — single pass with hash map.",
     );
-    v.into_frames()
+    v.into_labeled_frames(char_labels)
 }
 
 fn viz_hash_maps_group_anagrams() -> Vec<VizFrame> {
@@ -4944,6 +4981,7 @@ fn viz_strings_reverse() -> Vec<VizFrame> {
     let mut rng = rand::rng();
     let n = rng.random_range(6..=8);
     let (chars, vals) = rand_str_chars(&mut rng, n);
+    let char_labels: Vec<String> = chars.iter().map(|c| c.to_string()).collect();
     let s: String = chars.iter().collect();
 
     let mut v = VizLog::new(vals.clone());
@@ -4990,7 +5028,7 @@ fn viz_strings_reverse() -> Vec<VizFrame> {
         &[],
         format!("Answer: reversed to \"{}\". O(n) — n/2 swaps.", rev),
     );
-    v.into_frames()
+    v.into_labeled_frames(char_labels)
 }
 
 fn viz_strings_valid_palindrome() -> Vec<VizFrame> {
@@ -5005,6 +5043,7 @@ fn viz_strings_valid_palindrome() -> Vec<VizFrame> {
     }
     chars.extend(rev_half);
     let vals: Vec<i32> = chars.iter().map(|c| char_val(*c)).collect();
+    let char_labels: Vec<String> = chars.iter().map(|c| c.to_string()).collect();
     let n = chars.len();
     let s: String = chars.iter().collect();
 
@@ -5071,13 +5110,14 @@ fn viz_strings_valid_palindrome() -> Vec<VizFrame> {
             if is_palindrome { "IS" } else { "is NOT" },
         ),
     );
-    v.into_frames()
+    v.into_labeled_frames(char_labels)
 }
 
 fn viz_strings_is_anagram() -> Vec<VizFrame> {
     let mut rng = rand::rng();
     let n = rng.random_range(6..=8);
     let (chars1, vals1) = rand_str_chars(&mut rng, n);
+    let char_labels1: Vec<String> = chars1.iter().map(|c| c.to_string()).collect();
     let mut chars2 = chars1.clone();
     for i in (1..n).rev() {
         let j = rng.random_range(0..=i);
@@ -5109,6 +5149,7 @@ fn viz_strings_is_anagram() -> Vec<VizFrame> {
     }
 
     let vals2: Vec<i32> = chars2.iter().map(|c| char_val(*c)).collect();
+    let char_labels2: Vec<String> = chars2.iter().map(|c| c.to_string()).collect();
     let mut v2 = VizLog::new(vals2.clone());
     for (i, &c) in chars2.iter().enumerate() {
         *counts.entry(c).or_insert(0) -= 1;
@@ -5132,8 +5173,8 @@ fn viz_strings_is_anagram() -> Vec<VizFrame> {
         ),
     );
 
-    let mut frames = v.into_frames();
-    frames.extend(v2.into_frames());
+    let mut frames = v.into_labeled_frames(char_labels1);
+    frames.extend(v2.into_labeled_frames(char_labels2));
     frames
 }
 
@@ -5144,6 +5185,7 @@ fn viz_strings_first_unique_char() -> Vec<VizFrame> {
         .map(|_| (b'a' + rng.random_range(0..5_u8)) as char)
         .collect();
     let vals: Vec<i32> = chars.iter().map(|c| char_val(*c)).collect();
+    let char_labels: Vec<String> = chars.iter().map(|c| c.to_string()).collect();
     let s: String = chars.iter().collect();
 
     let mut v = VizLog::new(vals);
@@ -5171,7 +5213,7 @@ fn viz_strings_first_unique_char() -> Vec<VizFrame> {
                 &[(i, "i")],
                 format!("Found! '{}' at [{}] appears once", c, i),
             );
-            return v.into_frames();
+            return v.into_labeled_frames(char_labels);
         }
         v.ptrs(
             &[(i, HighlightKind::Active)],
@@ -5185,7 +5227,7 @@ fn viz_strings_first_unique_char() -> Vec<VizFrame> {
         &[],
         "Answer: no unique character found. O(n) — two passes.",
     );
-    v.into_frames()
+    v.into_labeled_frames(char_labels)
 }
 
 fn viz_strings_longest_common_prefix() -> Vec<VizFrame> {
@@ -5206,6 +5248,7 @@ fn viz_strings_longest_common_prefix() -> Vec<VizFrame> {
 
     let first_chars: Vec<char> = strs[0].chars().collect();
     let vals: Vec<i32> = first_chars.iter().map(|c| char_val(*c)).collect();
+    let char_labels: Vec<String> = first_chars.iter().map(|c| c.to_string()).collect();
 
     let mut v = VizLog::new(vals);
     v.ptrs(
@@ -5244,7 +5287,7 @@ fn viz_strings_longest_common_prefix() -> Vec<VizFrame> {
                 &[],
                 format!("Result: \"{}\" (length {})", &strs[0][..i], i),
             );
-            return v.into_frames();
+            return v.into_labeled_frames(char_labels);
         }
     }
 
@@ -5255,7 +5298,7 @@ fn viz_strings_longest_common_prefix() -> Vec<VizFrame> {
         &[],
         format!("Result: \"{}\" (length {})", prefix, prefix_len),
     );
-    v.into_frames()
+    v.into_labeled_frames(char_labels)
 }
 
 fn viz_strings_longest_palindromic_substring() -> Vec<VizFrame> {
@@ -5285,6 +5328,7 @@ fn viz_strings_longest_palindromic_substring() -> Vec<VizFrame> {
     }
 
     let vals: Vec<i32> = chars.iter().map(|c| char_val(*c)).collect();
+    let char_labels: Vec<String> = chars.iter().map(|c| c.to_string()).collect();
     let s: String = chars.iter().collect();
 
     let mut v = VizLog::new(vals);
@@ -5340,7 +5384,7 @@ fn viz_strings_longest_palindromic_substring() -> Vec<VizFrame> {
         ),
     );
 
-    let mut frames = v.into_frames();
+    let mut frames = v.into_labeled_frames(char_labels);
     if frames.len() > 40 {
         let last = frames.pop().unwrap();
         frames.truncate(38);
@@ -5368,6 +5412,7 @@ fn viz_strings_group_anagrams() -> Vec<VizFrame> {
     }
     let n = words.len();
 
+    let word_labels: Vec<String> = words.to_vec();
     let vals: Vec<i32> = words
         .iter()
         .map(|w| char_val(w.chars().next().unwrap()))
@@ -5405,7 +5450,7 @@ fn viz_strings_group_anagrams() -> Vec<VizFrame> {
             groups.len()
         ),
     );
-    v.into_frames()
+    v.into_labeled_frames(word_labels)
 }
 
 fn viz_strings_string_to_integer() -> Vec<VizFrame> {
@@ -5420,6 +5465,7 @@ fn viz_strings_string_to_integer() -> Vec<VizFrame> {
     let chars: Vec<char> = s.chars().collect();
     let n = chars.len();
 
+    let char_labels: Vec<String> = chars.iter().map(|c| c.to_string()).collect();
     let vals: Vec<i32> = chars
         .iter()
         .map(|c| {
@@ -5476,13 +5522,14 @@ fn viz_strings_string_to_integer() -> Vec<VizFrame> {
         &[],
         format!("Answer: {}. O(n) — single pass through digits.", result),
     );
-    v.into_frames()
+    v.into_labeled_frames(char_labels)
 }
 
 fn viz_strings_zigzag_conversion() -> Vec<VizFrame> {
     let mut rng = rand::rng();
     let n = rng.random_range(8..=10);
     let (chars, vals) = rand_str_chars(&mut rng, n);
+    let char_labels: Vec<String> = chars.iter().map(|c| c.to_string()).collect();
     let num_rows = rng.random_range(2..=3) as usize;
     let s: String = chars.iter().collect();
 
@@ -5540,13 +5587,14 @@ fn viz_strings_zigzag_conversion() -> Vec<VizFrame> {
         &[],
         format!("Answer: \"{}\". O(n) — single pass to assign rows.", result),
     );
-    v.into_frames()
+    v.into_labeled_frames(char_labels)
 }
 
 fn viz_strings_count_and_say() -> Vec<VizFrame> {
     let sequences = ["1", "11", "21", "1211", "111221"];
 
     let input_chars: Vec<char> = sequences[2].chars().collect();
+    let char_labels: Vec<String> = input_chars.iter().map(|c| c.to_string()).collect();
     let vals: Vec<i32> = input_chars
         .iter()
         .map(|c| (*c as i32) - ('0' as i32))
@@ -5601,7 +5649,7 @@ fn viz_strings_count_and_say() -> Vec<VizFrame> {
             sequences[2], result
         ),
     );
-    v.into_frames()
+    v.into_labeled_frames(char_labels)
 }
 
 fn viz_strings_longest_substring_no_repeat() -> Vec<VizFrame> {
@@ -5611,6 +5659,7 @@ fn viz_strings_longest_substring_no_repeat() -> Vec<VizFrame> {
         .map(|_| (b'a' + rng.random_range(0..6_u8)) as char)
         .collect();
     let vals: Vec<i32> = chars.iter().map(|c| char_val(*c)).collect();
+    let char_labels: Vec<String> = chars.iter().map(|c| c.to_string()).collect();
     let s: String = chars.iter().collect();
 
     let mut v = VizLog::new(vals);
@@ -5683,7 +5732,7 @@ fn viz_strings_longest_substring_no_repeat() -> Vec<VizFrame> {
         ),
     );
 
-    let mut frames = v.into_frames();
+    let mut frames = v.into_labeled_frames(char_labels);
     if frames.len() > 40 {
         let last = frames.pop().unwrap();
         frames.truncate(38);
@@ -5708,6 +5757,7 @@ fn viz_strings_minimum_window_substring() -> Vec<VizFrame> {
     }
 
     let vals: Vec<i32> = chars.iter().map(|c| char_val(*c)).collect();
+    let char_labels: Vec<String> = chars.iter().map(|c| c.to_string()).collect();
     let s: String = chars.iter().collect();
 
     let mut v = VizLog::new(vals);
@@ -5789,7 +5839,7 @@ fn viz_strings_minimum_window_substring() -> Vec<VizFrame> {
         );
     }
 
-    let mut frames = v.into_frames();
+    let mut frames = v.into_labeled_frames(char_labels);
     if frames.len() > 40 {
         let last = frames.pop().unwrap();
         frames.truncate(38);
@@ -5806,6 +5856,7 @@ fn viz_strings_regex_matching() -> Vec<VizFrame> {
 
     let text_chars: Vec<char> = text.chars().collect();
     let vals: Vec<i32> = text_chars.iter().map(|c| char_val(*c)).collect();
+    let char_labels: Vec<String> = text_chars.iter().map(|c| c.to_string()).collect();
     let n = text_chars.len();
 
     let mut v = VizLog::new(vals);
@@ -5876,7 +5927,7 @@ fn viz_strings_regex_matching() -> Vec<VizFrame> {
             pattern
         ),
     );
-    v.into_frames()
+    v.into_labeled_frames(char_labels)
 }
 
 fn viz_strings_edit_distance() -> Vec<VizFrame> {
@@ -5884,6 +5935,7 @@ fn viz_strings_edit_distance() -> Vec<VizFrame> {
     let len1 = rng.random_range(3..=5);
     let len2 = rng.random_range(3..=5);
     let (chars1, vals1) = rand_str_chars(&mut rng, len1);
+    let char_labels: Vec<String> = chars1.iter().map(|c| c.to_string()).collect();
     let (chars2, _) = rand_str_chars(&mut rng, len2);
     let s1: String = chars1.iter().collect();
     let s2: String = chars2.iter().collect();
@@ -5940,7 +5992,7 @@ fn viz_strings_edit_distance() -> Vec<VizFrame> {
             s1, s2, distance
         ),
     );
-    v.into_frames()
+    v.into_labeled_frames(char_labels)
 }
 
 fn viz_strings_wildcard_matching() -> Vec<VizFrame> {
@@ -5956,6 +6008,7 @@ fn viz_strings_wildcard_matching() -> Vec<VizFrame> {
 
     let text_chars: Vec<char> = text.chars().collect();
     let vals: Vec<i32> = text_chars.iter().map(|c| char_val(*c)).collect();
+    let char_labels: Vec<String> = text_chars.iter().map(|c| c.to_string()).collect();
     let n = text_chars.len();
 
     let mut v = VizLog::new(vals);
@@ -6022,7 +6075,7 @@ fn viz_strings_wildcard_matching() -> Vec<VizFrame> {
             pattern
         ),
     );
-    v.into_frames()
+    v.into_labeled_frames(char_labels)
 }
 
 // ─── Linked List Visualizations ──────────────────────────
@@ -6072,8 +6125,30 @@ fn viz_linked_lists_reverse() -> Vec<VizFrame> {
         format!("Answer: {:?}. O(n) — single pass.", reversed),
     );
 
-    let mut frames = v.into_frames();
-    frames.extend(v2.into_frames());
+    let labels: Vec<String> = list
+        .iter()
+        .enumerate()
+        .map(|(i, &val)| {
+            if i + 1 < list.len() {
+                format!("{} →", val)
+            } else {
+                val.to_string()
+            }
+        })
+        .collect();
+    let result_labels: Vec<String> = reversed
+        .iter()
+        .enumerate()
+        .map(|(i, &val)| {
+            if i + 1 < reversed.len() {
+                format!("{} →", val)
+            } else {
+                val.to_string()
+            }
+        })
+        .collect();
+    let mut frames = v.into_labeled_frames(labels);
+    frames.extend(v2.into_labeled_frames(result_labels));
     frames
 }
 
@@ -6149,8 +6224,37 @@ fn viz_linked_lists_merge_two_sorted() -> Vec<VizFrame> {
         format!("Answer: {:?}. O(n + m) — single merge pass.", merged),
     );
 
-    let mut frames = v.into_frames();
-    frames.extend(v2.into_frames());
+    let display_labels: Vec<String> = {
+        let mut labels = Vec::new();
+        for (i, &val) in a.iter().enumerate() {
+            if i + 1 < a.len() {
+                labels.push(format!("{} →", val));
+            } else {
+                labels.push(val.to_string());
+            }
+        }
+        for (i, &val) in b.iter().enumerate() {
+            if i + 1 < b.len() {
+                labels.push(format!("{} →", val));
+            } else {
+                labels.push(val.to_string());
+            }
+        }
+        labels
+    };
+    let result_labels: Vec<String> = merged
+        .iter()
+        .enumerate()
+        .map(|(i, &val)| {
+            if i + 1 < merged.len() {
+                format!("{} →", val)
+            } else {
+                val.to_string()
+            }
+        })
+        .collect();
+    let mut frames = v.into_labeled_frames(display_labels);
+    frames.extend(v2.into_labeled_frames(result_labels));
     frames
 }
 
@@ -6205,7 +6309,18 @@ fn viz_linked_lists_has_cycle() -> Vec<VizFrame> {
         }
     }
 
-    v.into_frames()
+    let labels: Vec<String> = list
+        .iter()
+        .enumerate()
+        .map(|(i, &val)| {
+            if i + 1 < list.len() {
+                format!("{} →", val)
+            } else {
+                val.to_string()
+            }
+        })
+        .collect();
+    v.into_labeled_frames(labels)
 }
 
 fn viz_linked_lists_remove_nth_from_end() -> Vec<VizFrame> {
@@ -6273,8 +6388,30 @@ fn viz_linked_lists_remove_nth_from_end() -> Vec<VizFrame> {
         ),
     );
 
-    let mut frames = v.into_frames();
-    frames.extend(v2.into_frames());
+    let labels: Vec<String> = list
+        .iter()
+        .enumerate()
+        .map(|(i, &val)| {
+            if i + 1 < list.len() {
+                format!("{} →", val)
+            } else {
+                val.to_string()
+            }
+        })
+        .collect();
+    let result_labels: Vec<String> = result
+        .iter()
+        .enumerate()
+        .map(|(i, &val)| {
+            if i + 1 < result.len() {
+                format!("{} →", val)
+            } else {
+                val.to_string()
+            }
+        })
+        .collect();
+    let mut frames = v.into_labeled_frames(labels);
+    frames.extend(v2.into_labeled_frames(result_labels));
     frames
 }
 
@@ -6360,7 +6497,18 @@ fn viz_linked_lists_is_palindrome() -> Vec<VizFrame> {
             if is_pal { "IS" } else { "NOT" }
         ),
     );
-    v.into_frames()
+    let labels: Vec<String> = list
+        .iter()
+        .enumerate()
+        .map(|(i, &val)| {
+            if i + 1 < list.len() {
+                format!("{} →", val)
+            } else {
+                val.to_string()
+            }
+        })
+        .collect();
+    v.into_labeled_frames(labels)
 }
 
 fn viz_linked_lists_add_two_numbers() -> Vec<VizFrame> {
@@ -6436,8 +6584,37 @@ fn viz_linked_lists_add_two_numbers() -> Vec<VizFrame> {
         ),
     );
 
-    let mut frames = v.into_frames();
-    frames.extend(v2.into_frames());
+    let display_labels: Vec<String> = {
+        let mut labels = Vec::new();
+        for (i, &val) in a.iter().enumerate() {
+            if i + 1 < a.len() {
+                labels.push(format!("{} →", val));
+            } else {
+                labels.push(val.to_string());
+            }
+        }
+        for (i, &val) in b.iter().enumerate() {
+            if i + 1 < b.len() {
+                labels.push(format!("{} →", val));
+            } else {
+                labels.push(val.to_string());
+            }
+        }
+        labels
+    };
+    let result_labels: Vec<String> = result
+        .iter()
+        .enumerate()
+        .map(|(i, &val)| {
+            if i + 1 < result.len() {
+                format!("{} →", val)
+            } else {
+                val.to_string()
+            }
+        })
+        .collect();
+    let mut frames = v.into_labeled_frames(display_labels);
+    frames.extend(v2.into_labeled_frames(result_labels));
     frames
 }
 
@@ -6503,8 +6680,30 @@ fn viz_linked_lists_reorder() -> Vec<VizFrame> {
         ),
     );
 
-    let mut frames = v.into_frames();
-    frames.extend(v2.into_frames());
+    let labels: Vec<String> = list
+        .iter()
+        .enumerate()
+        .map(|(i, &val)| {
+            if i + 1 < list.len() {
+                format!("{} →", val)
+            } else {
+                val.to_string()
+            }
+        })
+        .collect();
+    let result_labels: Vec<String> = result
+        .iter()
+        .enumerate()
+        .map(|(i, &val)| {
+            if i + 1 < result.len() {
+                format!("{} →", val)
+            } else {
+                val.to_string()
+            }
+        })
+        .collect();
+    let mut frames = v.into_labeled_frames(labels);
+    frames.extend(v2.into_labeled_frames(result_labels));
     frames
 }
 
@@ -6593,7 +6792,18 @@ fn viz_linked_lists_sort() -> Vec<VizFrame> {
         format!("Answer: {:?}. O(n log n) — merge sort.", list),
     );
 
-    let mut frames = v.into_frames();
+    let labels: Vec<String> = list
+        .iter()
+        .enumerate()
+        .map(|(i, &val)| {
+            if i + 1 < list.len() {
+                format!("{} →", val)
+            } else {
+                val.to_string()
+            }
+        })
+        .collect();
+    let mut frames = v.into_labeled_frames(labels);
     if let Some(last) = frames.last_mut() {
         last.array = list;
     }
@@ -6656,8 +6866,30 @@ fn viz_linked_lists_remove_duplicates_ii() -> Vec<VizFrame> {
         .collect();
     v2.ptrs(&all, &[], format!("Result: {:?}", result));
 
-    let mut frames = v.into_frames();
-    frames.extend(v2.into_frames());
+    let labels: Vec<String> = list
+        .iter()
+        .enumerate()
+        .map(|(i, &val)| {
+            if i + 1 < list.len() {
+                format!("{} →", val)
+            } else {
+                val.to_string()
+            }
+        })
+        .collect();
+    let result_labels: Vec<String> = result
+        .iter()
+        .enumerate()
+        .map(|(i, &val)| {
+            if i + 1 < result.len() {
+                format!("{} →", val)
+            } else {
+                val.to_string()
+            }
+        })
+        .collect();
+    let mut frames = v.into_labeled_frames(labels);
+    frames.extend(v2.into_labeled_frames(result_labels));
     frames
 }
 
@@ -6709,8 +6941,30 @@ fn viz_linked_lists_rotate() -> Vec<VizFrame> {
     let all: Vec<(usize, HighlightKind)> = (0..n).map(|i| (i, HighlightKind::Sorted)).collect();
     v2.ptrs(&all, &[], format!("Rotated: {:?}", result));
 
-    let mut frames = v.into_frames();
-    frames.extend(v2.into_frames());
+    let labels: Vec<String> = list
+        .iter()
+        .enumerate()
+        .map(|(i, &val)| {
+            if i + 1 < list.len() {
+                format!("{} →", val)
+            } else {
+                val.to_string()
+            }
+        })
+        .collect();
+    let result_labels: Vec<String> = result
+        .iter()
+        .enumerate()
+        .map(|(i, &val)| {
+            if i + 1 < result.len() {
+                format!("{} →", val)
+            } else {
+                val.to_string()
+            }
+        })
+        .collect();
+    let mut frames = v.into_labeled_frames(labels);
+    frames.extend(v2.into_labeled_frames(result_labels));
     frames
 }
 
@@ -6773,8 +7027,19 @@ fn viz_linked_lists_reverse_k_group() -> Vec<VizFrame> {
     let all: Vec<(usize, HighlightKind)> = (0..n).map(|i| (i, HighlightKind::Sorted)).collect();
     v2.ptrs(&all, &[], format!("Result: {:?}", list));
 
-    let mut frames = v.into_frames();
-    frames.extend(v2.into_frames());
+    let labels: Vec<String> = list
+        .iter()
+        .enumerate()
+        .map(|(i, &val)| {
+            if i + 1 < list.len() {
+                format!("{} →", val)
+            } else {
+                val.to_string()
+            }
+        })
+        .collect();
+    let mut frames = v.into_labeled_frames(labels.clone());
+    frames.extend(v2.into_labeled_frames(labels));
     frames
 }
 
@@ -6847,8 +7112,32 @@ fn viz_linked_lists_merge_k_sorted() -> Vec<VizFrame> {
         format!("Answer: {:?}. O(n log k) with a min-heap.", merged),
     );
 
-    let mut frames = v.into_frames();
-    frames.extend(v2.into_frames());
+    let display_labels: Vec<String> = {
+        let mut labels = Vec::new();
+        for list in &lists {
+            for (i, &val) in list.iter().enumerate() {
+                if i + 1 < list.len() {
+                    labels.push(format!("{} →", val));
+                } else {
+                    labels.push(val.to_string());
+                }
+            }
+        }
+        labels
+    };
+    let result_labels: Vec<String> = merged
+        .iter()
+        .enumerate()
+        .map(|(i, &val)| {
+            if i + 1 < merged.len() {
+                format!("{} →", val)
+            } else {
+                val.to_string()
+            }
+        })
+        .collect();
+    let mut frames = v.into_labeled_frames(display_labels);
+    frames.extend(v2.into_labeled_frames(result_labels));
     frames
 }
 
@@ -6909,7 +7198,18 @@ fn viz_linked_lists_copy_random_pointer() -> Vec<VizFrame> {
         &[],
         "Answer: deep copy complete. O(n) — two passes with hash map.".to_string(),
     );
-    v.into_frames()
+    let labels: Vec<String> = list
+        .iter()
+        .enumerate()
+        .map(|(i, &val)| {
+            if i + 1 < list.len() {
+                format!("{} →", val)
+            } else {
+                val.to_string()
+            }
+        })
+        .collect();
+    v.into_labeled_frames(labels)
 }
 
 fn viz_linked_lists_lru_cache() -> Vec<VizFrame> {
@@ -6923,10 +7223,24 @@ fn viz_linked_lists_lru_cache() -> Vec<VizFrame> {
 
     let mut all_frames: Vec<VizFrame> = Vec::new();
 
+    let make_ll_labels = |disp: &[i32], used: usize| -> Vec<String> {
+        disp.iter()
+            .enumerate()
+            .map(|(i, &val)| {
+                if i + 1 < used && i + 1 < disp.len() {
+                    format!("{} →", val)
+                } else {
+                    val.to_string()
+                }
+            })
+            .collect()
+    };
+
     // Initial frame
     {
+        let init_labels = make_ll_labels(&display, 0);
         let vl = VizLog::new(display.clone());
-        all_frames.extend(vl.into_frames());
+        all_frames.extend(vl.into_labeled_frames(init_labels));
     }
     all_frames.last_mut().unwrap().annotation = format!(
         "Goal: implement an LRU Cache (capacity={}). Strategy: hash map for O(1) lookup + \
@@ -6953,7 +7267,9 @@ fn viz_linked_lists_lru_cache() -> Vec<VizFrame> {
                 let idx = cache.len() - 1;
                 all_frames.push(VizFrame {
                     array: display.clone(),
-                    data: None,
+                    data: Some(super::VizData::Array {
+                        values: make_ll_labels(&display, cache.len()),
+                    }),
                     highlights: vec![(idx.min(display_len - 1), HighlightKind::Found)],
                     pointers: vec![(idx.min(display_len - 1), "hit".to_string())],
                     annotation: format!("GET key={} -> val={}, move to front", key, val),
@@ -6961,7 +7277,9 @@ fn viz_linked_lists_lru_cache() -> Vec<VizFrame> {
             } else {
                 all_frames.push(VizFrame {
                     array: display.clone(),
-                    data: None,
+                    data: Some(super::VizData::Array {
+                        values: make_ll_labels(&display, cache.len()),
+                    }),
                     highlights: vec![],
                     pointers: vec![],
                     annotation: format!("GET key={} -> miss", key),
@@ -6976,7 +7294,9 @@ fn viz_linked_lists_lru_cache() -> Vec<VizFrame> {
                 let evicted = cache.pop_front().unwrap();
                 all_frames.push(VizFrame {
                     array: display.clone(),
-                    data: None,
+                    data: Some(super::VizData::Array {
+                        values: make_ll_labels(&display, cache.len()),
+                    }),
                     highlights: vec![(0, HighlightKind::Swapping)],
                     pointers: vec![(0, "evict".to_string())],
                     annotation: format!("Evict LRU: key={}", evicted.0),
@@ -6994,7 +7314,9 @@ fn viz_linked_lists_lru_cache() -> Vec<VizFrame> {
             let idx = cache.len() - 1;
             all_frames.push(VizFrame {
                 array: display.clone(),
-                data: None,
+                data: Some(super::VizData::Array {
+                    values: make_ll_labels(&display, cache.len()),
+                }),
                 highlights: vec![(idx.min(display_len - 1), HighlightKind::Active)],
                 pointers: vec![(idx.min(display_len - 1), "put".to_string())],
                 annotation: format!("PUT key={}, val={}", key, val),
@@ -7004,9 +7326,12 @@ fn viz_linked_lists_lru_cache() -> Vec<VizFrame> {
 
     let used = cache.len().min(display_len);
     let all: Vec<(usize, HighlightKind)> = (0..used).map(|i| (i, HighlightKind::Sorted)).collect();
+    let final_labels = make_ll_labels(&display, cache.len());
     all_frames.push(VizFrame {
         array: display,
-        data: None,
+        data: Some(super::VizData::Array {
+            values: final_labels,
+        }),
         highlights: all,
         pointers: vec![],
         annotation: format!(
@@ -7090,8 +7415,30 @@ fn viz_linked_lists_flatten_multilevel() -> Vec<VizFrame> {
         format!("Answer: {:?}. O(n) — DFS traversal.", result),
     );
 
-    let mut frames = v.into_frames();
-    frames.extend(v2.into_frames());
+    let labels: Vec<String> = list
+        .iter()
+        .enumerate()
+        .map(|(i, &val)| {
+            if i + 1 < list.len() {
+                format!("{} →", val)
+            } else {
+                val.to_string()
+            }
+        })
+        .collect();
+    let result_labels: Vec<String> = result
+        .iter()
+        .enumerate()
+        .map(|(i, &val)| {
+            if i + 1 < result.len() {
+                format!("{} →", val)
+            } else {
+                val.to_string()
+            }
+        })
+        .collect();
+    let mut frames = v.into_labeled_frames(labels);
+    frames.extend(v2.into_labeled_frames(result_labels));
     frames
 }
 
@@ -32206,6 +32553,16 @@ fn viz_dp_longest_valid_parentheses() -> Vec<VizFrame> {
     let parens: Vec<i32> = (0..n)
         .map(|_| if rng.random_range(0..2) == 0 { 1 } else { 2 })
         .collect();
+    let bracket_labels: Vec<String> = parens
+        .iter()
+        .map(|&x| {
+            if x == 1 {
+                "(".to_string()
+            } else {
+                ")".to_string()
+            }
+        })
+        .collect();
     let mut v = VizLog::new(parens.clone());
     v.ptrs(
         &[],
@@ -32249,7 +32606,7 @@ fn viz_dp_longest_valid_parentheses() -> Vec<VizFrame> {
             max_len
         ),
     );
-    v.into_frames()
+    v.into_labeled_frames(bracket_labels)
 }
 
 // ─── Divide & Conquer ────────────────────────────────────────

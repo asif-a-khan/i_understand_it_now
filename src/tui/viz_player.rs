@@ -1517,12 +1517,29 @@ fn render_grid(f: &mut Frame, area: Rect, cells: &[Vec<String>], frame: &VizFram
         let pad_above = (cell_h.saturating_sub(1)) / 2;
         let pad_below = cell_h.saturating_sub(1).saturating_sub(pad_above);
 
+        let last_cell = data_rows * cols - 1;
+
+        // Helper: get cell style considering walls, start, end
+        let cell_style = |flat_idx: usize, row: &[String]| -> Style {
+            let c = flat_idx % cols;
+            let val = if c < row.len() { row[c].as_str() } else { "" };
+            if val == "-2" {
+                Style::new().fg(Color::DarkGray).bg(Color::DarkGray)
+            } else if flat_idx == 0 && !highlight_map.contains_key(&flat_idx) {
+                Style::new().fg(Color::Black).bg(Color::Green)
+            } else if flat_idx == last_cell && !highlight_map.contains_key(&flat_idx) {
+                Style::new().fg(Color::White).bg(Color::LightRed)
+            } else {
+                highlight_style(highlight_map.get(&flat_idx))
+            }
+        };
+
         for _ in 0..pad_above {
             let mut pad_spans: Vec<Span> =
                 vec![Span::styled("│", Style::new().fg(Color::DarkGray))];
             for c in 0..cols {
                 let flat_idx = r * cols + c;
-                let style = highlight_style(highlight_map.get(&flat_idx));
+                let style = cell_style(flat_idx, row);
                 pad_spans.push(Span::styled(" ".repeat(cell_w), style));
                 pad_spans.push(Span::styled("│", Style::new().fg(Color::DarkGray)));
             }
@@ -1533,10 +1550,36 @@ fn render_grid(f: &mut Frame, area: Rect, cells: &[Vec<String>], frame: &VizFram
         let mut val_spans: Vec<Span> = vec![Span::styled("│", Style::new().fg(Color::DarkGray))];
         for c in 0..cols {
             let flat_idx = r * cols + c;
-            let style = highlight_style(highlight_map.get(&flat_idx));
-            let val = if c < row.len() { &row[c] } else { "" };
+            let val = if c < row.len() { row[c].as_str() } else { "" };
+
+            // Special cell types: walls, start, end
+            let (display_val, style) = if val == "-2" {
+                // Wall cell: solid dark block
+                ("█", Style::new().fg(Color::DarkGray).bg(Color::DarkGray))
+            } else if flat_idx == 0 && !highlight_map.contains_key(&flat_idx) {
+                // Start cell (when not otherwise highlighted)
+                (
+                    "S",
+                    Style::new()
+                        .fg(Color::Black)
+                        .bg(Color::Green)
+                        .add_modifier(Modifier::BOLD),
+                )
+            } else if flat_idx == last_cell && !highlight_map.contains_key(&flat_idx) {
+                // End cell (when not otherwise highlighted)
+                (
+                    "E",
+                    Style::new()
+                        .fg(Color::White)
+                        .bg(Color::LightRed)
+                        .add_modifier(Modifier::BOLD),
+                )
+            } else {
+                (val, highlight_style(highlight_map.get(&flat_idx)))
+            };
+
             val_spans.push(Span::styled(
-                format!("{:^width$}", val, width = cell_w),
+                format!("{:^width$}", display_val, width = cell_w),
                 style,
             ));
             val_spans.push(Span::styled("│", Style::new().fg(Color::DarkGray)));
@@ -1548,7 +1591,7 @@ fn render_grid(f: &mut Frame, area: Rect, cells: &[Vec<String>], frame: &VizFram
                 vec![Span::styled("│", Style::new().fg(Color::DarkGray))];
             for c in 0..cols {
                 let flat_idx = r * cols + c;
-                let style = highlight_style(highlight_map.get(&flat_idx));
+                let style = cell_style(flat_idx, row);
                 pad_spans.push(Span::styled(" ".repeat(cell_w), style));
                 pad_spans.push(Span::styled("│", Style::new().fg(Color::DarkGray)));
             }
