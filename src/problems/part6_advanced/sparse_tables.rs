@@ -6,7 +6,7 @@ use std::collections::HashMap;
 
 use crate::problems::{Difficulty, Problem, SolutionResult, TestCase};
 use crate::solutions::part6_advanced::sparse_tables as solutions;
-use crate::tracker::{track_slice, OperationLog, Tracked};
+use crate::tracker::{track_slice, track_string, OperationLog, Tracked};
 
 pub fn problems() -> Vec<Box<dyn Problem>> {
     vec![
@@ -1251,10 +1251,15 @@ impl Problem for SparseTableLcpArray {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<LcpArrayTest>().unwrap();
         let expected = ref_lcp_queries(&t.s, &t.queries);
-        let actual = solutions::lcp_array_queries(&t.s, &t.queries);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_string(&t.s, shared_log.clone());
+        let actual = solutions::lcp_array_queries(&tracked, &t.queries);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("s=\"{}\", queries={:?}", t.s, t.queries),

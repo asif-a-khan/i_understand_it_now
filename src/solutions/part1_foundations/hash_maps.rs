@@ -1,4 +1,4 @@
-use crate::tracker::Tracked;
+use crate::tracker::{OperationLog, Tracked};
 // Hash Maps & Sets — Solution Templates
 // Edit these functions to solve each problem. Run with: cargo run -- solve <problem_id>
 
@@ -30,7 +30,7 @@ pub fn intersection(_nums1: &[Tracked<i32>], _nums2: &[Tracked<i32>]) -> Vec<i32
 /// Happy Number: determine if n is happy (sum of squares of digits eventually reaches 1).
 ///
 /// Use a HashSet to detect cycles. Repeatedly compute sum of digit squares.
-pub fn is_happy(_n: i32) -> bool {
+pub fn is_happy(_n: i32, _log: &mut OperationLog) -> bool {
     todo!()
 }
 
@@ -38,7 +38,7 @@ pub fn is_happy(_n: i32) -> bool {
 ///
 /// Use two HashMaps for bidirectional character mapping.
 /// Each character in s maps to exactly one character in t, and vice versa.
-pub fn is_isomorphic(_s: &str, _t: &str) -> bool {
+pub fn is_isomorphic(_s: &[Tracked<char>], _t: &[Tracked<char>]) -> bool {
     todo!()
 }
 
@@ -49,7 +49,7 @@ pub fn is_isomorphic(_s: &str, _t: &str) -> bool {
 /// For each string, sort its characters to form a key.
 /// Use a HashMap<sorted_chars, Vec<String>> to group anagrams.
 /// Return groups sorted internally, and the outer list sorted by first element.
-pub fn group_anagrams(_strs: &[String]) -> Vec<Vec<String>> {
+pub fn group_anagrams(_strs: &[String], _log: &mut OperationLog) -> Vec<Vec<String>> {
     todo!()
 }
 
@@ -90,7 +90,7 @@ pub fn encode(_strs: &[String]) -> String {
     todo!()
 }
 
-pub fn decode(_s: &str) -> Vec<String> {
+pub fn decode(_s: &[Tracked<char>]) -> Vec<String> {
     todo!()
 }
 
@@ -101,7 +101,7 @@ pub fn decode(_s: &str) -> Vec<String> {
 /// Use a sliding window with two HashMaps: one for the required character counts
 /// from t, one for the current window counts. Expand the right pointer to include
 /// characters, shrink the left pointer when all characters are satisfied.
-pub fn min_window_substring(_s: &str, _t: &str) -> String {
+pub fn min_window_substring(_s: &[Tracked<char>], _t: &[Tracked<char>]) -> String {
     todo!()
 }
 
@@ -109,7 +109,7 @@ pub fn min_window_substring(_s: &str, _t: &str) -> String {
 ///
 /// Use a sliding window with a HashMap tracking character counts.
 /// When the number of distinct characters exceeds k, shrink from the left.
-pub fn longest_k_distinct(_s: &str, _k: usize) -> i32 {
+pub fn longest_k_distinct(_s: &[Tracked<char>], _k: usize) -> i32 {
     todo!()
 }
 
@@ -118,7 +118,7 @@ pub fn longest_k_distinct(_s: &str, _k: usize) -> i32 {
 /// Build a directed graph by comparing adjacent words character by character.
 /// Then perform topological sort. Return "" if invalid (cycle or prefix conflict).
 /// If multiple valid orderings exist, return the lexicographically smallest one.
-pub fn alien_dictionary(_words: &[String]) -> String {
+pub fn alien_dictionary(_words: &[String], _log: &mut OperationLog) -> String {
     todo!()
 }
 
@@ -132,7 +132,7 @@ pub fn alien_dictionary(_words: &[String]) -> String {
 ///
 /// Output: Vec<String> containing the results of all "max" and "min" operations in order.
 /// Return "" for max/min when no keys exist.
-pub fn all_o1(_ops: &[(String, String)]) -> Vec<String> {
+pub fn all_o1(_ops: &[(String, String)], _log: &mut OperationLog) -> Vec<String> {
     todo!()
 }
 

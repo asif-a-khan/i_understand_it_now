@@ -5,7 +5,7 @@ use rand::Rng;
 
 use crate::problems::{Difficulty, Problem, SolutionResult, TestCase};
 use crate::solutions::part5_paradigms::greedy as solutions;
-use crate::tracker::{track_slice, OperationLog, Tracked};
+use crate::tracker::{track_slice, track_string, OperationLog, Tracked};
 
 pub fn problems() -> Vec<Box<dyn Problem>> {
     vec![
@@ -776,10 +776,15 @@ impl Problem for TaskScheduler {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<TaskSchedulerTest>().unwrap();
         let expected = ref_task_scheduler(&t.tasks, t.n);
-        let actual = solutions::task_scheduler(&t.tasks, t.n);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_tasks = track_slice(&t.tasks, shared_log.clone());
+        let actual = solutions::task_scheduler(&tracked_tasks, t.n);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("tasks={:?}, n={}", t.tasks, t.n),
@@ -845,10 +850,15 @@ impl Problem for PartitionLabels {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<PartitionLabelsTest>().unwrap();
         let expected = ref_partition_labels(&t.s);
-        let actual = solutions::partition_labels(&t.s);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_string(&t.s, shared_log.clone());
+        let actual = solutions::partition_labels(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("s=\"{}\"", t.s),

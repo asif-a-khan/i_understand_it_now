@@ -1,4 +1,4 @@
-use crate::tracker::Tracked;
+use crate::tracker::{OperationLog, Tracked};
 // Linked Lists -- Solution Templates
 // Edit these functions to solve each problem. Run with: cargo run -- solve <problem_id>
 //
@@ -89,7 +89,11 @@ pub fn copy_random_pointer(_vals: &[Tracked<i32>]) -> Vec<i32> {
 ///   ("get", [key])       -> returns Some(value) or Some(-1) if not found
 ///   ("put", [key, value]) -> returns None
 /// Return a Vec of results for each operation.
-pub fn lru_cache(_capacity: usize, _ops: &[(String, Vec<i32>)]) -> Vec<Option<i32>> {
+pub fn lru_cache(
+    _capacity: usize,
+    _ops: &[(String, Vec<i32>)],
+    _log: &mut OperationLog,
+) -> Vec<Option<i32>> {
     todo!()
 }
 

@@ -1,4 +1,4 @@
-use crate::tracker::Tracked;
+use crate::tracker::{OperationLog, Tracked};
 // Intervals — Solution Templates
 // Edit these functions to solve each problem. Run with: cargo run -- solve <problem_id>
 
@@ -59,7 +59,10 @@ pub fn my_calendar(_bookings: &[(Tracked<i32>, Tracked<i32>)]) -> Vec<bool> {
 }
 
 /// Employee Free Time: return common free time intervals across all employees.
-pub fn employee_free_time(_schedules: &[Vec<(i32, i32)>]) -> Vec<(i32, i32)> {
+pub fn employee_free_time(
+    _schedules: &[Vec<(i32, i32)>],
+    _log: &mut OperationLog,
+) -> Vec<(i32, i32)> {
     todo!()
 }
 

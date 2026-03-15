@@ -1,4 +1,4 @@
-use crate::tracker::Tracked;
+use crate::tracker::{OperationLog, Tracked};
 // Recursion — Solution Templates
 // Edit these functions to solve each problem. Run with: cargo run -- solve <problem_id>
 //
@@ -10,20 +10,20 @@ use crate::tracker::Tracked;
 /// Fibonacci: return the nth Fibonacci number.
 /// F(0) = 0, F(1) = 1, F(n) = F(n-1) + F(n-2).
 /// Hint: naive recursion works but is slow. Use memoization or build up from base cases.
-pub fn fibonacci(_n: u32) -> u64 {
+pub fn fibonacci(_n: u32, _log: &mut OperationLog) -> u64 {
     todo!()
 }
 
 /// Power of Two: return true if n is a power of two (2^k for some k >= 0).
 /// Hint: recursively check — what happens when you divide a power of two by 2?
-pub fn is_power_of_two(_n: i32) -> bool {
+pub fn is_power_of_two(_n: i32, _log: &mut OperationLog) -> bool {
     todo!()
 }
 
 /// Reverse String: reverse the string recursively.
 /// Do NOT use .rev() or .chars().rev().
 /// Hint: reverse(s) = last_char + reverse(middle) + first_char, or swap ends and recurse.
-pub fn reverse_string(_s: &str) -> String {
+pub fn reverse_string(_s: &[Tracked<char>]) -> String {
     todo!()
 }
 
@@ -66,13 +66,13 @@ pub fn subsets(_nums: &[Tracked<i32>]) -> Vec<Vec<i32>> {
 /// Letter Combinations: given a string of digits '2'-'9', return all letter combinations.
 /// Mapping: 2->abc, 3->def, 4->ghi, 5->jkl, 6->mno, 7->pqrs, 8->tuv, 9->wxyz
 /// Return sorted. Return empty vec for empty input.
-pub fn letter_combinations(_digits: &str) -> Vec<String> {
+pub fn letter_combinations(_digits: &[Tracked<char>]) -> Vec<String> {
     todo!()
 }
 
 /// Pow(x, n): compute x^n using recursive fast exponentiation.
 /// x^0 = 1, x^n = (x^(n/2))^2 * x^(n%2), handle negative n.
-pub fn pow(_x: f64, _n: i32) -> f64 {
+pub fn pow(_x: f64, _n: i32, _log: &mut OperationLog) -> f64 {
     todo!()
 }
 
@@ -82,7 +82,7 @@ pub fn pow(_x: f64, _n: i32) -> f64 {
 ///   1. Move n-1 disks from A to B via C
 ///   2. Move disk n from A to C
 ///   3. Move n-1 disks from B to C via A
-pub fn tower_of_hanoi(_num_disks: u32) -> Vec<(u8, u8)> {
+pub fn tower_of_hanoi(_num_disks: u32, _log: &mut OperationLog) -> Vec<(u8, u8)> {
     todo!()
 }
 
@@ -91,13 +91,13 @@ pub fn tower_of_hanoi(_num_disks: u32) -> Vec<(u8, u8)> {
 /// N-Queens: return the number of distinct solutions for placing n queens
 /// on an n x n board so no two queens attack each other.
 /// Hint: backtrack row by row, tracking which columns and diagonals are occupied.
-pub fn n_queens(_n: u32) -> u32 {
+pub fn n_queens(_n: u32, _log: &mut OperationLog) -> u32 {
     todo!()
 }
 
 /// Sudoku Solver: solve a 9x9 Sudoku (0 = empty cell). Return the solved grid.
 /// Hint: find an empty cell, try values 1-9, check validity, recurse.
-pub fn solve_sudoku(_board: &[Vec<u8>]) -> Vec<Vec<u8>> {
+pub fn solve_sudoku(_board: &[Vec<Tracked<u8>>]) -> Vec<Vec<u8>> {
     todo!()
 }
 
@@ -105,14 +105,14 @@ pub fn solve_sudoku(_board: &[Vec<u8>]) -> Vec<Vec<u8>> {
 /// Match must cover the entire string.
 /// Hint: if p has '*' at position 1, either skip the pattern pair (zero matches)
 /// or consume one char from s if it matches, and keep the pattern.
-pub fn regex_match(_s: &str, _p: &str) -> bool {
+pub fn regex_match(_s: &[Tracked<char>], _p: &[Tracked<char>]) -> bool {
     todo!()
 }
 
 /// Word Search: return true if word exists in the grid by adjacent (up/down/left/right)
 /// moves, using each cell at most once.
 /// Hint: DFS from each cell, mark visited, backtrack.
-pub fn word_search(_board: &[Vec<char>], _word: &str) -> bool {
+pub fn word_search(_board: &[Vec<Tracked<char>>], _word: &[Tracked<char>]) -> bool {
     todo!()
 }
 
@@ -121,6 +121,6 @@ pub fn word_search(_board: &[Vec<char>], _word: &str) -> bool {
 /// Valid digits: 0, 1, 8 (map to themselves), 6<->9 (map to each other).
 /// Hint: recursively generate strobogrammatic numbers of each length from low.len() to
 /// high.len(), then count those in range.
-pub fn strobogrammatic_in_range(_low: &str, _high: &str) -> i32 {
+pub fn strobogrammatic_in_range(_low: &[Tracked<char>], _high: &[Tracked<char>]) -> i32 {
     todo!()
 }

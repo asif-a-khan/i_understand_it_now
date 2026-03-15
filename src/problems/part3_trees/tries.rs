@@ -206,10 +206,10 @@ impl Problem for ImplementTrie {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<ImplementTrieTest>().unwrap();
         let expected = ref_implement_trie(&t.ops);
-        let actual = solutions::implement_trie(&t.ops);
+        let actual = solutions::implement_trie(&t.ops, log);
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("ops={:?}", t.ops),
@@ -292,11 +292,11 @@ impl Problem for SearchWord {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<SearchWordTest>().unwrap();
         let set: HashSet<&String> = t.dict.iter().collect();
         let expected: Vec<bool> = t.queries.iter().map(|q| set.contains(q)).collect();
-        let actual = solutions::search_word(&t.dict, &t.queries);
+        let actual = solutions::search_word(&t.dict, &t.queries, log);
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("dict={:?}, queries={:?}", t.dict, t.queries),
@@ -356,10 +356,10 @@ impl Problem for LongestCommonPrefix {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<LCPTest>().unwrap();
         let expected = ref_longest_common_prefix(&t.words);
-        let actual = solutions::longest_common_prefix(&t.words);
+        let actual = solutions::longest_common_prefix(&t.words, log);
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("words={:?}", t.words),
@@ -437,10 +437,10 @@ impl Problem for CountPrefix {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<CountPrefixTest>().unwrap();
         let expected = t.words.iter().filter(|w| w.starts_with(&t.prefix)).count() as i32;
-        let actual = solutions::count_prefix(&t.words, &t.prefix);
+        let actual = solutions::count_prefix(&t.words, &t.prefix, log);
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("words={:?}, prefix=\"{}\"", t.words, t.prefix),
@@ -500,7 +500,7 @@ impl Problem for AutoComplete {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<AutoCompleteTest>().unwrap();
         let mut expected: Vec<String> = t
             .words
@@ -510,7 +510,7 @@ impl Problem for AutoComplete {
             .collect();
         expected.sort();
         expected.dedup();
-        let actual = solutions::auto_complete(&t.words, &t.prefix);
+        let actual = solutions::auto_complete(&t.words, &t.prefix, log);
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("words={:?}, prefix=\"{}\"", t.words, t.prefix),
@@ -579,10 +579,27 @@ impl Problem for WordSearchII {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<WordSearchIITest>().unwrap();
         let expected = ref_word_search_ii(&t.board, &t.words);
-        let actual = solutions::word_search_ii(&t.board, &t.words);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_board: Vec<Vec<crate::tracker::Tracked<char>>> = t
+            .board
+            .iter()
+            .enumerate()
+            .map(|(r, row)| {
+                row.iter()
+                    .enumerate()
+                    .map(|(c, &ch)| {
+                        crate::tracker::Tracked::new(ch, r * row.len() + c, shared_log.clone())
+                    })
+                    .collect()
+            })
+            .collect();
+        let actual = solutions::word_search_ii(&tracked_board, &t.words);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("board={:?}, words={:?}", t.board, t.words),
@@ -710,10 +727,10 @@ impl Problem for ReplaceWords {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<ReplaceWordsTest>().unwrap();
         let expected = ref_replace_words(&t.dict, &t.sentence);
-        let actual = solutions::replace_words(&t.dict, &t.sentence);
+        let actual = solutions::replace_words(&t.dict, &t.sentence, log);
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("dict={:?}, sentence=\"{}\"", t.dict, t.sentence),
@@ -810,10 +827,10 @@ impl Problem for MapSum {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<MapSumTest>().unwrap();
         let expected = ref_map_sum(&t.ops);
-        let actual = solutions::map_sum(&t.ops);
+        let actual = solutions::map_sum(&t.ops, log);
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("ops={:?}", t.ops),
@@ -891,10 +908,10 @@ impl Problem for SearchSuggestions {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<SearchSuggestionsTest>().unwrap();
         let expected = ref_search_suggestions(&t.products, &t.search);
-        let actual = solutions::search_suggestions(&t.products, &t.search);
+        let actual = solutions::search_suggestions(&t.products, &t.search, log);
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("products={:?}, search=\"{}\"", t.products, t.search),
@@ -992,10 +1009,10 @@ impl Problem for AddSearchWord {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<AddSearchWordTest>().unwrap();
         let expected = ref_add_search_word(&t.ops);
-        let actual = solutions::add_search_word(&t.ops);
+        let actual = solutions::add_search_word(&t.ops, log);
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("ops={:?}", t.ops),
@@ -1084,10 +1101,10 @@ impl Problem for PalindromePairs {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<PalindromePairsTest>().unwrap();
         let expected = ref_palindrome_pairs(&t.words);
-        let actual = solutions::palindrome_pairs(&t.words);
+        let actual = solutions::palindrome_pairs(&t.words, log);
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("words={:?}", t.words),
@@ -1178,10 +1195,10 @@ impl Problem for WordBreakII {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<WordBreakIITest>().unwrap();
         let expected = ref_word_break_ii(&t.s, &t.word_dict);
-        let actual = solutions::word_break_ii(&t.s, &t.word_dict);
+        let actual = solutions::word_break_ii(&t.s, &t.word_dict, log);
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("s=\"{}\", word_dict={:?}", t.s, t.word_dict),
@@ -1279,10 +1296,10 @@ impl Problem for ConcatenatedWords {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<ConcatenatedWordsTest>().unwrap();
         let expected = ref_concatenated_words(&t.words);
-        let actual = solutions::concatenated_words(&t.words);
+        let actual = solutions::concatenated_words(&t.words, log);
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("words={:?}", t.words),
@@ -1459,10 +1476,10 @@ impl Problem for StreamOfCharacters {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<StreamTest>().unwrap();
         let expected = ref_stream_of_characters(&t.words, &t.stream);
-        let actual = solutions::stream_of_characters(&t.words, &t.stream);
+        let actual = solutions::stream_of_characters(&t.words, &t.stream, log);
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("words={:?}, stream={:?}", t.words, t.stream),

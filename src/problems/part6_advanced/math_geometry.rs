@@ -6,7 +6,7 @@ use std::collections::HashMap;
 
 use crate::problems::{Difficulty, Problem, SolutionResult, TestCase};
 use crate::solutions::part6_advanced::math_geometry as solutions;
-use crate::tracker::{track_slice, OperationLog, Tracked};
+use crate::tracker::{track_slice, track_string, OperationLog, Tracked};
 
 pub fn problems() -> Vec<Box<dyn Problem>> {
     vec![
@@ -410,10 +410,10 @@ impl Problem for MathGcd {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<GcdTest>().unwrap();
         let expected = ref_gcd(t.a, t.b);
-        let actual = solutions::gcd(t.a, t.b);
+        let actual = solutions::gcd(t.a, t.b, log);
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("a={}, b={}", t.a, t.b),
@@ -462,10 +462,10 @@ impl Problem for MathIsPrime {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<IsPrimeTest>().unwrap();
         let expected = ref_is_prime(t.n);
-        let actual = solutions::is_prime(t.n);
+        let actual = solutions::is_prime(t.n, log);
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("n={}", t.n),
@@ -514,10 +514,10 @@ impl Problem for MathCountPrimes {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<CountPrimesTest>().unwrap();
         let expected = ref_count_primes(t.n);
-        let actual = solutions::count_primes(t.n);
+        let actual = solutions::count_primes(t.n, log);
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("n={}", t.n),
@@ -570,10 +570,10 @@ impl Problem for MathPowerMod {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<PowerModTest>().unwrap();
         let expected = ref_power_mod(t.base, t.exp, t.m);
-        let actual = solutions::power_mod(t.base, t.exp, t.m);
+        let actual = solutions::power_mod(t.base, t.exp, t.m, log);
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("base={}, exp={}, m={}", t.base, t.exp, t.m),
@@ -622,10 +622,10 @@ impl Problem for MathReverseInteger {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<ReverseIntTest>().unwrap();
         let expected = ref_reverse_integer(t.x);
-        let actual = solutions::reverse_integer(t.x);
+        let actual = solutions::reverse_integer(t.x, log);
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("x={}", t.x),
@@ -674,10 +674,10 @@ impl Problem for MathSieveOfEratosthenes {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<SieveTest>().unwrap();
         let expected = ref_sieve(t.n);
-        let actual = solutions::sieve_of_eratosthenes(t.n);
+        let actual = solutions::sieve_of_eratosthenes(t.n, log);
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("n={}", t.n),
@@ -746,10 +746,16 @@ impl Problem for MathMultiplyStrings {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<MulStrTest>().unwrap();
         let expected = ref_multiply_strings(&t.num1, &t.num2);
-        let actual = solutions::multiply_strings(&t.num1, &t.num2);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked1 = track_string(&t.num1, shared_log.clone());
+        let tracked2 = track_string(&t.num2, shared_log.clone());
+        let actual = solutions::multiply_strings(&tracked1, &tracked2);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("num1=\"{}\", num2=\"{}\"", t.num1, t.num2),
@@ -869,10 +875,10 @@ impl Problem for MathUglyNumber {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<UglyNumTest>().unwrap();
         let expected = ref_ugly_number(t.n);
-        let actual = solutions::ugly_number(t.n);
+        let actual = solutions::ugly_number(t.n, log);
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("n={}", t.n),
@@ -1060,10 +1066,10 @@ impl Problem for MathModularInverse {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<ModInvTest>().unwrap();
         let expected = ref_modular_inverse(t.a, t.m);
-        let actual = solutions::modular_inverse(t.a, t.m);
+        let actual = solutions::modular_inverse(t.a, t.m, log);
         // Both -1 or both satisfy (a * x) % m == 1
         let is_correct = if expected == -1 {
             actual == -1

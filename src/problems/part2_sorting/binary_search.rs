@@ -344,10 +344,10 @@ impl Problem for BinarySearchSqrt {
         tests
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<SqrtTest>().unwrap();
         let expected = ref_isqrt(t.x);
-        let actual = solutions::integer_sqrt(t.x);
+        let actual = solutions::integer_sqrt(t.x, log);
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("x={}", t.x),
@@ -423,10 +423,10 @@ impl Problem for BinarySearchGuessNumber {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<GuessNumberTest>().unwrap();
         let expected = t.pick;
-        let actual = solutions::guess_number(t.n, t.pick);
+        let actual = solutions::guess_number(t.n, t.pick, log);
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("n={}, pick={}", t.n, t.pick),

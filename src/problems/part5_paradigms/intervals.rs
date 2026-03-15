@@ -994,10 +994,10 @@ impl Problem for EmployeeFreeTime {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<EmployeeFreeTimeTest>().unwrap();
         let expected = ref_employee_free_time(&t.schedules);
-        let actual = solutions::employee_free_time(&t.schedules);
+        let actual = solutions::employee_free_time(&t.schedules, log);
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("schedules={:?}", t.schedules),

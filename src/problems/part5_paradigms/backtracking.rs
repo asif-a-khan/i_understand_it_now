@@ -5,7 +5,7 @@ use rand::Rng;
 
 use crate::problems::{Difficulty, Problem, SolutionResult, TestCase};
 use crate::solutions::part5_paradigms::backtracking as solutions;
-use crate::tracker::{track_slice, OperationLog};
+use crate::tracker::{track_slice, track_string, OperationLog};
 
 pub fn problems() -> Vec<Box<dyn Problem>> {
     vec![
@@ -244,10 +244,10 @@ impl Problem for Combinations {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<CombinationsTest>().unwrap();
         let expected = ref_combinations(t.n, t.k);
-        let actual = solutions::combinations(t.n, t.k);
+        let actual = solutions::combinations(t.n, t.k, log);
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("n={}, k={}", t.n, t.k),
@@ -323,10 +323,15 @@ impl Problem for LetterCombinations {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<LetterCombinationsTest>().unwrap();
         let expected = ref_letter_combinations(&t.digits);
-        let actual = solutions::letter_combinations(&t.digits);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_string(&t.digits, shared_log.clone());
+        let actual = solutions::letter_combinations(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("digits=\"{}\"", t.digits),
@@ -409,10 +414,10 @@ impl Problem for BinaryStrings {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<BinaryStringsTest>().unwrap();
         let expected = ref_binary_strings(t.n);
-        let actual = solutions::binary_strings(t.n);
+        let actual = solutions::binary_strings(t.n, log);
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("n={}", t.n),
@@ -681,10 +686,15 @@ impl Problem for PalindromePartition {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<PalindromePartitionTest>().unwrap();
         let expected = ref_palindrome_partition(&t.s);
-        let actual = solutions::palindrome_partition(&t.s);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_string(&t.s, shared_log.clone());
+        let actual = solutions::palindrome_partition(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("s=\"{}\"", t.s),
@@ -773,10 +783,10 @@ impl Problem for GenerateParentheses {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<GenerateParenthesesTest>().unwrap();
         let expected = ref_generate_parentheses(t.n);
-        let actual = solutions::generate_parentheses(t.n);
+        let actual = solutions::generate_parentheses(t.n, log);
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("n={}", t.n),
@@ -879,10 +889,28 @@ impl Problem for WordSearch {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<WordSearchTest>().unwrap();
         let expected = ref_word_search(&t.board, &t.word);
-        let actual = solutions::word_search(&t.board, &t.word);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_board: Vec<Vec<crate::tracker::Tracked<char>>> = t
+            .board
+            .iter()
+            .enumerate()
+            .map(|(r, row)| {
+                row.iter()
+                    .enumerate()
+                    .map(|(c, &ch)| {
+                        crate::tracker::Tracked::new(ch, r * row.len() + c, shared_log.clone())
+                    })
+                    .collect()
+            })
+            .collect();
+        let tracked = track_string(&t.word, shared_log.clone());
+        let actual = solutions::word_search(&tracked_board, &tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("board={:?}, word=\"{}\"", t.board, t.word),
@@ -1029,10 +1057,10 @@ impl Problem for NQueens {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<NQueensTest>().unwrap();
         let expected = ref_n_queens(t.n);
-        let actual = solutions::n_queens(t.n);
+        let actual = solutions::n_queens(t.n, log);
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("n={}", t.n),
@@ -1136,10 +1164,27 @@ impl Problem for SudokuSolver {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<SudokuSolverTest>().unwrap();
         let expected = ref_solve_sudoku(&t.board);
-        let actual = solutions::sudoku_solver(&t.board);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_board: Vec<Vec<crate::tracker::Tracked<u8>>> = t
+            .board
+            .iter()
+            .enumerate()
+            .map(|(r, row)| {
+                row.iter()
+                    .enumerate()
+                    .map(|(c, &v)| {
+                        crate::tracker::Tracked::new(v, r * row.len() + c, shared_log.clone())
+                    })
+                    .collect()
+            })
+            .collect();
+        let actual = solutions::sudoku_solver(&tracked_board);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("board={:?}", t.board),
@@ -1297,10 +1342,15 @@ impl Problem for WordBreakII {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<WordBreakIITest>().unwrap();
         let expected = ref_word_break_ii(&t.s, &t.word_dict);
-        let actual = solutions::word_break_ii(&t.s, &t.word_dict);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_string(&t.s, shared_log.clone());
+        let actual = solutions::word_break_ii(&tracked, &t.word_dict);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("s=\"{}\", wordDict={:?}", t.s, t.word_dict),
@@ -1396,10 +1446,15 @@ impl Problem for RestoreIp {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<RestoreIpTest>().unwrap();
         let expected = ref_restore_ip(&t.s);
-        let actual = solutions::restore_ip(&t.s);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_string(&t.s, shared_log.clone());
+        let actual = solutions::restore_ip(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("s=\"{}\"", t.s),
@@ -1499,13 +1554,18 @@ impl Problem for ExpressionAddOperators {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test
             .data
             .downcast_ref::<ExpressionAddOperatorsTest>()
             .unwrap();
         let expected = ref_add_operators(&t.num, t.target);
-        let actual = solutions::expression_add_operators(&t.num, t.target);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_string(&t.num, shared_log.clone());
+        let actual = solutions::expression_add_operators(&tracked, t.target);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("num=\"{}\", target={}", t.num, t.target),

@@ -402,10 +402,10 @@ impl Problem for LongestCommonPrefix {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<LCPTest>().unwrap();
         let expected = ref_longest_common_prefix(&t.strs);
-        let actual = solutions::longest_common_prefix(&t.strs);
+        let actual = solutions::longest_common_prefix(&t.strs, log);
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("strs={:?}", t.strs),
@@ -595,10 +595,10 @@ impl Problem for GroupAnagrams {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<GroupAnagramsTest>().unwrap();
         let expected = ref_group_anagrams(&t.strs);
-        let actual = solutions::group_anagrams(&t.strs);
+        let actual = solutions::group_anagrams(&t.strs, log);
 
         // Normalize for comparison: sort each group, then sort groups by first element
         let normalize = |mut groups: Vec<Vec<String>>| -> Vec<Vec<String>> {
@@ -887,10 +887,10 @@ impl Problem for CountAndSay {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<CountAndSayTest>().unwrap();
         let expected = ref_count_and_say(t.n);
-        let actual = solutions::count_and_say(t.n);
+        let actual = solutions::count_and_say(t.n, log);
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("n={}", t.n),

@@ -1,4 +1,4 @@
-use crate::tracker::Tracked;
+use crate::tracker::{OperationLog, Tracked};
 // Backtracking — Solution Templates
 // Edit these functions to solve each problem. Run with: cargo run -- solve <problem_id>
 
@@ -22,7 +22,7 @@ pub fn permutations(_nums: &[Tracked<i32>]) -> Vec<Vec<i32>> {
 /// Generate all combinations of k numbers chosen from [1, n]. Return sorted.
 ///
 /// Example: n=4, k=2 => [[1,2],[1,3],[1,4],[2,3],[2,4],[3,4]]
-pub fn combinations(_n: i32, _k: i32) -> Vec<Vec<i32>> {
+pub fn combinations(_n: i32, _k: i32, _log: &mut OperationLog) -> Vec<Vec<i32>> {
     todo!()
 }
 
@@ -32,7 +32,7 @@ pub fn combinations(_n: i32, _k: i32) -> Vec<Vec<i32>> {
 /// Mapping: 2->abc, 3->def, 4->ghi, 5->jkl, 6->mno, 7->pqrs, 8->tuv, 9->wxyz
 ///
 /// Example: digits="23" => ["ad","ae","af","bd","be","bf","cd","ce","cf"]
-pub fn letter_combinations(_digits: &str) -> Vec<String> {
+pub fn letter_combinations(_digits: &[Tracked<char>]) -> Vec<String> {
     todo!()
 }
 
@@ -40,7 +40,7 @@ pub fn letter_combinations(_digits: &str) -> Vec<String> {
 ///
 /// Example: n=2 => ["00", "01", "10", "11"]
 /// Example: n=0 => [""]
-pub fn binary_strings(_n: usize) -> Vec<String> {
+pub fn binary_strings(_n: usize, _log: &mut OperationLog) -> Vec<String> {
     todo!()
 }
 
@@ -65,21 +65,21 @@ pub fn combination_sum_ii(_candidates: &[Tracked<i32>], _target: i32) -> Vec<Vec
 /// Palindrome Partitioning: partition s so every substring is a palindrome. Return sorted.
 ///
 /// Example: s="aab" => [["a","a","b"],["aa","b"]]
-pub fn palindrome_partition(_s: &str) -> Vec<Vec<String>> {
+pub fn palindrome_partition(_s: &[Tracked<char>]) -> Vec<Vec<String>> {
     todo!()
 }
 
 /// Generate all valid combinations of n pairs of parentheses. Return sorted.
 ///
 /// Example: n=3 => ["((()))","(()())","(())()","()(())","()()()"]
-pub fn generate_parentheses(_n: usize) -> Vec<String> {
+pub fn generate_parentheses(_n: usize, _log: &mut OperationLog) -> Vec<String> {
     todo!()
 }
 
 /// Word Search: return true if the word exists in the grid (adjacent cells, no reuse).
 ///
 /// Example: board=[['A','B','C','E'],['S','F','C','S'],['A','D','E','E']], word="ABCCED" => true
-pub fn word_search(_board: &[Vec<char>], _word: &str) -> bool {
+pub fn word_search(_board: &[Vec<Tracked<char>>], _word: &[Tracked<char>]) -> bool {
     todo!()
 }
 
@@ -89,7 +89,7 @@ pub fn word_search(_board: &[Vec<char>], _word: &str) -> bool {
 /// Each solution is Vec<String> where 'Q' is a queen and '.' is empty. Return sorted.
 ///
 /// Example: n=4 => [[".Q..","...Q","Q...","..Q."],["..Q.","Q...","...Q",".Q.."]]
-pub fn n_queens(_n: usize) -> Vec<Vec<String>> {
+pub fn n_queens(_n: usize, _log: &mut OperationLog) -> Vec<Vec<String>> {
     todo!()
 }
 
@@ -97,7 +97,7 @@ pub fn n_queens(_n: usize) -> Vec<Vec<String>> {
 /// and 3x3 box contains 1-9 exactly once.
 ///
 /// Example: A valid Sudoku puzzle => its unique solution
-pub fn sudoku_solver(_board: &[Vec<u8>]) -> Vec<Vec<u8>> {
+pub fn sudoku_solver(_board: &[Vec<Tracked<u8>>]) -> Vec<Vec<u8>> {
     todo!()
 }
 
@@ -105,14 +105,14 @@ pub fn sudoku_solver(_board: &[Vec<u8>]) -> Vec<Vec<u8>> {
 ///
 /// Example: s="catsanddog", wordDict=["cat","cats","and","sand","dog"]
 /// => ["cat sand dog","cats and dog"]
-pub fn word_break_ii(_s: &str, _word_dict: &[String]) -> Vec<String> {
+pub fn word_break_ii(_s: &[Tracked<char>], _word_dict: &[String]) -> Vec<String> {
     todo!()
 }
 
 /// Restore IP Addresses: insert dots to form all valid IPv4 addresses. Return sorted.
 ///
 /// Example: s="25525511135" => ["255.255.11.135","255.255.111.35"]
-pub fn restore_ip(_s: &str) -> Vec<String> {
+pub fn restore_ip(_s: &[Tracked<char>]) -> Vec<String> {
     todo!()
 }
 
@@ -121,6 +121,6 @@ pub fn restore_ip(_s: &str) -> Vec<String> {
 ///
 /// Example: num="123", target=6 => ["1*2*3","1+2+3"]
 /// Example: num="105", target=5 => ["1*0+5","10-5"]
-pub fn expression_add_operators(_num: &str, _target: i64) -> Vec<String> {
+pub fn expression_add_operators(_num: &[Tracked<char>], _target: i64) -> Vec<String> {
     todo!()
 }

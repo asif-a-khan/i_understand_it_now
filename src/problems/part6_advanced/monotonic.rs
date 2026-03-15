@@ -5,7 +5,7 @@ use rand::Rng;
 
 use crate::problems::{Difficulty, Problem, SolutionResult, TestCase};
 use crate::solutions::part6_advanced::monotonic as solutions;
-use crate::tracker::{track_slice, OperationLog, Tracked};
+use crate::tracker::{track_slice, track_string, OperationLog, Tracked};
 
 pub fn problems() -> Vec<Box<dyn Problem>> {
     vec![
@@ -761,10 +761,15 @@ impl Problem for MonotonicRemoveKDigits {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<RemoveKTest>().unwrap();
         let expected = ref_remove_k_digits(&t.num, t.k);
-        let actual = solutions::remove_k_digits(&t.num, t.k);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_string(&t.num, shared_log.clone());
+        let actual = solutions::remove_k_digits(&tracked, t.k);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("num=\"{}\", k={}", t.num, t.k),
@@ -1180,10 +1185,15 @@ impl Problem for MonotonicMaxBinaryString {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<MaxBinStringTest>().unwrap();
         let expected = ref_max_binary_string(&t.s);
-        let actual = solutions::max_binary_string(&t.s);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_string(&t.s, shared_log.clone());
+        let actual = solutions::max_binary_string(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("s=\"{}\"", t.s),

@@ -270,10 +270,10 @@ impl Problem for BitsCountOnes {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<CountOnesTest>().unwrap();
         let expected = ref_count_ones(t.n);
-        let actual = solutions::count_ones(t.n);
+        let actual = solutions::count_ones(t.n, log);
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("n={} (0b{:b})", t.n, t.n),
@@ -332,10 +332,10 @@ impl Problem for BitsIsPowerOfTwo {
         tests
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<PowerOfTwoTest>().unwrap();
         let expected = ref_is_power_of_two(t.n);
-        let actual = solutions::is_power_of_two(t.n);
+        let actual = solutions::is_power_of_two(t.n, log);
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("n={}", t.n),
@@ -384,10 +384,10 @@ impl Problem for BitsReverseBits {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<ReverseBitsTest>().unwrap();
         let expected = ref_reverse_bits(t.n);
-        let actual = solutions::reverse_bits(t.n);
+        let actual = solutions::reverse_bits(t.n, log);
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("n={} (0b{:032b})", t.n, t.n),
@@ -501,10 +501,10 @@ impl Problem for BitsCountingBits {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<CountingBitsTest>().unwrap();
         let expected = ref_counting_bits(t.n);
-        let actual = solutions::counting_bits(t.n);
+        let actual = solutions::counting_bits(t.n, log);
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("n={}", t.n),
@@ -615,10 +615,10 @@ impl Problem for BitsSumWithoutArithmetic {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<SumTest>().unwrap();
         let expected = ref_sum_without_arithmetic(t.a, t.b);
-        let actual = solutions::sum_without_arithmetic(t.a, t.b);
+        let actual = solutions::sum_without_arithmetic(t.a, t.b, log);
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("a={}, b={}", t.a, t.b),
@@ -1002,10 +1002,10 @@ impl Problem for BitsMinFlips {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<MinFlipsTest>().unwrap();
         let expected = ref_min_flips(t.a, t.b);
-        let actual = solutions::min_flips(t.a, t.b);
+        let actual = solutions::min_flips(t.a, t.b, log);
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("a={}, b={}", t.a, t.b),
@@ -1055,10 +1055,10 @@ impl Problem for BitsGrayCode {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<GrayCodeTest>().unwrap();
         let expected = ref_gray_code(t.n);
-        let actual = solutions::gray_code(t.n);
+        let actual = solutions::gray_code(t.n, log);
         // Validate: correct length, starts at 0, all present, adjacent differ by 1 bit
         let total = 1 << t.n;
         let valid_len = actual.len() == total as usize;

@@ -1,4 +1,4 @@
-use crate::tracker::Tracked;
+use crate::tracker::{OperationLog, Tracked};
 // Stacks, Queues & Deques — Solution Templates
 // Edit these functions to solve each problem. Run with: cargo run -- solve <problem_id>
 
@@ -10,7 +10,7 @@ use crate::tracker::Tracked;
 /// then check that each closer matches the top of the stack.
 ///
 /// Example: "([])" -> true, "([)]" -> false, "" -> true
-pub fn valid_parentheses(_s: &str) -> bool {
+pub fn valid_parentheses(_s: &[Tracked<char>]) -> bool {
     todo!()
 }
 
@@ -23,7 +23,7 @@ pub fn valid_parentheses(_s: &str) -> bool {
 /// - ("getMin", None)    -> return Some(minimum element)
 ///
 /// Hint: maintain a second stack tracking the current minimum.
-pub fn min_stack(_ops: &[(String, Option<i32>)]) -> Vec<Option<i32>> {
+pub fn min_stack(_ops: &[(String, Option<i32>)], _log: &mut OperationLog) -> Vec<Option<i32>> {
     todo!()
 }
 
@@ -36,7 +36,10 @@ pub fn min_stack(_ops: &[(String, Option<i32>)]) -> Vec<Option<i32>> {
 /// - ("empty", None)     -> return Some(1) if empty, Some(0) otherwise
 ///
 /// Hint: use an "input" stack and an "output" stack; transfer when output is empty.
-pub fn queue_using_stacks(_ops: &[(String, Option<i32>)]) -> Vec<Option<i32>> {
+pub fn queue_using_stacks(
+    _ops: &[(String, Option<i32>)],
+    _log: &mut OperationLog,
+) -> Vec<Option<i32>> {
     todo!()
 }
 
@@ -49,7 +52,7 @@ pub fn queue_using_stacks(_ops: &[(String, Option<i32>)]) -> Vec<Option<i32>> {
 /// - "C"                -> invalidate (remove) previous score
 ///
 /// Return the sum of all remaining scores.
-pub fn baseball_game(_ops: &[String]) -> i32 {
+pub fn baseball_game(_ops: &[String], _log: &mut OperationLog) -> i32 {
     todo!()
 }
 
@@ -85,7 +88,7 @@ pub fn daily_temperatures(_temperatures: &[Tracked<i32>]) -> Vec<i32> {
 /// Example: ["2", "1", "+", "3", "*"] -> 9  (i.e. (2+1)*3)
 ///
 /// Hint: use a stack. Push numbers; on operator, pop two, compute, push result.
-pub fn eval_rpn(_tokens: &[String]) -> i32 {
+pub fn eval_rpn(_tokens: &[String], _log: &mut OperationLog) -> i32 {
     todo!()
 }
 
@@ -94,7 +97,7 @@ pub fn eval_rpn(_tokens: &[String]) -> i32 {
 /// Rule: k[encoded] means repeat encoded k times.
 ///
 /// Hint: use a stack of (previous_string, repeat_count) pairs.
-pub fn decode_string(_s: &str) -> String {
+pub fn decode_string(_s: &[Tracked<char>]) -> String {
     todo!()
 }
 
@@ -161,7 +164,7 @@ pub fn trapping_rain_water_stack(_height: &[Tracked<i32>]) -> i32 {
 ///
 /// Hint: use a stack to save (result, sign) when entering parentheses.
 /// Track current result and sign as you scan the string.
-pub fn basic_calculator(_s: &str) -> i32 {
+pub fn basic_calculator(_s: &[Tracked<char>]) -> i32 {
     todo!()
 }
 
@@ -173,6 +176,9 @@ pub fn basic_calculator(_s: &str) -> i32 {
 ///
 /// Hint: maintain a frequency map and a map from frequency -> stack of values.
 /// Track the current maximum frequency.
-pub fn max_frequency_stack(_ops: &[(String, Option<i32>)]) -> Vec<Option<i32>> {
+pub fn max_frequency_stack(
+    _ops: &[(String, Option<i32>)],
+    _log: &mut OperationLog,
+) -> Vec<Option<i32>> {
     todo!()
 }

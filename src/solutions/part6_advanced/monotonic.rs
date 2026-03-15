@@ -38,7 +38,7 @@ pub fn maximal_rectangle(_matrix: &[Vec<Tracked<i32>>]) -> i32 {
 }
 
 /// Remove K Digits: smallest number after removing k digits.
-pub fn remove_k_digits(_num: &str, _k: usize) -> String {
+pub fn remove_k_digits(_num: &[Tracked<char>], _k: usize) -> String {
     todo!()
 }
 
@@ -73,6 +73,6 @@ pub fn shortest_subarray_sum_k(_nums: &[Tracked<i32>], _k: i32) -> i32 {
 }
 
 /// Maximum binary string after operations ("00"->"10", "10"->"01").
-pub fn max_binary_string(_s: &str) -> String {
+pub fn max_binary_string(_s: &[Tracked<char>]) -> String {
     todo!()
 }

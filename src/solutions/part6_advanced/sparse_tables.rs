@@ -82,7 +82,7 @@ pub fn range_frequency(_arr: &[Tracked<i32>], _queries: &[(usize, usize)]) -> Ve
 }
 
 /// LCP array queries: min LCP in LCP array at indices [l, r).
-pub fn lcp_array_queries(_s: &str, _queries: &[(usize, usize)]) -> Vec<i32> {
+pub fn lcp_array_queries(_s: &[Tracked<char>], _queries: &[(usize, usize)]) -> Vec<i32> {
     todo!()
 }
 

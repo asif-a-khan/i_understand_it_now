@@ -5,7 +5,7 @@ use rand::Rng;
 
 use crate::problems::{Difficulty, Problem, SolutionResult, TestCase};
 use crate::solutions::part5_paradigms::divide_conquer as solutions;
-use crate::tracker::{track_slice, OperationLog, Tracked};
+use crate::tracker::{track_slice, track_string, OperationLog, Tracked};
 
 pub fn problems() -> Vec<Box<dyn Problem>> {
     vec![
@@ -160,10 +160,10 @@ impl Problem for DcPower {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<DcPowerTest>().unwrap();
         let expected = ref_power(t.x, t.n);
-        let actual = solutions::power(t.x, t.n);
+        let actual = solutions::power(t.x, t.n, log);
         let is_correct = if expected.is_infinite() && actual.is_infinite() {
             expected.signum() == actual.signum()
         } else if expected == 0.0 && actual == 0.0 {
@@ -791,11 +791,16 @@ impl Problem for DcDifferentWays {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<DcDifferentWaysTest>().unwrap();
         let mut expected = ref_different_ways(&t.expression);
         expected.sort();
-        let mut actual = solutions::different_ways(&t.expression);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_string(&t.expression, shared_log.clone());
+        let mut actual = solutions::different_ways(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         actual.sort();
         SolutionResult {
             is_correct: expected == actual,

@@ -1,4 +1,4 @@
-use crate::tracker::Tracked;
+use crate::tracker::{OperationLog, Tracked};
 // Matrix / Grid Problems — Solution Templates
 // Edit these functions to solve each problem. Run with: cargo run -- solve <problem_id>
 
@@ -46,7 +46,7 @@ pub fn count_islands(_grid: &[Vec<Tracked<i32>>]) -> i32 {
 ///
 /// Example: board=[['X','X','X','X'],['X','O','O','X'],['X','X','O','X'],['X','O','X','X']]
 ///          => [['X','X','X','X'],['X','X','X','X'],['X','X','X','X'],['X','O','X','X']]
-pub fn surrounded_regions(_board: &[Vec<char>]) -> Vec<Vec<char>> {
+pub fn surrounded_regions(_board: &[Vec<Tracked<char>>]) -> Vec<Vec<char>> {
     todo!()
 }
 
@@ -80,7 +80,7 @@ pub fn zero_one_matrix(_mat: &[Vec<Tracked<i32>>]) -> Vec<Vec<i32>> {
 /// from sequentially adjacent cells (4-directional). Same cell cannot be reused.
 ///
 /// Example: board=[['A','B','C','E'],['S','F','C','S'],['A','D','E','E']], word="ABCCED" => true
-pub fn word_search(_board: &[Vec<char>], _word: &str) -> bool {
+pub fn word_search(_board: &[Vec<Tracked<char>>], _word: &[Tracked<char>]) -> bool {
     todo!()
 }
 
@@ -89,7 +89,7 @@ pub fn word_search(_board: &[Vec<char>], _word: &str) -> bool {
 ///
 /// Example: m=3, n=7 => 28
 /// Example: m=3, n=2 => 3
-pub fn unique_paths(_m: usize, _n: usize) -> i32 {
+pub fn unique_paths(_m: usize, _n: usize, _log: &mut OperationLog) -> i32 {
     todo!()
 }
 
@@ -131,6 +131,6 @@ pub fn longest_increasing_path(_matrix: &[Vec<Tracked<i32>>]) -> i32 {
 /// 'D' cells are dangerous (impassable), 'O' cells are open. Return -1 if unreachable.
 ///
 /// Example: grid=[['S','O','O'],['D','O','D'],['O','O','T']] => 4
-pub fn treasure_island(_grid: &[Vec<char>]) -> i32 {
+pub fn treasure_island(_grid: &[Vec<Tracked<char>>]) -> i32 {
     todo!()
 }

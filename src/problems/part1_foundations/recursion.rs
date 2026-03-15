@@ -6,7 +6,7 @@ use std::rc::Rc;
 use crate::problems::helpers;
 use crate::problems::{Difficulty, Problem, SolutionResult, TestCase};
 use crate::solutions::part1_foundations::recursion as solutions;
-use crate::tracker::{track_slice, OperationLog};
+use crate::tracker::{track_slice, track_string, OperationLog};
 
 pub fn problems() -> Vec<Box<dyn Problem>> {
     vec![
@@ -71,10 +71,10 @@ impl Problem for Fibonacci {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<FibonacciTest>().unwrap();
         let expected = ref_fibonacci(t.n);
-        let actual = solutions::fibonacci(t.n);
+        let actual = solutions::fibonacci(t.n, log);
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("n={}", t.n),
@@ -146,10 +146,10 @@ impl Problem for PowerOfTwo {
         tests
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<PowerOfTwoTest>().unwrap();
         let expected = ref_power_of_two(t.n);
-        let actual = solutions::is_power_of_two(t.n);
+        let actual = solutions::is_power_of_two(t.n, log);
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("n={}", t.n),
@@ -204,10 +204,15 @@ impl Problem for ReverseString {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<ReverseStringTest>().unwrap();
         let expected: String = t.s.chars().rev().collect();
-        let actual = solutions::reverse_string(&t.s);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_string(&t.s, shared_log.clone());
+        let actual = solutions::reverse_string(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("s=\"{}\"", t.s),
@@ -582,10 +587,15 @@ impl Problem for LetterCombinations {
         tests
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<LetterCombinationsTest>().unwrap();
         let expected = ref_letter_combinations(&t.digits);
-        let actual = solutions::letter_combinations(&t.digits);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_string(&t.digits, shared_log.clone());
+        let actual = solutions::letter_combinations(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("digits=\"{}\"", t.digits),
@@ -683,7 +693,7 @@ impl Problem for Pow {
         tests
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<PowTest>().unwrap();
         // Skip cases where x==0 and n<0 (undefined)
         if t.x == 0.0 && t.n < 0 {
@@ -695,7 +705,7 @@ impl Problem for Pow {
             };
         }
         let expected = ref_pow(t.x, t.n);
-        let actual = solutions::pow(t.x, t.n);
+        let actual = solutions::pow(t.x, t.n, log);
         let correct = if expected.is_infinite() || expected.is_nan() {
             (actual.is_infinite() && expected.is_infinite())
                 || (actual.is_nan() && expected.is_nan())
@@ -769,10 +779,10 @@ impl Problem for TowerOfHanoi {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<TowerOfHanoiTest>().unwrap();
         let expected = ref_hanoi(t.num_disks);
-        let actual = solutions::tower_of_hanoi(t.num_disks);
+        let actual = solutions::tower_of_hanoi(t.num_disks, log);
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("num_disks={}", t.num_disks),
@@ -843,10 +853,10 @@ impl Problem for NQueens {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<NQueensTest>().unwrap();
         let expected = ref_n_queens(t.n);
-        let actual = solutions::n_queens(t.n);
+        let actual = solutions::n_queens(t.n, log);
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("n={}", t.n),
@@ -990,10 +1000,27 @@ impl Problem for SudokuSolver {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<SudokuTest>().unwrap();
         let expected = ref_solve_sudoku(&t.board);
-        let actual = solutions::solve_sudoku(&t.board);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_board: Vec<Vec<crate::tracker::Tracked<u8>>> = t
+            .board
+            .iter()
+            .enumerate()
+            .map(|(r, row)| {
+                row.iter()
+                    .enumerate()
+                    .map(|(c, &v)| {
+                        crate::tracker::Tracked::new(v, r * row.len() + c, shared_log.clone())
+                    })
+                    .collect()
+            })
+            .collect();
+        let actual = solutions::solve_sudoku(&tracked_board);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         let correct = expected == actual && is_valid_sudoku(&actual);
         SolutionResult {
             is_correct: correct,
@@ -1175,10 +1202,16 @@ impl Problem for RegexMatch {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<RegexMatchTest>().unwrap();
         let expected = ref_regex_match(&t.s, &t.p);
-        let actual = solutions::regex_match(&t.s, &t.p);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_s = track_string(&t.s, shared_log.clone());
+        let tracked_p = track_string(&t.p, shared_log.clone());
+        let actual = solutions::regex_match(&tracked_s, &tracked_p);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("s=\"{}\", p=\"{}\"", t.s, t.p),
@@ -1296,10 +1329,32 @@ impl Problem for WordSearch {
         tests
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<WordSearchTest>().unwrap();
         let expected = ref_word_search(&t.board, &t.word);
-        let actual = solutions::word_search(&t.board, &t.word);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_word = track_string(&t.word, shared_log.clone());
+        let shared_log2 = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_board: Vec<Vec<crate::tracker::Tracked<char>>> = t
+            .board
+            .iter()
+            .enumerate()
+            .map(|(r, row)| {
+                row.iter()
+                    .enumerate()
+                    .map(|(c, &ch)| {
+                        crate::tracker::Tracked::new(ch, r * row.len() + c, shared_log2.clone())
+                    })
+                    .collect()
+            })
+            .collect();
+        let actual = solutions::word_search(&tracked_board, &tracked_word);
+        for op in shared_log2.borrow().operations() {
+            log.record(op.clone());
+        }
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("board={:?}, word=\"{}\"", t.board, t.word),
@@ -1451,10 +1506,16 @@ impl Problem for StrobogrammaticIII {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<StrobogrammaticTest>().unwrap();
         let expected = ref_strobogrammatic_iii(&t.low, &t.high);
-        let actual = solutions::strobogrammatic_in_range(&t.low, &t.high);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_low = track_string(&t.low, shared_log.clone());
+        let tracked_high = track_string(&t.high, shared_log.clone());
+        let actual = solutions::strobogrammatic_in_range(&tracked_low, &tracked_high);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("low=\"{}\", high=\"{}\"", t.low, t.high),

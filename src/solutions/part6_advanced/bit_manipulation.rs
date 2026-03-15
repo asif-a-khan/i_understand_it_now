@@ -1,4 +1,4 @@
-use crate::tracker::Tracked;
+use crate::tracker::{OperationLog, Tracked};
 // Bit Manipulation — Solution Templates
 // Edit these functions to solve each problem. Run with: cargo run -- solve <problem_id>
 
@@ -8,17 +8,17 @@ pub fn single_number(_nums: &[Tracked<i32>]) -> i32 {
 }
 
 /// Count set bits (Hamming weight) of a u32.
-pub fn count_ones(_n: u32) -> u32 {
+pub fn count_ones(_n: u32, _log: &mut OperationLog) -> u32 {
     todo!()
 }
 
 /// Check if n is a power of two.
-pub fn is_power_of_two(_n: i32) -> bool {
+pub fn is_power_of_two(_n: i32, _log: &mut OperationLog) -> bool {
     todo!()
 }
 
 /// Reverse the bits of a 32-bit unsigned integer.
-pub fn reverse_bits(_n: u32) -> u32 {
+pub fn reverse_bits(_n: u32, _log: &mut OperationLog) -> u32 {
     todo!()
 }
 
@@ -28,7 +28,7 @@ pub fn missing_number(_nums: &[Tracked<i32>]) -> i32 {
 }
 
 /// Counting bits: for each i in [0, n], return the number of 1-bits.
-pub fn counting_bits(_n: i32) -> Vec<i32> {
+pub fn counting_bits(_n: i32, _log: &mut OperationLog) -> Vec<i32> {
     todo!()
 }
 
@@ -38,7 +38,7 @@ pub fn subsets_bitmask(_nums: &[Tracked<i32>]) -> Vec<Vec<i32>> {
 }
 
 /// Add two integers without using + or -.
-pub fn sum_without_arithmetic(_a: i32, _b: i32) -> i32 {
+pub fn sum_without_arithmetic(_a: i32, _b: i32, _log: &mut OperationLog) -> i32 {
     todo!()
 }
 
@@ -68,11 +68,11 @@ pub fn max_and_pair(_nums: &[Tracked<i32>]) -> i32 {
 }
 
 /// Minimum bit flips to convert a to b.
-pub fn min_flips(_a: i32, _b: i32) -> i32 {
+pub fn min_flips(_a: i32, _b: i32, _log: &mut OperationLog) -> i32 {
     todo!()
 }
 
 /// Generate n-bit Gray code sequence starting from 0.
-pub fn gray_code(_n: i32) -> Vec<i32> {
+pub fn gray_code(_n: i32, _log: &mut OperationLog) -> Vec<i32> {
     todo!()
 }

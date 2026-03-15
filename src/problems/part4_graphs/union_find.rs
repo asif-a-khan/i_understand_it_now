@@ -5,7 +5,7 @@ use std::rc::Rc;
 
 use crate::problems::{Difficulty, Problem, SolutionResult, TestCase};
 use crate::solutions::part4_graphs::union_find as solutions;
-use crate::tracker::{track_slice, OperationLog, Tracked};
+use crate::tracker::{track_slice, OperationLog, Tracked, TrackedGraph, TrackedWeightedGraph};
 
 pub fn problems() -> Vec<Box<dyn Problem>> {
     vec![
@@ -138,13 +138,21 @@ impl Problem for UfConnectedComponents {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test
             .data
             .downcast_ref::<UfConnectedComponentsTest>()
             .unwrap();
         let expected = ref_uf_connected_components(t.n, &t.edges);
-        let actual = solutions::connected_components(t.n, &t.edges);
+        let actual = {
+            let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+            let graph = TrackedGraph::new(t.n, &t.edges, false, shared_log.clone());
+            let result = solutions::connected_components(&graph);
+            for op in shared_log.borrow().operations() {
+                log.record(op.clone());
+            }
+            result
+        };
         SolutionResult {
             is_correct: actual == expected,
             input_description: format!("n={}, edges={:?}", t.n, t.edges),
@@ -211,10 +219,18 @@ impl Problem for UfIsConnected {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<UfIsConnectedTest>().unwrap();
         let expected = ref_is_connected(t.n, &t.edges, t.u, t.v);
-        let actual = solutions::is_connected(t.n, &t.edges, t.u, t.v);
+        let actual = {
+            let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+            let graph = TrackedGraph::new(t.n, &t.edges, false, shared_log.clone());
+            let result = solutions::is_connected(&graph, t.u, t.v);
+            for op in shared_log.borrow().operations() {
+                log.record(op.clone());
+            }
+            result
+        };
         SolutionResult {
             is_correct: actual == expected,
             input_description: format!("n={}, edges={:?}, u={}, v={}", t.n, t.edges, t.u, t.v),
@@ -387,13 +403,27 @@ impl Problem for UfRedundantConnection {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test
             .data
             .downcast_ref::<UfRedundantConnectionTest>()
             .unwrap();
         let expected = ref_redundant_connection(&t.edges);
-        let actual = solutions::redundant_connection(&t.edges);
+        let actual = {
+            let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+            let n = t
+                .edges
+                .iter()
+                .flat_map(|&(u, v)| [u, v])
+                .max()
+                .map_or(0, |m| m + 1);
+            let graph = TrackedGraph::new(n, &t.edges, false, shared_log.clone());
+            let result = solutions::redundant_connection(&graph);
+            for op in shared_log.borrow().operations() {
+                log.record(op.clone());
+            }
+            result
+        };
         SolutionResult {
             is_correct: actual == expected,
             input_description: format!("edges={:?}", t.edges),
@@ -477,13 +507,13 @@ impl Problem for UfEarliestConnection {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test
             .data
             .downcast_ref::<UfEarliestConnectionTest>()
             .unwrap();
         let expected = ref_earliest_connection(t.n, &t.logs);
-        let actual = solutions::earliest_connection(t.n, &t.logs);
+        let actual = solutions::earliest_connection(t.n, &t.logs, log);
         SolutionResult {
             is_correct: actual == expected,
             input_description: format!("n={}, logs={:?}", t.n, t.logs),
@@ -574,10 +604,10 @@ impl Problem for UfAccountsMerge {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<UfAccountsMergeTest>().unwrap();
         let expected = ref_accounts_merge(&t.accounts);
-        let actual = solutions::accounts_merge(&t.accounts);
+        let actual = solutions::accounts_merge(&t.accounts, log);
         SolutionResult {
             is_correct: actual == expected,
             input_description: format!("accounts={:?}", t.accounts),
@@ -689,10 +719,10 @@ impl Problem for UfNumIslandsII {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<UfNumIslandsIITest>().unwrap();
         let expected = ref_num_islands_ii(t.rows, t.cols, &t.positions);
-        let actual = solutions::num_islands_ii(t.rows, t.cols, &t.positions);
+        let actual = solutions::num_islands_ii(t.rows, t.cols, &t.positions, log);
         SolutionResult {
             is_correct: actual == expected,
             input_description: format!(
@@ -814,10 +844,10 @@ impl Problem for UfSatisfiability {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<UfSatisfiabilityTest>().unwrap();
         let expected = ref_satisfiability(&t.equations);
-        let actual = solutions::satisfiability(&t.equations);
+        let actual = solutions::satisfiability(&t.equations, log);
         SolutionResult {
             is_correct: actual == expected,
             input_description: format!("equations={:?}", t.equations),
@@ -910,10 +940,10 @@ impl Problem for UfRegionsBySlashes {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<UfRegionsBySlashesTest>().unwrap();
         let expected = ref_regions_by_slashes(&t.grid);
-        let actual = solutions::regions_by_slashes(&t.grid);
+        let actual = solutions::regions_by_slashes(&t.grid, log);
         SolutionResult {
             is_correct: actual == expected,
             input_description: format!("grid={:?}", t.grid),
@@ -1131,13 +1161,21 @@ impl Problem for UfNumberOfIslandsRemoval {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test
             .data
             .downcast_ref::<UfNumberOfIslandsRemovalTest>()
             .unwrap();
         let expected = ref_components_after_removal(t.n, &t.edges);
-        let actual = solutions::number_of_islands_removal(t.n, &t.edges);
+        let actual = {
+            let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+            let graph = TrackedGraph::new(t.n, &t.edges, false, shared_log.clone());
+            let result = solutions::number_of_islands_removal(&graph);
+            for op in shared_log.borrow().operations() {
+                log.record(op.clone());
+            }
+            result
+        };
         SolutionResult {
             is_correct: actual == expected,
             input_description: format!("n={}, edges={:?}", t.n, t.edges),
@@ -1352,13 +1390,21 @@ impl Problem for UfMinCostConnectCities {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test
             .data
             .downcast_ref::<UfMinCostConnectCitiesTest>()
             .unwrap();
         let expected = ref_min_cost_connect_cities(t.n, &t.edges);
-        let actual = solutions::min_cost_connect_cities(t.n, &t.edges);
+        let actual = {
+            let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+            let graph = TrackedWeightedGraph::new(t.n, &t.edges, false, shared_log.clone());
+            let result = solutions::min_cost_connect_cities(&graph);
+            for op in shared_log.borrow().operations() {
+                log.record(op.clone());
+            }
+            result
+        };
         SolutionResult {
             is_correct: actual == expected,
             input_description: format!("n={}, edges={:?}", t.n, t.edges),
@@ -1553,13 +1599,21 @@ impl Problem for UfCheckingExistenceEdgeLength {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test
             .data
             .downcast_ref::<UfCheckingExistenceEdgeLengthTest>()
             .unwrap();
         let expected = ref_checking_edge_length(t.n, &t.edges, &t.queries);
-        let actual = solutions::checking_existence_edge_length(t.n, &t.edges, &t.queries);
+        let actual = {
+            let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+            let graph = TrackedWeightedGraph::new(t.n, &t.edges, false, shared_log.clone());
+            let result = solutions::checking_existence_edge_length(&graph, &t.queries);
+            for op in shared_log.borrow().operations() {
+                log.record(op.clone());
+            }
+            result
+        };
         SolutionResult {
             is_correct: actual == expected,
             input_description: format!("n={}, edges={:?}, queries={:?}", t.n, t.edges, t.queries),

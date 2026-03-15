@@ -76,7 +76,7 @@ pub fn merge_k_sorted(_lists: &[Vec<Tracked<i32>>]) -> Vec<i32> {
 /// Task Scheduler: Find minimum intervals to execute all tasks with cooldown n.
 ///
 /// Between two same tasks, there must be at least n intervals.
-pub fn task_scheduler(_tasks: &[char], _n: i32) -> i32 {
+pub fn task_scheduler(_tasks: &[Tracked<char>], _n: i32) -> i32 {
     todo!()
 }
 

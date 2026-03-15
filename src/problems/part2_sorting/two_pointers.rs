@@ -6,7 +6,7 @@ use std::rc::Rc;
 
 use crate::problems::{Difficulty, Problem, SolutionResult, TestCase};
 use crate::solutions::part2_sorting::two_pointers as solutions;
-use crate::tracker::{track_slice, OperationLog};
+use crate::tracker::{track_slice, track_string, OperationLog};
 
 pub fn problems() -> Vec<Box<dyn Problem>> {
     vec![
@@ -311,10 +311,15 @@ impl Problem for ValidPalindrome {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<ValidPalindromeTest>().unwrap();
         let expected = ref_valid_palindrome(&t.s);
-        let actual = solutions::valid_palindrome(&t.s);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_string(&t.s, shared_log.clone());
+        let actual = solutions::valid_palindrome(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("s={:?}", t.s),
@@ -607,10 +612,15 @@ impl Problem for LongestRepeatingReplacement {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<LRRTest>().unwrap();
         let expected = ref_longest_repeating_replacement(&t.s, t.k);
-        let actual = solutions::longest_repeating_replacement(&t.s, t.k);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_string(&t.s, shared_log.clone());
+        let actual = solutions::longest_repeating_replacement(&tracked, t.k);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("s={:?}, k={}", t.s, t.k),
@@ -929,10 +939,16 @@ impl Problem for MinimumWindowSubstring {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<MWSTest>().unwrap();
         let expected = ref_min_window(&t.s, &t.t);
-        let actual = solutions::minimum_window_substring(&t.s, &t.t);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_s = track_string(&t.s, shared_log.clone());
+        let tracked_t = track_string(&t.t, shared_log.clone());
+        let actual = solutions::minimum_window_substring(&tracked_s, &tracked_t);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         // Verify actual is valid: contains all chars of t and has same length as expected.
         let valid = if expected.is_empty() {
             actual.is_empty()
@@ -1076,10 +1092,15 @@ impl Problem for SubstringConcatenation {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<SubConcatTest>().unwrap();
         let expected = ref_substring_concatenation(&t.s, &t.words);
-        let mut actual = solutions::substring_concatenation(&t.s, &t.words);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_string(&t.s, shared_log.clone());
+        let mut actual = solutions::substring_concatenation(&tracked, &t.words);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         actual.sort();
         SolutionResult {
             is_correct: expected == actual,

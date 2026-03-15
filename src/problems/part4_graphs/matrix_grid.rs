@@ -546,10 +546,27 @@ impl Problem for MatrixGridSurroundedRegions {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<SurroundedRegionsTest>().unwrap();
         let expected = ref_surrounded_regions(&t.board);
-        let actual = solutions::surrounded_regions(&t.board);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_board: Vec<Vec<crate::tracker::Tracked<char>>> = t
+            .board
+            .iter()
+            .enumerate()
+            .map(|(r, row)| {
+                row.iter()
+                    .enumerate()
+                    .map(|(c, &ch)| {
+                        crate::tracker::Tracked::new(ch, r * row.len() + c, shared_log.clone())
+                    })
+                    .collect()
+            })
+            .collect();
+        let actual = solutions::surrounded_regions(&tracked_board);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("board={:?}", t.board),
@@ -1070,10 +1087,28 @@ impl Problem for MatrixGridWordSearch {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<WordSearchTest>().unwrap();
         let expected = ref_word_search(&t.board, &t.word);
-        let actual = solutions::word_search(&t.board, &t.word);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_board: Vec<Vec<crate::tracker::Tracked<char>>> = t
+            .board
+            .iter()
+            .enumerate()
+            .map(|(r, row)| {
+                row.iter()
+                    .enumerate()
+                    .map(|(c, &ch)| {
+                        crate::tracker::Tracked::new(ch, r * row.len() + c, shared_log.clone())
+                    })
+                    .collect()
+            })
+            .collect();
+        let tracked_word = crate::tracker::track_string(&t.word, shared_log.clone());
+        let actual = solutions::word_search(&tracked_board, &tracked_word);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("board={:?}, word={:?}", t.board, t.word),
@@ -1170,10 +1205,10 @@ impl Problem for MatrixGridUniquePaths {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<UniquePathsTest>().unwrap();
         let expected = ref_unique_paths(t.m, t.n);
-        let actual = solutions::unique_paths(t.m, t.n);
+        let actual = solutions::unique_paths(t.m, t.n, log);
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("m={}, n={}", t.m, t.n),
@@ -1757,10 +1792,27 @@ impl Problem for MatrixGridTreasureIsland {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<TreasureIslandTest>().unwrap();
         let expected = ref_treasure_island(&t.grid);
-        let actual = solutions::treasure_island(&t.grid);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_grid: Vec<Vec<crate::tracker::Tracked<char>>> = t
+            .grid
+            .iter()
+            .enumerate()
+            .map(|(r, row)| {
+                row.iter()
+                    .enumerate()
+                    .map(|(c, &ch)| {
+                        crate::tracker::Tracked::new(ch, r * row.len() + c, shared_log.clone())
+                    })
+                    .collect()
+            })
+            .collect();
+        let actual = solutions::treasure_island(&tracked_grid);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("grid={:?}", t.grid),

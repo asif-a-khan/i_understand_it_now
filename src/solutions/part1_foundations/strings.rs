@@ -10,7 +10,7 @@
 //   - Collect to String: `s.iter().map(|c| c.value).collect::<String>()`
 //   - Length: `s.len()`
 
-use crate::tracker::Tracked;
+use crate::tracker::{OperationLog, Tracked};
 
 /// Reverse String: return the reversed string.
 pub fn reverse(_s: &[Tracked<char>]) -> String {
@@ -34,7 +34,7 @@ pub fn first_unique_char(_s: &[Tracked<char>]) -> i32 {
 }
 
 /// Longest Common Prefix: return the longest common prefix among an array of strings.
-pub fn longest_common_prefix(_strs: &[String]) -> String {
+pub fn longest_common_prefix(_strs: &[String], _log: &mut OperationLog) -> String {
     todo!()
 }
 
@@ -45,7 +45,7 @@ pub fn longest_palindromic_substring(_s: &[Tracked<char>]) -> String {
 
 /// Group Anagrams: group strings that are anagrams of each other.
 /// Return groups sorted internally and the outer list sorted by first element.
-pub fn group_anagrams(_strs: &[String]) -> Vec<Vec<String>> {
+pub fn group_anagrams(_strs: &[String], _log: &mut OperationLog) -> Vec<Vec<String>> {
     todo!()
 }
 
@@ -62,7 +62,7 @@ pub fn zigzag_convert(_s: &[Tracked<char>], _num_rows: usize) -> String {
 }
 
 /// Count and Say: return the nth term of the count-and-say sequence (1-indexed).
-pub fn count_and_say(_n: usize) -> String {
+pub fn count_and_say(_n: usize, _log: &mut OperationLog) -> String {
     todo!()
 }
 

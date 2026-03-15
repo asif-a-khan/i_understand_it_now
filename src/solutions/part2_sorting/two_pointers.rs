@@ -18,7 +18,7 @@ pub fn move_zeroes(_nums: &[Tracked<i32>]) -> Vec<i32> {
 }
 
 /// Valid Palindrome: return true if s is a palindrome (alphanumeric only, case-insensitive).
-pub fn valid_palindrome(_s: &str) -> bool {
+pub fn valid_palindrome(_s: &[Tracked<char>]) -> bool {
     todo!()
 }
 
@@ -39,7 +39,7 @@ pub fn container_water(_height: &[Tracked<i32>]) -> i32 {
 
 /// Longest Repeating Character Replacement: return length of longest substring with same
 /// letter after at most k replacements.
-pub fn longest_repeating_replacement(_s: &str, _k: i32) -> i32 {
+pub fn longest_repeating_replacement(_s: &[Tracked<char>], _k: i32) -> i32 {
     todo!()
 }
 
@@ -60,12 +60,12 @@ pub fn trapping_rain_water(_height: &[Tracked<i32>]) -> i32 {
 }
 
 /// Minimum Window Substring: return smallest substring of s containing all chars of t.
-pub fn minimum_window_substring(_s: &str, _t: &str) -> String {
+pub fn minimum_window_substring(_s: &[Tracked<char>], _t: &[Tracked<char>]) -> String {
     todo!()
 }
 
 /// Substring with Concatenation of All Words: return starting indices of concatenation substrings.
-pub fn substring_concatenation(_s: &str, _words: &[String]) -> Vec<usize> {
+pub fn substring_concatenation(_s: &[Tracked<char>], _words: &[String]) -> Vec<usize> {
     todo!()
 }
 

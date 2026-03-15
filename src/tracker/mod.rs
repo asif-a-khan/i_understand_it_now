@@ -393,6 +393,36 @@ impl PartialOrd<char> for Tracked<char> {
     }
 }
 
+// ─── Tracked<u8> ─────────────────────────────────────────────────────
+
+#[allow(dead_code)]
+impl Tracked<u8> {
+    pub fn is_ascii_digit(&self) -> bool {
+        self.value.is_ascii_digit()
+    }
+    pub fn is_ascii_alphabetic(&self) -> bool {
+        self.value.is_ascii_alphabetic()
+    }
+    pub fn wrapping_add(&self, rhs: u8) -> u8 {
+        self.value.wrapping_add(rhs)
+    }
+    pub fn wrapping_sub(&self, rhs: u8) -> u8 {
+        self.value.wrapping_sub(rhs)
+    }
+}
+
+impl PartialEq<u8> for Tracked<u8> {
+    fn eq(&self, other: &u8) -> bool {
+        self.value == *other
+    }
+}
+
+impl PartialOrd<u8> for Tracked<u8> {
+    fn partial_cmp(&self, other: &u8) -> Option<std::cmp::Ordering> {
+        self.value.partial_cmp(other)
+    }
+}
+
 // ─── Tracked<Option<i32>> ────────────────────────────────────────────
 
 #[allow(dead_code)]
@@ -483,5 +513,229 @@ pub fn tracked_swap<T>(slice: &mut [Tracked<T>], a: usize, b: usize) {
             right_idx: b,
         });
         slice.swap(a, b);
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// TrackedGraph — records vertex visits for visualization
+// ═══════════════════════════════════════════════════════════════════════
+
+/// A tracked unweighted graph that records vertex accesses for visualization.
+///
+/// Users interact through natural graph methods:
+/// ```ignore
+/// let neighbors = graph.neighbors(v);  // records a Read at vertex v
+/// let n = graph.n();                    // number of nodes
+/// let has = graph.has_edge(u, v);       // records a Compare
+/// ```
+#[allow(dead_code)]
+pub struct TrackedGraph {
+    adj: Vec<Vec<usize>>,
+    edge_list: Vec<(usize, usize)>,
+    directed: bool,
+    log: Rc<RefCell<OperationLog>>,
+}
+
+#[allow(dead_code)]
+impl TrackedGraph {
+    /// Build a tracked graph from node count and edge list.
+    pub fn new(
+        n: usize,
+        edges: &[(usize, usize)],
+        directed: bool,
+        log: Rc<RefCell<OperationLog>>,
+    ) -> Self {
+        let mut adj = vec![vec![]; n];
+        for &(u, v) in edges {
+            if u < n && v < n {
+                adj[u].push(v);
+                if !directed {
+                    adj[v].push(u);
+                }
+            }
+        }
+        for neighbors in &mut adj {
+            neighbors.sort_unstable();
+            neighbors.dedup();
+        }
+        Self {
+            adj,
+            edge_list: edges.to_vec(),
+            directed,
+            log,
+        }
+    }
+
+    /// Number of nodes.
+    pub fn n(&self) -> usize {
+        self.adj.len()
+    }
+
+    /// Get neighbors of vertex v (records a Read operation).
+    pub fn neighbors(&self, v: usize) -> &[usize] {
+        self.log.borrow_mut().record(Operation::Read { idx: v });
+        &self.adj[v]
+    }
+
+    /// Check if edge (u, v) exists (records a Compare operation).
+    pub fn has_edge(&self, u: usize, v: usize) -> bool {
+        self.log.borrow_mut().record(Operation::Compare {
+            left_idx: u,
+            right_idx: v,
+        });
+        self.adj[u].contains(&v)
+    }
+
+    /// Get the full adjacency list (no operation recorded — for setup/display).
+    pub fn adj(&self) -> &[Vec<usize>] {
+        &self.adj
+    }
+
+    /// Get the original edge list.
+    pub fn edges(&self) -> &[(usize, usize)] {
+        &self.edge_list
+    }
+
+    /// Whether the graph is directed.
+    pub fn is_directed(&self) -> bool {
+        self.directed
+    }
+
+    /// Degree of vertex v.
+    pub fn degree(&self, v: usize) -> usize {
+        self.adj[v].len()
+    }
+
+    /// Number of edges.
+    pub fn num_edges(&self) -> usize {
+        if self.directed {
+            self.adj.iter().map(|ns| ns.len()).sum()
+        } else {
+            self.adj.iter().map(|ns| ns.len()).sum::<usize>() / 2
+        }
+    }
+}
+
+/// A tracked weighted graph that records vertex accesses for visualization.
+///
+/// Edge weights are stored inline: adjacency list contains `(neighbor, weight)` pairs.
+/// ```ignore
+/// let neighbors = graph.neighbors(v);  // returns &[(usize, i32)], records Read
+/// let n = graph.n();
+/// ```
+#[allow(dead_code)]
+pub struct TrackedWeightedGraph {
+    adj: Vec<Vec<(usize, i32)>>,
+    edge_list: Vec<(usize, usize, i32)>,
+    directed: bool,
+    log: Rc<RefCell<OperationLog>>,
+}
+
+#[allow(dead_code)]
+impl TrackedWeightedGraph {
+    /// Build a tracked weighted graph from node count and weighted edge list.
+    pub fn new(
+        n: usize,
+        edges: &[(usize, usize, i32)],
+        directed: bool,
+        log: Rc<RefCell<OperationLog>>,
+    ) -> Self {
+        let mut adj = vec![vec![]; n];
+        for &(u, v, w) in edges {
+            if u < n && v < n {
+                adj[u].push((v, w));
+                if !directed {
+                    adj[v].push((u, w));
+                }
+            }
+        }
+        for neighbors in &mut adj {
+            neighbors.sort_unstable();
+        }
+        Self {
+            adj,
+            edge_list: edges.to_vec(),
+            directed,
+            log,
+        }
+    }
+
+    /// Number of nodes.
+    pub fn n(&self) -> usize {
+        self.adj.len()
+    }
+
+    /// Get weighted neighbors of vertex v (records a Read operation).
+    /// Returns `&[(neighbor_id, weight)]`.
+    pub fn neighbors(&self, v: usize) -> &[(usize, i32)] {
+        self.log.borrow_mut().record(Operation::Read { idx: v });
+        &self.adj[v]
+    }
+
+    /// Get the full adjacency list (no operation recorded).
+    pub fn adj(&self) -> &[Vec<(usize, i32)>] {
+        &self.adj
+    }
+
+    /// Get the original weighted edge list.
+    pub fn edges(&self) -> &[(usize, usize, i32)] {
+        &self.edge_list
+    }
+
+    /// Whether the graph is directed.
+    pub fn is_directed(&self) -> bool {
+        self.directed
+    }
+
+    /// Degree of vertex v.
+    pub fn degree(&self, v: usize) -> usize {
+        self.adj[v].len()
+    }
+
+    /// Get edge weight between u and v (records a Compare, returns None if no edge).
+    pub fn weight(&self, u: usize, v: usize) -> Option<i32> {
+        self.log.borrow_mut().record(Operation::Compare {
+            left_idx: u,
+            right_idx: v,
+        });
+        self.adj[u].iter().find(|(nb, _)| *nb == v).map(|(_, w)| *w)
+    }
+
+    /// Number of edges.
+    pub fn num_edges(&self) -> usize {
+        self.edge_list.len()
+    }
+}
+
+// ─── Tracked<usize> convenience methods ──────────────────────────────
+
+#[allow(dead_code)]
+impl Tracked<usize> {
+    pub fn checked_add(&self, rhs: usize) -> Option<usize> {
+        self.value.checked_add(rhs)
+    }
+    pub fn checked_sub(&self, rhs: usize) -> Option<usize> {
+        self.value.checked_sub(rhs)
+    }
+    pub fn saturating_sub(&self, rhs: usize) -> usize {
+        self.value.saturating_sub(rhs)
+    }
+    pub fn min_val(&self, other: usize) -> usize {
+        self.value.min(other)
+    }
+    pub fn max_val(&self, other: usize) -> usize {
+        self.value.max(other)
+    }
+}
+
+impl PartialEq<usize> for Tracked<usize> {
+    fn eq(&self, other: &usize) -> bool {
+        self.value == *other
+    }
+}
+
+impl PartialOrd<usize> for Tracked<usize> {
+    fn partial_cmp(&self, other: &usize) -> Option<std::cmp::Ordering> {
+        self.value.partial_cmp(other)
     }
 }

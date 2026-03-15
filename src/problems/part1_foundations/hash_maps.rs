@@ -6,7 +6,7 @@ use std::rc::Rc;
 
 use crate::problems::{Difficulty, Problem, SolutionResult, TestCase};
 use crate::solutions::part1_foundations::hash_maps as solutions;
-use crate::tracker::{track_slice, OperationLog};
+use crate::tracker::{track_slice, track_string, OperationLog};
 
 pub fn problems() -> Vec<Box<dyn Problem>> {
     vec![
@@ -287,10 +287,10 @@ impl Problem for HappyNumber {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<HappyNumberTest>().unwrap();
         let expected = ref_happy_number(t.n);
-        let actual = solutions::is_happy(t.n);
+        let actual = solutions::is_happy(t.n, log);
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("n={}", t.n),
@@ -392,10 +392,16 @@ impl Problem for IsomorphicStrings {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<IsomorphicTest>().unwrap();
         let expected = ref_isomorphic(&t.s, &t.t);
-        let actual = solutions::is_isomorphic(&t.s, &t.t);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_s = track_string(&t.s, shared_log.clone());
+        let tracked_t = track_string(&t.t, shared_log.clone());
+        let actual = solutions::is_isomorphic(&tracked_s, &tracked_t);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("s=\"{}\", t=\"{}\"", t.s, t.t),
@@ -481,10 +487,10 @@ impl Problem for GroupAnagrams {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<GroupAnagramsTest>().unwrap();
         let expected = ref_group_anagrams(&t.strs);
-        let actual = solutions::group_anagrams(&t.strs);
+        let actual = solutions::group_anagrams(&t.strs, log);
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("strs={:?}", t.strs),
@@ -798,10 +804,15 @@ impl Problem for EncodeDecode {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<EncodeDecodeTest>().unwrap();
         let encoded = solutions::encode(&t.strs);
-        let decoded = solutions::decode(&encoded);
+        let shared_log2 = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_enc = track_string(&encoded, shared_log2.clone());
+        let decoded = solutions::decode(&tracked_enc);
+        for op in shared_log2.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: decoded == t.strs,
             input_description: format!("strs={:?}", t.strs),
@@ -864,10 +875,16 @@ impl Problem for MinWindowSubstring {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<MinWindowTest>().unwrap();
         let expected = ref_min_window(&t.s, &t.t);
-        let actual = solutions::min_window_substring(&t.s, &t.t);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_s = track_string(&t.s, shared_log.clone());
+        let tracked_t = track_string(&t.t, shared_log.clone());
+        let actual = solutions::min_window_substring(&tracked_s, &tracked_t);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("s=\"{}\", t=\"{}\"", t.s, t.t),
@@ -969,10 +986,15 @@ impl Problem for LongestKDistinct {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<LongestKDistinctTest>().unwrap();
         let expected = ref_longest_k_distinct(&t.s, t.k);
-        let actual = solutions::longest_k_distinct(&t.s, t.k);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_string(&t.s, shared_log.clone());
+        let actual = solutions::longest_k_distinct(&tracked, t.k);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("s=\"{}\", k={}", t.s, t.k),
@@ -1093,10 +1115,10 @@ impl Problem for AlienDictionary {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<AlienDictionaryTest>().unwrap();
         let expected = ref_alien_dictionary(&t.words);
-        let actual = solutions::alien_dictionary(&t.words);
+        let actual = solutions::alien_dictionary(&t.words, log);
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("words={:?}", t.words),
@@ -1295,7 +1317,7 @@ impl Problem for AllO1 {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<AllO1Test>().unwrap();
 
         // Convert ops to the format the user solution expects: Vec<(String, String)>
@@ -1310,7 +1332,7 @@ impl Problem for AllO1 {
             })
             .collect();
 
-        let actual = solutions::all_o1(&user_ops);
+        let actual = solutions::all_o1(&user_ops, log);
 
         let expected: Vec<String> = t
             .expected_results

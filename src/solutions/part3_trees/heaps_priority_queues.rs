@@ -38,7 +38,7 @@ pub fn k_closest_to_value(_arr: &[Tracked<i32>], _k: usize, _target: i32) -> Vec
 }
 
 /// Reorganize String: rearrange so no two adjacent chars are the same, or return "" if impossible.
-pub fn reorganize_string(_s: &str) -> String {
+pub fn reorganize_string(_s: &[Tracked<char>]) -> String {
     todo!()
 }
 
@@ -48,7 +48,7 @@ pub fn merge_k_sorted_lists(_lists: &[Vec<Tracked<i32>>]) -> Vec<i32> {
 }
 
 /// Task Scheduler: return minimum intervals to execute all tasks with cooldown n.
-pub fn task_scheduler(_tasks: &[char], _n: i32) -> i32 {
+pub fn task_scheduler(_tasks: &[Tracked<char>], _n: i32) -> i32 {
     todo!()
 }
 

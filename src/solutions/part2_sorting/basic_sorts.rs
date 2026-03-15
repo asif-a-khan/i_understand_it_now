@@ -164,7 +164,7 @@ pub fn h_index(_citations: &[Tracked<i32>]) -> i32 {
 /// Characters not in `order` can be placed at any position.
 ///
 /// Example: order = "cba", s = "abcd" -> "cbad"
-pub fn custom_sort_string(_order: &str, _s: &str) -> String {
+pub fn custom_sort_string(_order: &[Tracked<char>], _s: &[Tracked<char>]) -> String {
     todo!()
 }
 

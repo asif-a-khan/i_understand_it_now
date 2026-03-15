@@ -4,7 +4,7 @@ use std::rc::Rc;
 
 use crate::problems::{Difficulty, Problem, SolutionResult, TestCase};
 use crate::solutions::part4_graphs::topological_sort as solutions;
-use crate::tracker::{track_slice, OperationLog, Tracked};
+use crate::tracker::{track_slice, OperationLog, Tracked, TrackedGraph, TrackedWeightedGraph};
 
 pub fn problems() -> Vec<Box<dyn Problem>> {
     vec![
@@ -102,9 +102,17 @@ impl Problem for TopoSortBasic {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<TopoSortBasicTest>().unwrap();
-        let actual = solutions::topo_sort_basic(t.n, &t.edges);
+        let actual = {
+            let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+            let graph = TrackedGraph::new(t.n, &t.edges, true, shared_log.clone());
+            let result = solutions::topo_sort_basic(&graph);
+            for op in shared_log.borrow().operations() {
+                log.record(op.clone());
+            }
+            result
+        };
         let valid = ref_validate_topo_order(t.n, &t.edges, &actual);
         SolutionResult {
             is_correct: valid,
@@ -192,10 +200,18 @@ impl Problem for TopoSortCanFinish {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<CanFinishTest>().unwrap();
         let expected = ref_can_finish(t.n, &t.edges);
-        let actual = solutions::can_finish(t.n, &t.edges);
+        let actual = {
+            let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+            let graph = TrackedGraph::new(t.n, &t.edges, true, shared_log.clone());
+            let result = solutions::can_finish(&graph);
+            for op in shared_log.borrow().operations() {
+                log.record(op.clone());
+            }
+            result
+        };
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("n={}, edges={:?}", t.n, t.edges),
@@ -286,10 +302,18 @@ impl Problem for TopoSortFindOrder {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<FindOrderTest>().unwrap();
         let can = ref_can_finish(t.n, &t.edges);
-        let actual = solutions::find_order(t.n, &t.edges);
+        let actual = {
+            let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+            let graph = TrackedGraph::new(t.n, &t.edges, true, shared_log.clone());
+            let result = solutions::find_order(&graph);
+            for op in shared_log.borrow().operations() {
+                log.record(op.clone());
+            }
+            result
+        };
         let is_correct = if can {
             ref_validate_topo_order(t.n, &t.edges, &actual)
         } else {
@@ -362,10 +386,18 @@ impl Problem for TopoSortIsDag {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<IsDagTest>().unwrap();
         let expected = ref_can_finish(t.n, &t.edges); // DAG = can finish
-        let actual = solutions::is_dag(t.n, &t.edges);
+        let actual = {
+            let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+            let graph = TrackedGraph::new(t.n, &t.edges, true, shared_log.clone());
+            let result = solutions::is_dag(&graph);
+            for op in shared_log.borrow().operations() {
+                log.record(op.clone());
+            }
+            result
+        };
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("n={}, edges={:?}", t.n, t.edges),
@@ -419,9 +451,17 @@ impl Problem for TopoSortKahnBfs {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<KahnBfsTest>().unwrap();
-        let actual = solutions::kahn_bfs(t.n, &t.edges);
+        let actual = {
+            let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+            let graph = TrackedGraph::new(t.n, &t.edges, true, shared_log.clone());
+            let result = solutions::kahn_bfs(&graph);
+            for op in shared_log.borrow().operations() {
+                log.record(op.clone());
+            }
+            result
+        };
         let valid = ref_validate_topo_order(t.n, &t.edges, &actual);
         SolutionResult {
             is_correct: valid,
@@ -489,10 +529,18 @@ impl Problem for TopoSortParallelCourses {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<ParallelCoursesTest>().unwrap();
         let expected = ref_parallel_courses(t.n, &t.edges);
-        let actual = solutions::parallel_courses(t.n, &t.edges);
+        let actual = {
+            let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+            let graph = TrackedGraph::new(t.n, &t.edges, true, shared_log.clone());
+            let result = solutions::parallel_courses(&graph);
+            for op in shared_log.borrow().operations() {
+                log.record(op.clone());
+            }
+            result
+        };
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("n={}, edges={:?}", t.n, t.edges),
@@ -585,10 +633,18 @@ impl Problem for TopoSortAllAncestors {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<AllAncestorsTest>().unwrap();
         let expected = ref_all_ancestors(t.n, &t.edges);
-        let actual = solutions::all_ancestors(t.n, &t.edges);
+        let actual = {
+            let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+            let graph = TrackedGraph::new(t.n, &t.edges, true, shared_log.clone());
+            let result = solutions::all_ancestors(&graph);
+            for op in shared_log.borrow().operations() {
+                log.record(op.clone());
+            }
+            result
+        };
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("n={}, edges={:?}", t.n, t.edges),
@@ -686,10 +742,18 @@ impl Problem for TopoSortLongestPathDag {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<LongestPathDagTest>().unwrap();
         let expected = ref_longest_path_dag(t.n, &t.edges);
-        let actual = solutions::longest_path_dag(t.n, &t.edges);
+        let actual = {
+            let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+            let graph = TrackedWeightedGraph::new(t.n, &t.edges, true, shared_log.clone());
+            let result = solutions::longest_path_dag(&graph);
+            for op in shared_log.borrow().operations() {
+                log.record(op.clone());
+            }
+            result
+        };
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("n={}, edges={:?}", t.n, t.edges),
@@ -793,13 +857,13 @@ impl Problem for TopoSortSequenceReconstruction {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test
             .data
             .downcast_ref::<SequenceReconstructionTest>()
             .unwrap();
         let expected = ref_sequence_reconstruction(&t.org, &t.seqs);
-        let actual = solutions::sequence_reconstruction(&t.org, &t.seqs);
+        let actual = solutions::sequence_reconstruction(&t.org, &t.seqs, log);
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("org={:?}, seqs={:?}", t.org, t.seqs),
@@ -915,9 +979,9 @@ impl Problem for TopoSortBuildOrder {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<BuildOrderTest>().unwrap();
-        let actual = solutions::build_order(&t.projects, &t.deps);
+        let actual = solutions::build_order(&t.projects, &t.deps, log);
         let valid = ref_validate_build_order(&t.projects, &t.deps, &actual);
         SolutionResult {
             is_correct: valid,
@@ -1033,10 +1097,10 @@ impl Problem for TopoSortAlienDictionary {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<AlienDictionaryTest>().unwrap();
         let expected = ref_alien_dictionary(&t.words);
-        let actual = solutions::alien_dictionary(&t.words);
+        let actual = solutions::alien_dictionary(&t.words, log);
         // Validate the actual result respects the constraints
         let valid = if expected.is_empty() {
             actual.is_empty()
@@ -1200,11 +1264,19 @@ impl Problem for TopoSortMinimumHeightTrees {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<MinimumHeightTreesTest>().unwrap();
         let mut expected = ref_minimum_height_trees(t.n, &t.edges);
         expected.sort();
-        let mut actual = solutions::minimum_height_trees(t.n, &t.edges);
+        let mut actual = {
+            let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+            let graph = TrackedGraph::new(t.n, &t.edges, false, shared_log.clone());
+            let result = solutions::minimum_height_trees(&graph);
+            for op in shared_log.borrow().operations() {
+                log.record(op.clone());
+            }
+            result
+        };
         actual.sort();
         SolutionResult {
             is_correct: expected == actual,
@@ -1446,10 +1518,18 @@ impl Problem for TopoSortCriticalConnections {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<CriticalConnectionsTest>().unwrap();
         let expected = ref_critical_connections(t.n, &t.edges);
-        let mut actual = solutions::critical_connections(t.n, &t.edges);
+        let mut actual = {
+            let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+            let graph = TrackedGraph::new(t.n, &t.edges, false, shared_log.clone());
+            let result = solutions::critical_connections(&graph);
+            for op in shared_log.borrow().operations() {
+                log.record(op.clone());
+            }
+            result
+        };
         // Normalize: ensure u < v and sort
         for pair in actual.iter_mut() {
             if pair.0 > pair.1 {

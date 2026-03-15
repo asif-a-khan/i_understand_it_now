@@ -1,9 +1,9 @@
-use crate::tracker::Tracked;
+use crate::tracker::{OperationLog, Tracked};
 // Dynamic Programming — Solution Templates
 // Edit these functions to solve each problem. Run with: cargo run -- solve <problem_id>
 
 /// Climbing Stairs: return the number of distinct ways to climb n stairs (1 or 2 steps at a time).
-pub fn climbing_stairs(_n: i32) -> i32 {
+pub fn climbing_stairs(_n: i32, _log: &mut OperationLog) -> i32 {
     todo!()
 }
 
@@ -18,7 +18,7 @@ pub fn min_cost_stairs(_cost: &[Tracked<i32>]) -> i32 {
 }
 
 /// Fibonacci: return the nth Fibonacci number using DP. F(0)=0, F(1)=1.
-pub fn fibonacci(_n: i32) -> i64 {
+pub fn fibonacci(_n: i32, _log: &mut OperationLog) -> i64 {
     todo!()
 }
 
@@ -38,22 +38,22 @@ pub fn longest_increasing_subsequence(_nums: &[Tracked<i32>]) -> i32 {
 }
 
 /// Unique Paths: return the number of unique paths from top-left to bottom-right in an m x n grid.
-pub fn unique_paths(_m: usize, _n: usize) -> i32 {
+pub fn unique_paths(_m: usize, _n: usize, _log: &mut OperationLog) -> i32 {
     todo!()
 }
 
 /// Word Break: return true if `s` can be segmented into words from the dictionary.
-pub fn word_break(_s: &str, _word_dict: &[String]) -> bool {
+pub fn word_break(_s: &[Tracked<char>], _word_dict: &[String]) -> bool {
     todo!()
 }
 
 /// Longest Common Subsequence: return the length of the LCS of two strings.
-pub fn longest_common_subsequence(_text1: &str, _text2: &str) -> i32 {
+pub fn longest_common_subsequence(_text1: &[Tracked<char>], _text2: &[Tracked<char>]) -> i32 {
     todo!()
 }
 
 /// Edit Distance: return the minimum number of insert/delete/replace operations to convert word1 to word2.
-pub fn edit_distance(_word1: &str, _word2: &str) -> i32 {
+pub fn edit_distance(_word1: &[Tracked<char>], _word2: &[Tracked<char>]) -> i32 {
     todo!()
 }
 
@@ -63,12 +63,12 @@ pub fn burst_balloons(_nums: &[Tracked<i32>]) -> i32 {
 }
 
 /// Regular Expression Matching: return true if string `s` matches pattern `p` (with '.' and '*').
-pub fn regular_expression(_s: &str, _p: &str) -> bool {
+pub fn regular_expression(_s: &[Tracked<char>], _p: &[Tracked<char>]) -> bool {
     todo!()
 }
 
 /// Longest Valid Parentheses: return the length of the longest valid parentheses substring.
-pub fn longest_valid_parentheses(_s: &str) -> i32 {
+pub fn longest_valid_parentheses(_s: &[Tracked<char>]) -> i32 {
     todo!()
 }
 

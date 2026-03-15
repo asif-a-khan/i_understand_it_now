@@ -79,7 +79,7 @@ pub fn gas_station(_gas: &[Tracked<i32>], _cost: &[Tracked<i32>]) -> i32 {
 /// Same tasks must be separated by at least n intervals.
 ///
 /// Example: tasks=['A','A','A','B','B','B'], n=2 => 8
-pub fn task_scheduler(_tasks: &[char], _n: i32) -> i32 {
+pub fn task_scheduler(_tasks: &[Tracked<char>], _n: i32) -> i32 {
     todo!()
 }
 
@@ -87,7 +87,7 @@ pub fn task_scheduler(_tasks: &[char], _n: i32) -> i32 {
 /// Return sizes of the parts. Maximize number of parts.
 ///
 /// Example: s="ababcbacadefegdehijhklij" => [9,7,8]
-pub fn partition_labels(_s: &str) -> Vec<i32> {
+pub fn partition_labels(_s: &[Tracked<char>]) -> Vec<i32> {
     todo!()
 }
 

@@ -4,7 +4,7 @@ use std::rc::Rc;
 
 use crate::problems::{Difficulty, Problem, SolutionResult, TestCase};
 use crate::solutions::part4_graphs::shortest_path as solutions;
-use crate::tracker::{OperationLog, Tracked};
+use crate::tracker::{OperationLog, Tracked, TrackedGraph, TrackedWeightedGraph};
 
 pub fn problems() -> Vec<Box<dyn Problem>> {
     vec![
@@ -147,10 +147,18 @@ impl Problem for ShortestPathUnweighted {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<UnweightedTest>().unwrap();
         let expected = ref_bfs_shortest(t.n, &t.edges, t.src, t.dst);
-        let actual = solutions::shortest_path_unweighted(t.n, &t.edges, t.src, t.dst);
+        let actual = {
+            let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+            let graph = TrackedGraph::new(t.n, &t.edges, false, shared_log.clone());
+            let result = solutions::shortest_path_unweighted(&graph, t.src, t.dst);
+            for op in shared_log.borrow().operations() {
+                log.record(op.clone());
+            }
+            result
+        };
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!(
@@ -357,10 +365,10 @@ impl Problem for ShortestPathMinSteps {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<MinStepsTest>().unwrap();
         let expected = (t.target - t.start).abs();
-        let actual = solutions::min_steps(t.start, t.target);
+        let actual = solutions::min_steps(t.start, t.target, log);
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("start={}, target={}", t.start, t.target),
@@ -417,10 +425,18 @@ impl Problem for ShortestPathNetworkDelay {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<NetworkDelayTest>().unwrap();
         let expected = ref_network_delay(t.n, &t.edges, t.src);
-        let actual = solutions::network_delay(t.n, &t.edges, t.src);
+        let actual = {
+            let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+            let graph = TrackedWeightedGraph::new(t.n, &t.edges, true, shared_log.clone());
+            let result = solutions::network_delay(&graph, t.src);
+            for op in shared_log.borrow().operations() {
+                log.record(op.clone());
+            }
+            result
+        };
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("n={}, edges={:?}, src={}", t.n, t.edges, t.src),
@@ -518,10 +534,18 @@ impl Problem for ShortestPathCityFewestNeighbors {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<CityFewestNeighborsTest>().unwrap();
         let expected = ref_city_fewest_neighbors(t.n, &t.edges, t.threshold);
-        let actual = solutions::city_fewest_neighbors(t.n, &t.edges, t.threshold);
+        let actual = {
+            let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+            let graph = TrackedWeightedGraph::new(t.n, &t.edges, false, shared_log.clone());
+            let result = solutions::city_fewest_neighbors(&graph, t.threshold);
+            for op in shared_log.borrow().operations() {
+                log.record(op.clone());
+            }
+            result
+        };
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("n={}, edges={:?}, threshold={}", t.n, t.edges, t.threshold),
@@ -604,10 +628,18 @@ impl Problem for ShortestPathDijkstra {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<DijkstraTest>().unwrap();
         let expected = ref_dijkstra(t.n, &t.edges, t.src);
-        let actual = solutions::dijkstra(t.n, &t.edges, t.src);
+        let actual = {
+            let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+            let graph = TrackedWeightedGraph::new(t.n, &t.edges, true, shared_log.clone());
+            let result = solutions::dijkstra(&graph, t.src);
+            for op in shared_log.borrow().operations() {
+                log.record(op.clone());
+            }
+            result
+        };
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("n={}, edges={:?}, src={}", t.n, t.edges, t.src),
@@ -679,10 +711,18 @@ impl Problem for ShortestPathBellmanFord {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<BellmanFordTest>().unwrap();
         let expected = ref_bellman_ford(t.n, &t.edges, t.src);
-        let actual = solutions::bellman_ford(t.n, &t.edges, t.src);
+        let actual = {
+            let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+            let graph = TrackedWeightedGraph::new(t.n, &t.edges, true, shared_log.clone());
+            let result = solutions::bellman_ford(&graph, t.src);
+            for op in shared_log.borrow().operations() {
+                log.record(op.clone());
+            }
+            result
+        };
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("n={}, edges={:?}, src={}", t.n, t.edges, t.src),
@@ -771,10 +811,18 @@ impl Problem for ShortestPathCheapestFlights {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<CheapestFlightsTest>().unwrap();
         let expected = ref_cheapest_flights(t.n, &t.edges, t.src, t.dst, t.k);
-        let actual = solutions::cheapest_flights(t.n, &t.edges, t.src, t.dst, t.k);
+        let actual = {
+            let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+            let graph = TrackedWeightedGraph::new(t.n, &t.edges, true, shared_log.clone());
+            let result = solutions::cheapest_flights(&graph, t.src, t.dst, t.k);
+            for op in shared_log.borrow().operations() {
+                log.record(op.clone());
+            }
+            result
+        };
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!(
@@ -1124,10 +1172,18 @@ impl Problem for ShortestPathFloydWarshall {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<FloydWarshallTest>().unwrap();
         let expected = ref_floyd_warshall(t.n, &t.edges);
-        let actual = solutions::floyd_warshall(t.n, &t.edges);
+        let actual = {
+            let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+            let graph = TrackedWeightedGraph::new(t.n, &t.edges, true, shared_log.clone());
+            let result = solutions::floyd_warshall(&graph);
+            for op in shared_log.borrow().operations() {
+                log.record(op.clone());
+            }
+            result
+        };
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("n={}, edges={:?}", t.n, t.edges),
@@ -1221,10 +1277,18 @@ impl Problem for ShortestPathKShortest {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<KShortestTest>().unwrap();
         let expected = ref_k_shortest(t.n, &t.edges, t.src, t.dst, t.k);
-        let actual = solutions::k_shortest_paths(t.n, &t.edges, t.src, t.dst, t.k);
+        let actual = {
+            let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+            let graph = TrackedWeightedGraph::new(t.n, &t.edges, true, shared_log.clone());
+            let result = solutions::k_shortest_paths(&graph, t.src, t.dst, t.k);
+            for op in shared_log.borrow().operations() {
+                log.record(op.clone());
+            }
+            result
+        };
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!(
@@ -1432,10 +1496,18 @@ impl Problem for ShortestPathReconstruct {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<ReconstructTest>().unwrap();
         let ref_dist = ref_dijkstra(t.n, &t.edges, t.src);
-        let actual = solutions::reconstruct_shortest_path(t.n, &t.edges, t.src, t.dst);
+        let actual = {
+            let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+            let graph = TrackedWeightedGraph::new(t.n, &t.edges, true, shared_log.clone());
+            let result = solutions::reconstruct_shortest_path(&graph, t.src, t.dst);
+            for op in shared_log.borrow().operations() {
+                log.record(op.clone());
+            }
+            result
+        };
         let valid = ref_validate_path(t.n, &t.edges, t.src, t.dst, ref_dist[t.dst], &actual);
         SolutionResult {
             is_correct: valid,
@@ -1544,10 +1616,19 @@ impl Problem for ShortestPathAlternatingColors {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<AlternatingColorsTest>().unwrap();
         let expected = ref_alternating_colors(t.n, &t.red_edges, &t.blue_edges);
-        let actual = solutions::shortest_path_alternating_colors(t.n, &t.red_edges, &t.blue_edges);
+        let actual = {
+            let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+            let red_graph = TrackedGraph::new(t.n, &t.red_edges, true, shared_log.clone());
+            let blue_graph = TrackedGraph::new(t.n, &t.blue_edges, true, shared_log.clone());
+            let result = solutions::shortest_path_alternating_colors(&red_graph, &blue_graph);
+            for op in shared_log.borrow().operations() {
+                log.record(op.clone());
+            }
+            result
+        };
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!(

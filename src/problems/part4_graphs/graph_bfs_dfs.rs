@@ -5,7 +5,7 @@ use std::rc::Rc;
 
 use crate::problems::{Difficulty, Problem, SolutionResult, TestCase};
 use crate::solutions::part4_graphs::graph_bfs_dfs as solutions;
-use crate::tracker::{OperationLog, Tracked};
+use crate::tracker::{OperationLog, Tracked, TrackedGraph};
 
 pub fn problems() -> Vec<Box<dyn Problem>> {
     vec![
@@ -173,10 +173,18 @@ impl Problem for BfsOrder {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<BfsOrderTest>().unwrap();
         let expected = ref_bfs_order(t.n, &t.edges);
-        let actual = solutions::bfs_order(t.n, &t.edges);
+        let actual = {
+            let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+            let graph = TrackedGraph::new(t.n, &t.edges, false, shared_log.clone());
+            let result = solutions::bfs_order(&graph);
+            for op in shared_log.borrow().operations() {
+                log.record(op.clone());
+            }
+            result
+        };
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("n={}, edges={:?}", t.n, t.edges),
@@ -253,10 +261,18 @@ impl Problem for DfsOrder {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<DfsOrderTest>().unwrap();
         let expected = ref_dfs_order(t.n, &t.edges);
-        let actual = solutions::dfs_order(t.n, &t.edges);
+        let actual = {
+            let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+            let graph = TrackedGraph::new(t.n, &t.edges, false, shared_log.clone());
+            let result = solutions::dfs_order(&graph);
+            for op in shared_log.borrow().operations() {
+                log.record(op.clone());
+            }
+            result
+        };
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("n={}, edges={:?}", t.n, t.edges),
@@ -330,10 +346,18 @@ impl Problem for IsConnected {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<IsConnectedTest>().unwrap();
         let expected = ref_is_connected(t.n, &t.edges);
-        let actual = solutions::is_connected(t.n, &t.edges);
+        let actual = {
+            let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+            let graph = TrackedGraph::new(t.n, &t.edges, false, shared_log.clone());
+            let result = solutions::is_connected(&graph);
+            for op in shared_log.borrow().operations() {
+                log.record(op.clone());
+            }
+            result
+        };
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("n={}, edges={:?}", t.n, t.edges),
@@ -413,10 +437,18 @@ impl Problem for ShortestPathUnweighted {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<SPTest>().unwrap();
         let expected = ref_shortest_path_unweighted(t.n, &t.edges, t.src, t.dst);
-        let actual = solutions::shortest_path_unweighted(t.n, &t.edges, t.src, t.dst);
+        let actual = {
+            let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+            let graph = TrackedGraph::new(t.n, &t.edges, false, shared_log.clone());
+            let result = solutions::shortest_path_unweighted(&graph, t.src, t.dst);
+            for op in shared_log.borrow().operations() {
+                log.record(op.clone());
+            }
+            result
+        };
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!(
@@ -506,10 +538,18 @@ impl Problem for FindPath {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<FindPathTest>().unwrap();
         let adj = build_adj_undirected(t.n, &t.edges);
-        let actual = solutions::find_path(t.n, &t.edges, t.src, t.dst);
+        let actual = {
+            let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+            let graph = TrackedGraph::new(t.n, &t.edges, false, shared_log.clone());
+            let result = solutions::find_path(&graph, t.src, t.dst);
+            for op in shared_log.borrow().operations() {
+                log.record(op.clone());
+            }
+            result
+        };
 
         // Check if a path exists using BFS
         let path_exists = ref_shortest_path_unweighted(t.n, &t.edges, t.src, t.dst) >= 0;
@@ -593,14 +633,22 @@ impl Problem for CloneGraph {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<CloneGraphTest>().unwrap();
         let mut expected_edges: Vec<(usize, usize)> =
             t.edges.iter().map(|&(u, v)| (u.min(v), u.max(v))).collect();
         expected_edges.sort();
         expected_edges.dedup();
 
-        let (actual_n, actual_edges) = solutions::clone_graph(t.n, &t.edges);
+        let (actual_n, actual_edges) = {
+            let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+            let graph = TrackedGraph::new(t.n, &t.edges, false, shared_log.clone());
+            let result = solutions::clone_graph(&graph);
+            for op in shared_log.borrow().operations() {
+                log.record(op.clone());
+            }
+            result
+        };
         let mut actual_normalized: Vec<(usize, usize)> = actual_edges
             .iter()
             .map(|&(u, v)| (u.min(v), u.max(v)))
@@ -669,10 +717,18 @@ impl Problem for CourseSchedule {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<CourseScheduleTest>().unwrap();
         let expected = ref_can_finish(t.n, &t.prerequisites);
-        let actual = solutions::can_finish(t.n, &t.prerequisites);
+        let actual = {
+            let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+            let graph = TrackedGraph::new(t.n, &t.prerequisites, true, shared_log.clone());
+            let result = solutions::can_finish(&graph);
+            for op in shared_log.borrow().operations() {
+                log.record(op.clone());
+            }
+            result
+        };
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("n={}, prerequisites={:?}", t.n, t.prerequisites),
@@ -753,10 +809,18 @@ impl Problem for CourseScheduleII {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<CourseScheduleIITest>().unwrap();
         let can = ref_can_finish(t.n, &t.prerequisites);
-        let actual = solutions::course_order(t.n, &t.prerequisites);
+        let actual = {
+            let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+            let graph = TrackedGraph::new(t.n, &t.prerequisites, true, shared_log.clone());
+            let result = solutions::course_order(&graph);
+            for op in shared_log.borrow().operations() {
+                log.record(op.clone());
+            }
+            result
+        };
 
         if !can {
             let is_correct = actual.is_empty();
@@ -966,10 +1030,10 @@ impl Problem for WordLadder {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<WordLadderTest>().unwrap();
         let expected = ref_word_ladder(&t.begin, &t.end, &t.word_list);
-        let actual = solutions::word_ladder(&t.begin, &t.end, &t.word_list);
+        let actual = solutions::word_ladder(&t.begin, &t.end, &t.word_list, log);
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!(
@@ -1081,10 +1145,10 @@ impl Problem for WordLadderII {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<WordLadderIITest>().unwrap();
         let expected = ref_word_ladder_ii(&t.begin, &t.end, &t.word_list);
-        let actual = solutions::word_ladder_ii(&t.begin, &t.end, &t.word_list);
+        let actual = solutions::word_ladder_ii(&t.begin, &t.end, &t.word_list, log);
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!(
@@ -1237,10 +1301,27 @@ impl Problem for SurroundedRegions {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<SurroundedTest>().unwrap();
         let expected = ref_surrounded_regions(&t.board);
-        let actual = solutions::solve_surrounded(&t.board);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_board: Vec<Vec<crate::tracker::Tracked<char>>> = t
+            .board
+            .iter()
+            .enumerate()
+            .map(|(r, row)| {
+                row.iter()
+                    .enumerate()
+                    .map(|(c, &ch)| {
+                        crate::tracker::Tracked::new(ch, r * row.len() + c, shared_log.clone())
+                    })
+                    .collect()
+            })
+            .collect();
+        let actual = solutions::solve_surrounded(&tracked_board);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("board={:?}", t.board),
@@ -1509,10 +1590,24 @@ impl Problem for AllPaths {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<AllPathsTest>().unwrap();
         let expected = ref_all_paths(&t.graph);
-        let actual = solutions::all_paths(&t.graph);
+        let actual = {
+            let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+            let edges: Vec<(usize, usize)> = t
+                .graph
+                .iter()
+                .enumerate()
+                .flat_map(|(u, nbs)| nbs.iter().map(move |&v| (u, v)))
+                .collect();
+            let graph = TrackedGraph::new(t.graph.len(), &edges, true, shared_log.clone());
+            let result = solutions::all_paths(&graph);
+            for op in shared_log.borrow().operations() {
+                log.record(op.clone());
+            }
+            result
+        };
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("graph={:?}", t.graph),

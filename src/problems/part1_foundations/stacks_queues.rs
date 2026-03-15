@@ -6,7 +6,7 @@ use std::rc::Rc;
 
 use crate::problems::{Difficulty, Problem, SolutionResult, TestCase};
 use crate::solutions::part1_foundations::stacks_queues as solutions;
-use crate::tracker::{track_slice, OperationLog};
+use crate::tracker::{track_slice, track_string, OperationLog};
 
 pub fn problems() -> Vec<Box<dyn Problem>> {
     vec![
@@ -79,10 +79,15 @@ impl Problem for ValidParentheses {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<ValidParenthesesTest>().unwrap();
         let expected = ref_valid_parentheses(&t.s);
-        let actual = solutions::valid_parentheses(&t.s);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_string(&t.s, shared_log.clone());
+        let actual = solutions::valid_parentheses(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("s={:?}", t.s),
@@ -187,10 +192,10 @@ impl Problem for MinStack {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<MinStackTest>().unwrap();
         let expected = ref_min_stack(&t.operations);
-        let actual = solutions::min_stack(&t.operations);
+        let actual = solutions::min_stack(&t.operations, log);
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("ops={:?}", t.operations),
@@ -307,10 +312,10 @@ impl Problem for QueueUsingStacks {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<QueueUsingStacksTest>().unwrap();
         let expected = ref_queue_using_stacks(&t.operations);
-        let actual = solutions::queue_using_stacks(&t.operations);
+        let actual = solutions::queue_using_stacks(&t.operations, log);
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("ops={:?}", t.operations),
@@ -439,10 +444,10 @@ impl Problem for BaseballGame {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<BaseballGameTest>().unwrap();
         let expected = ref_baseball_game(&t.ops);
-        let actual = solutions::baseball_game(&t.ops);
+        let actual = solutions::baseball_game(&t.ops, log);
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("ops={:?}", t.ops),
@@ -682,10 +687,10 @@ impl Problem for EvalRPN {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<EvalRPNTest>().unwrap();
         let expected = ref_eval_rpn(&t.tokens);
-        let actual = solutions::eval_rpn(&t.tokens);
+        let actual = solutions::eval_rpn(&t.tokens, log);
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("tokens={:?}", t.tokens),
@@ -783,10 +788,15 @@ impl Problem for DecodeString {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<DecodeStringTest>().unwrap();
         let expected = ref_decode_string(&t.s);
-        let actual = solutions::decode_string(&t.s);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_string(&t.s, shared_log.clone());
+        let actual = solutions::decode_string(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("s={:?}", t.s),
@@ -1350,10 +1360,15 @@ impl Problem for BasicCalculator {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<BasicCalculatorTest>().unwrap();
         let expected = ref_basic_calculator(&t.s);
-        let actual = solutions::basic_calculator(&t.s);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_string(&t.s, shared_log.clone());
+        let actual = solutions::basic_calculator(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("s={:?}", t.s),
@@ -1494,10 +1509,10 @@ impl Problem for MaxFrequencyStack {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<MaxFrequencyStackTest>().unwrap();
         let expected = ref_max_frequency_stack(&t.operations);
-        let actual = solutions::max_frequency_stack(&t.operations);
+        let actual = solutions::max_frequency_stack(&t.operations, log);
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("ops={:?}", t.operations),

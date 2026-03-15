@@ -5,7 +5,7 @@ use rand::Rng;
 
 use crate::problems::{Difficulty, Problem, SolutionResult, TestCase};
 use crate::solutions::part5_paradigms::dynamic_programming as solutions;
-use crate::tracker::{track_slice, OperationLog};
+use crate::tracker::{track_slice, track_string, OperationLog};
 
 pub fn problems() -> Vec<Box<dyn Problem>> {
     vec![
@@ -68,10 +68,10 @@ impl Problem for ClimbingStairs {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<ClimbingStairsTest>().unwrap();
         let expected = ref_climbing_stairs(t.n);
-        let actual = solutions::climbing_stairs(t.n);
+        let actual = solutions::climbing_stairs(t.n, log);
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("n={}", t.n),
@@ -284,10 +284,10 @@ impl Problem for Fibonacci {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<FibonacciTest>().unwrap();
         let expected = ref_fibonacci(t.n);
-        let actual = solutions::fibonacci(t.n);
+        let actual = solutions::fibonacci(t.n, log);
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("n={}", t.n),
@@ -578,10 +578,10 @@ impl Problem for UniquePaths {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<UniquePathsTest>().unwrap();
         let expected = ref_unique_paths(t.m, t.n);
-        let actual = solutions::unique_paths(t.m, t.n);
+        let actual = solutions::unique_paths(t.m, t.n, log);
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("m={}, n={}", t.m, t.n),
@@ -671,10 +671,15 @@ impl Problem for WordBreak {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<WordBreakTest>().unwrap();
         let expected = ref_word_break(&t.s, &t.word_dict);
-        let actual = solutions::word_break(&t.s, &t.word_dict);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_string(&t.s, shared_log.clone());
+        let actual = solutions::word_break(&tracked, &t.word_dict);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("s=\"{}\", word_dict={:?}", t.s, t.word_dict),
@@ -749,10 +754,16 @@ impl Problem for LongestCommonSubsequence {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<LCSTest>().unwrap();
         let expected = ref_lcs(&t.text1, &t.text2);
-        let actual = solutions::longest_common_subsequence(&t.text1, &t.text2);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked1 = track_string(&t.text1, shared_log.clone());
+        let tracked2 = track_string(&t.text2, shared_log.clone());
+        let actual = solutions::longest_common_subsequence(&tracked1, &tracked2);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("text1=\"{}\", text2=\"{}\"", t.text1, t.text2),
@@ -827,10 +838,16 @@ impl Problem for EditDistance {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<EditDistanceTest>().unwrap();
         let expected = ref_edit_distance(&t.word1, &t.word2);
-        let actual = solutions::edit_distance(&t.word1, &t.word2);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked1 = track_string(&t.word1, shared_log.clone());
+        let tracked2 = track_string(&t.word2, shared_log.clone());
+        let actual = solutions::edit_distance(&tracked1, &tracked2);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("word1=\"{}\", word2=\"{}\"", t.word1, t.word2),
@@ -1014,10 +1031,16 @@ impl Problem for RegularExpression {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<RegexTest>().unwrap();
         let expected = ref_regex_match(&t.s, &t.p);
-        let actual = solutions::regular_expression(&t.s, &t.p);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_s = track_string(&t.s, shared_log.clone());
+        let tracked_p = track_string(&t.p, shared_log.clone());
+        let actual = solutions::regular_expression(&tracked_s, &tracked_p);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("s=\"{}\", p=\"{}\"", t.s, t.p),
@@ -1103,10 +1126,15 @@ impl Problem for LongestValidParentheses {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<LVPTest>().unwrap();
         let expected = ref_longest_valid_parens(&t.s);
-        let actual = solutions::longest_valid_parentheses(&t.s);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_string(&t.s, shared_log.clone());
+        let actual = solutions::longest_valid_parentheses(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("s=\"{}\"", t.s),

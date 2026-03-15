@@ -6,7 +6,7 @@ use rand::Rng;
 
 use crate::problems::{Difficulty, Problem, SolutionResult, TestCase};
 use crate::solutions::part2_sorting::basic_sorts as solutions;
-use crate::tracker::{track_slice, OperationLog, Tracked};
+use crate::tracker::{track_slice, track_string, OperationLog, Tracked};
 
 pub fn problems() -> Vec<Box<dyn Problem>> {
     vec![
@@ -957,10 +957,16 @@ impl Problem for CustomSortString {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<TwoStringTest>().unwrap();
         let expected = ref_custom_sort_string(&t.order, &t.s);
-        let actual = solutions::custom_sort_string(&t.order, &t.s);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked_order = track_string(&t.order, shared_log.clone());
+        let tracked_s = track_string(&t.s, shared_log.clone());
+        let actual = solutions::custom_sort_string(&tracked_order, &tracked_s);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
 
         // Validate: same character multiset and respects order
         let valid = same_char_multiset(&expected, &actual) && respects_order(&t.order, &actual);

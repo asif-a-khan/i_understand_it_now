@@ -6,7 +6,7 @@ use std::rc::Rc;
 
 use crate::problems::{Difficulty, Problem, SolutionResult, TestCase};
 use crate::solutions::part2_sorting::counting_radix as solutions;
-use crate::tracker::{track_slice, OperationLog};
+use crate::tracker::{track_slice, track_string, OperationLog};
 
 pub fn problems() -> Vec<Box<dyn Problem>> {
     vec![
@@ -357,10 +357,15 @@ impl Problem for SortByFrequency {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<SortByFrequencyTest>().unwrap();
         let expected = ref_sort_by_frequency(&t.s);
-        let actual = solutions::sort_by_frequency(&t.s);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_string(&t.s, shared_log.clone());
+        let actual = solutions::sort_by_frequency(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("s=\"{}\"", t.s),
@@ -642,10 +647,10 @@ impl Problem for TopKFrequentWords {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<TopKFrequentWordsTest>().unwrap();
         let expected = ref_top_k_frequent_words(&t.words, t.k);
-        let actual = solutions::top_k_frequent_words(&t.words, t.k);
+        let actual = solutions::top_k_frequent_words(&t.words, t.k, log);
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("words={:?}, k={}", t.words, t.k),
@@ -713,10 +718,15 @@ impl Problem for ReorganizeString {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<ReorganizeStringTest>().unwrap();
         let is_possible = ref_is_reorganize_possible(&t.s);
-        let actual = solutions::reorganize_string(&t.s);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_string(&t.s, shared_log.clone());
+        let actual = solutions::reorganize_string(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
 
         if !is_possible {
             let is_correct = actual.is_empty();
@@ -1058,13 +1068,18 @@ impl Problem for RadixSortSuffixArray {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test
             .data
             .downcast_ref::<RadixSortSuffixArrayTest>()
             .unwrap();
         let expected = ref_suffix_array(&t.s);
-        let actual = solutions::suffix_array(&t.s);
+        let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+        let tracked = track_string(&t.s, shared_log.clone());
+        let actual = solutions::suffix_array(&tracked);
+        for op in shared_log.borrow().operations() {
+            log.record(op.clone());
+        }
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("s=\"{}\"", t.s),

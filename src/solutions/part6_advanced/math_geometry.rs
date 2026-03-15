@@ -1,39 +1,39 @@
-use crate::tracker::Tracked;
+use crate::tracker::{OperationLog, Tracked};
 // Math & Geometry — Solution Templates
 // Edit these functions to solve each problem. Run with: cargo run -- solve <problem_id>
 
 /// GCD of two numbers using Euclidean algorithm.
-pub fn gcd(_a: i64, _b: i64) -> i64 {
+pub fn gcd(_a: i64, _b: i64, _log: &mut OperationLog) -> i64 {
     todo!()
 }
 
 /// Primality test.
-pub fn is_prime(_n: i64) -> bool {
+pub fn is_prime(_n: i64, _log: &mut OperationLog) -> bool {
     todo!()
 }
 
 /// Count primes strictly less than n.
-pub fn count_primes(_n: i32) -> i32 {
+pub fn count_primes(_n: i32, _log: &mut OperationLog) -> i32 {
     todo!()
 }
 
 /// (base^exp) mod m using fast exponentiation.
-pub fn power_mod(_base: i64, _exp: i64, _m: i64) -> i64 {
+pub fn power_mod(_base: i64, _exp: i64, _m: i64, _log: &mut OperationLog) -> i64 {
     todo!()
 }
 
 /// Reverse digits of integer. Return 0 on overflow.
-pub fn reverse_integer(_x: i32) -> i32 {
+pub fn reverse_integer(_x: i32, _log: &mut OperationLog) -> i32 {
     todo!()
 }
 
 /// List all primes up to and including n.
-pub fn sieve_of_eratosthenes(_n: i32) -> Vec<i32> {
+pub fn sieve_of_eratosthenes(_n: i32, _log: &mut OperationLog) -> Vec<i32> {
     todo!()
 }
 
 /// Multiply two large numbers represented as strings.
-pub fn multiply_strings(_num1: &str, _num2: &str) -> String {
+pub fn multiply_strings(_num1: &[Tracked<char>], _num2: &[Tracked<char>]) -> String {
     todo!()
 }
 
@@ -43,7 +43,7 @@ pub fn max_points_on_line(_points: &[(Tracked<i32>, Tracked<i32>)]) -> i32 {
 }
 
 /// Nth ugly number (factors only 2, 3, 5). 1-indexed.
-pub fn ugly_number(_n: i32) -> i32 {
+pub fn ugly_number(_n: i32, _log: &mut OperationLog) -> i32 {
     todo!()
 }
 
@@ -58,7 +58,7 @@ pub fn convex_hull(_points: &[(Tracked<i64>, Tracked<i64>)]) -> Vec<(i64, i64)> 
 }
 
 /// Modular multiplicative inverse: x where (a * x) % m == 1. Return -1 if none.
-pub fn modular_inverse(_a: i64, _m: i64) -> i64 {
+pub fn modular_inverse(_a: i64, _m: i64, _log: &mut OperationLog) -> i64 {
     todo!()
 }
 

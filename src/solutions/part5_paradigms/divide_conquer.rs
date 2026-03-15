@@ -1,4 +1,4 @@
-use crate::tracker::Tracked;
+use crate::tracker::{OperationLog, Tracked};
 // Divide and Conquer — Solution Templates
 // Edit these functions to solve each problem. Run with: cargo run -- solve <problem_id>
 
@@ -8,7 +8,7 @@ pub fn max_subarray(_nums: &[Tracked<i32>]) -> i32 {
 }
 
 /// Fast Power: compute x^n using divide and conquer. Handle negative exponents.
-pub fn power(_x: f64, _n: i32) -> f64 {
+pub fn power(_x: f64, _n: i32, _log: &mut OperationLog) -> f64 {
     todo!()
 }
 
@@ -48,7 +48,7 @@ pub fn majority_element(_nums: &[Tracked<i32>]) -> i32 {
 }
 
 /// Different Ways to Add Parentheses: return all possible results from different groupings, sorted.
-pub fn different_ways(_expression: &str) -> Vec<i32> {
+pub fn different_ways(_expression: &[Tracked<char>]) -> Vec<i32> {
     todo!()
 }
 

@@ -1182,10 +1182,10 @@ impl Problem for LruCache {
         tests
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<LruCacheTest>().unwrap();
         let expected = ref_lru_cache(t.capacity, &t.ops);
-        let actual = solutions::lru_cache(t.capacity, &t.ops);
+        let actual = solutions::lru_cache(t.capacity, &t.ops, log);
         SolutionResult {
             is_correct: expected == actual,
             input_description: format!("capacity={}, ops={:?}", t.capacity, t.ops),

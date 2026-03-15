@@ -1,4 +1,4 @@
-use crate::tracker::Tracked;
+use crate::tracker::{OperationLog, Tracked};
 // Binary Search — Solution Templates
 // Edit these functions to solve each problem. Run with: cargo run -- solve <problem_id>
 
@@ -32,7 +32,7 @@ pub fn search_first_last(_nums: &[Tracked<i32>], _target: i32) -> (i32, i32) {
 ///
 /// Example: x=8 => 2 (since 2*2=4 <= 8, 3*3=9 > 8)
 /// Example: x=16 => 4
-pub fn integer_sqrt(_x: u64) -> u64 {
+pub fn integer_sqrt(_x: u64, _log: &mut OperationLog) -> u64 {
     todo!()
 }
 
@@ -41,7 +41,7 @@ pub fn integer_sqrt(_x: u64) -> u64 {
 /// Use the helper: `guess(your_guess, pick)` returns -1 (too high), 1 (too low), 0 (correct).
 ///
 /// Example: n=10, pick=6 => 6
-pub fn guess_number(n: i32, pick: i32) -> i32 {
+pub fn guess_number(n: i32, pick: i32, _log: &mut OperationLog) -> i32 {
     // Helper function: simulates the guess API.
     // Returns: -1 if pick < num (guess too high), 1 if pick > num (guess too low), 0 if correct.
     fn guess(num: i32, pick: i32) -> i32 {

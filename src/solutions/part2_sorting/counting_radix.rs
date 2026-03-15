@@ -1,4 +1,4 @@
-use crate::tracker::Tracked;
+use crate::tracker::{OperationLog, Tracked};
 // Counting Sort & Radix Sort — Solution Templates
 // Edit these functions to solve each problem. Run with: cargo run -- solve <problem_id>
 
@@ -34,7 +34,7 @@ pub fn height_checker(_heights: &[Tracked<i32>]) -> i32 {
 /// Sort Characters By Frequency: Sort characters by frequency (descending).
 ///
 /// Ties between characters broken by character value (ascending).
-pub fn sort_by_frequency(_s: &str) -> String {
+pub fn sort_by_frequency(_s: &[Tracked<char>]) -> String {
     todo!()
 }
 
@@ -64,14 +64,14 @@ pub fn bucket_sort(_nums: &[Tracked<f64>]) -> Vec<f64> {
 /// Top K Frequent Words: Return k most frequent words.
 ///
 /// Sorted by frequency (descending), then lexicographically (ascending).
-pub fn top_k_frequent_words(_words: &[String], _k: usize) -> Vec<String> {
+pub fn top_k_frequent_words(_words: &[String], _k: usize, _log: &mut OperationLog) -> Vec<String> {
     todo!()
 }
 
 /// Reorganize String: Rearrange so no two adjacent characters are the same.
 ///
 /// Return empty string if impossible.
-pub fn reorganize_string(_s: &str) -> String {
+pub fn reorganize_string(_s: &[Tracked<char>]) -> String {
     todo!()
 }
 
@@ -107,7 +107,7 @@ pub fn create_maximum_number(
 ///
 /// Return Vec<usize> where result[i] is the start index of the i-th
 /// lexicographically smallest suffix.
-pub fn suffix_array(_s: &str) -> Vec<usize> {
+pub fn suffix_array(_s: &[Tracked<char>]) -> Vec<usize> {
     todo!()
 }
 

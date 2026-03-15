@@ -6,7 +6,7 @@ use std::rc::Rc;
 
 use crate::problems::{Difficulty, Problem, SolutionResult, TestCase};
 use crate::solutions::part4_graphs::mst as solutions;
-use crate::tracker::{OperationLog, Tracked};
+use crate::tracker::{OperationLog, Tracked, TrackedGraph, TrackedWeightedGraph};
 
 pub fn problems() -> Vec<Box<dyn Problem>> {
     vec![
@@ -308,10 +308,18 @@ impl Problem for MstIsTree {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<MstIsTreeTest>().unwrap();
         let expected = ref_is_tree(t.n, &t.edges);
-        let actual = solutions::is_tree(t.n, &t.edges);
+        let actual = {
+            let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+            let graph = TrackedGraph::new(t.n, &t.edges, false, shared_log.clone());
+            let result = solutions::is_tree(&graph);
+            for op in shared_log.borrow().operations() {
+                log.record(op.clone());
+            }
+            result
+        };
         SolutionResult {
             is_correct: actual == expected,
             input_description: format!("n={}, edges={:?}", t.n, t.edges),
@@ -378,13 +386,21 @@ impl Problem for MstConnectedComponents {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test
             .data
             .downcast_ref::<MstConnectedComponentsTest>()
             .unwrap();
         let expected = ref_connected_components(t.n, &t.edges);
-        let actual = solutions::connected_components(t.n, &t.edges);
+        let actual = {
+            let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+            let graph = TrackedGraph::new(t.n, &t.edges, false, shared_log.clone());
+            let result = solutions::connected_components(&graph);
+            for op in shared_log.borrow().operations() {
+                log.record(op.clone());
+            }
+            result
+        };
         SolutionResult {
             is_correct: actual == expected,
             input_description: format!("n={}, edges={:?}", t.n, t.edges),
@@ -454,13 +470,21 @@ impl Problem for MstMinSpanningWeight {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test
             .data
             .downcast_ref::<MstMinSpanningWeightTest>()
             .unwrap();
         let expected = ref_kruskal(t.n, &t.edges).0;
-        let actual = solutions::min_spanning_weight(t.n, &t.edges);
+        let actual = {
+            let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+            let graph = TrackedWeightedGraph::new(t.n, &t.edges, false, shared_log.clone());
+            let result = solutions::min_spanning_weight(&graph);
+            for op in shared_log.borrow().operations() {
+                log.record(op.clone());
+            }
+            result
+        };
         SolutionResult {
             is_correct: actual == expected,
             input_description: format!("n={}, edges={:?}", t.n, t.edges),
@@ -516,10 +540,18 @@ impl Problem for MstMaxEdgeInMst {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<MstMaxEdgeInMstTest>().unwrap();
         let expected = ref_max_edge_in_mst(t.n, &t.edges);
-        let actual = solutions::max_edge_in_mst(t.n, &t.edges);
+        let actual = {
+            let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+            let graph = TrackedWeightedGraph::new(t.n, &t.edges, false, shared_log.clone());
+            let result = solutions::max_edge_in_mst(&graph);
+            for op in shared_log.borrow().operations() {
+                log.record(op.clone());
+            }
+            result
+        };
         SolutionResult {
             is_correct: actual == expected,
             input_description: format!("n={}, edges={:?}", t.n, t.edges),
@@ -581,10 +613,18 @@ impl Problem for MstKruskal {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<MstKruskalTest>().unwrap();
         let expected = ref_kruskal_edges(t.n, &t.edges);
-        let actual = solutions::kruskal(t.n, &t.edges);
+        let actual = {
+            let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+            let graph = TrackedWeightedGraph::new(t.n, &t.edges, false, shared_log.clone());
+            let result = solutions::kruskal(&graph);
+            for op in shared_log.borrow().operations() {
+                log.record(op.clone());
+            }
+            result
+        };
         SolutionResult {
             is_correct: actual == expected,
             input_description: format!("n={}, edges={:?}", t.n, t.edges),
@@ -650,10 +690,18 @@ impl Problem for MstPrim {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<MstPrimTest>().unwrap();
         let expected = ref_prim(t.n, &t.edges);
-        let actual = solutions::prim(t.n, &t.edges);
+        let actual = {
+            let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+            let graph = TrackedWeightedGraph::new(t.n, &t.edges, false, shared_log.clone());
+            let result = solutions::prim(&graph);
+            for op in shared_log.borrow().operations() {
+                log.record(op.clone());
+            }
+            result
+        };
         SolutionResult {
             is_correct: actual == expected,
             input_description: format!("n={}, edges={:?}", t.n, t.edges),
@@ -719,13 +767,13 @@ impl Problem for MstMinCostRepairRoads {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test
             .data
             .downcast_ref::<MstMinCostRepairRoadsTest>()
             .unwrap();
         let expected = ref_min_cost_repair(t.n, &t.existing, &t.available);
-        let actual = solutions::min_cost_repair_roads(t.n, &t.existing, &t.available);
+        let actual = solutions::min_cost_repair_roads(t.n, &t.existing, &t.available, log);
         SolutionResult {
             is_correct: actual == expected,
             input_description: format!(
@@ -813,10 +861,18 @@ impl Problem for MstSecondMst {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<MstSecondMstTest>().unwrap();
         let expected = ref_second_mst(t.n, &t.edges);
-        let actual = solutions::second_mst(t.n, &t.edges);
+        let actual = {
+            let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+            let graph = TrackedWeightedGraph::new(t.n, &t.edges, false, shared_log.clone());
+            let result = solutions::second_mst(&graph);
+            for op in shared_log.borrow().operations() {
+                log.record(op.clone());
+            }
+            result
+        };
         SolutionResult {
             is_correct: actual == expected,
             input_description: format!("n={}, edges={:?}", t.n, t.edges),
@@ -916,10 +972,18 @@ impl Problem for MstCriticalEdges {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<MstCriticalEdgesTest>().unwrap();
         let expected = ref_critical_edges(t.n, &t.edges);
-        let actual = solutions::critical_edges(t.n, &t.edges);
+        let actual = {
+            let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+            let graph = TrackedWeightedGraph::new(t.n, &t.edges, false, shared_log.clone());
+            let result = solutions::critical_edges(&graph);
+            for op in shared_log.borrow().operations() {
+                log.record(op.clone());
+            }
+            result
+        };
         SolutionResult {
             is_correct: actual == expected,
             input_description: format!("n={}, edges={:?}", t.n, t.edges),
@@ -1008,10 +1072,18 @@ impl Problem for MstMaxSpanningTree {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<MstMaxSpanningTreeTest>().unwrap();
         let expected = ref_max_spanning_tree(t.n, &t.edges);
-        let actual = solutions::max_spanning_tree(t.n, &t.edges);
+        let actual = {
+            let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+            let graph = TrackedWeightedGraph::new(t.n, &t.edges, false, shared_log.clone());
+            let result = solutions::max_spanning_tree(&graph);
+            for op in shared_log.borrow().operations() {
+                log.record(op.clone());
+            }
+            result
+        };
         SolutionResult {
             is_correct: actual == expected,
             input_description: format!("n={}, edges={:?}", t.n, t.edges),
@@ -1090,13 +1162,21 @@ impl Problem for MstMinBottleneckPath {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test
             .data
             .downcast_ref::<MstMinBottleneckPathTest>()
             .unwrap();
         let expected = ref_min_bottleneck_path(t.n, &t.edges, t.src, t.dst);
-        let actual = solutions::min_bottleneck_path(t.n, &t.edges, t.src, t.dst);
+        let actual = {
+            let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+            let graph = TrackedWeightedGraph::new(t.n, &t.edges, false, shared_log.clone());
+            let result = solutions::min_bottleneck_path(&graph, t.src, t.dst);
+            for op in shared_log.borrow().operations() {
+                log.record(op.clone());
+            }
+            result
+        };
         SolutionResult {
             is_correct: actual == expected,
             input_description: format!(
@@ -1192,10 +1272,18 @@ impl Problem for MstOptimizeNetwork {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<MstOptimizeNetworkTest>().unwrap();
         let expected = ref_kruskal(t.n, &t.edges).0;
-        let actual = solutions::optimize_network(t.n, &t.edges);
+        let actual = {
+            let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+            let graph = TrackedWeightedGraph::new(t.n, &t.edges, false, shared_log.clone());
+            let result = solutions::optimize_network(&graph);
+            for op in shared_log.borrow().operations() {
+                log.record(op.clone());
+            }
+            result
+        };
         SolutionResult {
             is_correct: actual == expected,
             input_description: format!("n={}, edges={:?}", t.n, t.edges),
@@ -1270,10 +1358,18 @@ impl Problem for MstSteinerTree {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test.data.downcast_ref::<MstSteinerTreeTest>().unwrap();
         let expected = ref_steiner_tree(t.n, &t.edges, &t.terminals);
-        let actual = solutions::steiner_tree(t.n, &t.edges, &t.terminals);
+        let actual = {
+            let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+            let graph = TrackedWeightedGraph::new(t.n, &t.edges, false, shared_log.clone());
+            let result = solutions::steiner_tree(&graph, &t.terminals);
+            for op in shared_log.borrow().operations() {
+                log.record(op.clone());
+            }
+            result
+        };
         SolutionResult {
             is_correct: actual == expected,
             input_description: format!(
@@ -1376,13 +1472,21 @@ impl Problem for MstMinDegreeSpanningTree {
             .collect()
     }
 
-    fn run_solution(&self, test: &TestCase, _log: &mut OperationLog) -> SolutionResult {
+    fn run_solution(&self, test: &TestCase, log: &mut OperationLog) -> SolutionResult {
         let t = test
             .data
             .downcast_ref::<MstMinDegreeSpanningTreeTest>()
             .unwrap();
         let expected = ref_min_degree_spanning_tree(t.n, &t.edges);
-        let actual = solutions::min_degree_spanning_tree(t.n, &t.edges);
+        let actual = {
+            let shared_log = Rc::new(RefCell::new(OperationLog::new()));
+            let graph = TrackedWeightedGraph::new(t.n, &t.edges, false, shared_log.clone());
+            let result = solutions::min_degree_spanning_tree(&graph);
+            for op in shared_log.borrow().operations() {
+                log.record(op.clone());
+            }
+            result
+        };
         SolutionResult {
             is_correct: actual == expected,
             input_description: format!("n={}, edges={:?}", t.n, t.edges),
